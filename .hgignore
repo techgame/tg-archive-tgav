@@ -1,0 +1,19 @@
+syntax: glob
+audioFormats
+glEngine
+geoMath
+
+syntax: glob
+Icon?
+\.DS_Store
+*.pyc
+*.pyo
+*~
+.*.swp
+\.svn/
+demo
+doc
+sandbox
+
+syntax: regexp
+^gen/.*/build/.*
