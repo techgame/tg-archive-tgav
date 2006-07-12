@@ -1159,1749 +1159,5568 @@ GL_STENCIL_BACK_WRITEMASK = 0x8CA5
 #~ line: 2389, skipped: 598 ~~~~~~
 
 @bind(None, [GLenum, GLfloat])
-def glAccum(op, value): pass
-
+def glAccum(op, value, _api_=None): 
+    """glAccum(op, value)
+    
+        op : GLenum
+        value : GLfloat
+    """
+    return _api_(op, value)
+    
 @bind(None, [GLenum, GLclampf])
-def glAlphaFunc(func, ref): pass
-
+def glAlphaFunc(func, ref, _api_=None): 
+    """glAlphaFunc(func, ref)
+    
+        func : GLenum
+        ref : GLclampf
+    """
+    return _api_(func, ref)
+    
 @bind(GLboolean, [GLsizei, POINTER(GLuint), POINTER(GLboolean)])
-def glAreTexturesResident(n, textures, residences): pass
-
+def glAreTexturesResident(n, textures, residences, _api_=None): 
+    """glAreTexturesResident(n, textures, residences)
+    
+        n : GLsizei
+        textures : POINTER(GLuint)
+        residences : POINTER(GLboolean)
+    """
+    return _api_(n, textures, residences)
+    
 @bind(None, [GLint])
-def glArrayElement(i): pass
-
+def glArrayElement(i, _api_=None): 
+    """glArrayElement(i)
+    
+        i : GLint
+    """
+    return _api_(i)
+    
 @bind(None, [GLenum])
-def glBegin(mode): pass
-
+def glBegin(mode, _api_=None): 
+    """glBegin(mode)
+    
+        mode : GLenum
+    """
+    return _api_(mode)
+    
 @bind(None, [GLenum, GLuint])
-def glBindTexture(target, texture): pass
-
+def glBindTexture(target, texture, _api_=None): 
+    """glBindTexture(target, texture)
+    
+        target : GLenum
+        texture : GLuint
+    """
+    return _api_(target, texture)
+    
 @bind(None, [GLsizei, GLsizei, GLfloat, GLfloat, GLfloat, GLfloat, POINTER(GLubyte)])
-def glBitmap(width, height, xorig, yorig, xmove, ymove, bitmap): pass
-
+def glBitmap(width, height, xorig, yorig, xmove, ymove, bitmap, _api_=None): 
+    """glBitmap(width, height, xorig, yorig, xmove, ymove, bitmap)
+    
+        width : GLsizei
+        height : GLsizei
+        xorig : GLfloat
+        yorig : GLfloat
+        xmove : GLfloat
+        ymove : GLfloat
+        bitmap : POINTER(GLubyte)
+    """
+    return _api_(width, height, xorig, yorig, xmove, ymove, bitmap)
+    
 @bind(None, [GLclampf, GLclampf, GLclampf, GLclampf])
-def glBlendColor(red, green, blue, alpha): pass
-
+def glBlendColor(red, green, blue, alpha, _api_=None): 
+    """glBlendColor(red, green, blue, alpha)
+    
+        red : GLclampf
+        green : GLclampf
+        blue : GLclampf
+        alpha : GLclampf
+    """
+    return _api_(red, green, blue, alpha)
+    
 @bind(None, [GLenum])
-def glBlendEquation(mode): pass
-
+def glBlendEquation(mode, _api_=None): 
+    """glBlendEquation(mode)
+    
+        mode : GLenum
+    """
+    return _api_(mode)
+    
 @bind(None, [GLenum, GLenum])
-def glBlendFunc(sfactor, dfactor): pass
-
+def glBlendFunc(sfactor, dfactor, _api_=None): 
+    """glBlendFunc(sfactor, dfactor)
+    
+        sfactor : GLenum
+        dfactor : GLenum
+    """
+    return _api_(sfactor, dfactor)
+    
 @bind(None, [GLuint])
-def glCallList(list): pass
-
+def glCallList(list, _api_=None): 
+    """glCallList(list)
+    
+        list : GLuint
+    """
+    return _api_(list)
+    
 @bind(None, [GLsizei, GLenum, POINTER(GLvoid)])
-def glCallLists(n, type, lists): pass
-
+def glCallLists(n, type, lists, _api_=None): 
+    """glCallLists(n, type, lists)
+    
+        n : GLsizei
+        type : GLenum
+        lists : POINTER(GLvoid)
+    """
+    return _api_(n, type, lists)
+    
 @bind(None, [GLbitfield])
-def glClear(mask): pass
-
+def glClear(mask, _api_=None): 
+    """glClear(mask)
+    
+        mask : GLbitfield
+    """
+    return _api_(mask)
+    
 @bind(None, [GLfloat, GLfloat, GLfloat, GLfloat])
-def glClearAccum(red, green, blue, alpha): pass
-
+def glClearAccum(red, green, blue, alpha, _api_=None): 
+    """glClearAccum(red, green, blue, alpha)
+    
+        red : GLfloat
+        green : GLfloat
+        blue : GLfloat
+        alpha : GLfloat
+    """
+    return _api_(red, green, blue, alpha)
+    
 @bind(None, [GLclampf, GLclampf, GLclampf, GLclampf])
-def glClearColor(red, green, blue, alpha): pass
-
+def glClearColor(red, green, blue, alpha, _api_=None): 
+    """glClearColor(red, green, blue, alpha)
+    
+        red : GLclampf
+        green : GLclampf
+        blue : GLclampf
+        alpha : GLclampf
+    """
+    return _api_(red, green, blue, alpha)
+    
 @bind(None, [GLclampd])
-def glClearDepth(depth): pass
-
+def glClearDepth(depth, _api_=None): 
+    """glClearDepth(depth)
+    
+        depth : GLclampd
+    """
+    return _api_(depth)
+    
 @bind(None, [GLfloat])
-def glClearIndex(c): pass
-
+def glClearIndex(c, _api_=None): 
+    """glClearIndex(c)
+    
+        c : GLfloat
+    """
+    return _api_(c)
+    
 @bind(None, [GLint])
-def glClearStencil(s): pass
-
+def glClearStencil(s, _api_=None): 
+    """glClearStencil(s)
+    
+        s : GLint
+    """
+    return _api_(s)
+    
 @bind(None, [GLenum, POINTER(GLdouble)])
-def glClipPlane(plane, equation): pass
-
+def glClipPlane(plane, equation, _api_=None): 
+    """glClipPlane(plane, equation)
+    
+        plane : GLenum
+        equation : POINTER(GLdouble)
+    """
+    return _api_(plane, equation)
+    
 @bind(None, [GLbyte, GLbyte, GLbyte])
-def glColor3b(red, green, blue): pass
-
+def glColor3b(red, green, blue, _api_=None): 
+    """glColor3b(red, green, blue)
+    
+        red : GLbyte
+        green : GLbyte
+        blue : GLbyte
+    """
+    return _api_(red, green, blue)
+    
 @bind(None, [POINTER(GLbyte)])
-def glColor3bv(v): pass
-
+def glColor3bv(v, _api_=None): 
+    """glColor3bv(v)
+    
+        v : POINTER(GLbyte)
+    """
+    return _api_(v)
+    
 @bind(None, [GLdouble, GLdouble, GLdouble])
-def glColor3d(red, green, blue): pass
-
+def glColor3d(red, green, blue, _api_=None): 
+    """glColor3d(red, green, blue)
+    
+        red : GLdouble
+        green : GLdouble
+        blue : GLdouble
+    """
+    return _api_(red, green, blue)
+    
 @bind(None, [POINTER(GLdouble)])
-def glColor3dv(v): pass
-
+def glColor3dv(v, _api_=None): 
+    """glColor3dv(v)
+    
+        v : POINTER(GLdouble)
+    """
+    return _api_(v)
+    
 @bind(None, [GLfloat, GLfloat, GLfloat])
-def glColor3f(red, green, blue): pass
-
+def glColor3f(red, green, blue, _api_=None): 
+    """glColor3f(red, green, blue)
+    
+        red : GLfloat
+        green : GLfloat
+        blue : GLfloat
+    """
+    return _api_(red, green, blue)
+    
 @bind(None, [POINTER(GLfloat)])
-def glColor3fv(v): pass
-
+def glColor3fv(v, _api_=None): 
+    """glColor3fv(v)
+    
+        v : POINTER(GLfloat)
+    """
+    return _api_(v)
+    
 @bind(None, [GLint, GLint, GLint])
-def glColor3i(red, green, blue): pass
-
+def glColor3i(red, green, blue, _api_=None): 
+    """glColor3i(red, green, blue)
+    
+        red : GLint
+        green : GLint
+        blue : GLint
+    """
+    return _api_(red, green, blue)
+    
 @bind(None, [POINTER(GLint)])
-def glColor3iv(v): pass
-
+def glColor3iv(v, _api_=None): 
+    """glColor3iv(v)
+    
+        v : POINTER(GLint)
+    """
+    return _api_(v)
+    
 @bind(None, [GLshort, GLshort, GLshort])
-def glColor3s(red, green, blue): pass
-
+def glColor3s(red, green, blue, _api_=None): 
+    """glColor3s(red, green, blue)
+    
+        red : GLshort
+        green : GLshort
+        blue : GLshort
+    """
+    return _api_(red, green, blue)
+    
 @bind(None, [POINTER(GLshort)])
-def glColor3sv(v): pass
-
+def glColor3sv(v, _api_=None): 
+    """glColor3sv(v)
+    
+        v : POINTER(GLshort)
+    """
+    return _api_(v)
+    
 @bind(None, [GLubyte, GLubyte, GLubyte])
-def glColor3ub(red, green, blue): pass
-
+def glColor3ub(red, green, blue, _api_=None): 
+    """glColor3ub(red, green, blue)
+    
+        red : GLubyte
+        green : GLubyte
+        blue : GLubyte
+    """
+    return _api_(red, green, blue)
+    
 @bind(None, [POINTER(GLubyte)])
-def glColor3ubv(v): pass
-
+def glColor3ubv(v, _api_=None): 
+    """glColor3ubv(v)
+    
+        v : POINTER(GLubyte)
+    """
+    return _api_(v)
+    
 @bind(None, [GLuint, GLuint, GLuint])
-def glColor3ui(red, green, blue): pass
-
+def glColor3ui(red, green, blue, _api_=None): 
+    """glColor3ui(red, green, blue)
+    
+        red : GLuint
+        green : GLuint
+        blue : GLuint
+    """
+    return _api_(red, green, blue)
+    
 @bind(None, [POINTER(GLuint)])
-def glColor3uiv(v): pass
-
+def glColor3uiv(v, _api_=None): 
+    """glColor3uiv(v)
+    
+        v : POINTER(GLuint)
+    """
+    return _api_(v)
+    
 @bind(None, [GLushort, GLushort, GLushort])
-def glColor3us(red, green, blue): pass
-
+def glColor3us(red, green, blue, _api_=None): 
+    """glColor3us(red, green, blue)
+    
+        red : GLushort
+        green : GLushort
+        blue : GLushort
+    """
+    return _api_(red, green, blue)
+    
 @bind(None, [POINTER(GLushort)])
-def glColor3usv(v): pass
-
+def glColor3usv(v, _api_=None): 
+    """glColor3usv(v)
+    
+        v : POINTER(GLushort)
+    """
+    return _api_(v)
+    
 @bind(None, [GLbyte, GLbyte, GLbyte, GLbyte])
-def glColor4b(red, green, blue, alpha): pass
-
+def glColor4b(red, green, blue, alpha, _api_=None): 
+    """glColor4b(red, green, blue, alpha)
+    
+        red : GLbyte
+        green : GLbyte
+        blue : GLbyte
+        alpha : GLbyte
+    """
+    return _api_(red, green, blue, alpha)
+    
 @bind(None, [POINTER(GLbyte)])
-def glColor4bv(v): pass
-
+def glColor4bv(v, _api_=None): 
+    """glColor4bv(v)
+    
+        v : POINTER(GLbyte)
+    """
+    return _api_(v)
+    
 @bind(None, [GLdouble, GLdouble, GLdouble, GLdouble])
-def glColor4d(red, green, blue, alpha): pass
-
+def glColor4d(red, green, blue, alpha, _api_=None): 
+    """glColor4d(red, green, blue, alpha)
+    
+        red : GLdouble
+        green : GLdouble
+        blue : GLdouble
+        alpha : GLdouble
+    """
+    return _api_(red, green, blue, alpha)
+    
 @bind(None, [POINTER(GLdouble)])
-def glColor4dv(v): pass
-
+def glColor4dv(v, _api_=None): 
+    """glColor4dv(v)
+    
+        v : POINTER(GLdouble)
+    """
+    return _api_(v)
+    
 @bind(None, [GLfloat, GLfloat, GLfloat, GLfloat])
-def glColor4f(red, green, blue, alpha): pass
-
+def glColor4f(red, green, blue, alpha, _api_=None): 
+    """glColor4f(red, green, blue, alpha)
+    
+        red : GLfloat
+        green : GLfloat
+        blue : GLfloat
+        alpha : GLfloat
+    """
+    return _api_(red, green, blue, alpha)
+    
 @bind(None, [POINTER(GLfloat)])
-def glColor4fv(v): pass
-
+def glColor4fv(v, _api_=None): 
+    """glColor4fv(v)
+    
+        v : POINTER(GLfloat)
+    """
+    return _api_(v)
+    
 @bind(None, [GLint, GLint, GLint, GLint])
-def glColor4i(red, green, blue, alpha): pass
-
+def glColor4i(red, green, blue, alpha, _api_=None): 
+    """glColor4i(red, green, blue, alpha)
+    
+        red : GLint
+        green : GLint
+        blue : GLint
+        alpha : GLint
+    """
+    return _api_(red, green, blue, alpha)
+    
 @bind(None, [POINTER(GLint)])
-def glColor4iv(v): pass
-
+def glColor4iv(v, _api_=None): 
+    """glColor4iv(v)
+    
+        v : POINTER(GLint)
+    """
+    return _api_(v)
+    
 @bind(None, [GLshort, GLshort, GLshort, GLshort])
-def glColor4s(red, green, blue, alpha): pass
-
+def glColor4s(red, green, blue, alpha, _api_=None): 
+    """glColor4s(red, green, blue, alpha)
+    
+        red : GLshort
+        green : GLshort
+        blue : GLshort
+        alpha : GLshort
+    """
+    return _api_(red, green, blue, alpha)
+    
 @bind(None, [POINTER(GLshort)])
-def glColor4sv(v): pass
-
+def glColor4sv(v, _api_=None): 
+    """glColor4sv(v)
+    
+        v : POINTER(GLshort)
+    """
+    return _api_(v)
+    
 @bind(None, [GLubyte, GLubyte, GLubyte, GLubyte])
-def glColor4ub(red, green, blue, alpha): pass
-
+def glColor4ub(red, green, blue, alpha, _api_=None): 
+    """glColor4ub(red, green, blue, alpha)
+    
+        red : GLubyte
+        green : GLubyte
+        blue : GLubyte
+        alpha : GLubyte
+    """
+    return _api_(red, green, blue, alpha)
+    
 @bind(None, [POINTER(GLubyte)])
-def glColor4ubv(v): pass
-
+def glColor4ubv(v, _api_=None): 
+    """glColor4ubv(v)
+    
+        v : POINTER(GLubyte)
+    """
+    return _api_(v)
+    
 @bind(None, [GLuint, GLuint, GLuint, GLuint])
-def glColor4ui(red, green, blue, alpha): pass
-
+def glColor4ui(red, green, blue, alpha, _api_=None): 
+    """glColor4ui(red, green, blue, alpha)
+    
+        red : GLuint
+        green : GLuint
+        blue : GLuint
+        alpha : GLuint
+    """
+    return _api_(red, green, blue, alpha)
+    
 @bind(None, [POINTER(GLuint)])
-def glColor4uiv(v): pass
-
+def glColor4uiv(v, _api_=None): 
+    """glColor4uiv(v)
+    
+        v : POINTER(GLuint)
+    """
+    return _api_(v)
+    
 @bind(None, [GLushort, GLushort, GLushort, GLushort])
-def glColor4us(red, green, blue, alpha): pass
-
+def glColor4us(red, green, blue, alpha, _api_=None): 
+    """glColor4us(red, green, blue, alpha)
+    
+        red : GLushort
+        green : GLushort
+        blue : GLushort
+        alpha : GLushort
+    """
+    return _api_(red, green, blue, alpha)
+    
 @bind(None, [POINTER(GLushort)])
-def glColor4usv(v): pass
-
+def glColor4usv(v, _api_=None): 
+    """glColor4usv(v)
+    
+        v : POINTER(GLushort)
+    """
+    return _api_(v)
+    
 @bind(None, [GLboolean, GLboolean, GLboolean, GLboolean])
-def glColorMask(red, green, blue, alpha): pass
-
+def glColorMask(red, green, blue, alpha, _api_=None): 
+    """glColorMask(red, green, blue, alpha)
+    
+        red : GLboolean
+        green : GLboolean
+        blue : GLboolean
+        alpha : GLboolean
+    """
+    return _api_(red, green, blue, alpha)
+    
 @bind(None, [GLenum, GLenum])
-def glColorMaterial(face, mode): pass
-
+def glColorMaterial(face, mode, _api_=None): 
+    """glColorMaterial(face, mode)
+    
+        face : GLenum
+        mode : GLenum
+    """
+    return _api_(face, mode)
+    
 @bind(None, [GLint, GLenum, GLsizei, POINTER(GLvoid)])
-def glColorPointer(size, type, stride, pointer): pass
-
+def glColorPointer(size, type, stride, pointer, _api_=None): 
+    """glColorPointer(size, type, stride, pointer)
+    
+        size : GLint
+        type : GLenum
+        stride : GLsizei
+        pointer : POINTER(GLvoid)
+    """
+    return _api_(size, type, stride, pointer)
+    
 @bind(None, [GLenum, GLsizei, GLsizei, GLenum, GLenum, POINTER(GLvoid)])
-def glColorSubTable(target, start, count, format, type, data): pass
-
+def glColorSubTable(target, start, count, format, type, data, _api_=None): 
+    """glColorSubTable(target, start, count, format, type, data)
+    
+        target : GLenum
+        start : GLsizei
+        count : GLsizei
+        format : GLenum
+        type : GLenum
+        data : POINTER(GLvoid)
+    """
+    return _api_(target, start, count, format, type, data)
+    
 @bind(None, [GLenum, GLenum, GLsizei, GLenum, GLenum, POINTER(GLvoid)])
-def glColorTable(target, internalformat, width, format, type, table): pass
-
+def glColorTable(target, internalformat, width, format, type, table, _api_=None): 
+    """glColorTable(target, internalformat, width, format, type, table)
+    
+        target : GLenum
+        internalformat : GLenum
+        width : GLsizei
+        format : GLenum
+        type : GLenum
+        table : POINTER(GLvoid)
+    """
+    return _api_(target, internalformat, width, format, type, table)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLfloat)])
-def glColorTableParameterfv(target, pname, params): pass
-
+def glColorTableParameterfv(target, pname, params, _api_=None): 
+    """glColorTableParameterfv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(GLfloat)
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLint)])
-def glColorTableParameteriv(target, pname, params): pass
-
+def glColorTableParameteriv(target, pname, params, _api_=None): 
+    """glColorTableParameteriv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, GLenum, GLsizei, GLenum, GLenum, POINTER(GLvoid)])
-def glConvolutionFilter1D(target, internalformat, width, format, type, image): pass
-
+def glConvolutionFilter1D(target, internalformat, width, format, type, image, _api_=None): 
+    """glConvolutionFilter1D(target, internalformat, width, format, type, image)
+    
+        target : GLenum
+        internalformat : GLenum
+        width : GLsizei
+        format : GLenum
+        type : GLenum
+        image : POINTER(GLvoid)
+    """
+    return _api_(target, internalformat, width, format, type, image)
+    
 @bind(None, [GLenum, GLenum, GLsizei, GLsizei, GLenum, GLenum, POINTER(GLvoid)])
-def glConvolutionFilter2D(target, internalformat, width, height, format, type, image): pass
-
+def glConvolutionFilter2D(target, internalformat, width, height, format, type, image, _api_=None): 
+    """glConvolutionFilter2D(target, internalformat, width, height, format, type, image)
+    
+        target : GLenum
+        internalformat : GLenum
+        width : GLsizei
+        height : GLsizei
+        format : GLenum
+        type : GLenum
+        image : POINTER(GLvoid)
+    """
+    return _api_(target, internalformat, width, height, format, type, image)
+    
 @bind(None, [GLenum, GLenum, GLfloat])
-def glConvolutionParameterf(target, pname, params): pass
-
+def glConvolutionParameterf(target, pname, params, _api_=None): 
+    """glConvolutionParameterf(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : GLfloat
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLfloat)])
-def glConvolutionParameterfv(target, pname, params): pass
-
+def glConvolutionParameterfv(target, pname, params, _api_=None): 
+    """glConvolutionParameterfv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(GLfloat)
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, GLenum, GLint])
-def glConvolutionParameteri(target, pname, params): pass
-
+def glConvolutionParameteri(target, pname, params, _api_=None): 
+    """glConvolutionParameteri(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : GLint
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLint)])
-def glConvolutionParameteriv(target, pname, params): pass
-
+def glConvolutionParameteriv(target, pname, params, _api_=None): 
+    """glConvolutionParameteriv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, GLsizei, GLint, GLint, GLsizei])
-def glCopyColorSubTable(target, start, x, y, width): pass
-
+def glCopyColorSubTable(target, start, x, y, width, _api_=None): 
+    """glCopyColorSubTable(target, start, x, y, width)
+    
+        target : GLenum
+        start : GLsizei
+        x : GLint
+        y : GLint
+        width : GLsizei
+    """
+    return _api_(target, start, x, y, width)
+    
 @bind(None, [GLenum, GLenum, GLint, GLint, GLsizei])
-def glCopyColorTable(target, internalformat, x, y, width): pass
-
+def glCopyColorTable(target, internalformat, x, y, width, _api_=None): 
+    """glCopyColorTable(target, internalformat, x, y, width)
+    
+        target : GLenum
+        internalformat : GLenum
+        x : GLint
+        y : GLint
+        width : GLsizei
+    """
+    return _api_(target, internalformat, x, y, width)
+    
 @bind(None, [GLenum, GLenum, GLint, GLint, GLsizei])
-def glCopyConvolutionFilter1D(target, internalformat, x, y, width): pass
-
+def glCopyConvolutionFilter1D(target, internalformat, x, y, width, _api_=None): 
+    """glCopyConvolutionFilter1D(target, internalformat, x, y, width)
+    
+        target : GLenum
+        internalformat : GLenum
+        x : GLint
+        y : GLint
+        width : GLsizei
+    """
+    return _api_(target, internalformat, x, y, width)
+    
 @bind(None, [GLenum, GLenum, GLint, GLint, GLsizei, GLsizei])
-def glCopyConvolutionFilter2D(target, internalformat, x, y, width, height): pass
-
+def glCopyConvolutionFilter2D(target, internalformat, x, y, width, height, _api_=None): 
+    """glCopyConvolutionFilter2D(target, internalformat, x, y, width, height)
+    
+        target : GLenum
+        internalformat : GLenum
+        x : GLint
+        y : GLint
+        width : GLsizei
+        height : GLsizei
+    """
+    return _api_(target, internalformat, x, y, width, height)
+    
 @bind(None, [GLint, GLint, GLsizei, GLsizei, GLenum])
-def glCopyPixels(x, y, width, height, type): pass
-
+def glCopyPixels(x, y, width, height, type, _api_=None): 
+    """glCopyPixels(x, y, width, height, type)
+    
+        x : GLint
+        y : GLint
+        width : GLsizei
+        height : GLsizei
+        type : GLenum
+    """
+    return _api_(x, y, width, height, type)
+    
 @bind(None, [GLenum, GLint, GLenum, GLint, GLint, GLsizei, GLint])
-def glCopyTexImage1D(target, level, internalformat, x, y, width, border): pass
-
+def glCopyTexImage1D(target, level, internalformat, x, y, width, border, _api_=None): 
+    """glCopyTexImage1D(target, level, internalformat, x, y, width, border)
+    
+        target : GLenum
+        level : GLint
+        internalformat : GLenum
+        x : GLint
+        y : GLint
+        width : GLsizei
+        border : GLint
+    """
+    return _api_(target, level, internalformat, x, y, width, border)
+    
 @bind(None, [GLenum, GLint, GLenum, GLint, GLint, GLsizei, GLsizei, GLint])
-def glCopyTexImage2D(target, level, internalformat, x, y, width, height, border): pass
-
+def glCopyTexImage2D(target, level, internalformat, x, y, width, height, border, _api_=None): 
+    """glCopyTexImage2D(target, level, internalformat, x, y, width, height, border)
+    
+        target : GLenum
+        level : GLint
+        internalformat : GLenum
+        x : GLint
+        y : GLint
+        width : GLsizei
+        height : GLsizei
+        border : GLint
+    """
+    return _api_(target, level, internalformat, x, y, width, height, border)
+    
 @bind(None, [GLenum, GLint, GLint, GLint, GLint, GLsizei])
-def glCopyTexSubImage1D(target, level, xoffset, x, y, width): pass
-
+def glCopyTexSubImage1D(target, level, xoffset, x, y, width, _api_=None): 
+    """glCopyTexSubImage1D(target, level, xoffset, x, y, width)
+    
+        target : GLenum
+        level : GLint
+        xoffset : GLint
+        x : GLint
+        y : GLint
+        width : GLsizei
+    """
+    return _api_(target, level, xoffset, x, y, width)
+    
 @bind(None, [GLenum, GLint, GLint, GLint, GLint, GLint, GLsizei, GLsizei])
-def glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height): pass
-
+def glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height, _api_=None): 
+    """glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height)
+    
+        target : GLenum
+        level : GLint
+        xoffset : GLint
+        yoffset : GLint
+        x : GLint
+        y : GLint
+        width : GLsizei
+        height : GLsizei
+    """
+    return _api_(target, level, xoffset, yoffset, x, y, width, height)
+    
 @bind(None, [GLenum, GLint, GLint, GLint, GLint, GLint, GLint, GLsizei, GLsizei])
-def glCopyTexSubImage3D(target, level, xoffset, yoffset, zoffset, x, y, width, height): pass
-
+def glCopyTexSubImage3D(target, level, xoffset, yoffset, zoffset, x, y, width, height, _api_=None): 
+    """glCopyTexSubImage3D(target, level, xoffset, yoffset, zoffset, x, y, width, height)
+    
+        target : GLenum
+        level : GLint
+        xoffset : GLint
+        yoffset : GLint
+        zoffset : GLint
+        x : GLint
+        y : GLint
+        width : GLsizei
+        height : GLsizei
+    """
+    return _api_(target, level, xoffset, yoffset, zoffset, x, y, width, height)
+    
 @bind(None, [GLenum])
-def glCullFace(mode): pass
-
+def glCullFace(mode, _api_=None): 
+    """glCullFace(mode)
+    
+        mode : GLenum
+    """
+    return _api_(mode)
+    
 @bind(None, [GLuint, GLsizei])
-def glDeleteLists(list, range): pass
-
+def glDeleteLists(list, range, _api_=None): 
+    """glDeleteLists(list, range)
+    
+        list : GLuint
+        range : GLsizei
+    """
+    return _api_(list, range)
+    
 @bind(None, [GLsizei, POINTER(GLuint)])
-def glDeleteTextures(n, textures): pass
-
+def glDeleteTextures(n, textures, _api_=None): 
+    """glDeleteTextures(n, textures)
+    
+        n : GLsizei
+        textures : POINTER(GLuint)
+    """
+    return _api_(n, textures)
+    
 @bind(None, [GLenum])
-def glDepthFunc(func): pass
-
+def glDepthFunc(func, _api_=None): 
+    """glDepthFunc(func)
+    
+        func : GLenum
+    """
+    return _api_(func)
+    
 @bind(None, [GLboolean])
-def glDepthMask(flag): pass
-
+def glDepthMask(flag, _api_=None): 
+    """glDepthMask(flag)
+    
+        flag : GLboolean
+    """
+    return _api_(flag)
+    
 @bind(None, [GLclampd, GLclampd])
-def glDepthRange(zNear, zFar): pass
-
+def glDepthRange(zNear, zFar, _api_=None): 
+    """glDepthRange(zNear, zFar)
+    
+        zNear : GLclampd
+        zFar : GLclampd
+    """
+    return _api_(zNear, zFar)
+    
 @bind(None, [GLenum])
-def glDisable(cap): pass
-
+def glDisable(cap, _api_=None): 
+    """glDisable(cap)
+    
+        cap : GLenum
+    """
+    return _api_(cap)
+    
 @bind(None, [GLenum])
-def glDisableClientState(array): pass
-
+def glDisableClientState(array, _api_=None): 
+    """glDisableClientState(array)
+    
+        array : GLenum
+    """
+    return _api_(array)
+    
 @bind(None, [GLenum, GLint, GLsizei])
-def glDrawArrays(mode, first, count): pass
-
+def glDrawArrays(mode, first, count, _api_=None): 
+    """glDrawArrays(mode, first, count)
+    
+        mode : GLenum
+        first : GLint
+        count : GLsizei
+    """
+    return _api_(mode, first, count)
+    
 @bind(None, [GLenum])
-def glDrawBuffer(mode): pass
-
+def glDrawBuffer(mode, _api_=None): 
+    """glDrawBuffer(mode)
+    
+        mode : GLenum
+    """
+    return _api_(mode)
+    
 @bind(None, [GLenum, GLsizei, GLenum, POINTER(GLvoid)])
-def glDrawElements(mode, count, type, indices): pass
-
+def glDrawElements(mode, count, type, indices, _api_=None): 
+    """glDrawElements(mode, count, type, indices)
+    
+        mode : GLenum
+        count : GLsizei
+        type : GLenum
+        indices : POINTER(GLvoid)
+    """
+    return _api_(mode, count, type, indices)
+    
 @bind(None, [GLsizei, GLsizei, GLenum, GLenum, POINTER(GLvoid)])
-def glDrawPixels(width, height, format, type, pixels): pass
-
+def glDrawPixels(width, height, format, type, pixels, _api_=None): 
+    """glDrawPixels(width, height, format, type, pixels)
+    
+        width : GLsizei
+        height : GLsizei
+        format : GLenum
+        type : GLenum
+        pixels : POINTER(GLvoid)
+    """
+    return _api_(width, height, format, type, pixels)
+    
 @bind(None, [GLenum, GLuint, GLuint, GLsizei, GLenum, POINTER(GLvoid)])
-def glDrawRangeElements(mode, start, end, count, type, indices): pass
-
+def glDrawRangeElements(mode, start, end, count, type, indices, _api_=None): 
+    """glDrawRangeElements(mode, start, end, count, type, indices)
+    
+        mode : GLenum
+        start : GLuint
+        end : GLuint
+        count : GLsizei
+        type : GLenum
+        indices : POINTER(GLvoid)
+    """
+    return _api_(mode, start, end, count, type, indices)
+    
 @bind(None, [GLboolean])
-def glEdgeFlag(flag): pass
-
+def glEdgeFlag(flag, _api_=None): 
+    """glEdgeFlag(flag)
+    
+        flag : GLboolean
+    """
+    return _api_(flag)
+    
 @bind(None, [GLsizei, POINTER(GLvoid)])
-def glEdgeFlagPointer(stride, pointer): pass
-
+def glEdgeFlagPointer(stride, pointer, _api_=None): 
+    """glEdgeFlagPointer(stride, pointer)
+    
+        stride : GLsizei
+        pointer : POINTER(GLvoid)
+    """
+    return _api_(stride, pointer)
+    
 @bind(None, [POINTER(GLboolean)])
-def glEdgeFlagv(flag): pass
-
+def glEdgeFlagv(flag, _api_=None): 
+    """glEdgeFlagv(flag)
+    
+        flag : POINTER(GLboolean)
+    """
+    return _api_(flag)
+    
 @bind(None, [GLenum])
-def glEnable(cap): pass
-
+def glEnable(cap, _api_=None): 
+    """glEnable(cap)
+    
+        cap : GLenum
+    """
+    return _api_(cap)
+    
 @bind(None, [GLenum])
-def glEnableClientState(array): pass
-
+def glEnableClientState(array, _api_=None): 
+    """glEnableClientState(array)
+    
+        array : GLenum
+    """
+    return _api_(array)
+    
 @bind(None, [])
-def glEnd(): pass
-
+def glEnd(_api_=None): 
+    """glEnd()
+    
+        
+    """
+    return _api_()
+    
 @bind(None, [])
-def glEndList(): pass
-
+def glEndList(_api_=None): 
+    """glEndList()
+    
+        
+    """
+    return _api_()
+    
 @bind(None, [GLdouble])
-def glEvalCoord1d(u): pass
-
+def glEvalCoord1d(u, _api_=None): 
+    """glEvalCoord1d(u)
+    
+        u : GLdouble
+    """
+    return _api_(u)
+    
 @bind(None, [POINTER(GLdouble)])
-def glEvalCoord1dv(u): pass
-
+def glEvalCoord1dv(u, _api_=None): 
+    """glEvalCoord1dv(u)
+    
+        u : POINTER(GLdouble)
+    """
+    return _api_(u)
+    
 @bind(None, [GLfloat])
-def glEvalCoord1f(u): pass
-
+def glEvalCoord1f(u, _api_=None): 
+    """glEvalCoord1f(u)
+    
+        u : GLfloat
+    """
+    return _api_(u)
+    
 @bind(None, [POINTER(GLfloat)])
-def glEvalCoord1fv(u): pass
-
+def glEvalCoord1fv(u, _api_=None): 
+    """glEvalCoord1fv(u)
+    
+        u : POINTER(GLfloat)
+    """
+    return _api_(u)
+    
 @bind(None, [GLdouble, GLdouble])
-def glEvalCoord2d(u, v): pass
-
+def glEvalCoord2d(u, v, _api_=None): 
+    """glEvalCoord2d(u, v)
+    
+        u : GLdouble
+        v : GLdouble
+    """
+    return _api_(u, v)
+    
 @bind(None, [POINTER(GLdouble)])
-def glEvalCoord2dv(u): pass
-
+def glEvalCoord2dv(u, _api_=None): 
+    """glEvalCoord2dv(u)
+    
+        u : POINTER(GLdouble)
+    """
+    return _api_(u)
+    
 @bind(None, [GLfloat, GLfloat])
-def glEvalCoord2f(u, v): pass
-
+def glEvalCoord2f(u, v, _api_=None): 
+    """glEvalCoord2f(u, v)
+    
+        u : GLfloat
+        v : GLfloat
+    """
+    return _api_(u, v)
+    
 @bind(None, [POINTER(GLfloat)])
-def glEvalCoord2fv(u): pass
-
+def glEvalCoord2fv(u, _api_=None): 
+    """glEvalCoord2fv(u)
+    
+        u : POINTER(GLfloat)
+    """
+    return _api_(u)
+    
 @bind(None, [GLenum, GLint, GLint])
-def glEvalMesh1(mode, i1, i2): pass
-
+def glEvalMesh1(mode, i1, i2, _api_=None): 
+    """glEvalMesh1(mode, i1, i2)
+    
+        mode : GLenum
+        i1 : GLint
+        i2 : GLint
+    """
+    return _api_(mode, i1, i2)
+    
 @bind(None, [GLenum, GLint, GLint, GLint, GLint])
-def glEvalMesh2(mode, i1, i2, j1, j2): pass
-
+def glEvalMesh2(mode, i1, i2, j1, j2, _api_=None): 
+    """glEvalMesh2(mode, i1, i2, j1, j2)
+    
+        mode : GLenum
+        i1 : GLint
+        i2 : GLint
+        j1 : GLint
+        j2 : GLint
+    """
+    return _api_(mode, i1, i2, j1, j2)
+    
 @bind(None, [GLint])
-def glEvalPoint1(i): pass
-
+def glEvalPoint1(i, _api_=None): 
+    """glEvalPoint1(i)
+    
+        i : GLint
+    """
+    return _api_(i)
+    
 @bind(None, [GLint, GLint])
-def glEvalPoint2(i, j): pass
-
+def glEvalPoint2(i, j, _api_=None): 
+    """glEvalPoint2(i, j)
+    
+        i : GLint
+        j : GLint
+    """
+    return _api_(i, j)
+    
 @bind(None, [GLsizei, GLenum, POINTER(GLfloat)])
-def glFeedbackBuffer(size, type, buffer): pass
-
+def glFeedbackBuffer(size, type, buffer, _api_=None): 
+    """glFeedbackBuffer(size, type, buffer)
+    
+        size : GLsizei
+        type : GLenum
+        buffer : POINTER(GLfloat)
+    """
+    return _api_(size, type, buffer)
+    
 @bind(None, [])
-def glFinish(): pass
-
+def glFinish(_api_=None): 
+    """glFinish()
+    
+        
+    """
+    return _api_()
+    
 @bind(None, [])
-def glFlush(): pass
-
+def glFlush(_api_=None): 
+    """glFlush()
+    
+        
+    """
+    return _api_()
+    
 @bind(None, [GLenum, GLfloat])
-def glFogf(pname, param): pass
-
+def glFogf(pname, param, _api_=None): 
+    """glFogf(pname, param)
+    
+        pname : GLenum
+        param : GLfloat
+    """
+    return _api_(pname, param)
+    
 @bind(None, [GLenum, POINTER(GLfloat)])
-def glFogfv(pname, params): pass
-
+def glFogfv(pname, params, _api_=None): 
+    """glFogfv(pname, params)
+    
+        pname : GLenum
+        params : POINTER(GLfloat)
+    """
+    return _api_(pname, params)
+    
 @bind(None, [GLenum, GLint])
-def glFogi(pname, param): pass
-
+def glFogi(pname, param, _api_=None): 
+    """glFogi(pname, param)
+    
+        pname : GLenum
+        param : GLint
+    """
+    return _api_(pname, param)
+    
 @bind(None, [GLenum, POINTER(GLint)])
-def glFogiv(pname, params): pass
-
+def glFogiv(pname, params, _api_=None): 
+    """glFogiv(pname, params)
+    
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(pname, params)
+    
 @bind(None, [GLenum])
-def glFrontFace(mode): pass
-
+def glFrontFace(mode, _api_=None): 
+    """glFrontFace(mode)
+    
+        mode : GLenum
+    """
+    return _api_(mode)
+    
 @bind(None, [GLdouble, GLdouble, GLdouble, GLdouble, GLdouble, GLdouble])
-def glFrustum(left, right, bottom, top, zNear, zFar): pass
-
+def glFrustum(left, right, bottom, top, zNear, zFar, _api_=None): 
+    """glFrustum(left, right, bottom, top, zNear, zFar)
+    
+        left : GLdouble
+        right : GLdouble
+        bottom : GLdouble
+        top : GLdouble
+        zNear : GLdouble
+        zFar : GLdouble
+    """
+    return _api_(left, right, bottom, top, zNear, zFar)
+    
 @bind(GLuint, [GLsizei])
-def glGenLists(range): pass
-
+def glGenLists(range, _api_=None): 
+    """glGenLists(range)
+    
+        range : GLsizei
+    """
+    return _api_(range)
+    
 @bind(None, [GLsizei, POINTER(GLuint)])
-def glGenTextures(n, textures): pass
-
+def glGenTextures(n, textures, _api_=None): 
+    """glGenTextures(n, textures)
+    
+        n : GLsizei
+        textures : POINTER(GLuint)
+    """
+    return _api_(n, textures)
+    
 @bind(None, [GLenum, POINTER(GLboolean)])
-def glGetBooleanv(pname, params): pass
-
+def glGetBooleanv(pname, params, _api_=None): 
+    """glGetBooleanv(pname, params)
+    
+        pname : GLenum
+        params : POINTER(GLboolean)
+    """
+    return _api_(pname, params)
+    
 @bind(None, [GLenum, POINTER(GLdouble)])
-def glGetClipPlane(plane, equation): pass
-
+def glGetClipPlane(plane, equation, _api_=None): 
+    """glGetClipPlane(plane, equation)
+    
+        plane : GLenum
+        equation : POINTER(GLdouble)
+    """
+    return _api_(plane, equation)
+    
 @bind(None, [GLenum, GLenum, GLenum, POINTER(GLvoid)])
-def glGetColorTable(target, format, type, table): pass
-
+def glGetColorTable(target, format, type, table, _api_=None): 
+    """glGetColorTable(target, format, type, table)
+    
+        target : GLenum
+        format : GLenum
+        type : GLenum
+        table : POINTER(GLvoid)
+    """
+    return _api_(target, format, type, table)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLfloat)])
-def glGetColorTableParameterfv(target, pname, params): pass
-
+def glGetColorTableParameterfv(target, pname, params, _api_=None): 
+    """glGetColorTableParameterfv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(GLfloat)
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLint)])
-def glGetColorTableParameteriv(target, pname, params): pass
-
+def glGetColorTableParameteriv(target, pname, params, _api_=None): 
+    """glGetColorTableParameteriv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, GLenum, GLenum, POINTER(GLvoid)])
-def glGetConvolutionFilter(target, format, type, image): pass
-
+def glGetConvolutionFilter(target, format, type, image, _api_=None): 
+    """glGetConvolutionFilter(target, format, type, image)
+    
+        target : GLenum
+        format : GLenum
+        type : GLenum
+        image : POINTER(GLvoid)
+    """
+    return _api_(target, format, type, image)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLfloat)])
-def glGetConvolutionParameterfv(target, pname, params): pass
-
+def glGetConvolutionParameterfv(target, pname, params, _api_=None): 
+    """glGetConvolutionParameterfv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(GLfloat)
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLint)])
-def glGetConvolutionParameteriv(target, pname, params): pass
-
+def glGetConvolutionParameteriv(target, pname, params, _api_=None): 
+    """glGetConvolutionParameteriv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, POINTER(GLdouble)])
-def glGetDoublev(pname, params): pass
-
+def glGetDoublev(pname, params, _api_=None): 
+    """glGetDoublev(pname, params)
+    
+        pname : GLenum
+        params : POINTER(GLdouble)
+    """
+    return _api_(pname, params)
+    
 @bind(GLenum, [])
-def glGetError(): pass
-
+def glGetError(_api_=None): 
+    """glGetError()
+    
+        
+    """
+    return _api_()
+    
 @bind(None, [GLenum, POINTER(GLfloat)])
-def glGetFloatv(pname, params): pass
-
+def glGetFloatv(pname, params, _api_=None): 
+    """glGetFloatv(pname, params)
+    
+        pname : GLenum
+        params : POINTER(GLfloat)
+    """
+    return _api_(pname, params)
+    
 @bind(None, [GLenum, GLboolean, GLenum, GLenum, POINTER(GLvoid)])
-def glGetHistogram(target, reset, format, type, values): pass
-
+def glGetHistogram(target, reset, format, type, values, _api_=None): 
+    """glGetHistogram(target, reset, format, type, values)
+    
+        target : GLenum
+        reset : GLboolean
+        format : GLenum
+        type : GLenum
+        values : POINTER(GLvoid)
+    """
+    return _api_(target, reset, format, type, values)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLfloat)])
-def glGetHistogramParameterfv(target, pname, params): pass
-
+def glGetHistogramParameterfv(target, pname, params, _api_=None): 
+    """glGetHistogramParameterfv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(GLfloat)
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLint)])
-def glGetHistogramParameteriv(target, pname, params): pass
-
+def glGetHistogramParameteriv(target, pname, params, _api_=None): 
+    """glGetHistogramParameteriv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, POINTER(GLint)])
-def glGetIntegerv(pname, params): pass
-
+def glGetIntegerv(pname, params, _api_=None): 
+    """glGetIntegerv(pname, params)
+    
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(pname, params)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLfloat)])
-def glGetLightfv(light, pname, params): pass
-
+def glGetLightfv(light, pname, params, _api_=None): 
+    """glGetLightfv(light, pname, params)
+    
+        light : GLenum
+        pname : GLenum
+        params : POINTER(GLfloat)
+    """
+    return _api_(light, pname, params)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLint)])
-def glGetLightiv(light, pname, params): pass
-
+def glGetLightiv(light, pname, params, _api_=None): 
+    """glGetLightiv(light, pname, params)
+    
+        light : GLenum
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(light, pname, params)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLdouble)])
-def glGetMapdv(target, query, v): pass
-
+def glGetMapdv(target, query, v, _api_=None): 
+    """glGetMapdv(target, query, v)
+    
+        target : GLenum
+        query : GLenum
+        v : POINTER(GLdouble)
+    """
+    return _api_(target, query, v)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLfloat)])
-def glGetMapfv(target, query, v): pass
-
+def glGetMapfv(target, query, v, _api_=None): 
+    """glGetMapfv(target, query, v)
+    
+        target : GLenum
+        query : GLenum
+        v : POINTER(GLfloat)
+    """
+    return _api_(target, query, v)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLint)])
-def glGetMapiv(target, query, v): pass
-
+def glGetMapiv(target, query, v, _api_=None): 
+    """glGetMapiv(target, query, v)
+    
+        target : GLenum
+        query : GLenum
+        v : POINTER(GLint)
+    """
+    return _api_(target, query, v)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLfloat)])
-def glGetMaterialfv(face, pname, params): pass
-
+def glGetMaterialfv(face, pname, params, _api_=None): 
+    """glGetMaterialfv(face, pname, params)
+    
+        face : GLenum
+        pname : GLenum
+        params : POINTER(GLfloat)
+    """
+    return _api_(face, pname, params)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLint)])
-def glGetMaterialiv(face, pname, params): pass
-
+def glGetMaterialiv(face, pname, params, _api_=None): 
+    """glGetMaterialiv(face, pname, params)
+    
+        face : GLenum
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(face, pname, params)
+    
 @bind(None, [GLenum, GLboolean, GLenum, GLenum, POINTER(GLvoid)])
-def glGetMinmax(target, reset, format, type, values): pass
-
+def glGetMinmax(target, reset, format, type, values, _api_=None): 
+    """glGetMinmax(target, reset, format, type, values)
+    
+        target : GLenum
+        reset : GLboolean
+        format : GLenum
+        type : GLenum
+        values : POINTER(GLvoid)
+    """
+    return _api_(target, reset, format, type, values)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLfloat)])
-def glGetMinmaxParameterfv(target, pname, params): pass
-
+def glGetMinmaxParameterfv(target, pname, params, _api_=None): 
+    """glGetMinmaxParameterfv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(GLfloat)
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLint)])
-def glGetMinmaxParameteriv(target, pname, params): pass
-
+def glGetMinmaxParameteriv(target, pname, params, _api_=None): 
+    """glGetMinmaxParameteriv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, POINTER(GLfloat)])
-def glGetPixelMapfv(map, values): pass
-
+def glGetPixelMapfv(map, values, _api_=None): 
+    """glGetPixelMapfv(map, values)
+    
+        map : GLenum
+        values : POINTER(GLfloat)
+    """
+    return _api_(map, values)
+    
 @bind(None, [GLenum, POINTER(GLuint)])
-def glGetPixelMapuiv(map, values): pass
-
+def glGetPixelMapuiv(map, values, _api_=None): 
+    """glGetPixelMapuiv(map, values)
+    
+        map : GLenum
+        values : POINTER(GLuint)
+    """
+    return _api_(map, values)
+    
 @bind(None, [GLenum, POINTER(GLushort)])
-def glGetPixelMapusv(map, values): pass
-
+def glGetPixelMapusv(map, values, _api_=None): 
+    """glGetPixelMapusv(map, values)
+    
+        map : GLenum
+        values : POINTER(GLushort)
+    """
+    return _api_(map, values)
+    
 @bind(None, [GLenum, POINTER(POINTER(GLvoid))])
-def glGetPointerv(pname, params): pass
-
+def glGetPointerv(pname, params, _api_=None): 
+    """glGetPointerv(pname, params)
+    
+        pname : GLenum
+        params : POINTER(POINTER(GLvoid))
+    """
+    return _api_(pname, params)
+    
 @bind(None, [POINTER(GLubyte)])
-def glGetPolygonStipple(mask): pass
-
+def glGetPolygonStipple(mask, _api_=None): 
+    """glGetPolygonStipple(mask)
+    
+        mask : POINTER(GLubyte)
+    """
+    return _api_(mask)
+    
 @bind(None, [GLenum, GLenum, GLenum, POINTER(GLvoid), POINTER(GLvoid), POINTER(GLvoid)])
-def glGetSeparableFilter(target, format, type, row, column, span): pass
-
+def glGetSeparableFilter(target, format, type, row, column, span, _api_=None): 
+    """glGetSeparableFilter(target, format, type, row, column, span)
+    
+        target : GLenum
+        format : GLenum
+        type : GLenum
+        row : POINTER(GLvoid)
+        column : POINTER(GLvoid)
+        span : POINTER(GLvoid)
+    """
+    return _api_(target, format, type, row, column, span)
+    
 @bind(POINTER(GLubyte), [GLenum])
-def glGetString(name): pass
-
+def glGetString(name, _api_=None): 
+    """glGetString(name)
+    
+        name : GLenum
+    """
+    return _api_(name)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLfloat)])
-def glGetTexEnvfv(target, pname, params): pass
-
+def glGetTexEnvfv(target, pname, params, _api_=None): 
+    """glGetTexEnvfv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(GLfloat)
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLint)])
-def glGetTexEnviv(target, pname, params): pass
-
+def glGetTexEnviv(target, pname, params, _api_=None): 
+    """glGetTexEnviv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLdouble)])
-def glGetTexGendv(coord, pname, params): pass
-
+def glGetTexGendv(coord, pname, params, _api_=None): 
+    """glGetTexGendv(coord, pname, params)
+    
+        coord : GLenum
+        pname : GLenum
+        params : POINTER(GLdouble)
+    """
+    return _api_(coord, pname, params)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLfloat)])
-def glGetTexGenfv(coord, pname, params): pass
-
+def glGetTexGenfv(coord, pname, params, _api_=None): 
+    """glGetTexGenfv(coord, pname, params)
+    
+        coord : GLenum
+        pname : GLenum
+        params : POINTER(GLfloat)
+    """
+    return _api_(coord, pname, params)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLint)])
-def glGetTexGeniv(coord, pname, params): pass
-
+def glGetTexGeniv(coord, pname, params, _api_=None): 
+    """glGetTexGeniv(coord, pname, params)
+    
+        coord : GLenum
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(coord, pname, params)
+    
 @bind(None, [GLenum, GLint, GLenum, GLenum, POINTER(GLvoid)])
-def glGetTexImage(target, level, format, type, pixels): pass
-
+def glGetTexImage(target, level, format, type, pixels, _api_=None): 
+    """glGetTexImage(target, level, format, type, pixels)
+    
+        target : GLenum
+        level : GLint
+        format : GLenum
+        type : GLenum
+        pixels : POINTER(GLvoid)
+    """
+    return _api_(target, level, format, type, pixels)
+    
 @bind(None, [GLenum, GLint, GLenum, POINTER(GLfloat)])
-def glGetTexLevelParameterfv(target, level, pname, params): pass
-
+def glGetTexLevelParameterfv(target, level, pname, params, _api_=None): 
+    """glGetTexLevelParameterfv(target, level, pname, params)
+    
+        target : GLenum
+        level : GLint
+        pname : GLenum
+        params : POINTER(GLfloat)
+    """
+    return _api_(target, level, pname, params)
+    
 @bind(None, [GLenum, GLint, GLenum, POINTER(GLint)])
-def glGetTexLevelParameteriv(target, level, pname, params): pass
-
+def glGetTexLevelParameteriv(target, level, pname, params, _api_=None): 
+    """glGetTexLevelParameteriv(target, level, pname, params)
+    
+        target : GLenum
+        level : GLint
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(target, level, pname, params)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLfloat)])
-def glGetTexParameterfv(target, pname, params): pass
-
+def glGetTexParameterfv(target, pname, params, _api_=None): 
+    """glGetTexParameterfv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(GLfloat)
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLint)])
-def glGetTexParameteriv(target, pname, params): pass
-
+def glGetTexParameteriv(target, pname, params, _api_=None): 
+    """glGetTexParameteriv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, GLenum])
-def glHint(target, mode): pass
-
+def glHint(target, mode, _api_=None): 
+    """glHint(target, mode)
+    
+        target : GLenum
+        mode : GLenum
+    """
+    return _api_(target, mode)
+    
 @bind(None, [GLenum, GLsizei, GLenum, GLboolean])
-def glHistogram(target, width, internalformat, sink): pass
-
+def glHistogram(target, width, internalformat, sink, _api_=None): 
+    """glHistogram(target, width, internalformat, sink)
+    
+        target : GLenum
+        width : GLsizei
+        internalformat : GLenum
+        sink : GLboolean
+    """
+    return _api_(target, width, internalformat, sink)
+    
 @bind(None, [GLuint])
-def glIndexMask(mask): pass
-
+def glIndexMask(mask, _api_=None): 
+    """glIndexMask(mask)
+    
+        mask : GLuint
+    """
+    return _api_(mask)
+    
 @bind(None, [GLenum, GLsizei, POINTER(GLvoid)])
-def glIndexPointer(type, stride, pointer): pass
-
+def glIndexPointer(type, stride, pointer, _api_=None): 
+    """glIndexPointer(type, stride, pointer)
+    
+        type : GLenum
+        stride : GLsizei
+        pointer : POINTER(GLvoid)
+    """
+    return _api_(type, stride, pointer)
+    
 @bind(None, [GLdouble])
-def glIndexd(c): pass
-
+def glIndexd(c, _api_=None): 
+    """glIndexd(c)
+    
+        c : GLdouble
+    """
+    return _api_(c)
+    
 @bind(None, [POINTER(GLdouble)])
-def glIndexdv(c): pass
-
+def glIndexdv(c, _api_=None): 
+    """glIndexdv(c)
+    
+        c : POINTER(GLdouble)
+    """
+    return _api_(c)
+    
 @bind(None, [GLfloat])
-def glIndexf(c): pass
-
+def glIndexf(c, _api_=None): 
+    """glIndexf(c)
+    
+        c : GLfloat
+    """
+    return _api_(c)
+    
 @bind(None, [POINTER(GLfloat)])
-def glIndexfv(c): pass
-
+def glIndexfv(c, _api_=None): 
+    """glIndexfv(c)
+    
+        c : POINTER(GLfloat)
+    """
+    return _api_(c)
+    
 @bind(None, [GLint])
-def glIndexi(c): pass
-
+def glIndexi(c, _api_=None): 
+    """glIndexi(c)
+    
+        c : GLint
+    """
+    return _api_(c)
+    
 @bind(None, [POINTER(GLint)])
-def glIndexiv(c): pass
-
+def glIndexiv(c, _api_=None): 
+    """glIndexiv(c)
+    
+        c : POINTER(GLint)
+    """
+    return _api_(c)
+    
 @bind(None, [GLshort])
-def glIndexs(c): pass
-
+def glIndexs(c, _api_=None): 
+    """glIndexs(c)
+    
+        c : GLshort
+    """
+    return _api_(c)
+    
 @bind(None, [POINTER(GLshort)])
-def glIndexsv(c): pass
-
+def glIndexsv(c, _api_=None): 
+    """glIndexsv(c)
+    
+        c : POINTER(GLshort)
+    """
+    return _api_(c)
+    
 @bind(None, [GLubyte])
-def glIndexub(c): pass
-
+def glIndexub(c, _api_=None): 
+    """glIndexub(c)
+    
+        c : GLubyte
+    """
+    return _api_(c)
+    
 @bind(None, [POINTER(GLubyte)])
-def glIndexubv(c): pass
-
+def glIndexubv(c, _api_=None): 
+    """glIndexubv(c)
+    
+        c : POINTER(GLubyte)
+    """
+    return _api_(c)
+    
 @bind(None, [])
-def glInitNames(): pass
-
+def glInitNames(_api_=None): 
+    """glInitNames()
+    
+        
+    """
+    return _api_()
+    
 @bind(None, [GLenum, GLsizei, POINTER(GLvoid)])
-def glInterleavedArrays(format, stride, pointer): pass
-
+def glInterleavedArrays(format, stride, pointer, _api_=None): 
+    """glInterleavedArrays(format, stride, pointer)
+    
+        format : GLenum
+        stride : GLsizei
+        pointer : POINTER(GLvoid)
+    """
+    return _api_(format, stride, pointer)
+    
 @bind(GLboolean, [GLenum])
-def glIsEnabled(cap): pass
-
+def glIsEnabled(cap, _api_=None): 
+    """glIsEnabled(cap)
+    
+        cap : GLenum
+    """
+    return _api_(cap)
+    
 @bind(GLboolean, [GLuint])
-def glIsList(list): pass
-
+def glIsList(list, _api_=None): 
+    """glIsList(list)
+    
+        list : GLuint
+    """
+    return _api_(list)
+    
 @bind(GLboolean, [GLuint])
-def glIsTexture(texture): pass
-
+def glIsTexture(texture, _api_=None): 
+    """glIsTexture(texture)
+    
+        texture : GLuint
+    """
+    return _api_(texture)
+    
 @bind(None, [GLenum, GLfloat])
-def glLightModelf(pname, param): pass
-
+def glLightModelf(pname, param, _api_=None): 
+    """glLightModelf(pname, param)
+    
+        pname : GLenum
+        param : GLfloat
+    """
+    return _api_(pname, param)
+    
 @bind(None, [GLenum, POINTER(GLfloat)])
-def glLightModelfv(pname, params): pass
-
+def glLightModelfv(pname, params, _api_=None): 
+    """glLightModelfv(pname, params)
+    
+        pname : GLenum
+        params : POINTER(GLfloat)
+    """
+    return _api_(pname, params)
+    
 @bind(None, [GLenum, GLint])
-def glLightModeli(pname, param): pass
-
+def glLightModeli(pname, param, _api_=None): 
+    """glLightModeli(pname, param)
+    
+        pname : GLenum
+        param : GLint
+    """
+    return _api_(pname, param)
+    
 @bind(None, [GLenum, POINTER(GLint)])
-def glLightModeliv(pname, params): pass
-
+def glLightModeliv(pname, params, _api_=None): 
+    """glLightModeliv(pname, params)
+    
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(pname, params)
+    
 @bind(None, [GLenum, GLenum, GLfloat])
-def glLightf(light, pname, param): pass
-
+def glLightf(light, pname, param, _api_=None): 
+    """glLightf(light, pname, param)
+    
+        light : GLenum
+        pname : GLenum
+        param : GLfloat
+    """
+    return _api_(light, pname, param)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLfloat)])
-def glLightfv(light, pname, params): pass
-
+def glLightfv(light, pname, params, _api_=None): 
+    """glLightfv(light, pname, params)
+    
+        light : GLenum
+        pname : GLenum
+        params : POINTER(GLfloat)
+    """
+    return _api_(light, pname, params)
+    
 @bind(None, [GLenum, GLenum, GLint])
-def glLighti(light, pname, param): pass
-
+def glLighti(light, pname, param, _api_=None): 
+    """glLighti(light, pname, param)
+    
+        light : GLenum
+        pname : GLenum
+        param : GLint
+    """
+    return _api_(light, pname, param)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLint)])
-def glLightiv(light, pname, params): pass
-
+def glLightiv(light, pname, params, _api_=None): 
+    """glLightiv(light, pname, params)
+    
+        light : GLenum
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(light, pname, params)
+    
 @bind(None, [GLint, GLushort])
-def glLineStipple(factor, pattern): pass
-
+def glLineStipple(factor, pattern, _api_=None): 
+    """glLineStipple(factor, pattern)
+    
+        factor : GLint
+        pattern : GLushort
+    """
+    return _api_(factor, pattern)
+    
 @bind(None, [GLfloat])
-def glLineWidth(width): pass
-
+def glLineWidth(width, _api_=None): 
+    """glLineWidth(width)
+    
+        width : GLfloat
+    """
+    return _api_(width)
+    
 @bind(None, [GLuint])
-def glListBase(base): pass
-
+def glListBase(base, _api_=None): 
+    """glListBase(base)
+    
+        base : GLuint
+    """
+    return _api_(base)
+    
 @bind(None, [])
-def glLoadIdentity(): pass
-
+def glLoadIdentity(_api_=None): 
+    """glLoadIdentity()
+    
+        
+    """
+    return _api_()
+    
 @bind(None, [POINTER(GLdouble)])
-def glLoadMatrixd(m): pass
-
+def glLoadMatrixd(m, _api_=None): 
+    """glLoadMatrixd(m)
+    
+        m : POINTER(GLdouble)
+    """
+    return _api_(m)
+    
 @bind(None, [POINTER(GLfloat)])
-def glLoadMatrixf(m): pass
-
+def glLoadMatrixf(m, _api_=None): 
+    """glLoadMatrixf(m)
+    
+        m : POINTER(GLfloat)
+    """
+    return _api_(m)
+    
 @bind(None, [GLuint])
-def glLoadName(name): pass
-
+def glLoadName(name, _api_=None): 
+    """glLoadName(name)
+    
+        name : GLuint
+    """
+    return _api_(name)
+    
 @bind(None, [GLenum])
-def glLogicOp(opcode): pass
-
+def glLogicOp(opcode, _api_=None): 
+    """glLogicOp(opcode)
+    
+        opcode : GLenum
+    """
+    return _api_(opcode)
+    
 @bind(None, [GLenum, GLdouble, GLdouble, GLint, GLint, POINTER(GLdouble)])
-def glMap1d(target, u1, u2, stride, order, points): pass
-
+def glMap1d(target, u1, u2, stride, order, points, _api_=None): 
+    """glMap1d(target, u1, u2, stride, order, points)
+    
+        target : GLenum
+        u1 : GLdouble
+        u2 : GLdouble
+        stride : GLint
+        order : GLint
+        points : POINTER(GLdouble)
+    """
+    return _api_(target, u1, u2, stride, order, points)
+    
 @bind(None, [GLenum, GLfloat, GLfloat, GLint, GLint, POINTER(GLfloat)])
-def glMap1f(target, u1, u2, stride, order, points): pass
-
+def glMap1f(target, u1, u2, stride, order, points, _api_=None): 
+    """glMap1f(target, u1, u2, stride, order, points)
+    
+        target : GLenum
+        u1 : GLfloat
+        u2 : GLfloat
+        stride : GLint
+        order : GLint
+        points : POINTER(GLfloat)
+    """
+    return _api_(target, u1, u2, stride, order, points)
+    
 @bind(None, [GLenum, GLdouble, GLdouble, GLint, GLint, GLdouble, GLdouble, GLint, GLint, POINTER(GLdouble)])
-def glMap2d(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points): pass
-
+def glMap2d(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points, _api_=None): 
+    """glMap2d(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points)
+    
+        target : GLenum
+        u1 : GLdouble
+        u2 : GLdouble
+        ustride : GLint
+        uorder : GLint
+        v1 : GLdouble
+        v2 : GLdouble
+        vstride : GLint
+        vorder : GLint
+        points : POINTER(GLdouble)
+    """
+    return _api_(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points)
+    
 @bind(None, [GLenum, GLfloat, GLfloat, GLint, GLint, GLfloat, GLfloat, GLint, GLint, POINTER(GLfloat)])
-def glMap2f(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points): pass
-
+def glMap2f(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points, _api_=None): 
+    """glMap2f(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points)
+    
+        target : GLenum
+        u1 : GLfloat
+        u2 : GLfloat
+        ustride : GLint
+        uorder : GLint
+        v1 : GLfloat
+        v2 : GLfloat
+        vstride : GLint
+        vorder : GLint
+        points : POINTER(GLfloat)
+    """
+    return _api_(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points)
+    
 @bind(None, [GLint, GLdouble, GLdouble])
-def glMapGrid1d(un, u1, u2): pass
-
+def glMapGrid1d(un, u1, u2, _api_=None): 
+    """glMapGrid1d(un, u1, u2)
+    
+        un : GLint
+        u1 : GLdouble
+        u2 : GLdouble
+    """
+    return _api_(un, u1, u2)
+    
 @bind(None, [GLint, GLfloat, GLfloat])
-def glMapGrid1f(un, u1, u2): pass
-
+def glMapGrid1f(un, u1, u2, _api_=None): 
+    """glMapGrid1f(un, u1, u2)
+    
+        un : GLint
+        u1 : GLfloat
+        u2 : GLfloat
+    """
+    return _api_(un, u1, u2)
+    
 @bind(None, [GLint, GLdouble, GLdouble, GLint, GLdouble, GLdouble])
-def glMapGrid2d(un, u1, u2, vn, v1, v2): pass
-
+def glMapGrid2d(un, u1, u2, vn, v1, v2, _api_=None): 
+    """glMapGrid2d(un, u1, u2, vn, v1, v2)
+    
+        un : GLint
+        u1 : GLdouble
+        u2 : GLdouble
+        vn : GLint
+        v1 : GLdouble
+        v2 : GLdouble
+    """
+    return _api_(un, u1, u2, vn, v1, v2)
+    
 @bind(None, [GLint, GLfloat, GLfloat, GLint, GLfloat, GLfloat])
-def glMapGrid2f(un, u1, u2, vn, v1, v2): pass
-
+def glMapGrid2f(un, u1, u2, vn, v1, v2, _api_=None): 
+    """glMapGrid2f(un, u1, u2, vn, v1, v2)
+    
+        un : GLint
+        u1 : GLfloat
+        u2 : GLfloat
+        vn : GLint
+        v1 : GLfloat
+        v2 : GLfloat
+    """
+    return _api_(un, u1, u2, vn, v1, v2)
+    
 @bind(None, [GLenum, GLenum, GLfloat])
-def glMaterialf(face, pname, param): pass
-
+def glMaterialf(face, pname, param, _api_=None): 
+    """glMaterialf(face, pname, param)
+    
+        face : GLenum
+        pname : GLenum
+        param : GLfloat
+    """
+    return _api_(face, pname, param)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLfloat)])
-def glMaterialfv(face, pname, params): pass
-
+def glMaterialfv(face, pname, params, _api_=None): 
+    """glMaterialfv(face, pname, params)
+    
+        face : GLenum
+        pname : GLenum
+        params : POINTER(GLfloat)
+    """
+    return _api_(face, pname, params)
+    
 @bind(None, [GLenum, GLenum, GLint])
-def glMateriali(face, pname, param): pass
-
+def glMateriali(face, pname, param, _api_=None): 
+    """glMateriali(face, pname, param)
+    
+        face : GLenum
+        pname : GLenum
+        param : GLint
+    """
+    return _api_(face, pname, param)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLint)])
-def glMaterialiv(face, pname, params): pass
-
+def glMaterialiv(face, pname, params, _api_=None): 
+    """glMaterialiv(face, pname, params)
+    
+        face : GLenum
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(face, pname, params)
+    
 @bind(None, [GLenum])
-def glMatrixMode(mode): pass
-
+def glMatrixMode(mode, _api_=None): 
+    """glMatrixMode(mode)
+    
+        mode : GLenum
+    """
+    return _api_(mode)
+    
 @bind(None, [GLenum, GLenum, GLboolean])
-def glMinmax(target, internalformat, sink): pass
-
+def glMinmax(target, internalformat, sink, _api_=None): 
+    """glMinmax(target, internalformat, sink)
+    
+        target : GLenum
+        internalformat : GLenum
+        sink : GLboolean
+    """
+    return _api_(target, internalformat, sink)
+    
 @bind(None, [POINTER(GLdouble)])
-def glMultMatrixd(m): pass
-
+def glMultMatrixd(m, _api_=None): 
+    """glMultMatrixd(m)
+    
+        m : POINTER(GLdouble)
+    """
+    return _api_(m)
+    
 @bind(None, [POINTER(GLfloat)])
-def glMultMatrixf(m): pass
-
+def glMultMatrixf(m, _api_=None): 
+    """glMultMatrixf(m)
+    
+        m : POINTER(GLfloat)
+    """
+    return _api_(m)
+    
 @bind(None, [GLuint, GLenum])
-def glNewList(list, mode): pass
-
+def glNewList(list, mode, _api_=None): 
+    """glNewList(list, mode)
+    
+        list : GLuint
+        mode : GLenum
+    """
+    return _api_(list, mode)
+    
 @bind(None, [GLbyte, GLbyte, GLbyte])
-def glNormal3b(nx, ny, nz): pass
-
+def glNormal3b(nx, ny, nz, _api_=None): 
+    """glNormal3b(nx, ny, nz)
+    
+        nx : GLbyte
+        ny : GLbyte
+        nz : GLbyte
+    """
+    return _api_(nx, ny, nz)
+    
 @bind(None, [POINTER(GLbyte)])
-def glNormal3bv(v): pass
-
+def glNormal3bv(v, _api_=None): 
+    """glNormal3bv(v)
+    
+        v : POINTER(GLbyte)
+    """
+    return _api_(v)
+    
 @bind(None, [GLdouble, GLdouble, GLdouble])
-def glNormal3d(nx, ny, nz): pass
-
+def glNormal3d(nx, ny, nz, _api_=None): 
+    """glNormal3d(nx, ny, nz)
+    
+        nx : GLdouble
+        ny : GLdouble
+        nz : GLdouble
+    """
+    return _api_(nx, ny, nz)
+    
 @bind(None, [POINTER(GLdouble)])
-def glNormal3dv(v): pass
-
+def glNormal3dv(v, _api_=None): 
+    """glNormal3dv(v)
+    
+        v : POINTER(GLdouble)
+    """
+    return _api_(v)
+    
 @bind(None, [GLfloat, GLfloat, GLfloat])
-def glNormal3f(nx, ny, nz): pass
-
+def glNormal3f(nx, ny, nz, _api_=None): 
+    """glNormal3f(nx, ny, nz)
+    
+        nx : GLfloat
+        ny : GLfloat
+        nz : GLfloat
+    """
+    return _api_(nx, ny, nz)
+    
 @bind(None, [POINTER(GLfloat)])
-def glNormal3fv(v): pass
-
+def glNormal3fv(v, _api_=None): 
+    """glNormal3fv(v)
+    
+        v : POINTER(GLfloat)
+    """
+    return _api_(v)
+    
 @bind(None, [GLint, GLint, GLint])
-def glNormal3i(nx, ny, nz): pass
-
+def glNormal3i(nx, ny, nz, _api_=None): 
+    """glNormal3i(nx, ny, nz)
+    
+        nx : GLint
+        ny : GLint
+        nz : GLint
+    """
+    return _api_(nx, ny, nz)
+    
 @bind(None, [POINTER(GLint)])
-def glNormal3iv(v): pass
-
+def glNormal3iv(v, _api_=None): 
+    """glNormal3iv(v)
+    
+        v : POINTER(GLint)
+    """
+    return _api_(v)
+    
 @bind(None, [GLshort, GLshort, GLshort])
-def glNormal3s(nx, ny, nz): pass
-
+def glNormal3s(nx, ny, nz, _api_=None): 
+    """glNormal3s(nx, ny, nz)
+    
+        nx : GLshort
+        ny : GLshort
+        nz : GLshort
+    """
+    return _api_(nx, ny, nz)
+    
 @bind(None, [POINTER(GLshort)])
-def glNormal3sv(v): pass
-
+def glNormal3sv(v, _api_=None): 
+    """glNormal3sv(v)
+    
+        v : POINTER(GLshort)
+    """
+    return _api_(v)
+    
 @bind(None, [GLenum, GLsizei, POINTER(GLvoid)])
-def glNormalPointer(type, stride, pointer): pass
-
+def glNormalPointer(type, stride, pointer, _api_=None): 
+    """glNormalPointer(type, stride, pointer)
+    
+        type : GLenum
+        stride : GLsizei
+        pointer : POINTER(GLvoid)
+    """
+    return _api_(type, stride, pointer)
+    
 @bind(None, [GLdouble, GLdouble, GLdouble, GLdouble, GLdouble, GLdouble])
-def glOrtho(left, right, bottom, top, zNear, zFar): pass
-
+def glOrtho(left, right, bottom, top, zNear, zFar, _api_=None): 
+    """glOrtho(left, right, bottom, top, zNear, zFar)
+    
+        left : GLdouble
+        right : GLdouble
+        bottom : GLdouble
+        top : GLdouble
+        zNear : GLdouble
+        zFar : GLdouble
+    """
+    return _api_(left, right, bottom, top, zNear, zFar)
+    
 @bind(None, [GLfloat])
-def glPassThrough(token): pass
-
+def glPassThrough(token, _api_=None): 
+    """glPassThrough(token)
+    
+        token : GLfloat
+    """
+    return _api_(token)
+    
 @bind(None, [GLenum, GLint, POINTER(GLfloat)])
-def glPixelMapfv(map, mapsize, values): pass
-
+def glPixelMapfv(map, mapsize, values, _api_=None): 
+    """glPixelMapfv(map, mapsize, values)
+    
+        map : GLenum
+        mapsize : GLint
+        values : POINTER(GLfloat)
+    """
+    return _api_(map, mapsize, values)
+    
 @bind(None, [GLenum, GLint, POINTER(GLuint)])
-def glPixelMapuiv(map, mapsize, values): pass
-
+def glPixelMapuiv(map, mapsize, values, _api_=None): 
+    """glPixelMapuiv(map, mapsize, values)
+    
+        map : GLenum
+        mapsize : GLint
+        values : POINTER(GLuint)
+    """
+    return _api_(map, mapsize, values)
+    
 @bind(None, [GLenum, GLint, POINTER(GLushort)])
-def glPixelMapusv(map, mapsize, values): pass
-
+def glPixelMapusv(map, mapsize, values, _api_=None): 
+    """glPixelMapusv(map, mapsize, values)
+    
+        map : GLenum
+        mapsize : GLint
+        values : POINTER(GLushort)
+    """
+    return _api_(map, mapsize, values)
+    
 @bind(None, [GLenum, GLfloat])
-def glPixelStoref(pname, param): pass
-
+def glPixelStoref(pname, param, _api_=None): 
+    """glPixelStoref(pname, param)
+    
+        pname : GLenum
+        param : GLfloat
+    """
+    return _api_(pname, param)
+    
 @bind(None, [GLenum, GLint])
-def glPixelStorei(pname, param): pass
-
+def glPixelStorei(pname, param, _api_=None): 
+    """glPixelStorei(pname, param)
+    
+        pname : GLenum
+        param : GLint
+    """
+    return _api_(pname, param)
+    
 @bind(None, [GLenum, GLfloat])
-def glPixelTransferf(pname, param): pass
-
+def glPixelTransferf(pname, param, _api_=None): 
+    """glPixelTransferf(pname, param)
+    
+        pname : GLenum
+        param : GLfloat
+    """
+    return _api_(pname, param)
+    
 @bind(None, [GLenum, GLint])
-def glPixelTransferi(pname, param): pass
-
+def glPixelTransferi(pname, param, _api_=None): 
+    """glPixelTransferi(pname, param)
+    
+        pname : GLenum
+        param : GLint
+    """
+    return _api_(pname, param)
+    
 @bind(None, [GLfloat, GLfloat])
-def glPixelZoom(xfactor, yfactor): pass
-
+def glPixelZoom(xfactor, yfactor, _api_=None): 
+    """glPixelZoom(xfactor, yfactor)
+    
+        xfactor : GLfloat
+        yfactor : GLfloat
+    """
+    return _api_(xfactor, yfactor)
+    
 @bind(None, [GLfloat])
-def glPointSize(size): pass
-
+def glPointSize(size, _api_=None): 
+    """glPointSize(size)
+    
+        size : GLfloat
+    """
+    return _api_(size)
+    
 @bind(None, [GLenum, GLenum])
-def glPolygonMode(face, mode): pass
-
+def glPolygonMode(face, mode, _api_=None): 
+    """glPolygonMode(face, mode)
+    
+        face : GLenum
+        mode : GLenum
+    """
+    return _api_(face, mode)
+    
 @bind(None, [GLfloat, GLfloat])
-def glPolygonOffset(factor, units): pass
-
+def glPolygonOffset(factor, units, _api_=None): 
+    """glPolygonOffset(factor, units)
+    
+        factor : GLfloat
+        units : GLfloat
+    """
+    return _api_(factor, units)
+    
 @bind(None, [POINTER(GLubyte)])
-def glPolygonStipple(mask): pass
-
+def glPolygonStipple(mask, _api_=None): 
+    """glPolygonStipple(mask)
+    
+        mask : POINTER(GLubyte)
+    """
+    return _api_(mask)
+    
 @bind(None, [])
-def glPopAttrib(): pass
-
+def glPopAttrib(_api_=None): 
+    """glPopAttrib()
+    
+        
+    """
+    return _api_()
+    
 @bind(None, [])
-def glPopClientAttrib(): pass
-
+def glPopClientAttrib(_api_=None): 
+    """glPopClientAttrib()
+    
+        
+    """
+    return _api_()
+    
 @bind(None, [])
-def glPopMatrix(): pass
-
+def glPopMatrix(_api_=None): 
+    """glPopMatrix()
+    
+        
+    """
+    return _api_()
+    
 @bind(None, [])
-def glPopName(): pass
-
+def glPopName(_api_=None): 
+    """glPopName()
+    
+        
+    """
+    return _api_()
+    
 @bind(None, [GLsizei, POINTER(GLuint), POINTER(GLclampf)])
-def glPrioritizeTextures(n, textures, priorities): pass
-
+def glPrioritizeTextures(n, textures, priorities, _api_=None): 
+    """glPrioritizeTextures(n, textures, priorities)
+    
+        n : GLsizei
+        textures : POINTER(GLuint)
+        priorities : POINTER(GLclampf)
+    """
+    return _api_(n, textures, priorities)
+    
 @bind(None, [GLbitfield])
-def glPushAttrib(mask): pass
-
+def glPushAttrib(mask, _api_=None): 
+    """glPushAttrib(mask)
+    
+        mask : GLbitfield
+    """
+    return _api_(mask)
+    
 @bind(None, [GLbitfield])
-def glPushClientAttrib(mask): pass
-
+def glPushClientAttrib(mask, _api_=None): 
+    """glPushClientAttrib(mask)
+    
+        mask : GLbitfield
+    """
+    return _api_(mask)
+    
 @bind(None, [])
-def glPushMatrix(): pass
-
+def glPushMatrix(_api_=None): 
+    """glPushMatrix()
+    
+        
+    """
+    return _api_()
+    
 @bind(None, [GLuint])
-def glPushName(name): pass
-
+def glPushName(name, _api_=None): 
+    """glPushName(name)
+    
+        name : GLuint
+    """
+    return _api_(name)
+    
 @bind(None, [GLdouble, GLdouble])
-def glRasterPos2d(x, y): pass
-
+def glRasterPos2d(x, y, _api_=None): 
+    """glRasterPos2d(x, y)
+    
+        x : GLdouble
+        y : GLdouble
+    """
+    return _api_(x, y)
+    
 @bind(None, [POINTER(GLdouble)])
-def glRasterPos2dv(v): pass
-
+def glRasterPos2dv(v, _api_=None): 
+    """glRasterPos2dv(v)
+    
+        v : POINTER(GLdouble)
+    """
+    return _api_(v)
+    
 @bind(None, [GLfloat, GLfloat])
-def glRasterPos2f(x, y): pass
-
+def glRasterPos2f(x, y, _api_=None): 
+    """glRasterPos2f(x, y)
+    
+        x : GLfloat
+        y : GLfloat
+    """
+    return _api_(x, y)
+    
 @bind(None, [POINTER(GLfloat)])
-def glRasterPos2fv(v): pass
-
+def glRasterPos2fv(v, _api_=None): 
+    """glRasterPos2fv(v)
+    
+        v : POINTER(GLfloat)
+    """
+    return _api_(v)
+    
 @bind(None, [GLint, GLint])
-def glRasterPos2i(x, y): pass
-
+def glRasterPos2i(x, y, _api_=None): 
+    """glRasterPos2i(x, y)
+    
+        x : GLint
+        y : GLint
+    """
+    return _api_(x, y)
+    
 @bind(None, [POINTER(GLint)])
-def glRasterPos2iv(v): pass
-
+def glRasterPos2iv(v, _api_=None): 
+    """glRasterPos2iv(v)
+    
+        v : POINTER(GLint)
+    """
+    return _api_(v)
+    
 @bind(None, [GLshort, GLshort])
-def glRasterPos2s(x, y): pass
-
+def glRasterPos2s(x, y, _api_=None): 
+    """glRasterPos2s(x, y)
+    
+        x : GLshort
+        y : GLshort
+    """
+    return _api_(x, y)
+    
 @bind(None, [POINTER(GLshort)])
-def glRasterPos2sv(v): pass
-
+def glRasterPos2sv(v, _api_=None): 
+    """glRasterPos2sv(v)
+    
+        v : POINTER(GLshort)
+    """
+    return _api_(v)
+    
 @bind(None, [GLdouble, GLdouble, GLdouble])
-def glRasterPos3d(x, y, z): pass
-
+def glRasterPos3d(x, y, z, _api_=None): 
+    """glRasterPos3d(x, y, z)
+    
+        x : GLdouble
+        y : GLdouble
+        z : GLdouble
+    """
+    return _api_(x, y, z)
+    
 @bind(None, [POINTER(GLdouble)])
-def glRasterPos3dv(v): pass
-
+def glRasterPos3dv(v, _api_=None): 
+    """glRasterPos3dv(v)
+    
+        v : POINTER(GLdouble)
+    """
+    return _api_(v)
+    
 @bind(None, [GLfloat, GLfloat, GLfloat])
-def glRasterPos3f(x, y, z): pass
-
+def glRasterPos3f(x, y, z, _api_=None): 
+    """glRasterPos3f(x, y, z)
+    
+        x : GLfloat
+        y : GLfloat
+        z : GLfloat
+    """
+    return _api_(x, y, z)
+    
 @bind(None, [POINTER(GLfloat)])
-def glRasterPos3fv(v): pass
-
+def glRasterPos3fv(v, _api_=None): 
+    """glRasterPos3fv(v)
+    
+        v : POINTER(GLfloat)
+    """
+    return _api_(v)
+    
 @bind(None, [GLint, GLint, GLint])
-def glRasterPos3i(x, y, z): pass
-
+def glRasterPos3i(x, y, z, _api_=None): 
+    """glRasterPos3i(x, y, z)
+    
+        x : GLint
+        y : GLint
+        z : GLint
+    """
+    return _api_(x, y, z)
+    
 @bind(None, [POINTER(GLint)])
-def glRasterPos3iv(v): pass
-
+def glRasterPos3iv(v, _api_=None): 
+    """glRasterPos3iv(v)
+    
+        v : POINTER(GLint)
+    """
+    return _api_(v)
+    
 @bind(None, [GLshort, GLshort, GLshort])
-def glRasterPos3s(x, y, z): pass
-
+def glRasterPos3s(x, y, z, _api_=None): 
+    """glRasterPos3s(x, y, z)
+    
+        x : GLshort
+        y : GLshort
+        z : GLshort
+    """
+    return _api_(x, y, z)
+    
 @bind(None, [POINTER(GLshort)])
-def glRasterPos3sv(v): pass
-
+def glRasterPos3sv(v, _api_=None): 
+    """glRasterPos3sv(v)
+    
+        v : POINTER(GLshort)
+    """
+    return _api_(v)
+    
 @bind(None, [GLdouble, GLdouble, GLdouble, GLdouble])
-def glRasterPos4d(x, y, z, w): pass
-
+def glRasterPos4d(x, y, z, w, _api_=None): 
+    """glRasterPos4d(x, y, z, w)
+    
+        x : GLdouble
+        y : GLdouble
+        z : GLdouble
+        w : GLdouble
+    """
+    return _api_(x, y, z, w)
+    
 @bind(None, [POINTER(GLdouble)])
-def glRasterPos4dv(v): pass
-
+def glRasterPos4dv(v, _api_=None): 
+    """glRasterPos4dv(v)
+    
+        v : POINTER(GLdouble)
+    """
+    return _api_(v)
+    
 @bind(None, [GLfloat, GLfloat, GLfloat, GLfloat])
-def glRasterPos4f(x, y, z, w): pass
-
+def glRasterPos4f(x, y, z, w, _api_=None): 
+    """glRasterPos4f(x, y, z, w)
+    
+        x : GLfloat
+        y : GLfloat
+        z : GLfloat
+        w : GLfloat
+    """
+    return _api_(x, y, z, w)
+    
 @bind(None, [POINTER(GLfloat)])
-def glRasterPos4fv(v): pass
-
+def glRasterPos4fv(v, _api_=None): 
+    """glRasterPos4fv(v)
+    
+        v : POINTER(GLfloat)
+    """
+    return _api_(v)
+    
 @bind(None, [GLint, GLint, GLint, GLint])
-def glRasterPos4i(x, y, z, w): pass
-
+def glRasterPos4i(x, y, z, w, _api_=None): 
+    """glRasterPos4i(x, y, z, w)
+    
+        x : GLint
+        y : GLint
+        z : GLint
+        w : GLint
+    """
+    return _api_(x, y, z, w)
+    
 @bind(None, [POINTER(GLint)])
-def glRasterPos4iv(v): pass
-
+def glRasterPos4iv(v, _api_=None): 
+    """glRasterPos4iv(v)
+    
+        v : POINTER(GLint)
+    """
+    return _api_(v)
+    
 @bind(None, [GLshort, GLshort, GLshort, GLshort])
-def glRasterPos4s(x, y, z, w): pass
-
+def glRasterPos4s(x, y, z, w, _api_=None): 
+    """glRasterPos4s(x, y, z, w)
+    
+        x : GLshort
+        y : GLshort
+        z : GLshort
+        w : GLshort
+    """
+    return _api_(x, y, z, w)
+    
 @bind(None, [POINTER(GLshort)])
-def glRasterPos4sv(v): pass
-
+def glRasterPos4sv(v, _api_=None): 
+    """glRasterPos4sv(v)
+    
+        v : POINTER(GLshort)
+    """
+    return _api_(v)
+    
 @bind(None, [GLenum])
-def glReadBuffer(mode): pass
-
+def glReadBuffer(mode, _api_=None): 
+    """glReadBuffer(mode)
+    
+        mode : GLenum
+    """
+    return _api_(mode)
+    
 @bind(None, [GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, POINTER(GLvoid)])
-def glReadPixels(x, y, width, height, format, type, pixels): pass
-
+def glReadPixels(x, y, width, height, format, type, pixels, _api_=None): 
+    """glReadPixels(x, y, width, height, format, type, pixels)
+    
+        x : GLint
+        y : GLint
+        width : GLsizei
+        height : GLsizei
+        format : GLenum
+        type : GLenum
+        pixels : POINTER(GLvoid)
+    """
+    return _api_(x, y, width, height, format, type, pixels)
+    
 @bind(None, [GLdouble, GLdouble, GLdouble, GLdouble])
-def glRectd(x1, y1, x2, y2): pass
-
+def glRectd(x1, y1, x2, y2, _api_=None): 
+    """glRectd(x1, y1, x2, y2)
+    
+        x1 : GLdouble
+        y1 : GLdouble
+        x2 : GLdouble
+        y2 : GLdouble
+    """
+    return _api_(x1, y1, x2, y2)
+    
 @bind(None, [POINTER(GLdouble), POINTER(GLdouble)])
-def glRectdv(v1, v2): pass
-
+def glRectdv(v1, v2, _api_=None): 
+    """glRectdv(v1, v2)
+    
+        v1 : POINTER(GLdouble)
+        v2 : POINTER(GLdouble)
+    """
+    return _api_(v1, v2)
+    
 @bind(None, [GLfloat, GLfloat, GLfloat, GLfloat])
-def glRectf(x1, y1, x2, y2): pass
-
+def glRectf(x1, y1, x2, y2, _api_=None): 
+    """glRectf(x1, y1, x2, y2)
+    
+        x1 : GLfloat
+        y1 : GLfloat
+        x2 : GLfloat
+        y2 : GLfloat
+    """
+    return _api_(x1, y1, x2, y2)
+    
 @bind(None, [POINTER(GLfloat), POINTER(GLfloat)])
-def glRectfv(v1, v2): pass
-
+def glRectfv(v1, v2, _api_=None): 
+    """glRectfv(v1, v2)
+    
+        v1 : POINTER(GLfloat)
+        v2 : POINTER(GLfloat)
+    """
+    return _api_(v1, v2)
+    
 @bind(None, [GLint, GLint, GLint, GLint])
-def glRecti(x1, y1, x2, y2): pass
-
+def glRecti(x1, y1, x2, y2, _api_=None): 
+    """glRecti(x1, y1, x2, y2)
+    
+        x1 : GLint
+        y1 : GLint
+        x2 : GLint
+        y2 : GLint
+    """
+    return _api_(x1, y1, x2, y2)
+    
 @bind(None, [POINTER(GLint), POINTER(GLint)])
-def glRectiv(v1, v2): pass
-
+def glRectiv(v1, v2, _api_=None): 
+    """glRectiv(v1, v2)
+    
+        v1 : POINTER(GLint)
+        v2 : POINTER(GLint)
+    """
+    return _api_(v1, v2)
+    
 @bind(None, [GLshort, GLshort, GLshort, GLshort])
-def glRects(x1, y1, x2, y2): pass
-
+def glRects(x1, y1, x2, y2, _api_=None): 
+    """glRects(x1, y1, x2, y2)
+    
+        x1 : GLshort
+        y1 : GLshort
+        x2 : GLshort
+        y2 : GLshort
+    """
+    return _api_(x1, y1, x2, y2)
+    
 @bind(None, [POINTER(GLshort), POINTER(GLshort)])
-def glRectsv(v1, v2): pass
-
+def glRectsv(v1, v2, _api_=None): 
+    """glRectsv(v1, v2)
+    
+        v1 : POINTER(GLshort)
+        v2 : POINTER(GLshort)
+    """
+    return _api_(v1, v2)
+    
 @bind(GLint, [GLenum])
-def glRenderMode(mode): pass
-
+def glRenderMode(mode, _api_=None): 
+    """glRenderMode(mode)
+    
+        mode : GLenum
+    """
+    return _api_(mode)
+    
 @bind(None, [GLenum])
-def glResetHistogram(target): pass
-
+def glResetHistogram(target, _api_=None): 
+    """glResetHistogram(target)
+    
+        target : GLenum
+    """
+    return _api_(target)
+    
 @bind(None, [GLenum])
-def glResetMinmax(target): pass
-
+def glResetMinmax(target, _api_=None): 
+    """glResetMinmax(target)
+    
+        target : GLenum
+    """
+    return _api_(target)
+    
 @bind(None, [GLdouble, GLdouble, GLdouble, GLdouble])
-def glRotated(angle, x, y, z): pass
-
+def glRotated(angle, x, y, z, _api_=None): 
+    """glRotated(angle, x, y, z)
+    
+        angle : GLdouble
+        x : GLdouble
+        y : GLdouble
+        z : GLdouble
+    """
+    return _api_(angle, x, y, z)
+    
 @bind(None, [GLfloat, GLfloat, GLfloat, GLfloat])
-def glRotatef(angle, x, y, z): pass
-
+def glRotatef(angle, x, y, z, _api_=None): 
+    """glRotatef(angle, x, y, z)
+    
+        angle : GLfloat
+        x : GLfloat
+        y : GLfloat
+        z : GLfloat
+    """
+    return _api_(angle, x, y, z)
+    
 @bind(None, [GLdouble, GLdouble, GLdouble])
-def glScaled(x, y, z): pass
-
+def glScaled(x, y, z, _api_=None): 
+    """glScaled(x, y, z)
+    
+        x : GLdouble
+        y : GLdouble
+        z : GLdouble
+    """
+    return _api_(x, y, z)
+    
 @bind(None, [GLfloat, GLfloat, GLfloat])
-def glScalef(x, y, z): pass
-
+def glScalef(x, y, z, _api_=None): 
+    """glScalef(x, y, z)
+    
+        x : GLfloat
+        y : GLfloat
+        z : GLfloat
+    """
+    return _api_(x, y, z)
+    
 @bind(None, [GLint, GLint, GLsizei, GLsizei])
-def glScissor(x, y, width, height): pass
-
+def glScissor(x, y, width, height, _api_=None): 
+    """glScissor(x, y, width, height)
+    
+        x : GLint
+        y : GLint
+        width : GLsizei
+        height : GLsizei
+    """
+    return _api_(x, y, width, height)
+    
 @bind(None, [GLsizei, POINTER(GLuint)])
-def glSelectBuffer(size, buffer): pass
-
+def glSelectBuffer(size, buffer, _api_=None): 
+    """glSelectBuffer(size, buffer)
+    
+        size : GLsizei
+        buffer : POINTER(GLuint)
+    """
+    return _api_(size, buffer)
+    
 @bind(None, [GLenum, GLenum, GLsizei, GLsizei, GLenum, GLenum, POINTER(GLvoid), POINTER(GLvoid)])
-def glSeparableFilter2D(target, internalformat, width, height, format, type, row, column): pass
-
+def glSeparableFilter2D(target, internalformat, width, height, format, type, row, column, _api_=None): 
+    """glSeparableFilter2D(target, internalformat, width, height, format, type, row, column)
+    
+        target : GLenum
+        internalformat : GLenum
+        width : GLsizei
+        height : GLsizei
+        format : GLenum
+        type : GLenum
+        row : POINTER(GLvoid)
+        column : POINTER(GLvoid)
+    """
+    return _api_(target, internalformat, width, height, format, type, row, column)
+    
 @bind(None, [GLenum])
-def glShadeModel(mode): pass
-
+def glShadeModel(mode, _api_=None): 
+    """glShadeModel(mode)
+    
+        mode : GLenum
+    """
+    return _api_(mode)
+    
 @bind(None, [GLenum, GLint, GLuint])
-def glStencilFunc(func, ref, mask): pass
-
+def glStencilFunc(func, ref, mask, _api_=None): 
+    """glStencilFunc(func, ref, mask)
+    
+        func : GLenum
+        ref : GLint
+        mask : GLuint
+    """
+    return _api_(func, ref, mask)
+    
 @bind(None, [GLuint])
-def glStencilMask(mask): pass
-
+def glStencilMask(mask, _api_=None): 
+    """glStencilMask(mask)
+    
+        mask : GLuint
+    """
+    return _api_(mask)
+    
 @bind(None, [GLenum, GLenum, GLenum])
-def glStencilOp(fail, zfail, zpass): pass
-
+def glStencilOp(fail, zfail, zpass, _api_=None): 
+    """glStencilOp(fail, zfail, zpass)
+    
+        fail : GLenum
+        zfail : GLenum
+        zpass : GLenum
+    """
+    return _api_(fail, zfail, zpass)
+    
 @bind(None, [GLdouble])
-def glTexCoord1d(s): pass
-
+def glTexCoord1d(s, _api_=None): 
+    """glTexCoord1d(s)
+    
+        s : GLdouble
+    """
+    return _api_(s)
+    
 @bind(None, [POINTER(GLdouble)])
-def glTexCoord1dv(v): pass
-
+def glTexCoord1dv(v, _api_=None): 
+    """glTexCoord1dv(v)
+    
+        v : POINTER(GLdouble)
+    """
+    return _api_(v)
+    
 @bind(None, [GLfloat])
-def glTexCoord1f(s): pass
-
+def glTexCoord1f(s, _api_=None): 
+    """glTexCoord1f(s)
+    
+        s : GLfloat
+    """
+    return _api_(s)
+    
 @bind(None, [POINTER(GLfloat)])
-def glTexCoord1fv(v): pass
-
+def glTexCoord1fv(v, _api_=None): 
+    """glTexCoord1fv(v)
+    
+        v : POINTER(GLfloat)
+    """
+    return _api_(v)
+    
 @bind(None, [GLint])
-def glTexCoord1i(s): pass
-
+def glTexCoord1i(s, _api_=None): 
+    """glTexCoord1i(s)
+    
+        s : GLint
+    """
+    return _api_(s)
+    
 @bind(None, [POINTER(GLint)])
-def glTexCoord1iv(v): pass
-
+def glTexCoord1iv(v, _api_=None): 
+    """glTexCoord1iv(v)
+    
+        v : POINTER(GLint)
+    """
+    return _api_(v)
+    
 @bind(None, [GLshort])
-def glTexCoord1s(s): pass
-
+def glTexCoord1s(s, _api_=None): 
+    """glTexCoord1s(s)
+    
+        s : GLshort
+    """
+    return _api_(s)
+    
 @bind(None, [POINTER(GLshort)])
-def glTexCoord1sv(v): pass
-
+def glTexCoord1sv(v, _api_=None): 
+    """glTexCoord1sv(v)
+    
+        v : POINTER(GLshort)
+    """
+    return _api_(v)
+    
 @bind(None, [GLdouble, GLdouble])
-def glTexCoord2d(s, t): pass
-
+def glTexCoord2d(s, t, _api_=None): 
+    """glTexCoord2d(s, t)
+    
+        s : GLdouble
+        t : GLdouble
+    """
+    return _api_(s, t)
+    
 @bind(None, [POINTER(GLdouble)])
-def glTexCoord2dv(v): pass
-
+def glTexCoord2dv(v, _api_=None): 
+    """glTexCoord2dv(v)
+    
+        v : POINTER(GLdouble)
+    """
+    return _api_(v)
+    
 @bind(None, [GLfloat, GLfloat])
-def glTexCoord2f(s, t): pass
-
+def glTexCoord2f(s, t, _api_=None): 
+    """glTexCoord2f(s, t)
+    
+        s : GLfloat
+        t : GLfloat
+    """
+    return _api_(s, t)
+    
 @bind(None, [POINTER(GLfloat)])
-def glTexCoord2fv(v): pass
-
+def glTexCoord2fv(v, _api_=None): 
+    """glTexCoord2fv(v)
+    
+        v : POINTER(GLfloat)
+    """
+    return _api_(v)
+    
 @bind(None, [GLint, GLint])
-def glTexCoord2i(s, t): pass
-
+def glTexCoord2i(s, t, _api_=None): 
+    """glTexCoord2i(s, t)
+    
+        s : GLint
+        t : GLint
+    """
+    return _api_(s, t)
+    
 @bind(None, [POINTER(GLint)])
-def glTexCoord2iv(v): pass
-
+def glTexCoord2iv(v, _api_=None): 
+    """glTexCoord2iv(v)
+    
+        v : POINTER(GLint)
+    """
+    return _api_(v)
+    
 @bind(None, [GLshort, GLshort])
-def glTexCoord2s(s, t): pass
-
+def glTexCoord2s(s, t, _api_=None): 
+    """glTexCoord2s(s, t)
+    
+        s : GLshort
+        t : GLshort
+    """
+    return _api_(s, t)
+    
 @bind(None, [POINTER(GLshort)])
-def glTexCoord2sv(v): pass
-
+def glTexCoord2sv(v, _api_=None): 
+    """glTexCoord2sv(v)
+    
+        v : POINTER(GLshort)
+    """
+    return _api_(v)
+    
 @bind(None, [GLdouble, GLdouble, GLdouble])
-def glTexCoord3d(s, t, r): pass
-
+def glTexCoord3d(s, t, r, _api_=None): 
+    """glTexCoord3d(s, t, r)
+    
+        s : GLdouble
+        t : GLdouble
+        r : GLdouble
+    """
+    return _api_(s, t, r)
+    
 @bind(None, [POINTER(GLdouble)])
-def glTexCoord3dv(v): pass
-
+def glTexCoord3dv(v, _api_=None): 
+    """glTexCoord3dv(v)
+    
+        v : POINTER(GLdouble)
+    """
+    return _api_(v)
+    
 @bind(None, [GLfloat, GLfloat, GLfloat])
-def glTexCoord3f(s, t, r): pass
-
+def glTexCoord3f(s, t, r, _api_=None): 
+    """glTexCoord3f(s, t, r)
+    
+        s : GLfloat
+        t : GLfloat
+        r : GLfloat
+    """
+    return _api_(s, t, r)
+    
 @bind(None, [POINTER(GLfloat)])
-def glTexCoord3fv(v): pass
-
+def glTexCoord3fv(v, _api_=None): 
+    """glTexCoord3fv(v)
+    
+        v : POINTER(GLfloat)
+    """
+    return _api_(v)
+    
 @bind(None, [GLint, GLint, GLint])
-def glTexCoord3i(s, t, r): pass
-
+def glTexCoord3i(s, t, r, _api_=None): 
+    """glTexCoord3i(s, t, r)
+    
+        s : GLint
+        t : GLint
+        r : GLint
+    """
+    return _api_(s, t, r)
+    
 @bind(None, [POINTER(GLint)])
-def glTexCoord3iv(v): pass
-
+def glTexCoord3iv(v, _api_=None): 
+    """glTexCoord3iv(v)
+    
+        v : POINTER(GLint)
+    """
+    return _api_(v)
+    
 @bind(None, [GLshort, GLshort, GLshort])
-def glTexCoord3s(s, t, r): pass
-
+def glTexCoord3s(s, t, r, _api_=None): 
+    """glTexCoord3s(s, t, r)
+    
+        s : GLshort
+        t : GLshort
+        r : GLshort
+    """
+    return _api_(s, t, r)
+    
 @bind(None, [POINTER(GLshort)])
-def glTexCoord3sv(v): pass
-
+def glTexCoord3sv(v, _api_=None): 
+    """glTexCoord3sv(v)
+    
+        v : POINTER(GLshort)
+    """
+    return _api_(v)
+    
 @bind(None, [GLdouble, GLdouble, GLdouble, GLdouble])
-def glTexCoord4d(s, t, r, q): pass
-
+def glTexCoord4d(s, t, r, q, _api_=None): 
+    """glTexCoord4d(s, t, r, q)
+    
+        s : GLdouble
+        t : GLdouble
+        r : GLdouble
+        q : GLdouble
+    """
+    return _api_(s, t, r, q)
+    
 @bind(None, [POINTER(GLdouble)])
-def glTexCoord4dv(v): pass
-
+def glTexCoord4dv(v, _api_=None): 
+    """glTexCoord4dv(v)
+    
+        v : POINTER(GLdouble)
+    """
+    return _api_(v)
+    
 @bind(None, [GLfloat, GLfloat, GLfloat, GLfloat])
-def glTexCoord4f(s, t, r, q): pass
-
+def glTexCoord4f(s, t, r, q, _api_=None): 
+    """glTexCoord4f(s, t, r, q)
+    
+        s : GLfloat
+        t : GLfloat
+        r : GLfloat
+        q : GLfloat
+    """
+    return _api_(s, t, r, q)
+    
 @bind(None, [POINTER(GLfloat)])
-def glTexCoord4fv(v): pass
-
+def glTexCoord4fv(v, _api_=None): 
+    """glTexCoord4fv(v)
+    
+        v : POINTER(GLfloat)
+    """
+    return _api_(v)
+    
 @bind(None, [GLint, GLint, GLint, GLint])
-def glTexCoord4i(s, t, r, q): pass
-
+def glTexCoord4i(s, t, r, q, _api_=None): 
+    """glTexCoord4i(s, t, r, q)
+    
+        s : GLint
+        t : GLint
+        r : GLint
+        q : GLint
+    """
+    return _api_(s, t, r, q)
+    
 @bind(None, [POINTER(GLint)])
-def glTexCoord4iv(v): pass
-
+def glTexCoord4iv(v, _api_=None): 
+    """glTexCoord4iv(v)
+    
+        v : POINTER(GLint)
+    """
+    return _api_(v)
+    
 @bind(None, [GLshort, GLshort, GLshort, GLshort])
-def glTexCoord4s(s, t, r, q): pass
-
+def glTexCoord4s(s, t, r, q, _api_=None): 
+    """glTexCoord4s(s, t, r, q)
+    
+        s : GLshort
+        t : GLshort
+        r : GLshort
+        q : GLshort
+    """
+    return _api_(s, t, r, q)
+    
 @bind(None, [POINTER(GLshort)])
-def glTexCoord4sv(v): pass
-
+def glTexCoord4sv(v, _api_=None): 
+    """glTexCoord4sv(v)
+    
+        v : POINTER(GLshort)
+    """
+    return _api_(v)
+    
 @bind(None, [GLint, GLenum, GLsizei, POINTER(GLvoid)])
-def glTexCoordPointer(size, type, stride, pointer): pass
-
+def glTexCoordPointer(size, type, stride, pointer, _api_=None): 
+    """glTexCoordPointer(size, type, stride, pointer)
+    
+        size : GLint
+        type : GLenum
+        stride : GLsizei
+        pointer : POINTER(GLvoid)
+    """
+    return _api_(size, type, stride, pointer)
+    
 @bind(None, [GLenum, GLenum, GLfloat])
-def glTexEnvf(target, pname, param): pass
-
+def glTexEnvf(target, pname, param, _api_=None): 
+    """glTexEnvf(target, pname, param)
+    
+        target : GLenum
+        pname : GLenum
+        param : GLfloat
+    """
+    return _api_(target, pname, param)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLfloat)])
-def glTexEnvfv(target, pname, params): pass
-
+def glTexEnvfv(target, pname, params, _api_=None): 
+    """glTexEnvfv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(GLfloat)
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, GLenum, GLint])
-def glTexEnvi(target, pname, param): pass
-
+def glTexEnvi(target, pname, param, _api_=None): 
+    """glTexEnvi(target, pname, param)
+    
+        target : GLenum
+        pname : GLenum
+        param : GLint
+    """
+    return _api_(target, pname, param)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLint)])
-def glTexEnviv(target, pname, params): pass
-
+def glTexEnviv(target, pname, params, _api_=None): 
+    """glTexEnviv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, GLenum, GLdouble])
-def glTexGend(coord, pname, param): pass
-
+def glTexGend(coord, pname, param, _api_=None): 
+    """glTexGend(coord, pname, param)
+    
+        coord : GLenum
+        pname : GLenum
+        param : GLdouble
+    """
+    return _api_(coord, pname, param)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLdouble)])
-def glTexGendv(coord, pname, params): pass
-
+def glTexGendv(coord, pname, params, _api_=None): 
+    """glTexGendv(coord, pname, params)
+    
+        coord : GLenum
+        pname : GLenum
+        params : POINTER(GLdouble)
+    """
+    return _api_(coord, pname, params)
+    
 @bind(None, [GLenum, GLenum, GLfloat])
-def glTexGenf(coord, pname, param): pass
-
+def glTexGenf(coord, pname, param, _api_=None): 
+    """glTexGenf(coord, pname, param)
+    
+        coord : GLenum
+        pname : GLenum
+        param : GLfloat
+    """
+    return _api_(coord, pname, param)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLfloat)])
-def glTexGenfv(coord, pname, params): pass
-
+def glTexGenfv(coord, pname, params, _api_=None): 
+    """glTexGenfv(coord, pname, params)
+    
+        coord : GLenum
+        pname : GLenum
+        params : POINTER(GLfloat)
+    """
+    return _api_(coord, pname, params)
+    
 @bind(None, [GLenum, GLenum, GLint])
-def glTexGeni(coord, pname, param): pass
-
+def glTexGeni(coord, pname, param, _api_=None): 
+    """glTexGeni(coord, pname, param)
+    
+        coord : GLenum
+        pname : GLenum
+        param : GLint
+    """
+    return _api_(coord, pname, param)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLint)])
-def glTexGeniv(coord, pname, params): pass
-
+def glTexGeniv(coord, pname, params, _api_=None): 
+    """glTexGeniv(coord, pname, params)
+    
+        coord : GLenum
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(coord, pname, params)
+    
 @bind(None, [GLenum, GLint, GLenum, GLsizei, GLint, GLenum, GLenum, POINTER(GLvoid)])
-def glTexImage1D(target, level, internalformat, width, border, format, type, pixels): pass
-
+def glTexImage1D(target, level, internalformat, width, border, format, type, pixels, _api_=None): 
+    """glTexImage1D(target, level, internalformat, width, border, format, type, pixels)
+    
+        target : GLenum
+        level : GLint
+        internalformat : GLenum
+        width : GLsizei
+        border : GLint
+        format : GLenum
+        type : GLenum
+        pixels : POINTER(GLvoid)
+    """
+    return _api_(target, level, internalformat, width, border, format, type, pixels)
+    
 @bind(None, [GLenum, GLint, GLenum, GLsizei, GLsizei, GLint, GLenum, GLenum, POINTER(GLvoid)])
-def glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels): pass
-
+def glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels, _api_=None): 
+    """glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels)
+    
+        target : GLenum
+        level : GLint
+        internalformat : GLenum
+        width : GLsizei
+        height : GLsizei
+        border : GLint
+        format : GLenum
+        type : GLenum
+        pixels : POINTER(GLvoid)
+    """
+    return _api_(target, level, internalformat, width, height, border, format, type, pixels)
+    
 @bind(None, [GLenum, GLint, GLenum, GLsizei, GLsizei, GLsizei, GLint, GLenum, GLenum, POINTER(GLvoid)])
-def glTexImage3D(target, level, internalformat, width, height, depth, border, format, type, pixels): pass
-
+def glTexImage3D(target, level, internalformat, width, height, depth, border, format, type, pixels, _api_=None): 
+    """glTexImage3D(target, level, internalformat, width, height, depth, border, format, type, pixels)
+    
+        target : GLenum
+        level : GLint
+        internalformat : GLenum
+        width : GLsizei
+        height : GLsizei
+        depth : GLsizei
+        border : GLint
+        format : GLenum
+        type : GLenum
+        pixels : POINTER(GLvoid)
+    """
+    return _api_(target, level, internalformat, width, height, depth, border, format, type, pixels)
+    
 @bind(None, [GLenum, GLenum, GLfloat])
-def glTexParameterf(target, pname, param): pass
-
+def glTexParameterf(target, pname, param, _api_=None): 
+    """glTexParameterf(target, pname, param)
+    
+        target : GLenum
+        pname : GLenum
+        param : GLfloat
+    """
+    return _api_(target, pname, param)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLfloat)])
-def glTexParameterfv(target, pname, params): pass
-
+def glTexParameterfv(target, pname, params, _api_=None): 
+    """glTexParameterfv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(GLfloat)
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, GLenum, GLint])
-def glTexParameteri(target, pname, param): pass
-
+def glTexParameteri(target, pname, param, _api_=None): 
+    """glTexParameteri(target, pname, param)
+    
+        target : GLenum
+        pname : GLenum
+        param : GLint
+    """
+    return _api_(target, pname, param)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLint)])
-def glTexParameteriv(target, pname, params): pass
-
+def glTexParameteriv(target, pname, params, _api_=None): 
+    """glTexParameteriv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, GLint, GLint, GLsizei, GLenum, GLenum, POINTER(GLvoid)])
-def glTexSubImage1D(target, level, xoffset, width, format, type, pixels): pass
-
+def glTexSubImage1D(target, level, xoffset, width, format, type, pixels, _api_=None): 
+    """glTexSubImage1D(target, level, xoffset, width, format, type, pixels)
+    
+        target : GLenum
+        level : GLint
+        xoffset : GLint
+        width : GLsizei
+        format : GLenum
+        type : GLenum
+        pixels : POINTER(GLvoid)
+    """
+    return _api_(target, level, xoffset, width, format, type, pixels)
+    
 @bind(None, [GLenum, GLint, GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, POINTER(GLvoid)])
-def glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels): pass
-
+def glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels, _api_=None): 
+    """glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels)
+    
+        target : GLenum
+        level : GLint
+        xoffset : GLint
+        yoffset : GLint
+        width : GLsizei
+        height : GLsizei
+        format : GLenum
+        type : GLenum
+        pixels : POINTER(GLvoid)
+    """
+    return _api_(target, level, xoffset, yoffset, width, height, format, type, pixels)
+    
 @bind(None, [GLenum, GLint, GLint, GLint, GLint, GLsizei, GLsizei, GLsizei, GLenum, GLenum, POINTER(GLvoid)])
-def glTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, pixels): pass
-
+def glTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, pixels, _api_=None): 
+    """glTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, pixels)
+    
+        target : GLenum
+        level : GLint
+        xoffset : GLint
+        yoffset : GLint
+        zoffset : GLint
+        width : GLsizei
+        height : GLsizei
+        depth : GLsizei
+        format : GLenum
+        type : GLenum
+        pixels : POINTER(GLvoid)
+    """
+    return _api_(target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, pixels)
+    
 @bind(None, [GLdouble, GLdouble, GLdouble])
-def glTranslated(x, y, z): pass
-
+def glTranslated(x, y, z, _api_=None): 
+    """glTranslated(x, y, z)
+    
+        x : GLdouble
+        y : GLdouble
+        z : GLdouble
+    """
+    return _api_(x, y, z)
+    
 @bind(None, [GLfloat, GLfloat, GLfloat])
-def glTranslatef(x, y, z): pass
-
+def glTranslatef(x, y, z, _api_=None): 
+    """glTranslatef(x, y, z)
+    
+        x : GLfloat
+        y : GLfloat
+        z : GLfloat
+    """
+    return _api_(x, y, z)
+    
 @bind(None, [GLdouble, GLdouble])
-def glVertex2d(x, y): pass
-
+def glVertex2d(x, y, _api_=None): 
+    """glVertex2d(x, y)
+    
+        x : GLdouble
+        y : GLdouble
+    """
+    return _api_(x, y)
+    
 @bind(None, [POINTER(GLdouble)])
-def glVertex2dv(v): pass
-
+def glVertex2dv(v, _api_=None): 
+    """glVertex2dv(v)
+    
+        v : POINTER(GLdouble)
+    """
+    return _api_(v)
+    
 @bind(None, [GLfloat, GLfloat])
-def glVertex2f(x, y): pass
-
+def glVertex2f(x, y, _api_=None): 
+    """glVertex2f(x, y)
+    
+        x : GLfloat
+        y : GLfloat
+    """
+    return _api_(x, y)
+    
 @bind(None, [POINTER(GLfloat)])
-def glVertex2fv(v): pass
-
+def glVertex2fv(v, _api_=None): 
+    """glVertex2fv(v)
+    
+        v : POINTER(GLfloat)
+    """
+    return _api_(v)
+    
 @bind(None, [GLint, GLint])
-def glVertex2i(x, y): pass
-
+def glVertex2i(x, y, _api_=None): 
+    """glVertex2i(x, y)
+    
+        x : GLint
+        y : GLint
+    """
+    return _api_(x, y)
+    
 @bind(None, [POINTER(GLint)])
-def glVertex2iv(v): pass
-
+def glVertex2iv(v, _api_=None): 
+    """glVertex2iv(v)
+    
+        v : POINTER(GLint)
+    """
+    return _api_(v)
+    
 @bind(None, [GLshort, GLshort])
-def glVertex2s(x, y): pass
-
+def glVertex2s(x, y, _api_=None): 
+    """glVertex2s(x, y)
+    
+        x : GLshort
+        y : GLshort
+    """
+    return _api_(x, y)
+    
 @bind(None, [POINTER(GLshort)])
-def glVertex2sv(v): pass
-
+def glVertex2sv(v, _api_=None): 
+    """glVertex2sv(v)
+    
+        v : POINTER(GLshort)
+    """
+    return _api_(v)
+    
 @bind(None, [GLdouble, GLdouble, GLdouble])
-def glVertex3d(x, y, z): pass
-
+def glVertex3d(x, y, z, _api_=None): 
+    """glVertex3d(x, y, z)
+    
+        x : GLdouble
+        y : GLdouble
+        z : GLdouble
+    """
+    return _api_(x, y, z)
+    
 @bind(None, [POINTER(GLdouble)])
-def glVertex3dv(v): pass
-
+def glVertex3dv(v, _api_=None): 
+    """glVertex3dv(v)
+    
+        v : POINTER(GLdouble)
+    """
+    return _api_(v)
+    
 @bind(None, [GLfloat, GLfloat, GLfloat])
-def glVertex3f(x, y, z): pass
-
+def glVertex3f(x, y, z, _api_=None): 
+    """glVertex3f(x, y, z)
+    
+        x : GLfloat
+        y : GLfloat
+        z : GLfloat
+    """
+    return _api_(x, y, z)
+    
 @bind(None, [POINTER(GLfloat)])
-def glVertex3fv(v): pass
-
+def glVertex3fv(v, _api_=None): 
+    """glVertex3fv(v)
+    
+        v : POINTER(GLfloat)
+    """
+    return _api_(v)
+    
 @bind(None, [GLint, GLint, GLint])
-def glVertex3i(x, y, z): pass
-
+def glVertex3i(x, y, z, _api_=None): 
+    """glVertex3i(x, y, z)
+    
+        x : GLint
+        y : GLint
+        z : GLint
+    """
+    return _api_(x, y, z)
+    
 @bind(None, [POINTER(GLint)])
-def glVertex3iv(v): pass
-
+def glVertex3iv(v, _api_=None): 
+    """glVertex3iv(v)
+    
+        v : POINTER(GLint)
+    """
+    return _api_(v)
+    
 @bind(None, [GLshort, GLshort, GLshort])
-def glVertex3s(x, y, z): pass
-
+def glVertex3s(x, y, z, _api_=None): 
+    """glVertex3s(x, y, z)
+    
+        x : GLshort
+        y : GLshort
+        z : GLshort
+    """
+    return _api_(x, y, z)
+    
 @bind(None, [POINTER(GLshort)])
-def glVertex3sv(v): pass
-
+def glVertex3sv(v, _api_=None): 
+    """glVertex3sv(v)
+    
+        v : POINTER(GLshort)
+    """
+    return _api_(v)
+    
 @bind(None, [GLdouble, GLdouble, GLdouble, GLdouble])
-def glVertex4d(x, y, z, w): pass
-
+def glVertex4d(x, y, z, w, _api_=None): 
+    """glVertex4d(x, y, z, w)
+    
+        x : GLdouble
+        y : GLdouble
+        z : GLdouble
+        w : GLdouble
+    """
+    return _api_(x, y, z, w)
+    
 @bind(None, [POINTER(GLdouble)])
-def glVertex4dv(v): pass
-
+def glVertex4dv(v, _api_=None): 
+    """glVertex4dv(v)
+    
+        v : POINTER(GLdouble)
+    """
+    return _api_(v)
+    
 @bind(None, [GLfloat, GLfloat, GLfloat, GLfloat])
-def glVertex4f(x, y, z, w): pass
-
+def glVertex4f(x, y, z, w, _api_=None): 
+    """glVertex4f(x, y, z, w)
+    
+        x : GLfloat
+        y : GLfloat
+        z : GLfloat
+        w : GLfloat
+    """
+    return _api_(x, y, z, w)
+    
 @bind(None, [POINTER(GLfloat)])
-def glVertex4fv(v): pass
-
+def glVertex4fv(v, _api_=None): 
+    """glVertex4fv(v)
+    
+        v : POINTER(GLfloat)
+    """
+    return _api_(v)
+    
 @bind(None, [GLint, GLint, GLint, GLint])
-def glVertex4i(x, y, z, w): pass
-
+def glVertex4i(x, y, z, w, _api_=None): 
+    """glVertex4i(x, y, z, w)
+    
+        x : GLint
+        y : GLint
+        z : GLint
+        w : GLint
+    """
+    return _api_(x, y, z, w)
+    
 @bind(None, [POINTER(GLint)])
-def glVertex4iv(v): pass
-
+def glVertex4iv(v, _api_=None): 
+    """glVertex4iv(v)
+    
+        v : POINTER(GLint)
+    """
+    return _api_(v)
+    
 @bind(None, [GLshort, GLshort, GLshort, GLshort])
-def glVertex4s(x, y, z, w): pass
-
+def glVertex4s(x, y, z, w, _api_=None): 
+    """glVertex4s(x, y, z, w)
+    
+        x : GLshort
+        y : GLshort
+        z : GLshort
+        w : GLshort
+    """
+    return _api_(x, y, z, w)
+    
 @bind(None, [POINTER(GLshort)])
-def glVertex4sv(v): pass
-
+def glVertex4sv(v, _api_=None): 
+    """glVertex4sv(v)
+    
+        v : POINTER(GLshort)
+    """
+    return _api_(v)
+    
 @bind(None, [GLint, GLenum, GLsizei, POINTER(GLvoid)])
-def glVertexPointer(size, type, stride, pointer): pass
-
+def glVertexPointer(size, type, stride, pointer, _api_=None): 
+    """glVertexPointer(size, type, stride, pointer)
+    
+        size : GLint
+        type : GLenum
+        stride : GLsizei
+        pointer : POINTER(GLvoid)
+    """
+    return _api_(size, type, stride, pointer)
+    
 @bind(None, [GLint, GLint, GLsizei, GLsizei])
-def glViewport(x, y, width, height): pass
-
+def glViewport(x, y, width, height, _api_=None): 
+    """glViewport(x, y, width, height)
+    
+        x : GLint
+        y : GLint
+        width : GLsizei
+        height : GLsizei
+    """
+    return _api_(x, y, width, height)
+    
 
 @bind(None, [GLclampf, GLboolean])
-def glSampleCoverage(arg_0, arg_1): pass
-
+def glSampleCoverage(arg_0, arg_1, _api_=None): 
+    """glSampleCoverage(arg_0, arg_1)
+    
+        arg_0 : GLclampf
+        arg_1 : GLboolean
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [GLenum])
-def glSamplePass(arg_0): pass
-
+def glSamplePass(arg_0, _api_=None): 
+    """glSamplePass(arg_0)
+    
+        arg_0 : GLenum
+    """
+    return _api_(arg_0)
+    
 
 @bind(None, [POINTER(GLfloat)])
-def glLoadTransposeMatrixf(arg_0): pass
-
+def glLoadTransposeMatrixf(arg_0, _api_=None): 
+    """glLoadTransposeMatrixf(arg_0)
+    
+        arg_0 : POINTER(GLfloat)
+    """
+    return _api_(arg_0)
+    
 @bind(None, [POINTER(GLdouble)])
-def glLoadTransposeMatrixd(arg_0): pass
-
+def glLoadTransposeMatrixd(arg_0, _api_=None): 
+    """glLoadTransposeMatrixd(arg_0)
+    
+        arg_0 : POINTER(GLdouble)
+    """
+    return _api_(arg_0)
+    
 @bind(None, [POINTER(GLfloat)])
-def glMultTransposeMatrixf(arg_0): pass
-
+def glMultTransposeMatrixf(arg_0, _api_=None): 
+    """glMultTransposeMatrixf(arg_0)
+    
+        arg_0 : POINTER(GLfloat)
+    """
+    return _api_(arg_0)
+    
 @bind(None, [POINTER(GLdouble)])
-def glMultTransposeMatrixd(arg_0): pass
-
+def glMultTransposeMatrixd(arg_0, _api_=None): 
+    """glMultTransposeMatrixd(arg_0)
+    
+        arg_0 : POINTER(GLdouble)
+    """
+    return _api_(arg_0)
+    
 
 @bind(None, [GLenum, GLint, GLenum, GLsizei, GLsizei, GLsizei, GLint, GLsizei, POINTER(GLvoid)])
-def glCompressedTexImage3D(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6, arg_7, arg_8): pass
-
+def glCompressedTexImage3D(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6, arg_7, arg_8, _api_=None): 
+    """glCompressedTexImage3D(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6, arg_7, arg_8)
+    
+        arg_0 : GLenum
+        arg_1 : GLint
+        arg_2 : GLenum
+        arg_3 : GLsizei
+        arg_4 : GLsizei
+        arg_5 : GLsizei
+        arg_6 : GLint
+        arg_7 : GLsizei
+        arg_8 : POINTER(GLvoid)
+    """
+    return _api_(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6, arg_7, arg_8)
+    
 @bind(None, [GLenum, GLint, GLenum, GLsizei, GLsizei, GLint, GLsizei, POINTER(GLvoid)])
-def glCompressedTexImage2D(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6, arg_7): pass
-
+def glCompressedTexImage2D(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6, arg_7, _api_=None): 
+    """glCompressedTexImage2D(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6, arg_7)
+    
+        arg_0 : GLenum
+        arg_1 : GLint
+        arg_2 : GLenum
+        arg_3 : GLsizei
+        arg_4 : GLsizei
+        arg_5 : GLint
+        arg_6 : GLsizei
+        arg_7 : POINTER(GLvoid)
+    """
+    return _api_(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6, arg_7)
+    
 @bind(None, [GLenum, GLint, GLenum, GLsizei, GLint, GLsizei, POINTER(GLvoid)])
-def glCompressedTexImage1D(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6): pass
-
+def glCompressedTexImage1D(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6, _api_=None): 
+    """glCompressedTexImage1D(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6)
+    
+        arg_0 : GLenum
+        arg_1 : GLint
+        arg_2 : GLenum
+        arg_3 : GLsizei
+        arg_4 : GLint
+        arg_5 : GLsizei
+        arg_6 : POINTER(GLvoid)
+    """
+    return _api_(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6)
+    
 @bind(None, [GLenum, GLint, GLint, GLint, GLint, GLsizei, GLsizei, GLsizei, GLenum, GLsizei, POINTER(GLvoid)])
-def glCompressedTexSubImage3D(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6, arg_7, arg_8, arg_9, arg_10): pass
-
+def glCompressedTexSubImage3D(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6, arg_7, arg_8, arg_9, arg_10, _api_=None): 
+    """glCompressedTexSubImage3D(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6, arg_7, arg_8, arg_9, arg_10)
+    
+        arg_0 : GLenum
+        arg_1 : GLint
+        arg_2 : GLint
+        arg_3 : GLint
+        arg_4 : GLint
+        arg_5 : GLsizei
+        arg_6 : GLsizei
+        arg_7 : GLsizei
+        arg_8 : GLenum
+        arg_9 : GLsizei
+        arg_10 : POINTER(GLvoid)
+    """
+    return _api_(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6, arg_7, arg_8, arg_9, arg_10)
+    
 @bind(None, [GLenum, GLint, GLint, GLint, GLsizei, GLsizei, GLenum, GLsizei, POINTER(GLvoid)])
-def glCompressedTexSubImage2D(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6, arg_7, arg_8): pass
-
+def glCompressedTexSubImage2D(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6, arg_7, arg_8, _api_=None): 
+    """glCompressedTexSubImage2D(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6, arg_7, arg_8)
+    
+        arg_0 : GLenum
+        arg_1 : GLint
+        arg_2 : GLint
+        arg_3 : GLint
+        arg_4 : GLsizei
+        arg_5 : GLsizei
+        arg_6 : GLenum
+        arg_7 : GLsizei
+        arg_8 : POINTER(GLvoid)
+    """
+    return _api_(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6, arg_7, arg_8)
+    
 @bind(None, [GLenum, GLint, GLint, GLsizei, GLenum, GLsizei, POINTER(GLvoid)])
-def glCompressedTexSubImage1D(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6): pass
-
+def glCompressedTexSubImage1D(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6, _api_=None): 
+    """glCompressedTexSubImage1D(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6)
+    
+        arg_0 : GLenum
+        arg_1 : GLint
+        arg_2 : GLint
+        arg_3 : GLsizei
+        arg_4 : GLenum
+        arg_5 : GLsizei
+        arg_6 : POINTER(GLvoid)
+    """
+    return _api_(arg_0, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6)
+    
 @bind(None, [GLenum, GLint, POINTER(GLvoid)])
-def glGetCompressedTexImage(arg_0, arg_1, arg_2): pass
-
+def glGetCompressedTexImage(arg_0, arg_1, arg_2, _api_=None): 
+    """glGetCompressedTexImage(arg_0, arg_1, arg_2)
+    
+        arg_0 : GLenum
+        arg_1 : GLint
+        arg_2 : POINTER(GLvoid)
+    """
+    return _api_(arg_0, arg_1, arg_2)
+    
 
 @bind(None, [GLenum])
-def glActiveTexture(arg_0): pass
-
+def glActiveTexture(arg_0, _api_=None): 
+    """glActiveTexture(arg_0)
+    
+        arg_0 : GLenum
+    """
+    return _api_(arg_0)
+    
 @bind(None, [GLenum])
-def glClientActiveTexture(arg_0): pass
-
+def glClientActiveTexture(arg_0, _api_=None): 
+    """glClientActiveTexture(arg_0)
+    
+        arg_0 : GLenum
+    """
+    return _api_(arg_0)
+    
 @bind(None, [GLenum, GLdouble])
-def glMultiTexCoord1d(arg_0, arg_1): pass
-
+def glMultiTexCoord1d(arg_0, arg_1, _api_=None): 
+    """glMultiTexCoord1d(arg_0, arg_1)
+    
+        arg_0 : GLenum
+        arg_1 : GLdouble
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [GLenum, POINTER(GLdouble)])
-def glMultiTexCoord1dv(arg_0, arg_1): pass
-
+def glMultiTexCoord1dv(arg_0, arg_1, _api_=None): 
+    """glMultiTexCoord1dv(arg_0, arg_1)
+    
+        arg_0 : GLenum
+        arg_1 : POINTER(GLdouble)
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [GLenum, GLfloat])
-def glMultiTexCoord1f(arg_0, arg_1): pass
-
+def glMultiTexCoord1f(arg_0, arg_1, _api_=None): 
+    """glMultiTexCoord1f(arg_0, arg_1)
+    
+        arg_0 : GLenum
+        arg_1 : GLfloat
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [GLenum, POINTER(GLfloat)])
-def glMultiTexCoord1fv(arg_0, arg_1): pass
-
+def glMultiTexCoord1fv(arg_0, arg_1, _api_=None): 
+    """glMultiTexCoord1fv(arg_0, arg_1)
+    
+        arg_0 : GLenum
+        arg_1 : POINTER(GLfloat)
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [GLenum, GLint])
-def glMultiTexCoord1i(arg_0, arg_1): pass
-
+def glMultiTexCoord1i(arg_0, arg_1, _api_=None): 
+    """glMultiTexCoord1i(arg_0, arg_1)
+    
+        arg_0 : GLenum
+        arg_1 : GLint
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [GLenum, POINTER(GLint)])
-def glMultiTexCoord1iv(arg_0, arg_1): pass
-
+def glMultiTexCoord1iv(arg_0, arg_1, _api_=None): 
+    """glMultiTexCoord1iv(arg_0, arg_1)
+    
+        arg_0 : GLenum
+        arg_1 : POINTER(GLint)
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [GLenum, GLshort])
-def glMultiTexCoord1s(arg_0, arg_1): pass
-
+def glMultiTexCoord1s(arg_0, arg_1, _api_=None): 
+    """glMultiTexCoord1s(arg_0, arg_1)
+    
+        arg_0 : GLenum
+        arg_1 : GLshort
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [GLenum, POINTER(GLshort)])
-def glMultiTexCoord1sv(arg_0, arg_1): pass
-
+def glMultiTexCoord1sv(arg_0, arg_1, _api_=None): 
+    """glMultiTexCoord1sv(arg_0, arg_1)
+    
+        arg_0 : GLenum
+        arg_1 : POINTER(GLshort)
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [GLenum, GLdouble, GLdouble])
-def glMultiTexCoord2d(arg_0, arg_1, arg_2): pass
-
+def glMultiTexCoord2d(arg_0, arg_1, arg_2, _api_=None): 
+    """glMultiTexCoord2d(arg_0, arg_1, arg_2)
+    
+        arg_0 : GLenum
+        arg_1 : GLdouble
+        arg_2 : GLdouble
+    """
+    return _api_(arg_0, arg_1, arg_2)
+    
 @bind(None, [GLenum, POINTER(GLdouble)])
-def glMultiTexCoord2dv(arg_0, arg_1): pass
-
+def glMultiTexCoord2dv(arg_0, arg_1, _api_=None): 
+    """glMultiTexCoord2dv(arg_0, arg_1)
+    
+        arg_0 : GLenum
+        arg_1 : POINTER(GLdouble)
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [GLenum, GLfloat, GLfloat])
-def glMultiTexCoord2f(arg_0, arg_1, arg_2): pass
-
+def glMultiTexCoord2f(arg_0, arg_1, arg_2, _api_=None): 
+    """glMultiTexCoord2f(arg_0, arg_1, arg_2)
+    
+        arg_0 : GLenum
+        arg_1 : GLfloat
+        arg_2 : GLfloat
+    """
+    return _api_(arg_0, arg_1, arg_2)
+    
 @bind(None, [GLenum, POINTER(GLfloat)])
-def glMultiTexCoord2fv(arg_0, arg_1): pass
-
+def glMultiTexCoord2fv(arg_0, arg_1, _api_=None): 
+    """glMultiTexCoord2fv(arg_0, arg_1)
+    
+        arg_0 : GLenum
+        arg_1 : POINTER(GLfloat)
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [GLenum, GLint, GLint])
-def glMultiTexCoord2i(arg_0, arg_1, arg_2): pass
-
+def glMultiTexCoord2i(arg_0, arg_1, arg_2, _api_=None): 
+    """glMultiTexCoord2i(arg_0, arg_1, arg_2)
+    
+        arg_0 : GLenum
+        arg_1 : GLint
+        arg_2 : GLint
+    """
+    return _api_(arg_0, arg_1, arg_2)
+    
 @bind(None, [GLenum, POINTER(GLint)])
-def glMultiTexCoord2iv(arg_0, arg_1): pass
-
+def glMultiTexCoord2iv(arg_0, arg_1, _api_=None): 
+    """glMultiTexCoord2iv(arg_0, arg_1)
+    
+        arg_0 : GLenum
+        arg_1 : POINTER(GLint)
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [GLenum, GLshort, GLshort])
-def glMultiTexCoord2s(arg_0, arg_1, arg_2): pass
-
+def glMultiTexCoord2s(arg_0, arg_1, arg_2, _api_=None): 
+    """glMultiTexCoord2s(arg_0, arg_1, arg_2)
+    
+        arg_0 : GLenum
+        arg_1 : GLshort
+        arg_2 : GLshort
+    """
+    return _api_(arg_0, arg_1, arg_2)
+    
 @bind(None, [GLenum, POINTER(GLshort)])
-def glMultiTexCoord2sv(arg_0, arg_1): pass
-
+def glMultiTexCoord2sv(arg_0, arg_1, _api_=None): 
+    """glMultiTexCoord2sv(arg_0, arg_1)
+    
+        arg_0 : GLenum
+        arg_1 : POINTER(GLshort)
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [GLenum, GLdouble, GLdouble, GLdouble])
-def glMultiTexCoord3d(arg_0, arg_1, arg_2, arg_3): pass
-
+def glMultiTexCoord3d(arg_0, arg_1, arg_2, arg_3, _api_=None): 
+    """glMultiTexCoord3d(arg_0, arg_1, arg_2, arg_3)
+    
+        arg_0 : GLenum
+        arg_1 : GLdouble
+        arg_2 : GLdouble
+        arg_3 : GLdouble
+    """
+    return _api_(arg_0, arg_1, arg_2, arg_3)
+    
 @bind(None, [GLenum, POINTER(GLdouble)])
-def glMultiTexCoord3dv(arg_0, arg_1): pass
-
+def glMultiTexCoord3dv(arg_0, arg_1, _api_=None): 
+    """glMultiTexCoord3dv(arg_0, arg_1)
+    
+        arg_0 : GLenum
+        arg_1 : POINTER(GLdouble)
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [GLenum, GLfloat, GLfloat, GLfloat])
-def glMultiTexCoord3f(arg_0, arg_1, arg_2, arg_3): pass
-
+def glMultiTexCoord3f(arg_0, arg_1, arg_2, arg_3, _api_=None): 
+    """glMultiTexCoord3f(arg_0, arg_1, arg_2, arg_3)
+    
+        arg_0 : GLenum
+        arg_1 : GLfloat
+        arg_2 : GLfloat
+        arg_3 : GLfloat
+    """
+    return _api_(arg_0, arg_1, arg_2, arg_3)
+    
 @bind(None, [GLenum, POINTER(GLfloat)])
-def glMultiTexCoord3fv(arg_0, arg_1): pass
-
+def glMultiTexCoord3fv(arg_0, arg_1, _api_=None): 
+    """glMultiTexCoord3fv(arg_0, arg_1)
+    
+        arg_0 : GLenum
+        arg_1 : POINTER(GLfloat)
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [GLenum, GLint, GLint, GLint])
-def glMultiTexCoord3i(arg_0, arg_1, arg_2, arg_3): pass
-
+def glMultiTexCoord3i(arg_0, arg_1, arg_2, arg_3, _api_=None): 
+    """glMultiTexCoord3i(arg_0, arg_1, arg_2, arg_3)
+    
+        arg_0 : GLenum
+        arg_1 : GLint
+        arg_2 : GLint
+        arg_3 : GLint
+    """
+    return _api_(arg_0, arg_1, arg_2, arg_3)
+    
 @bind(None, [GLenum, POINTER(GLint)])
-def glMultiTexCoord3iv(arg_0, arg_1): pass
-
+def glMultiTexCoord3iv(arg_0, arg_1, _api_=None): 
+    """glMultiTexCoord3iv(arg_0, arg_1)
+    
+        arg_0 : GLenum
+        arg_1 : POINTER(GLint)
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [GLenum, GLshort, GLshort, GLshort])
-def glMultiTexCoord3s(arg_0, arg_1, arg_2, arg_3): pass
-
+def glMultiTexCoord3s(arg_0, arg_1, arg_2, arg_3, _api_=None): 
+    """glMultiTexCoord3s(arg_0, arg_1, arg_2, arg_3)
+    
+        arg_0 : GLenum
+        arg_1 : GLshort
+        arg_2 : GLshort
+        arg_3 : GLshort
+    """
+    return _api_(arg_0, arg_1, arg_2, arg_3)
+    
 @bind(None, [GLenum, POINTER(GLshort)])
-def glMultiTexCoord3sv(arg_0, arg_1): pass
-
+def glMultiTexCoord3sv(arg_0, arg_1, _api_=None): 
+    """glMultiTexCoord3sv(arg_0, arg_1)
+    
+        arg_0 : GLenum
+        arg_1 : POINTER(GLshort)
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [GLenum, GLdouble, GLdouble, GLdouble, GLdouble])
-def glMultiTexCoord4d(arg_0, arg_1, arg_2, arg_3, arg_4): pass
-
+def glMultiTexCoord4d(arg_0, arg_1, arg_2, arg_3, arg_4, _api_=None): 
+    """glMultiTexCoord4d(arg_0, arg_1, arg_2, arg_3, arg_4)
+    
+        arg_0 : GLenum
+        arg_1 : GLdouble
+        arg_2 : GLdouble
+        arg_3 : GLdouble
+        arg_4 : GLdouble
+    """
+    return _api_(arg_0, arg_1, arg_2, arg_3, arg_4)
+    
 @bind(None, [GLenum, POINTER(GLdouble)])
-def glMultiTexCoord4dv(arg_0, arg_1): pass
-
+def glMultiTexCoord4dv(arg_0, arg_1, _api_=None): 
+    """glMultiTexCoord4dv(arg_0, arg_1)
+    
+        arg_0 : GLenum
+        arg_1 : POINTER(GLdouble)
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [GLenum, GLfloat, GLfloat, GLfloat, GLfloat])
-def glMultiTexCoord4f(arg_0, arg_1, arg_2, arg_3, arg_4): pass
-
+def glMultiTexCoord4f(arg_0, arg_1, arg_2, arg_3, arg_4, _api_=None): 
+    """glMultiTexCoord4f(arg_0, arg_1, arg_2, arg_3, arg_4)
+    
+        arg_0 : GLenum
+        arg_1 : GLfloat
+        arg_2 : GLfloat
+        arg_3 : GLfloat
+        arg_4 : GLfloat
+    """
+    return _api_(arg_0, arg_1, arg_2, arg_3, arg_4)
+    
 @bind(None, [GLenum, POINTER(GLfloat)])
-def glMultiTexCoord4fv(arg_0, arg_1): pass
-
+def glMultiTexCoord4fv(arg_0, arg_1, _api_=None): 
+    """glMultiTexCoord4fv(arg_0, arg_1)
+    
+        arg_0 : GLenum
+        arg_1 : POINTER(GLfloat)
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [GLenum, GLint, GLint, GLint, GLint])
-def glMultiTexCoord4i(arg_0, arg_1, arg_2, arg_3, arg_4): pass
-
+def glMultiTexCoord4i(arg_0, arg_1, arg_2, arg_3, arg_4, _api_=None): 
+    """glMultiTexCoord4i(arg_0, arg_1, arg_2, arg_3, arg_4)
+    
+        arg_0 : GLenum
+        arg_1 : GLint
+        arg_2 : GLint
+        arg_3 : GLint
+        arg_4 : GLint
+    """
+    return _api_(arg_0, arg_1, arg_2, arg_3, arg_4)
+    
 @bind(None, [GLenum, POINTER(GLint)])
-def glMultiTexCoord4iv(arg_0, arg_1): pass
-
+def glMultiTexCoord4iv(arg_0, arg_1, _api_=None): 
+    """glMultiTexCoord4iv(arg_0, arg_1)
+    
+        arg_0 : GLenum
+        arg_1 : POINTER(GLint)
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [GLenum, GLshort, GLshort, GLshort, GLshort])
-def glMultiTexCoord4s(arg_0, arg_1, arg_2, arg_3, arg_4): pass
-
+def glMultiTexCoord4s(arg_0, arg_1, arg_2, arg_3, arg_4, _api_=None): 
+    """glMultiTexCoord4s(arg_0, arg_1, arg_2, arg_3, arg_4)
+    
+        arg_0 : GLenum
+        arg_1 : GLshort
+        arg_2 : GLshort
+        arg_3 : GLshort
+        arg_4 : GLshort
+    """
+    return _api_(arg_0, arg_1, arg_2, arg_3, arg_4)
+    
 @bind(None, [GLenum, POINTER(GLshort)])
-def glMultiTexCoord4sv(arg_0, arg_1): pass
-
+def glMultiTexCoord4sv(arg_0, arg_1, _api_=None): 
+    """glMultiTexCoord4sv(arg_0, arg_1)
+    
+        arg_0 : GLenum
+        arg_1 : POINTER(GLshort)
+    """
+    return _api_(arg_0, arg_1)
+    
 
 @bind(None, [GLfloat])
-def glFogCoordf(arg_0): pass
-
+def glFogCoordf(arg_0, _api_=None): 
+    """glFogCoordf(arg_0)
+    
+        arg_0 : GLfloat
+    """
+    return _api_(arg_0)
+    
 @bind(None, [POINTER(GLfloat)])
-def glFogCoordfv(arg_0): pass
-
+def glFogCoordfv(arg_0, _api_=None): 
+    """glFogCoordfv(arg_0)
+    
+        arg_0 : POINTER(GLfloat)
+    """
+    return _api_(arg_0)
+    
 @bind(None, [GLdouble])
-def glFogCoordd(arg_0): pass
-
+def glFogCoordd(arg_0, _api_=None): 
+    """glFogCoordd(arg_0)
+    
+        arg_0 : GLdouble
+    """
+    return _api_(arg_0)
+    
 @bind(None, [POINTER(GLdouble)])
-def glFogCoorddv(arg_0): pass
-
+def glFogCoorddv(arg_0, _api_=None): 
+    """glFogCoorddv(arg_0)
+    
+        arg_0 : POINTER(GLdouble)
+    """
+    return _api_(arg_0)
+    
 @bind(None, [GLenum, GLsizei, POINTER(GLvoid)])
-def glFogCoordPointer(arg_0, arg_1, arg_2): pass
-
+def glFogCoordPointer(arg_0, arg_1, arg_2, _api_=None): 
+    """glFogCoordPointer(arg_0, arg_1, arg_2)
+    
+        arg_0 : GLenum
+        arg_1 : GLsizei
+        arg_2 : POINTER(GLvoid)
+    """
+    return _api_(arg_0, arg_1, arg_2)
+    
 
 @bind(None, [GLbyte, GLbyte, GLbyte])
-def glSecondaryColor3b(arg_0, arg_1, arg_2): pass
-
+def glSecondaryColor3b(arg_0, arg_1, arg_2, _api_=None): 
+    """glSecondaryColor3b(arg_0, arg_1, arg_2)
+    
+        arg_0 : GLbyte
+        arg_1 : GLbyte
+        arg_2 : GLbyte
+    """
+    return _api_(arg_0, arg_1, arg_2)
+    
 @bind(None, [POINTER(GLbyte)])
-def glSecondaryColor3bv(arg_0): pass
-
+def glSecondaryColor3bv(arg_0, _api_=None): 
+    """glSecondaryColor3bv(arg_0)
+    
+        arg_0 : POINTER(GLbyte)
+    """
+    return _api_(arg_0)
+    
 @bind(None, [GLdouble, GLdouble, GLdouble])
-def glSecondaryColor3d(arg_0, arg_1, arg_2): pass
-
+def glSecondaryColor3d(arg_0, arg_1, arg_2, _api_=None): 
+    """glSecondaryColor3d(arg_0, arg_1, arg_2)
+    
+        arg_0 : GLdouble
+        arg_1 : GLdouble
+        arg_2 : GLdouble
+    """
+    return _api_(arg_0, arg_1, arg_2)
+    
 @bind(None, [POINTER(GLdouble)])
-def glSecondaryColor3dv(arg_0): pass
-
+def glSecondaryColor3dv(arg_0, _api_=None): 
+    """glSecondaryColor3dv(arg_0)
+    
+        arg_0 : POINTER(GLdouble)
+    """
+    return _api_(arg_0)
+    
 @bind(None, [GLfloat, GLfloat, GLfloat])
-def glSecondaryColor3f(arg_0, arg_1, arg_2): pass
-
+def glSecondaryColor3f(arg_0, arg_1, arg_2, _api_=None): 
+    """glSecondaryColor3f(arg_0, arg_1, arg_2)
+    
+        arg_0 : GLfloat
+        arg_1 : GLfloat
+        arg_2 : GLfloat
+    """
+    return _api_(arg_0, arg_1, arg_2)
+    
 @bind(None, [POINTER(GLfloat)])
-def glSecondaryColor3fv(arg_0): pass
-
+def glSecondaryColor3fv(arg_0, _api_=None): 
+    """glSecondaryColor3fv(arg_0)
+    
+        arg_0 : POINTER(GLfloat)
+    """
+    return _api_(arg_0)
+    
 @bind(None, [GLint, GLint, GLint])
-def glSecondaryColor3i(arg_0, arg_1, arg_2): pass
-
+def glSecondaryColor3i(arg_0, arg_1, arg_2, _api_=None): 
+    """glSecondaryColor3i(arg_0, arg_1, arg_2)
+    
+        arg_0 : GLint
+        arg_1 : GLint
+        arg_2 : GLint
+    """
+    return _api_(arg_0, arg_1, arg_2)
+    
 @bind(None, [POINTER(GLint)])
-def glSecondaryColor3iv(arg_0): pass
-
+def glSecondaryColor3iv(arg_0, _api_=None): 
+    """glSecondaryColor3iv(arg_0)
+    
+        arg_0 : POINTER(GLint)
+    """
+    return _api_(arg_0)
+    
 @bind(None, [GLshort, GLshort, GLshort])
-def glSecondaryColor3s(arg_0, arg_1, arg_2): pass
-
+def glSecondaryColor3s(arg_0, arg_1, arg_2, _api_=None): 
+    """glSecondaryColor3s(arg_0, arg_1, arg_2)
+    
+        arg_0 : GLshort
+        arg_1 : GLshort
+        arg_2 : GLshort
+    """
+    return _api_(arg_0, arg_1, arg_2)
+    
 @bind(None, [POINTER(GLshort)])
-def glSecondaryColor3sv(arg_0): pass
-
+def glSecondaryColor3sv(arg_0, _api_=None): 
+    """glSecondaryColor3sv(arg_0)
+    
+        arg_0 : POINTER(GLshort)
+    """
+    return _api_(arg_0)
+    
 @bind(None, [GLubyte, GLubyte, GLubyte])
-def glSecondaryColor3ub(arg_0, arg_1, arg_2): pass
-
+def glSecondaryColor3ub(arg_0, arg_1, arg_2, _api_=None): 
+    """glSecondaryColor3ub(arg_0, arg_1, arg_2)
+    
+        arg_0 : GLubyte
+        arg_1 : GLubyte
+        arg_2 : GLubyte
+    """
+    return _api_(arg_0, arg_1, arg_2)
+    
 @bind(None, [POINTER(GLubyte)])
-def glSecondaryColor3ubv(arg_0): pass
-
+def glSecondaryColor3ubv(arg_0, _api_=None): 
+    """glSecondaryColor3ubv(arg_0)
+    
+        arg_0 : POINTER(GLubyte)
+    """
+    return _api_(arg_0)
+    
 @bind(None, [GLuint, GLuint, GLuint])
-def glSecondaryColor3ui(arg_0, arg_1, arg_2): pass
-
+def glSecondaryColor3ui(arg_0, arg_1, arg_2, _api_=None): 
+    """glSecondaryColor3ui(arg_0, arg_1, arg_2)
+    
+        arg_0 : GLuint
+        arg_1 : GLuint
+        arg_2 : GLuint
+    """
+    return _api_(arg_0, arg_1, arg_2)
+    
 @bind(None, [POINTER(GLuint)])
-def glSecondaryColor3uiv(arg_0): pass
-
+def glSecondaryColor3uiv(arg_0, _api_=None): 
+    """glSecondaryColor3uiv(arg_0)
+    
+        arg_0 : POINTER(GLuint)
+    """
+    return _api_(arg_0)
+    
 @bind(None, [GLushort, GLushort, GLushort])
-def glSecondaryColor3us(arg_0, arg_1, arg_2): pass
-
+def glSecondaryColor3us(arg_0, arg_1, arg_2, _api_=None): 
+    """glSecondaryColor3us(arg_0, arg_1, arg_2)
+    
+        arg_0 : GLushort
+        arg_1 : GLushort
+        arg_2 : GLushort
+    """
+    return _api_(arg_0, arg_1, arg_2)
+    
 @bind(None, [POINTER(GLushort)])
-def glSecondaryColor3usv(arg_0): pass
-
+def glSecondaryColor3usv(arg_0, _api_=None): 
+    """glSecondaryColor3usv(arg_0)
+    
+        arg_0 : POINTER(GLushort)
+    """
+    return _api_(arg_0)
+    
 @bind(None, [GLint, GLenum, GLsizei, POINTER(GLvoid)])
-def glSecondaryColorPointer(arg_0, arg_1, arg_2, arg_3): pass
-
+def glSecondaryColorPointer(arg_0, arg_1, arg_2, arg_3, _api_=None): 
+    """glSecondaryColorPointer(arg_0, arg_1, arg_2, arg_3)
+    
+        arg_0 : GLint
+        arg_1 : GLenum
+        arg_2 : GLsizei
+        arg_3 : POINTER(GLvoid)
+    """
+    return _api_(arg_0, arg_1, arg_2, arg_3)
+    
 
 @bind(None, [GLenum, GLfloat])
-def glPointParameterf(pname, param): pass
-
+def glPointParameterf(pname, param, _api_=None): 
+    """glPointParameterf(pname, param)
+    
+        pname : GLenum
+        param : GLfloat
+    """
+    return _api_(pname, param)
+    
 @bind(None, [GLenum, POINTER(GLfloat)])
-def glPointParameterfv(pname, params): pass
-
+def glPointParameterfv(pname, params, _api_=None): 
+    """glPointParameterfv(pname, params)
+    
+        pname : GLenum
+        params : POINTER(GLfloat)
+    """
+    return _api_(pname, params)
+    
 @bind(None, [GLenum, GLint])
-def glPointParameteri(pname, param): pass
-
+def glPointParameteri(pname, param, _api_=None): 
+    """glPointParameteri(pname, param)
+    
+        pname : GLenum
+        param : GLint
+    """
+    return _api_(pname, param)
+    
 @bind(None, [GLenum, POINTER(GLint)])
-def glPointParameteriv(pname, params): pass
-
+def glPointParameteriv(pname, params, _api_=None): 
+    """glPointParameteriv(pname, params)
+    
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(pname, params)
+    
 
 @bind(None, [GLenum, GLenum, GLenum, GLenum])
-def glBlendFuncSeparate(arg_0, arg_1, arg_2, arg_3): pass
-
+def glBlendFuncSeparate(arg_0, arg_1, arg_2, arg_3, _api_=None): 
+    """glBlendFuncSeparate(arg_0, arg_1, arg_2, arg_3)
+    
+        arg_0 : GLenum
+        arg_1 : GLenum
+        arg_2 : GLenum
+        arg_3 : GLenum
+    """
+    return _api_(arg_0, arg_1, arg_2, arg_3)
+    
 
 @bind(None, [GLenum, POINTER(GLint), POINTER(GLsizei), GLsizei])
-def glMultiDrawArrays(arg_0, arg_1, arg_2, arg_3): pass
-
+def glMultiDrawArrays(arg_0, arg_1, arg_2, arg_3, _api_=None): 
+    """glMultiDrawArrays(arg_0, arg_1, arg_2, arg_3)
+    
+        arg_0 : GLenum
+        arg_1 : POINTER(GLint)
+        arg_2 : POINTER(GLsizei)
+        arg_3 : GLsizei
+    """
+    return _api_(arg_0, arg_1, arg_2, arg_3)
+    
 @bind(None, [GLenum, POINTER(GLsizei), GLenum, POINTER(POINTER(GLvoid)), GLsizei])
-def glMultiDrawElements(arg_0, arg_1, arg_2, arg_3, arg_4): pass
-
+def glMultiDrawElements(arg_0, arg_1, arg_2, arg_3, arg_4, _api_=None): 
+    """glMultiDrawElements(arg_0, arg_1, arg_2, arg_3, arg_4)
+    
+        arg_0 : GLenum
+        arg_1 : POINTER(GLsizei)
+        arg_2 : GLenum
+        arg_3 : POINTER(POINTER(GLvoid))
+        arg_4 : GLsizei
+    """
+    return _api_(arg_0, arg_1, arg_2, arg_3, arg_4)
+    
 
 @bind(None, [GLdouble, GLdouble])
-def glWindowPos2d(arg_0, arg_1): pass
-
+def glWindowPos2d(arg_0, arg_1, _api_=None): 
+    """glWindowPos2d(arg_0, arg_1)
+    
+        arg_0 : GLdouble
+        arg_1 : GLdouble
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [POINTER(GLdouble)])
-def glWindowPos2dv(arg_0): pass
-
+def glWindowPos2dv(arg_0, _api_=None): 
+    """glWindowPos2dv(arg_0)
+    
+        arg_0 : POINTER(GLdouble)
+    """
+    return _api_(arg_0)
+    
 @bind(None, [GLfloat, GLfloat])
-def glWindowPos2f(arg_0, arg_1): pass
-
+def glWindowPos2f(arg_0, arg_1, _api_=None): 
+    """glWindowPos2f(arg_0, arg_1)
+    
+        arg_0 : GLfloat
+        arg_1 : GLfloat
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [POINTER(GLfloat)])
-def glWindowPos2fv(arg_0): pass
-
+def glWindowPos2fv(arg_0, _api_=None): 
+    """glWindowPos2fv(arg_0)
+    
+        arg_0 : POINTER(GLfloat)
+    """
+    return _api_(arg_0)
+    
 @bind(None, [GLint, GLint])
-def glWindowPos2i(arg_0, arg_1): pass
-
+def glWindowPos2i(arg_0, arg_1, _api_=None): 
+    """glWindowPos2i(arg_0, arg_1)
+    
+        arg_0 : GLint
+        arg_1 : GLint
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [POINTER(GLint)])
-def glWindowPos2iv(arg_0): pass
-
+def glWindowPos2iv(arg_0, _api_=None): 
+    """glWindowPos2iv(arg_0)
+    
+        arg_0 : POINTER(GLint)
+    """
+    return _api_(arg_0)
+    
 @bind(None, [GLshort, GLshort])
-def glWindowPos2s(arg_0, arg_1): pass
-
+def glWindowPos2s(arg_0, arg_1, _api_=None): 
+    """glWindowPos2s(arg_0, arg_1)
+    
+        arg_0 : GLshort
+        arg_1 : GLshort
+    """
+    return _api_(arg_0, arg_1)
+    
 @bind(None, [POINTER(GLshort)])
-def glWindowPos2sv(arg_0): pass
-
+def glWindowPos2sv(arg_0, _api_=None): 
+    """glWindowPos2sv(arg_0)
+    
+        arg_0 : POINTER(GLshort)
+    """
+    return _api_(arg_0)
+    
 @bind(None, [GLdouble, GLdouble, GLdouble])
-def glWindowPos3d(arg_0, arg_1, arg_2): pass
-
+def glWindowPos3d(arg_0, arg_1, arg_2, _api_=None): 
+    """glWindowPos3d(arg_0, arg_1, arg_2)
+    
+        arg_0 : GLdouble
+        arg_1 : GLdouble
+        arg_2 : GLdouble
+    """
+    return _api_(arg_0, arg_1, arg_2)
+    
 @bind(None, [POINTER(GLdouble)])
-def glWindowPos3dv(arg_0): pass
-
+def glWindowPos3dv(arg_0, _api_=None): 
+    """glWindowPos3dv(arg_0)
+    
+        arg_0 : POINTER(GLdouble)
+    """
+    return _api_(arg_0)
+    
 @bind(None, [GLfloat, GLfloat, GLfloat])
-def glWindowPos3f(arg_0, arg_1, arg_2): pass
-
+def glWindowPos3f(arg_0, arg_1, arg_2, _api_=None): 
+    """glWindowPos3f(arg_0, arg_1, arg_2)
+    
+        arg_0 : GLfloat
+        arg_1 : GLfloat
+        arg_2 : GLfloat
+    """
+    return _api_(arg_0, arg_1, arg_2)
+    
 @bind(None, [POINTER(GLfloat)])
-def glWindowPos3fv(arg_0): pass
-
+def glWindowPos3fv(arg_0, _api_=None): 
+    """glWindowPos3fv(arg_0)
+    
+        arg_0 : POINTER(GLfloat)
+    """
+    return _api_(arg_0)
+    
 @bind(None, [GLint, GLint, GLint])
-def glWindowPos3i(arg_0, arg_1, arg_2): pass
-
+def glWindowPos3i(arg_0, arg_1, arg_2, _api_=None): 
+    """glWindowPos3i(arg_0, arg_1, arg_2)
+    
+        arg_0 : GLint
+        arg_1 : GLint
+        arg_2 : GLint
+    """
+    return _api_(arg_0, arg_1, arg_2)
+    
 @bind(None, [POINTER(GLint)])
-def glWindowPos3iv(arg_0): pass
-
+def glWindowPos3iv(arg_0, _api_=None): 
+    """glWindowPos3iv(arg_0)
+    
+        arg_0 : POINTER(GLint)
+    """
+    return _api_(arg_0)
+    
 @bind(None, [GLshort, GLshort, GLshort])
-def glWindowPos3s(arg_0, arg_1, arg_2): pass
-
+def glWindowPos3s(arg_0, arg_1, arg_2, _api_=None): 
+    """glWindowPos3s(arg_0, arg_1, arg_2)
+    
+        arg_0 : GLshort
+        arg_1 : GLshort
+        arg_2 : GLshort
+    """
+    return _api_(arg_0, arg_1, arg_2)
+    
 @bind(None, [POINTER(GLshort)])
-def glWindowPos3sv(arg_0): pass
-
+def glWindowPos3sv(arg_0, _api_=None): 
+    """glWindowPos3sv(arg_0)
+    
+        arg_0 : POINTER(GLshort)
+    """
+    return _api_(arg_0)
+    
 
 @bind(None, [GLsizei, POINTER(GLuint)])
-def glGenQueries(n, ids): pass
-
+def glGenQueries(n, ids, _api_=None): 
+    """glGenQueries(n, ids)
+    
+        n : GLsizei
+        ids : POINTER(GLuint)
+    """
+    return _api_(n, ids)
+    
 @bind(None, [GLsizei, POINTER(GLuint)])
-def glDeleteQueries(n, ids): pass
-
+def glDeleteQueries(n, ids, _api_=None): 
+    """glDeleteQueries(n, ids)
+    
+        n : GLsizei
+        ids : POINTER(GLuint)
+    """
+    return _api_(n, ids)
+    
 @bind(GLboolean, [GLuint])
-def glIsQuery(id): pass
-
+def glIsQuery(id, _api_=None): 
+    """glIsQuery(id)
+    
+        id : GLuint
+    """
+    return _api_(id)
+    
 @bind(None, [GLenum, GLuint])
-def glBeginQuery(target, id): pass
-
+def glBeginQuery(target, id, _api_=None): 
+    """glBeginQuery(target, id)
+    
+        target : GLenum
+        id : GLuint
+    """
+    return _api_(target, id)
+    
 @bind(None, [GLenum])
-def glEndQuery(target): pass
-
+def glEndQuery(target, _api_=None): 
+    """glEndQuery(target)
+    
+        target : GLenum
+    """
+    return _api_(target)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLint)])
-def glGetQueryiv(target, pname, params): pass
-
+def glGetQueryiv(target, pname, params, _api_=None): 
+    """glGetQueryiv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLuint, GLenum, POINTER(GLint)])
-def glGetQueryObjectiv(id, pname, params): pass
-
+def glGetQueryObjectiv(id, pname, params, _api_=None): 
+    """glGetQueryObjectiv(id, pname, params)
+    
+        id : GLuint
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(id, pname, params)
+    
 @bind(None, [GLuint, GLenum, POINTER(GLuint)])
-def glGetQueryObjectuiv(id, pname, params): pass
-
+def glGetQueryObjectuiv(id, pname, params, _api_=None): 
+    """glGetQueryObjectuiv(id, pname, params)
+    
+        id : GLuint
+        pname : GLenum
+        params : POINTER(GLuint)
+    """
+    return _api_(id, pname, params)
+    
 
 @bind(None, [GLenum, GLuint])
-def glBindBuffer(target, buffer): pass
-
+def glBindBuffer(target, buffer, _api_=None): 
+    """glBindBuffer(target, buffer)
+    
+        target : GLenum
+        buffer : GLuint
+    """
+    return _api_(target, buffer)
+    
 @bind(None, [GLsizei, POINTER(GLuint)])
-def glDeleteBuffers(n, buffers): pass
-
+def glDeleteBuffers(n, buffers, _api_=None): 
+    """glDeleteBuffers(n, buffers)
+    
+        n : GLsizei
+        buffers : POINTER(GLuint)
+    """
+    return _api_(n, buffers)
+    
 @bind(None, [GLsizei, POINTER(GLuint)])
-def glGenBuffers(n, buffers): pass
-
+def glGenBuffers(n, buffers, _api_=None): 
+    """glGenBuffers(n, buffers)
+    
+        n : GLsizei
+        buffers : POINTER(GLuint)
+    """
+    return _api_(n, buffers)
+    
 @bind(GLboolean, [GLuint])
-def glIsBuffer(buffer): pass
-
+def glIsBuffer(buffer, _api_=None): 
+    """glIsBuffer(buffer)
+    
+        buffer : GLuint
+    """
+    return _api_(buffer)
+    
 @bind(None, [GLenum, GLsizeiptr, POINTER(GLvoid), GLenum])
-def glBufferData(target, size, data, usage): pass
-
+def glBufferData(target, size, data, usage, _api_=None): 
+    """glBufferData(target, size, data, usage)
+    
+        target : GLenum
+        size : GLsizeiptr
+        data : POINTER(GLvoid)
+        usage : GLenum
+    """
+    return _api_(target, size, data, usage)
+    
 @bind(None, [GLenum, GLintptr, GLsizeiptr, POINTER(GLvoid)])
-def glBufferSubData(target, offset, size, data): pass
-
+def glBufferSubData(target, offset, size, data, _api_=None): 
+    """glBufferSubData(target, offset, size, data)
+    
+        target : GLenum
+        offset : GLintptr
+        size : GLsizeiptr
+        data : POINTER(GLvoid)
+    """
+    return _api_(target, offset, size, data)
+    
 @bind(None, [GLenum, GLintptr, GLsizeiptr, POINTER(GLvoid)])
-def glGetBufferSubData(target, offset, size, data): pass
-
+def glGetBufferSubData(target, offset, size, data, _api_=None): 
+    """glGetBufferSubData(target, offset, size, data)
+    
+        target : GLenum
+        offset : GLintptr
+        size : GLsizeiptr
+        data : POINTER(GLvoid)
+    """
+    return _api_(target, offset, size, data)
+    
 @bind(POINTER(GLvoid), [GLenum, GLenum])
-def glMapBuffer(target, access): pass
-
+def glMapBuffer(target, access, _api_=None): 
+    """glMapBuffer(target, access)
+    
+        target : GLenum
+        access : GLenum
+    """
+    return _api_(target, access)
+    
 @bind(GLboolean, [GLenum])
-def glUnmapBuffer(target): pass
-
+def glUnmapBuffer(target, _api_=None): 
+    """glUnmapBuffer(target)
+    
+        target : GLenum
+    """
+    return _api_(target)
+    
 @bind(None, [GLenum, GLenum, POINTER(GLint)])
-def glGetBufferParameteriv(target, pname, params): pass
-
+def glGetBufferParameteriv(target, pname, params, _api_=None): 
+    """glGetBufferParameteriv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(target, pname, params)
+    
 @bind(None, [GLenum, GLenum, POINTER(POINTER(GLvoid))])
-def glGetBufferPointerv(target, pname, params): pass
-
+def glGetBufferPointerv(target, pname, params, _api_=None): 
+    """glGetBufferPointerv(target, pname, params)
+    
+        target : GLenum
+        pname : GLenum
+        params : POINTER(POINTER(GLvoid))
+    """
+    return _api_(target, pname, params)
+    
 
 @bind(None, [GLsizei, POINTER(GLenum)])
-def glDrawBuffers(n, bufs): pass
-
+def glDrawBuffers(n, bufs, _api_=None): 
+    """glDrawBuffers(n, bufs)
+    
+        n : GLsizei
+        bufs : POINTER(GLenum)
+    """
+    return _api_(n, bufs)
+    
 @bind(None, [GLuint, GLdouble])
-def glVertexAttrib1d(index, x): pass
-
+def glVertexAttrib1d(index, x, _api_=None): 
+    """glVertexAttrib1d(index, x)
+    
+        index : GLuint
+        x : GLdouble
+    """
+    return _api_(index, x)
+    
 @bind(None, [GLuint, POINTER(GLdouble)])
-def glVertexAttrib1dv(index, v): pass
-
+def glVertexAttrib1dv(index, v, _api_=None): 
+    """glVertexAttrib1dv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLdouble)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, GLfloat])
-def glVertexAttrib1f(index, x): pass
-
+def glVertexAttrib1f(index, x, _api_=None): 
+    """glVertexAttrib1f(index, x)
+    
+        index : GLuint
+        x : GLfloat
+    """
+    return _api_(index, x)
+    
 @bind(None, [GLuint, POINTER(GLfloat)])
-def glVertexAttrib1fv(index, v): pass
-
+def glVertexAttrib1fv(index, v, _api_=None): 
+    """glVertexAttrib1fv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLfloat)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, GLshort])
-def glVertexAttrib1s(index, x): pass
-
+def glVertexAttrib1s(index, x, _api_=None): 
+    """glVertexAttrib1s(index, x)
+    
+        index : GLuint
+        x : GLshort
+    """
+    return _api_(index, x)
+    
 @bind(None, [GLuint, POINTER(GLshort)])
-def glVertexAttrib1sv(index, v): pass
-
+def glVertexAttrib1sv(index, v, _api_=None): 
+    """glVertexAttrib1sv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLshort)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, GLdouble, GLdouble])
-def glVertexAttrib2d(index, x, y): pass
-
+def glVertexAttrib2d(index, x, y, _api_=None): 
+    """glVertexAttrib2d(index, x, y)
+    
+        index : GLuint
+        x : GLdouble
+        y : GLdouble
+    """
+    return _api_(index, x, y)
+    
 @bind(None, [GLuint, POINTER(GLdouble)])
-def glVertexAttrib2dv(index, v): pass
-
+def glVertexAttrib2dv(index, v, _api_=None): 
+    """glVertexAttrib2dv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLdouble)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, GLfloat, GLfloat])
-def glVertexAttrib2f(index, x, y): pass
-
+def glVertexAttrib2f(index, x, y, _api_=None): 
+    """glVertexAttrib2f(index, x, y)
+    
+        index : GLuint
+        x : GLfloat
+        y : GLfloat
+    """
+    return _api_(index, x, y)
+    
 @bind(None, [GLuint, POINTER(GLfloat)])
-def glVertexAttrib2fv(index, v): pass
-
+def glVertexAttrib2fv(index, v, _api_=None): 
+    """glVertexAttrib2fv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLfloat)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, GLshort, GLshort])
-def glVertexAttrib2s(index, x, y): pass
-
+def glVertexAttrib2s(index, x, y, _api_=None): 
+    """glVertexAttrib2s(index, x, y)
+    
+        index : GLuint
+        x : GLshort
+        y : GLshort
+    """
+    return _api_(index, x, y)
+    
 @bind(None, [GLuint, POINTER(GLshort)])
-def glVertexAttrib2sv(index, v): pass
-
+def glVertexAttrib2sv(index, v, _api_=None): 
+    """glVertexAttrib2sv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLshort)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, GLdouble, GLdouble, GLdouble])
-def glVertexAttrib3d(index, x, y, z): pass
-
+def glVertexAttrib3d(index, x, y, z, _api_=None): 
+    """glVertexAttrib3d(index, x, y, z)
+    
+        index : GLuint
+        x : GLdouble
+        y : GLdouble
+        z : GLdouble
+    """
+    return _api_(index, x, y, z)
+    
 @bind(None, [GLuint, POINTER(GLdouble)])
-def glVertexAttrib3dv(index, v): pass
-
+def glVertexAttrib3dv(index, v, _api_=None): 
+    """glVertexAttrib3dv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLdouble)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, GLfloat, GLfloat, GLfloat])
-def glVertexAttrib3f(index, x, y, z): pass
-
+def glVertexAttrib3f(index, x, y, z, _api_=None): 
+    """glVertexAttrib3f(index, x, y, z)
+    
+        index : GLuint
+        x : GLfloat
+        y : GLfloat
+        z : GLfloat
+    """
+    return _api_(index, x, y, z)
+    
 @bind(None, [GLuint, POINTER(GLfloat)])
-def glVertexAttrib3fv(index, v): pass
-
+def glVertexAttrib3fv(index, v, _api_=None): 
+    """glVertexAttrib3fv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLfloat)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, GLshort, GLshort, GLshort])
-def glVertexAttrib3s(index, x, y, z): pass
-
+def glVertexAttrib3s(index, x, y, z, _api_=None): 
+    """glVertexAttrib3s(index, x, y, z)
+    
+        index : GLuint
+        x : GLshort
+        y : GLshort
+        z : GLshort
+    """
+    return _api_(index, x, y, z)
+    
 @bind(None, [GLuint, POINTER(GLshort)])
-def glVertexAttrib3sv(index, v): pass
-
+def glVertexAttrib3sv(index, v, _api_=None): 
+    """glVertexAttrib3sv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLshort)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, POINTER(GLbyte)])
-def glVertexAttrib4Nbv(index, v): pass
-
+def glVertexAttrib4Nbv(index, v, _api_=None): 
+    """glVertexAttrib4Nbv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLbyte)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, POINTER(GLint)])
-def glVertexAttrib4Niv(index, v): pass
-
+def glVertexAttrib4Niv(index, v, _api_=None): 
+    """glVertexAttrib4Niv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLint)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, POINTER(GLshort)])
-def glVertexAttrib4Nsv(index, v): pass
-
+def glVertexAttrib4Nsv(index, v, _api_=None): 
+    """glVertexAttrib4Nsv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLshort)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, GLubyte, GLubyte, GLubyte, GLubyte])
-def glVertexAttrib4Nub(index, x, y, z, w): pass
-
+def glVertexAttrib4Nub(index, x, y, z, w, _api_=None): 
+    """glVertexAttrib4Nub(index, x, y, z, w)
+    
+        index : GLuint
+        x : GLubyte
+        y : GLubyte
+        z : GLubyte
+        w : GLubyte
+    """
+    return _api_(index, x, y, z, w)
+    
 @bind(None, [GLuint, POINTER(GLubyte)])
-def glVertexAttrib4Nubv(index, v): pass
-
+def glVertexAttrib4Nubv(index, v, _api_=None): 
+    """glVertexAttrib4Nubv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLubyte)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, POINTER(GLuint)])
-def glVertexAttrib4Nuiv(index, v): pass
-
+def glVertexAttrib4Nuiv(index, v, _api_=None): 
+    """glVertexAttrib4Nuiv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLuint)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, POINTER(GLushort)])
-def glVertexAttrib4Nusv(index, v): pass
-
+def glVertexAttrib4Nusv(index, v, _api_=None): 
+    """glVertexAttrib4Nusv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLushort)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, POINTER(GLbyte)])
-def glVertexAttrib4bv(index, v): pass
-
+def glVertexAttrib4bv(index, v, _api_=None): 
+    """glVertexAttrib4bv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLbyte)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, GLdouble, GLdouble, GLdouble, GLdouble])
-def glVertexAttrib4d(index, x, y, z, w): pass
-
+def glVertexAttrib4d(index, x, y, z, w, _api_=None): 
+    """glVertexAttrib4d(index, x, y, z, w)
+    
+        index : GLuint
+        x : GLdouble
+        y : GLdouble
+        z : GLdouble
+        w : GLdouble
+    """
+    return _api_(index, x, y, z, w)
+    
 @bind(None, [GLuint, POINTER(GLdouble)])
-def glVertexAttrib4dv(index, v): pass
-
+def glVertexAttrib4dv(index, v, _api_=None): 
+    """glVertexAttrib4dv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLdouble)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, GLfloat, GLfloat, GLfloat, GLfloat])
-def glVertexAttrib4f(index, x, y, z, w): pass
-
+def glVertexAttrib4f(index, x, y, z, w, _api_=None): 
+    """glVertexAttrib4f(index, x, y, z, w)
+    
+        index : GLuint
+        x : GLfloat
+        y : GLfloat
+        z : GLfloat
+        w : GLfloat
+    """
+    return _api_(index, x, y, z, w)
+    
 @bind(None, [GLuint, POINTER(GLfloat)])
-def glVertexAttrib4fv(index, v): pass
-
+def glVertexAttrib4fv(index, v, _api_=None): 
+    """glVertexAttrib4fv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLfloat)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, POINTER(GLint)])
-def glVertexAttrib4iv(index, v): pass
-
+def glVertexAttrib4iv(index, v, _api_=None): 
+    """glVertexAttrib4iv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLint)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, GLshort, GLshort, GLshort, GLshort])
-def glVertexAttrib4s(index, x, y, z, w): pass
-
+def glVertexAttrib4s(index, x, y, z, w, _api_=None): 
+    """glVertexAttrib4s(index, x, y, z, w)
+    
+        index : GLuint
+        x : GLshort
+        y : GLshort
+        z : GLshort
+        w : GLshort
+    """
+    return _api_(index, x, y, z, w)
+    
 @bind(None, [GLuint, POINTER(GLshort)])
-def glVertexAttrib4sv(index, v): pass
-
+def glVertexAttrib4sv(index, v, _api_=None): 
+    """glVertexAttrib4sv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLshort)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, POINTER(GLubyte)])
-def glVertexAttrib4ubv(index, v): pass
-
+def glVertexAttrib4ubv(index, v, _api_=None): 
+    """glVertexAttrib4ubv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLubyte)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, POINTER(GLuint)])
-def glVertexAttrib4uiv(index, v): pass
-
+def glVertexAttrib4uiv(index, v, _api_=None): 
+    """glVertexAttrib4uiv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLuint)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, POINTER(GLushort)])
-def glVertexAttrib4usv(index, v): pass
-
+def glVertexAttrib4usv(index, v, _api_=None): 
+    """glVertexAttrib4usv(index, v)
+    
+        index : GLuint
+        v : POINTER(GLushort)
+    """
+    return _api_(index, v)
+    
 @bind(None, [GLuint, GLint, GLenum, GLboolean, GLsizei, POINTER(GLvoid)])
-def glVertexAttribPointer(index, size, type, normalized, stride, pointer): pass
-
+def glVertexAttribPointer(index, size, type, normalized, stride, pointer, _api_=None): 
+    """glVertexAttribPointer(index, size, type, normalized, stride, pointer)
+    
+        index : GLuint
+        size : GLint
+        type : GLenum
+        normalized : GLboolean
+        stride : GLsizei
+        pointer : POINTER(GLvoid)
+    """
+    return _api_(index, size, type, normalized, stride, pointer)
+    
 @bind(None, [GLuint])
-def glEnableVertexAttribArray(index): pass
-
+def glEnableVertexAttribArray(index, _api_=None): 
+    """glEnableVertexAttribArray(index)
+    
+        index : GLuint
+    """
+    return _api_(index)
+    
 @bind(None, [GLuint])
-def glDisableVertexAttribArray(index): pass
-
+def glDisableVertexAttribArray(index, _api_=None): 
+    """glDisableVertexAttribArray(index)
+    
+        index : GLuint
+    """
+    return _api_(index)
+    
 @bind(None, [GLuint, GLenum, POINTER(GLdouble)])
-def glGetVertexAttribdv(index, pname, params): pass
-
+def glGetVertexAttribdv(index, pname, params, _api_=None): 
+    """glGetVertexAttribdv(index, pname, params)
+    
+        index : GLuint
+        pname : GLenum
+        params : POINTER(GLdouble)
+    """
+    return _api_(index, pname, params)
+    
 @bind(None, [GLuint, GLenum, POINTER(GLfloat)])
-def glGetVertexAttribfv(index, pname, params): pass
-
+def glGetVertexAttribfv(index, pname, params, _api_=None): 
+    """glGetVertexAttribfv(index, pname, params)
+    
+        index : GLuint
+        pname : GLenum
+        params : POINTER(GLfloat)
+    """
+    return _api_(index, pname, params)
+    
 @bind(None, [GLuint, GLenum, POINTER(GLint)])
-def glGetVertexAttribiv(index, pname, params): pass
-
+def glGetVertexAttribiv(index, pname, params, _api_=None): 
+    """glGetVertexAttribiv(index, pname, params)
+    
+        index : GLuint
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(index, pname, params)
+    
 @bind(None, [GLuint, GLenum, POINTER(POINTER(GLvoid))])
-def glGetVertexAttribPointerv(index, pname, pointer): pass
-
+def glGetVertexAttribPointerv(index, pname, pointer, _api_=None): 
+    """glGetVertexAttribPointerv(index, pname, pointer)
+    
+        index : GLuint
+        pname : GLenum
+        pointer : POINTER(POINTER(GLvoid))
+    """
+    return _api_(index, pname, pointer)
+    
 @bind(None, [GLuint])
-def glDeleteShader(shader): pass
-
+def glDeleteShader(shader, _api_=None): 
+    """glDeleteShader(shader)
+    
+        shader : GLuint
+    """
+    return _api_(shader)
+    
 @bind(None, [GLuint, GLuint])
-def glDetachShader(program, shader): pass
-
+def glDetachShader(program, shader, _api_=None): 
+    """glDetachShader(program, shader)
+    
+        program : GLuint
+        shader : GLuint
+    """
+    return _api_(program, shader)
+    
 @bind(GLuint, [GLenum])
-def glCreateShader(type): pass
-
+def glCreateShader(type, _api_=None): 
+    """glCreateShader(type)
+    
+        type : GLenum
+    """
+    return _api_(type)
+    
 @bind(None, [GLuint, GLsizei, POINTER(POINTER(GLchar)), POINTER(GLint)])
-def glShaderSource(shader, count, string, length): pass
-
+def glShaderSource(shader, count, string, length, _api_=None): 
+    """glShaderSource(shader, count, string, length)
+    
+        shader : GLuint
+        count : GLsizei
+        string : POINTER(POINTER(GLchar))
+        length : POINTER(GLint)
+    """
+    return _api_(shader, count, string, length)
+    
 @bind(None, [GLuint])
-def glCompileShader(shader): pass
-
+def glCompileShader(shader, _api_=None): 
+    """glCompileShader(shader)
+    
+        shader : GLuint
+    """
+    return _api_(shader)
+    
 @bind(GLuint, [])
-def glCreateProgram(): pass
-
+def glCreateProgram(_api_=None): 
+    """glCreateProgram()
+    
+        
+    """
+    return _api_()
+    
 @bind(None, [GLuint, GLuint])
-def glAttachShader(program, shader): pass
-
+def glAttachShader(program, shader, _api_=None): 
+    """glAttachShader(program, shader)
+    
+        program : GLuint
+        shader : GLuint
+    """
+    return _api_(program, shader)
+    
 @bind(None, [GLuint])
-def glLinkProgram(program): pass
-
+def glLinkProgram(program, _api_=None): 
+    """glLinkProgram(program)
+    
+        program : GLuint
+    """
+    return _api_(program)
+    
 @bind(None, [GLuint])
-def glUseProgram(program): pass
-
+def glUseProgram(program, _api_=None): 
+    """glUseProgram(program)
+    
+        program : GLuint
+    """
+    return _api_(program)
+    
 @bind(None, [GLuint])
-def glDeleteProgram(program): pass
-
+def glDeleteProgram(program, _api_=None): 
+    """glDeleteProgram(program)
+    
+        program : GLuint
+    """
+    return _api_(program)
+    
 @bind(None, [GLuint])
-def glValidateProgram(program): pass
-
+def glValidateProgram(program, _api_=None): 
+    """glValidateProgram(program)
+    
+        program : GLuint
+    """
+    return _api_(program)
+    
 @bind(None, [GLint, GLfloat])
-def glUniform1f(location, v0): pass
-
+def glUniform1f(location, v0, _api_=None): 
+    """glUniform1f(location, v0)
+    
+        location : GLint
+        v0 : GLfloat
+    """
+    return _api_(location, v0)
+    
 @bind(None, [GLint, GLfloat, GLfloat])
-def glUniform2f(location, v0, v1): pass
-
+def glUniform2f(location, v0, v1, _api_=None): 
+    """glUniform2f(location, v0, v1)
+    
+        location : GLint
+        v0 : GLfloat
+        v1 : GLfloat
+    """
+    return _api_(location, v0, v1)
+    
 @bind(None, [GLint, GLfloat, GLfloat, GLfloat])
-def glUniform3f(location, v0, v1, v2): pass
-
+def glUniform3f(location, v0, v1, v2, _api_=None): 
+    """glUniform3f(location, v0, v1, v2)
+    
+        location : GLint
+        v0 : GLfloat
+        v1 : GLfloat
+        v2 : GLfloat
+    """
+    return _api_(location, v0, v1, v2)
+    
 @bind(None, [GLint, GLfloat, GLfloat, GLfloat, GLfloat])
-def glUniform4f(location, v0, v1, v2, v3): pass
-
+def glUniform4f(location, v0, v1, v2, v3, _api_=None): 
+    """glUniform4f(location, v0, v1, v2, v3)
+    
+        location : GLint
+        v0 : GLfloat
+        v1 : GLfloat
+        v2 : GLfloat
+        v3 : GLfloat
+    """
+    return _api_(location, v0, v1, v2, v3)
+    
 @bind(None, [GLint, GLint])
-def glUniform1i(location, v0): pass
-
+def glUniform1i(location, v0, _api_=None): 
+    """glUniform1i(location, v0)
+    
+        location : GLint
+        v0 : GLint
+    """
+    return _api_(location, v0)
+    
 @bind(None, [GLint, GLint, GLint])
-def glUniform2i(location, v0, v1): pass
-
+def glUniform2i(location, v0, v1, _api_=None): 
+    """glUniform2i(location, v0, v1)
+    
+        location : GLint
+        v0 : GLint
+        v1 : GLint
+    """
+    return _api_(location, v0, v1)
+    
 @bind(None, [GLint, GLint, GLint, GLint])
-def glUniform3i(location, v0, v1, v2): pass
-
+def glUniform3i(location, v0, v1, v2, _api_=None): 
+    """glUniform3i(location, v0, v1, v2)
+    
+        location : GLint
+        v0 : GLint
+        v1 : GLint
+        v2 : GLint
+    """
+    return _api_(location, v0, v1, v2)
+    
 @bind(None, [GLint, GLint, GLint, GLint, GLint])
-def glUniform4i(location, v0, v1, v2, v3): pass
-
+def glUniform4i(location, v0, v1, v2, v3, _api_=None): 
+    """glUniform4i(location, v0, v1, v2, v3)
+    
+        location : GLint
+        v0 : GLint
+        v1 : GLint
+        v2 : GLint
+        v3 : GLint
+    """
+    return _api_(location, v0, v1, v2, v3)
+    
 @bind(None, [GLint, GLsizei, POINTER(GLfloat)])
-def glUniform1fv(location, count, value): pass
-
+def glUniform1fv(location, count, value, _api_=None): 
+    """glUniform1fv(location, count, value)
+    
+        location : GLint
+        count : GLsizei
+        value : POINTER(GLfloat)
+    """
+    return _api_(location, count, value)
+    
 @bind(None, [GLint, GLsizei, POINTER(GLfloat)])
-def glUniform2fv(location, count, value): pass
-
+def glUniform2fv(location, count, value, _api_=None): 
+    """glUniform2fv(location, count, value)
+    
+        location : GLint
+        count : GLsizei
+        value : POINTER(GLfloat)
+    """
+    return _api_(location, count, value)
+    
 @bind(None, [GLint, GLsizei, POINTER(GLfloat)])
-def glUniform3fv(location, count, value): pass
-
+def glUniform3fv(location, count, value, _api_=None): 
+    """glUniform3fv(location, count, value)
+    
+        location : GLint
+        count : GLsizei
+        value : POINTER(GLfloat)
+    """
+    return _api_(location, count, value)
+    
 @bind(None, [GLint, GLsizei, POINTER(GLfloat)])
-def glUniform4fv(location, count, value): pass
-
+def glUniform4fv(location, count, value, _api_=None): 
+    """glUniform4fv(location, count, value)
+    
+        location : GLint
+        count : GLsizei
+        value : POINTER(GLfloat)
+    """
+    return _api_(location, count, value)
+    
 @bind(None, [GLint, GLsizei, POINTER(GLint)])
-def glUniform1iv(location, count, value): pass
-
+def glUniform1iv(location, count, value, _api_=None): 
+    """glUniform1iv(location, count, value)
+    
+        location : GLint
+        count : GLsizei
+        value : POINTER(GLint)
+    """
+    return _api_(location, count, value)
+    
 @bind(None, [GLint, GLsizei, POINTER(GLint)])
-def glUniform2iv(location, count, value): pass
-
+def glUniform2iv(location, count, value, _api_=None): 
+    """glUniform2iv(location, count, value)
+    
+        location : GLint
+        count : GLsizei
+        value : POINTER(GLint)
+    """
+    return _api_(location, count, value)
+    
 @bind(None, [GLint, GLsizei, POINTER(GLint)])
-def glUniform3iv(location, count, value): pass
-
+def glUniform3iv(location, count, value, _api_=None): 
+    """glUniform3iv(location, count, value)
+    
+        location : GLint
+        count : GLsizei
+        value : POINTER(GLint)
+    """
+    return _api_(location, count, value)
+    
 @bind(None, [GLint, GLsizei, POINTER(GLint)])
-def glUniform4iv(location, count, value): pass
-
+def glUniform4iv(location, count, value, _api_=None): 
+    """glUniform4iv(location, count, value)
+    
+        location : GLint
+        count : GLsizei
+        value : POINTER(GLint)
+    """
+    return _api_(location, count, value)
+    
 @bind(None, [GLint, GLsizei, GLboolean, POINTER(GLfloat)])
-def glUniformMatrix2fv(location, count, transpose, value): pass
-
+def glUniformMatrix2fv(location, count, transpose, value, _api_=None): 
+    """glUniformMatrix2fv(location, count, transpose, value)
+    
+        location : GLint
+        count : GLsizei
+        transpose : GLboolean
+        value : POINTER(GLfloat)
+    """
+    return _api_(location, count, transpose, value)
+    
 @bind(None, [GLint, GLsizei, GLboolean, POINTER(GLfloat)])
-def glUniformMatrix3fv(location, count, transpose, value): pass
-
+def glUniformMatrix3fv(location, count, transpose, value, _api_=None): 
+    """glUniformMatrix3fv(location, count, transpose, value)
+    
+        location : GLint
+        count : GLsizei
+        transpose : GLboolean
+        value : POINTER(GLfloat)
+    """
+    return _api_(location, count, transpose, value)
+    
 @bind(None, [GLint, GLsizei, GLboolean, POINTER(GLfloat)])
-def glUniformMatrix4fv(location, count, transpose, value): pass
-
+def glUniformMatrix4fv(location, count, transpose, value, _api_=None): 
+    """glUniformMatrix4fv(location, count, transpose, value)
+    
+        location : GLint
+        count : GLsizei
+        transpose : GLboolean
+        value : POINTER(GLfloat)
+    """
+    return _api_(location, count, transpose, value)
+    
 @bind(GLboolean, [GLuint])
-def glIsShader(shader): pass
-
+def glIsShader(shader, _api_=None): 
+    """glIsShader(shader)
+    
+        shader : GLuint
+    """
+    return _api_(shader)
+    
 @bind(GLboolean, [GLuint])
-def glIsProgram(program): pass
-
+def glIsProgram(program, _api_=None): 
+    """glIsProgram(program)
+    
+        program : GLuint
+    """
+    return _api_(program)
+    
 @bind(None, [GLuint, GLenum, POINTER(GLint)])
-def glGetShaderiv(shader, pname, params): pass
-
+def glGetShaderiv(shader, pname, params, _api_=None): 
+    """glGetShaderiv(shader, pname, params)
+    
+        shader : GLuint
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(shader, pname, params)
+    
 @bind(None, [GLuint, GLenum, POINTER(GLint)])
-def glGetProgramiv(program, pname, params): pass
-
+def glGetProgramiv(program, pname, params, _api_=None): 
+    """glGetProgramiv(program, pname, params)
+    
+        program : GLuint
+        pname : GLenum
+        params : POINTER(GLint)
+    """
+    return _api_(program, pname, params)
+    
 @bind(None, [GLuint, GLsizei, POINTER(GLsizei), POINTER(GLuint)])
-def glGetAttachedShaders(program, maxCount, count, shaders): pass
-
+def glGetAttachedShaders(program, maxCount, count, shaders, _api_=None): 
+    """glGetAttachedShaders(program, maxCount, count, shaders)
+    
+        program : GLuint
+        maxCount : GLsizei
+        count : POINTER(GLsizei)
+        shaders : POINTER(GLuint)
+    """
+    return _api_(program, maxCount, count, shaders)
+    
 @bind(None, [GLuint, GLsizei, POINTER(GLsizei), POINTER(GLchar)])
-def glGetShaderInfoLog(shader, bufSize, length, infoLog): pass
-
+def glGetShaderInfoLog(shader, bufSize, length, infoLog, _api_=None): 
+    """glGetShaderInfoLog(shader, bufSize, length, infoLog)
+    
+        shader : GLuint
+        bufSize : GLsizei
+        length : POINTER(GLsizei)
+        infoLog : POINTER(GLchar)
+    """
+    return _api_(shader, bufSize, length, infoLog)
+    
 @bind(None, [GLuint, GLsizei, POINTER(GLsizei), POINTER(GLchar)])
-def glGetProgramInfoLog(program, bufSize, length, infoLog): pass
-
+def glGetProgramInfoLog(program, bufSize, length, infoLog, _api_=None): 
+    """glGetProgramInfoLog(program, bufSize, length, infoLog)
+    
+        program : GLuint
+        bufSize : GLsizei
+        length : POINTER(GLsizei)
+        infoLog : POINTER(GLchar)
+    """
+    return _api_(program, bufSize, length, infoLog)
+    
 @bind(GLint, [GLuint, POINTER(GLchar)])
-def glGetUniformLocation(program, name): pass
-
+def glGetUniformLocation(program, name, _api_=None): 
+    """glGetUniformLocation(program, name)
+    
+        program : GLuint
+        name : POINTER(GLchar)
+    """
+    return _api_(program, name)
+    
 @bind(None, [GLuint, GLuint, GLsizei, POINTER(GLsizei), POINTER(GLsizei), POINTER(GLenum), POINTER(GLchar)])
-def glGetActiveUniform(program, index, bufSize, length, size, type, name): pass
-
+def glGetActiveUniform(program, index, bufSize, length, size, type, name, _api_=None): 
+    """glGetActiveUniform(program, index, bufSize, length, size, type, name)
+    
+        program : GLuint
+        index : GLuint
+        bufSize : GLsizei
+        length : POINTER(GLsizei)
+        size : POINTER(GLsizei)
+        type : POINTER(GLenum)
+        name : POINTER(GLchar)
+    """
+    return _api_(program, index, bufSize, length, size, type, name)
+    
 @bind(None, [GLuint, GLint, POINTER(GLfloat)])
-def glGetUniformfv(program, location, params): pass
-
+def glGetUniformfv(program, location, params, _api_=None): 
+    """glGetUniformfv(program, location, params)
+    
+        program : GLuint
+        location : GLint
+        params : POINTER(GLfloat)
+    """
+    return _api_(program, location, params)
+    
 @bind(None, [GLuint, GLint, POINTER(GLint)])
-def glGetUniformiv(program, location, params): pass
-
+def glGetUniformiv(program, location, params, _api_=None): 
+    """glGetUniformiv(program, location, params)
+    
+        program : GLuint
+        location : GLint
+        params : POINTER(GLint)
+    """
+    return _api_(program, location, params)
+    
 @bind(None, [GLuint, GLsizei, POINTER(GLsizei), POINTER(GLchar)])
-def glGetShaderSource(shader, bufSize, length, source): pass
-
+def glGetShaderSource(shader, bufSize, length, source, _api_=None): 
+    """glGetShaderSource(shader, bufSize, length, source)
+    
+        shader : GLuint
+        bufSize : GLsizei
+        length : POINTER(GLsizei)
+        source : POINTER(GLchar)
+    """
+    return _api_(shader, bufSize, length, source)
+    
 @bind(None, [GLuint, GLuint, POINTER(GLchar)])
-def glBindAttribLocation(program, index, name): pass
-
+def glBindAttribLocation(program, index, name, _api_=None): 
+    """glBindAttribLocation(program, index, name)
+    
+        program : GLuint
+        index : GLuint
+        name : POINTER(GLchar)
+    """
+    return _api_(program, index, name)
+    
 @bind(None, [GLuint, GLuint, GLsizei, POINTER(GLsizei), POINTER(GLsizei), POINTER(GLenum), POINTER(GLchar)])
-def glGetActiveAttrib(program, index, bufSize, length, size, type, name): pass
-
+def glGetActiveAttrib(program, index, bufSize, length, size, type, name, _api_=None): 
+    """glGetActiveAttrib(program, index, bufSize, length, size, type, name)
+    
+        program : GLuint
+        index : GLuint
+        bufSize : GLsizei
+        length : POINTER(GLsizei)
+        size : POINTER(GLsizei)
+        type : POINTER(GLenum)
+        name : POINTER(GLchar)
+    """
+    return _api_(program, index, bufSize, length, size, type, name)
+    
 @bind(GLint, [GLuint, POINTER(GLchar)])
-def glGetAttribLocation(program, name): pass
-
+def glGetAttribLocation(program, name, _api_=None): 
+    """glGetAttribLocation(program, name)
+    
+        program : GLuint
+        name : POINTER(GLchar)
+    """
+    return _api_(program, name)
+    
 @bind(None, [GLenum, GLenum, GLint, GLuint])
-def glStencilFuncSeparate(face, func, ref, mask): pass
-
+def glStencilFuncSeparate(face, func, ref, mask, _api_=None): 
+    """glStencilFuncSeparate(face, func, ref, mask)
+    
+        face : GLenum
+        func : GLenum
+        ref : GLint
+        mask : GLuint
+    """
+    return _api_(face, func, ref, mask)
+    
 @bind(None, [GLenum, GLenum, GLenum, GLenum])
-def glStencilOpSeparate(face, fail, zfail, zpass): pass
-
+def glStencilOpSeparate(face, fail, zfail, zpass, _api_=None): 
+    """glStencilOpSeparate(face, fail, zfail, zpass)
+    
+        face : GLenum
+        fail : GLenum
+        zfail : GLenum
+        zpass : GLenum
+    """
+    return _api_(face, fail, zfail, zpass)
+    
 @bind(None, [GLenum, GLuint])
-def glStencilMaskSeparate(face, mask): pass
-
+def glStencilMaskSeparate(face, mask, _api_=None): 
+    """glStencilMaskSeparate(face, mask)
+    
+        face : GLenum
+        mask : GLuint
+    """
+    return _api_(face, mask)
+    
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

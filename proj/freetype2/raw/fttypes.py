@@ -103,3 +103,5 @@ FT_ListRec = FT_ListRec_ # typedef FT_ListRec
 #~   "/usr/local/include/freetype2/freetype/fttypes.h"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+cleanupNamespace(globals())
+

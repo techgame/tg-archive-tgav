@@ -212,16 +212,34 @@ class FT_GlyphSlotRec_(Structure):
 FT_GlyphSlot.set_type(FT_GlyphSlotRec_)
 
 @bind(FT_Error, [POINTER(FT_Library)])
-def FT_Init_FreeType(alibrary): pass
-
+def FT_Init_FreeType(alibrary, _api_=None): 
+    """FT_Init_FreeType(alibrary)
+    
+        alibrary : POINTER(FT_Library)
+    """
+    return _api_(alibrary)
+    
 
 @bind(None, [FT_Library, POINTER(FT_Int), POINTER(FT_Int), POINTER(FT_Int)])
-def FT_Library_Version(library, amajor, aminor, apatch): pass
-
+def FT_Library_Version(library, amajor, aminor, apatch, _api_=None): 
+    """FT_Library_Version(library, amajor, aminor, apatch)
+    
+        library : FT_Library
+        amajor : POINTER(FT_Int)
+        aminor : POINTER(FT_Int)
+        apatch : POINTER(FT_Int)
+    """
+    return _api_(library, amajor, aminor, apatch)
+    
 
 @bind(FT_Error, [FT_Library])
-def FT_Done_FreeType(library): pass
-
+def FT_Done_FreeType(library, _api_=None): 
+    """FT_Done_FreeType(library)
+    
+        library : FT_Library
+    """
+    return _api_(library)
+    
 
 FT_OPEN_MEMORY = 0x1
 FT_OPEN_STREAM = 0x2
@@ -252,44 +270,116 @@ class FT_Open_Args_(Structure):
 FT_Open_Args = FT_Open_Args_ # typedef FT_Open_Args
 
 @bind(FT_Error, [FT_Library, POINTER(c_char), FT_Long, POINTER(FT_Face)])
-def FT_New_Face(library, filepathname, face_index, aface): pass
-
+def FT_New_Face(library, filepathname, face_index, aface, _api_=None): 
+    """FT_New_Face(library, filepathname, face_index, aface)
+    
+        library : FT_Library
+        filepathname : POINTER(c_char)
+        face_index : FT_Long
+        aface : POINTER(FT_Face)
+    """
+    return _api_(library, filepathname, face_index, aface)
+    
 
 @bind(FT_Error, [FT_Library, POINTER(FT_Byte), FT_Long, FT_Long, POINTER(FT_Face)])
-def FT_New_Memory_Face(library, file_base, file_size, face_index, aface): pass
-
+def FT_New_Memory_Face(library, file_base, file_size, face_index, aface, _api_=None): 
+    """FT_New_Memory_Face(library, file_base, file_size, face_index, aface)
+    
+        library : FT_Library
+        file_base : POINTER(FT_Byte)
+        file_size : FT_Long
+        face_index : FT_Long
+        aface : POINTER(FT_Face)
+    """
+    return _api_(library, file_base, file_size, face_index, aface)
+    
 
 @bind(FT_Error, [FT_Library, POINTER(FT_Open_Args), FT_Long, POINTER(FT_Face)])
-def FT_Open_Face(library, args, face_index, aface): pass
-
+def FT_Open_Face(library, args, face_index, aface, _api_=None): 
+    """FT_Open_Face(library, args, face_index, aface)
+    
+        library : FT_Library
+        args : POINTER(FT_Open_Args)
+        face_index : FT_Long
+        aface : POINTER(FT_Face)
+    """
+    return _api_(library, args, face_index, aface)
+    
 
 @bind(FT_Error, [FT_Face, POINTER(c_char)])
-def FT_Attach_File(face, filepathname): pass
-
+def FT_Attach_File(face, filepathname, _api_=None): 
+    """FT_Attach_File(face, filepathname)
+    
+        face : FT_Face
+        filepathname : POINTER(c_char)
+    """
+    return _api_(face, filepathname)
+    
 
 @bind(FT_Error, [FT_Face, POINTER(FT_Open_Args)])
-def FT_Attach_Stream(face, parameters): pass
-
+def FT_Attach_Stream(face, parameters, _api_=None): 
+    """FT_Attach_Stream(face, parameters)
+    
+        face : FT_Face
+        parameters : POINTER(FT_Open_Args)
+    """
+    return _api_(face, parameters)
+    
 
 @bind(FT_Error, [FT_Face])
-def FT_Done_Face(face): pass
-
+def FT_Done_Face(face, _api_=None): 
+    """FT_Done_Face(face)
+    
+        face : FT_Face
+    """
+    return _api_(face)
+    
 
 @bind(FT_Error, [FT_Face, FT_F26Dot6, FT_F26Dot6, FT_UInt, FT_UInt])
-def FT_Set_Char_Size(face, char_width, char_height, horz_resolution, vert_resolution): pass
-
+def FT_Set_Char_Size(face, char_width, char_height, horz_resolution, vert_resolution, _api_=None): 
+    """FT_Set_Char_Size(face, char_width, char_height, horz_resolution, vert_resolution)
+    
+        face : FT_Face
+        char_width : FT_F26Dot6
+        char_height : FT_F26Dot6
+        horz_resolution : FT_UInt
+        vert_resolution : FT_UInt
+    """
+    return _api_(face, char_width, char_height, horz_resolution, vert_resolution)
+    
 
 @bind(FT_Error, [FT_Face, FT_UInt, FT_UInt])
-def FT_Set_Pixel_Sizes(face, pixel_width, pixel_height): pass
-
+def FT_Set_Pixel_Sizes(face, pixel_width, pixel_height, _api_=None): 
+    """FT_Set_Pixel_Sizes(face, pixel_width, pixel_height)
+    
+        face : FT_Face
+        pixel_width : FT_UInt
+        pixel_height : FT_UInt
+    """
+    return _api_(face, pixel_width, pixel_height)
+    
 
 @bind(FT_Error, [FT_Face, FT_UInt, FT_Int32])
-def FT_Load_Glyph(face, glyph_index, load_flags): pass
-
+def FT_Load_Glyph(face, glyph_index, load_flags, _api_=None): 
+    """FT_Load_Glyph(face, glyph_index, load_flags)
+    
+        face : FT_Face
+        glyph_index : FT_UInt
+        load_flags : FT_Int32
+    """
+    return _api_(face, glyph_index, load_flags)
+    
 
 @bind(FT_Error, [FT_Face, FT_ULong, FT_Int32])
-def FT_Load_Char(face, char_code, load_flags): pass
-
+def FT_Load_Char(face, char_code, load_flags, _api_=None): 
+    """FT_Load_Char(face, char_code, load_flags)
+    
+        face : FT_Face
+        char_code : FT_ULong
+        load_flags : FT_Int32
+    """
+    return _api_(face, char_code, load_flags)
+    
 
 FT_LOAD_DEFAULT = 0x0
 FT_LOAD_NO_SCALE = 0x1
@@ -310,8 +400,15 @@ FT_LOAD_SBITS_ONLY = 0x4000
 FT_LOAD_NO_AUTOHINT = 0x8000
 
 @bind(None, [FT_Face, POINTER(FT_Matrix), POINTER(FT_Vector)])
-def FT_Set_Transform(face, matrix, delta): pass
-
+def FT_Set_Transform(face, matrix, delta, _api_=None): 
+    """FT_Set_Transform(face, matrix, delta)
+    
+        face : FT_Face
+        matrix : POINTER(FT_Matrix)
+        delta : POINTER(FT_Vector)
+    """
+    return _api_(face, matrix, delta)
+    
 
 class FT_Render_Mode_(c_int):
     '''enum FT_Render_Mode_''' 
@@ -325,80 +422,192 @@ class FT_Render_Mode_(c_int):
 FT_Render_Mode = FT_Render_Mode_ # typedef FT_Render_Mode
 
 @bind(FT_Error, [FT_GlyphSlot, FT_Render_Mode])
-def FT_Render_Glyph(slot, render_mode): pass
-
+def FT_Render_Glyph(slot, render_mode, _api_=None): 
+    """FT_Render_Glyph(slot, render_mode)
+    
+        slot : FT_GlyphSlot
+        render_mode : FT_Render_Mode
+    """
+    return _api_(slot, render_mode)
+    
 
 @bind(FT_Error, [FT_Face, FT_UInt, FT_UInt, FT_UInt, POINTER(FT_Vector)])
-def FT_Get_Kerning(face, left_glyph, right_glyph, kern_mode, akerning): pass
-
+def FT_Get_Kerning(face, left_glyph, right_glyph, kern_mode, akerning, _api_=None): 
+    """FT_Get_Kerning(face, left_glyph, right_glyph, kern_mode, akerning)
+    
+        face : FT_Face
+        left_glyph : FT_UInt
+        right_glyph : FT_UInt
+        kern_mode : FT_UInt
+        akerning : POINTER(FT_Vector)
+    """
+    return _api_(face, left_glyph, right_glyph, kern_mode, akerning)
+    
 
 @bind(FT_Error, [FT_Face, FT_UInt, FT_Pointer, FT_UInt])
-def FT_Get_Glyph_Name(face, glyph_index, buffer, buffer_max): pass
-
+def FT_Get_Glyph_Name(face, glyph_index, buffer, buffer_max, _api_=None): 
+    """FT_Get_Glyph_Name(face, glyph_index, buffer, buffer_max)
+    
+        face : FT_Face
+        glyph_index : FT_UInt
+        buffer : FT_Pointer
+        buffer_max : FT_UInt
+    """
+    return _api_(face, glyph_index, buffer, buffer_max)
+    
 
 @bind(POINTER(c_char), [FT_Face])
-def FT_Get_Postscript_Name(face): pass
-
+def FT_Get_Postscript_Name(face, _api_=None): 
+    """FT_Get_Postscript_Name(face)
+    
+        face : FT_Face
+    """
+    return _api_(face)
+    
 
 @bind(FT_Error, [FT_Face, FT_Encoding])
-def FT_Select_Charmap(face, encoding): pass
-
+def FT_Select_Charmap(face, encoding, _api_=None): 
+    """FT_Select_Charmap(face, encoding)
+    
+        face : FT_Face
+        encoding : FT_Encoding
+    """
+    return _api_(face, encoding)
+    
 
 @bind(FT_Error, [FT_Face, FT_CharMap])
-def FT_Set_Charmap(face, charmap): pass
-
+def FT_Set_Charmap(face, charmap, _api_=None): 
+    """FT_Set_Charmap(face, charmap)
+    
+        face : FT_Face
+        charmap : FT_CharMap
+    """
+    return _api_(face, charmap)
+    
 
 @bind(FT_Int, [FT_CharMap])
-def FT_Get_Charmap_Index(charmap): pass
-
+def FT_Get_Charmap_Index(charmap, _api_=None): 
+    """FT_Get_Charmap_Index(charmap)
+    
+        charmap : FT_CharMap
+    """
+    return _api_(charmap)
+    
 
 @bind(FT_UInt, [FT_Face, FT_ULong])
-def FT_Get_Char_Index(face, charcode): pass
-
+def FT_Get_Char_Index(face, charcode, _api_=None): 
+    """FT_Get_Char_Index(face, charcode)
+    
+        face : FT_Face
+        charcode : FT_ULong
+    """
+    return _api_(face, charcode)
+    
 
 @bind(FT_ULong, [FT_Face, POINTER(FT_UInt)])
-def FT_Get_First_Char(face, agindex): pass
-
+def FT_Get_First_Char(face, agindex, _api_=None): 
+    """FT_Get_First_Char(face, agindex)
+    
+        face : FT_Face
+        agindex : POINTER(FT_UInt)
+    """
+    return _api_(face, agindex)
+    
 
 @bind(FT_ULong, [FT_Face, FT_ULong, POINTER(FT_UInt)])
-def FT_Get_Next_Char(face, char_code, agindex): pass
-
+def FT_Get_Next_Char(face, char_code, agindex, _api_=None): 
+    """FT_Get_Next_Char(face, char_code, agindex)
+    
+        face : FT_Face
+        char_code : FT_ULong
+        agindex : POINTER(FT_UInt)
+    """
+    return _api_(face, char_code, agindex)
+    
 
 @bind(FT_UInt, [FT_Face, POINTER(FT_String)])
-def FT_Get_Name_Index(face, glyph_name): pass
-
+def FT_Get_Name_Index(face, glyph_name, _api_=None): 
+    """FT_Get_Name_Index(face, glyph_name)
+    
+        face : FT_Face
+        glyph_name : POINTER(FT_String)
+    """
+    return _api_(face, glyph_name)
+    
 
 @bind(FT_Long, [FT_Long, FT_Long, FT_Long])
-def FT_MulDiv(a, b, c): pass
-
+def FT_MulDiv(a, b, c, _api_=None): 
+    """FT_MulDiv(a, b, c)
+    
+        a : FT_Long
+        b : FT_Long
+        c : FT_Long
+    """
+    return _api_(a, b, c)
+    
 
 @bind(FT_Long, [FT_Long, FT_Long])
-def FT_MulFix(a, b): pass
-
+def FT_MulFix(a, b, _api_=None): 
+    """FT_MulFix(a, b)
+    
+        a : FT_Long
+        b : FT_Long
+    """
+    return _api_(a, b)
+    
 
 @bind(FT_Long, [FT_Long, FT_Long])
-def FT_DivFix(a, b): pass
-
-
-@bind(FT_Fixed, [FT_Fixed])
-def FT_RoundFix(a): pass
-
-
-@bind(FT_Fixed, [FT_Fixed])
-def FT_CeilFix(a): pass
-
+def FT_DivFix(a, b, _api_=None): 
+    """FT_DivFix(a, b)
+    
+        a : FT_Long
+        b : FT_Long
+    """
+    return _api_(a, b)
+    
 
 @bind(FT_Fixed, [FT_Fixed])
-def FT_FloorFix(a): pass
+def FT_RoundFix(a, _api_=None): 
+    """FT_RoundFix(a)
+    
+        a : FT_Fixed
+    """
+    return _api_(a)
+    
 
+@bind(FT_Fixed, [FT_Fixed])
+def FT_CeilFix(a, _api_=None): 
+    """FT_CeilFix(a)
+    
+        a : FT_Fixed
+    """
+    return _api_(a)
+    
+
+@bind(FT_Fixed, [FT_Fixed])
+def FT_FloorFix(a, _api_=None): 
+    """FT_FloorFix(a)
+    
+        a : FT_Fixed
+    """
+    return _api_(a)
+    
 
 @bind(None, [POINTER(FT_Vector), POINTER(FT_Matrix)])
-def FT_Vector_Transform(vec, matrix): pass
-
+def FT_Vector_Transform(vec, matrix, _api_=None): 
+    """FT_Vector_Transform(vec, matrix)
+    
+        vec : POINTER(FT_Vector)
+        matrix : POINTER(FT_Matrix)
+    """
+    return _api_(vec, matrix)
+    
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ End of code generated from:
 #~   "/usr/local/include/freetype2/freetype/freetype.h"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+cleanupNamespace(globals())
 

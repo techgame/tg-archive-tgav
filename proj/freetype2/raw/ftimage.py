@@ -102,3 +102,5 @@ FT_RASTER_FLAG_CLIP = 0x4
 #~   "/usr/local/include/freetype2/freetype/ftimage.h"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+cleanupNamespace(globals())
+

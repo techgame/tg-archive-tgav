@@ -62,3 +62,5 @@ FT_Stream.set_type(FT_StreamRec_)
 #~   "/usr/local/include/freetype2/freetype/ftsystem.h"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+cleanupNamespace(globals())
+

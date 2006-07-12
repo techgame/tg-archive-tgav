@@ -14,6 +14,7 @@
 import os
 from TG.gccxml.codeAnalyzer import CodeAnalyzer
 from TG.gccxml.xforms.ctypes import AtomFilterVisitor, CCodeGenContext
+from TG.gccxml.xforms.ctypes import utils
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -102,6 +103,8 @@ def main():
         print 'Done Writing:', ciFile.filename
         print
     print
+
+    utils.includeSupportIn(context.getOutputFilename('_ctypes_support.py'), copySource=False)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

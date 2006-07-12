@@ -3,45 +3,19 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 from ctypes import *
-from ctypes.util import find_library
+import _ctypes_support
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def loadFirstLibrary(*libraryname):
-    for name in libraryname: 
-        path = find_library(name)
-        if path:
-            library = cdll.LoadLibrary(path)
-            return library
+freetypeLib = _ctypes_support.loadFirstLibrary('freetype')
 
-freetypeLib = loadFirstLibrary('freetype')
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#~ Definitions 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-def attachToLibFn(lib, fn):
-    libfn = getattr(lib, fn.__name__, None)
-    if libfn is not None:
-        libfn.restype = fn.restype
-        libfn.argtypes = fn.argtypes
-        if fn.errcheck is not None:
-            libfn.errcheck = fn.errcheck
-
-        libfn.__doc__ = '%s(%s)' % (fn.__name__, ', '.join(fn.func_code.co_varnames))
-    fn.api = libfn
-    return libfn
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+def cleanupNamespace(namespace):
+    _ctypes_support.scrubNamespace(namespace, globals())
 
 def bind(restype, argtypes, errcheck=None):
     def bindFuncTypes(fn):
-        fn.restype = restype
-        fn.argtypes = argtypes
-        fn.errcheck = errcheck
-        return attachToLibFn(freetypeLib, fn) or fn
-
+        return _ctypes_support.attachToLibFn(fn, restype, argtypes, errcheck, freetypeLib)
     return bindFuncTypes
 

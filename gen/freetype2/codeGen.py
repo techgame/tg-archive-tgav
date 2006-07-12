@@ -14,6 +14,7 @@
 import os
 from TG.gccxml.codeAnalyzer import CodeAnalyzer
 from TG.gccxml.xforms.ctypes import AtomFilterVisitor, CCodeGenContext
+from TG.gccxml.xforms.ctypes import utils
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -132,6 +133,7 @@ def main():
 
     for ciFile in ciFilesByName.itervalues():
         ciFile.importAll('_ctypes_freetype')
+        ciFile.footer += '\ncleanupNamespace(globals())\n'
 
     ftimage = ciFilesByName['ftimage.h']
     ftimage.importAll(fttypes)
@@ -156,6 +158,8 @@ def main():
         print 'Done Writing:', ciFile.filename
         print
     print
+
+    utils.includeSupportIn(context.getOutputFilename('_ctypes_support.py'), copySource=False)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

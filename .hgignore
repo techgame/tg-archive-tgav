@@ -10,6 +10,7 @@ Icon?
 *.pyo
 *~
 .*.swp
+.*.swo
 \.svn/
 demo
 doc
