@@ -10,13 +10,17 @@ from fttypes import *
 #~   "/usr/local/include/freetype2/freetype/ftsystem.h"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-FT_Memory = POINTER("FT_MemoryRec_") # typedef FT_Memory
+# typedef FT_Memory
+FT_Memory = POINTER("FT_MemoryRec_")
 
-FT_Alloc_Func = POINTER(CFUNCTYPE(c_void_p, FT_Memory, c_long)) # typedef FT_Alloc_Func
+# typedef FT_Alloc_Func
+FT_Alloc_Func = POINTER(CFUNCTYPE(c_void_p, FT_Memory, c_long))
 
-FT_Free_Func = POINTER(CFUNCTYPE(None, FT_Memory, c_void_p)) # typedef FT_Free_Func
+# typedef FT_Free_Func
+FT_Free_Func = POINTER(CFUNCTYPE(None, FT_Memory, c_void_p))
 
-FT_Realloc_Func = POINTER(CFUNCTYPE(c_void_p, FT_Memory, c_long, c_long, c_void_p)) # typedef FT_Realloc_Func
+# typedef FT_Realloc_Func
+FT_Realloc_Func = POINTER(CFUNCTYPE(c_void_p, FT_Memory, c_long, c_long, c_void_p))
 
 class FT_MemoryRec_(Structure):
     _fields_ = [
@@ -27,7 +31,8 @@ class FT_MemoryRec_(Structure):
         ]
 FT_Memory.set_type(FT_MemoryRec_)
 
-FT_Stream = POINTER("FT_StreamRec_") # typedef FT_Stream
+# typedef FT_Stream
+FT_Stream = POINTER("FT_StreamRec_")
 
 class FT_StreamDesc_(Union):
     _fields_ = [
@@ -35,11 +40,14 @@ class FT_StreamDesc_(Union):
         ("pointer", c_void_p),
         ]
 
-FT_StreamDesc = FT_StreamDesc_ # typedef FT_StreamDesc
+# typedef FT_StreamDesc
+FT_StreamDesc = FT_StreamDesc_
 
-FT_Stream_IoFunc = POINTER(CFUNCTYPE(c_ulong, FT_Stream, c_ulong, POINTER(c_ubyte), c_ulong)) # typedef FT_Stream_IoFunc
+# typedef FT_Stream_IoFunc
+FT_Stream_IoFunc = POINTER(CFUNCTYPE(c_ulong, FT_Stream, c_ulong, POINTER(c_ubyte), c_ulong))
 
-FT_Stream_CloseFunc = POINTER(CFUNCTYPE(None, FT_Stream)) # typedef FT_Stream_CloseFunc
+# typedef FT_Stream_CloseFunc
+FT_Stream_CloseFunc = POINTER(CFUNCTYPE(None, FT_Stream))
 
 class FT_StreamRec_(Structure):
     _fields_ = [

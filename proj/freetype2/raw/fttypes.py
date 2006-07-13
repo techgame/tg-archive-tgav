@@ -11,8 +11,8 @@ from _ctypes_freetype import *
 
 #~ Code block from "/usr/local/include/freetype2/freetype/config/ftconfig.h" ~~~
 
-class FT_Int32(c_int):
-    """typedef FT_Int32"""
+# typedef FT_Int32
+FT_Int32 = c_int
 
 #~ Code block from "/usr/local/include/freetype2/freetype/config/ftoption.h" ~~~
 
@@ -24,40 +24,41 @@ FT_MAX_MODULES = 32
 
 #~ Code block from "/usr/local/include/freetype2/freetype/fttypes.h" ~~~
 
-class FT_Byte(c_ubyte):
-    """typedef FT_Byte"""
+# typedef FT_Byte
+FT_Byte = c_ubyte
 
-class FT_String(c_char):
-    """typedef FT_String"""
+# typedef FT_String
+FT_String = c_char
 
-class FT_Short(c_short):
-    """typedef FT_Short"""
+# typedef FT_Short
+FT_Short = c_short
 
-class FT_UShort(c_ushort):
-    """typedef FT_UShort"""
+# typedef FT_UShort
+FT_UShort = c_ushort
 
-class FT_Int(c_int):
-    """typedef FT_Int"""
+# typedef FT_Int
+FT_Int = c_int
 
-class FT_UInt(c_uint):
-    """typedef FT_UInt"""
+# typedef FT_UInt
+FT_UInt = c_uint
 
-class FT_Long(c_long):
-    """typedef FT_Long"""
+# typedef FT_Long
+FT_Long = c_long
 
-class FT_ULong(c_ulong):
-    """typedef FT_ULong"""
+# typedef FT_ULong
+FT_ULong = c_ulong
 
-class FT_F26Dot6(c_long):
-    """typedef FT_F26Dot6"""
+# typedef FT_F26Dot6
+FT_F26Dot6 = c_long
 
-class FT_Fixed(c_long):
-    """typedef FT_Fixed"""
+# typedef FT_Fixed
+FT_Fixed = c_long
 
-class FT_Error(c_int):
-    """typedef FT_Error"""
+# typedef FT_Error
+FT_Error = c_int
 
-FT_Pointer = c_void_p # typedef FT_Pointer
+# typedef FT_Pointer
+FT_Pointer = c_void_p
 
 class FT_Matrix_(Structure):
     _fields_ = [
@@ -67,9 +68,11 @@ class FT_Matrix_(Structure):
         ("yy", FT_Fixed),
         ]
 
-FT_Matrix = FT_Matrix_ # typedef FT_Matrix
+# typedef FT_Matrix
+FT_Matrix = FT_Matrix_
 
-FT_Generic_Finalizer = POINTER(CFUNCTYPE(None, FT_Pointer)) # typedef FT_Generic_Finalizer
+# typedef FT_Generic_Finalizer
+FT_Generic_Finalizer = POINTER(CFUNCTYPE(None, FT_Pointer))
 
 class FT_Generic_(Structure):
     _fields_ = [
@@ -77,9 +80,11 @@ class FT_Generic_(Structure):
         ("finalizer", FT_Generic_Finalizer),
         ]
 
-FT_Generic = FT_Generic_ # typedef FT_Generic
+# typedef FT_Generic
+FT_Generic = FT_Generic_
 
-FT_ListNode = POINTER("FT_ListNodeRec_") # typedef FT_ListNode
+# typedef FT_ListNode
+FT_ListNode = POINTER("FT_ListNodeRec_")
 
 class FT_ListNodeRec_(Structure):
     _fields_ = [
@@ -95,7 +100,8 @@ class FT_ListRec_(Structure):
         ("tail", FT_ListNode),
         ]
 
-FT_ListRec = FT_ListRec_ # typedef FT_ListRec
+# typedef FT_ListRec
+FT_ListRec = FT_ListRec_
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

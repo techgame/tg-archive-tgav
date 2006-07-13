@@ -28,7 +28,8 @@ class FT_Glyph_Metrics_(Structure):
         ("vertAdvance", FT_Pos),
         ]
 
-FT_Glyph_Metrics = FT_Glyph_Metrics_ # typedef FT_Glyph_Metrics
+# typedef FT_Glyph_Metrics
+FT_Glyph_Metrics = FT_Glyph_Metrics_
 
 class FT_Bitmap_Size_(Structure):
     _fields_ = [
@@ -39,27 +40,35 @@ class FT_Bitmap_Size_(Structure):
         ("y_ppem", FT_Pos),
         ]
 
-FT_Bitmap_Size = FT_Bitmap_Size_ # typedef FT_Bitmap_Size
+# typedef FT_Bitmap_Size
+FT_Bitmap_Size = FT_Bitmap_Size_
 
 class FT_LibraryRec_(Structure):
     _fields_ = []
-FT_Library = POINTER(FT_LibraryRec_) # typedef FT_Library
+# typedef FT_Library
+FT_Library = POINTER(FT_LibraryRec_)
 
 class FT_ModuleRec_(Structure):
     _fields_ = []
-FT_Module = POINTER(FT_ModuleRec_) # typedef FT_Module
+# typedef FT_Module
+FT_Module = POINTER(FT_ModuleRec_)
 
 class FT_DriverRec_(Structure):
     _fields_ = []
-FT_Driver = POINTER(FT_DriverRec_) # typedef FT_Driver
+# typedef FT_Driver
+FT_Driver = POINTER(FT_DriverRec_)
 
-FT_Face = POINTER("FT_FaceRec_") # typedef FT_Face
+# typedef FT_Face
+FT_Face = POINTER("FT_FaceRec_")
 
-FT_Size = POINTER("FT_SizeRec_") # typedef FT_Size
+# typedef FT_Size
+FT_Size = POINTER("FT_SizeRec_")
 
-FT_GlyphSlot = POINTER("FT_GlyphSlotRec_") # typedef FT_GlyphSlot
+# typedef FT_GlyphSlot
+FT_GlyphSlot = POINTER("FT_GlyphSlotRec_")
 
-FT_CharMap = POINTER("FT_CharMapRec_") # typedef FT_CharMap
+# typedef FT_CharMap
+FT_CharMap = POINTER("FT_CharMapRec_")
 
 class FT_Encoding_(c_int):
     '''enum FT_Encoding_''' 
@@ -83,7 +92,8 @@ class FT_Encoding_(c_int):
     FT_ENCODING_OLD_LATIN_2 = 1818326066
     FT_ENCODING_APPLE_ROMAN = 1634889070
 
-FT_Encoding = FT_Encoding_ # typedef FT_Encoding
+# typedef FT_Encoding
+FT_Encoding = FT_Encoding_
 
 class FT_CharMapRec_(Structure):
     _fields_ = [
@@ -96,7 +106,8 @@ FT_CharMap.set_type(FT_CharMapRec_)
 
 class FT_Face_InternalRec_(Structure):
     _fields_ = []
-FT_Face_Internal = POINTER(FT_Face_InternalRec_) # typedef FT_Face_Internal
+# typedef FT_Face_Internal
+FT_Face_Internal = POINTER(FT_Face_InternalRec_)
 
 class FT_FaceRec_(Structure):
     _fields_ = [
@@ -151,7 +162,8 @@ FT_STYLE_FLAG_BOLD = ( 1 << 1 )
 
 class FT_Size_InternalRec_(Structure):
     _fields_ = []
-FT_Size_Internal = POINTER(FT_Size_InternalRec_) # typedef FT_Size_Internal
+# typedef FT_Size_Internal
+FT_Size_Internal = POINTER(FT_Size_InternalRec_)
 
 class FT_Size_Metrics_(Structure):
     _fields_ = [
@@ -165,7 +177,8 @@ class FT_Size_Metrics_(Structure):
         ("max_advance", FT_Pos),
         ]
 
-FT_Size_Metrics = FT_Size_Metrics_ # typedef FT_Size_Metrics
+# typedef FT_Size_Metrics
+FT_Size_Metrics = FT_Size_Metrics_
 
 class FT_SizeRec_(Structure):
     _fields_ = [
@@ -178,11 +191,13 @@ FT_Size.set_type(FT_SizeRec_)
 
 class FT_SubGlyphRec_(Structure):
     _fields_ = []
-FT_SubGlyph = POINTER(FT_SubGlyphRec_) # typedef FT_SubGlyph
+# typedef FT_SubGlyph
+FT_SubGlyph = POINTER(FT_SubGlyphRec_)
 
 class FT_Slot_InternalRec_(Structure):
     _fields_ = []
-FT_Slot_Internal = POINTER(FT_Slot_InternalRec_) # typedef FT_Slot_Internal
+# typedef FT_Slot_Internal
+FT_Slot_Internal = POINTER(FT_Slot_InternalRec_)
 
 class FT_GlyphSlotRec_(Structure):
     _fields_ = [
@@ -253,7 +268,8 @@ class FT_Parameter_(Structure):
         ("data", FT_Pointer),
         ]
 
-FT_Parameter = FT_Parameter_ # typedef FT_Parameter
+# typedef FT_Parameter
+FT_Parameter = FT_Parameter_
 
 class FT_Open_Args_(Structure):
     _fields_ = [
@@ -267,7 +283,8 @@ class FT_Open_Args_(Structure):
         ("params", POINTER(FT_Parameter)),
         ]
 
-FT_Open_Args = FT_Open_Args_ # typedef FT_Open_Args
+# typedef FT_Open_Args
+FT_Open_Args = FT_Open_Args_
 
 @bind(FT_Error, [FT_Library, POINTER(c_char), FT_Long, POINTER(FT_Face)])
 def FT_New_Face(library, filepathname, face_index, aface, _api_=None): 
@@ -419,7 +436,8 @@ class FT_Render_Mode_(c_int):
     FT_RENDER_MODE_LCD_V = 4
     FT_RENDER_MODE_MAX = 5
 
-FT_Render_Mode = FT_Render_Mode_ # typedef FT_Render_Mode
+# typedef FT_Render_Mode
+FT_Render_Mode = FT_Render_Mode_
 
 @bind(FT_Error, [FT_GlyphSlot, FT_Render_Mode])
 def FT_Render_Glyph(slot, render_mode, _api_=None): 

@@ -10,8 +10,8 @@ from fttypes import *
 #~   "/usr/local/include/freetype2/freetype/ftimage.h"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class FT_Pos(c_long):
-    """typedef FT_Pos"""
+# typedef FT_Pos
+FT_Pos = c_long
 
 class FT_Vector_(Structure):
     _fields_ = [
@@ -19,7 +19,8 @@ class FT_Vector_(Structure):
         ("y", FT_Pos),
         ]
 
-FT_Vector = FT_Vector_ # typedef FT_Vector
+# typedef FT_Vector
+FT_Vector = FT_Vector_
 
 class FT_BBox_(Structure):
     _fields_ = [
@@ -29,7 +30,8 @@ class FT_BBox_(Structure):
         ("yMax", FT_Pos),
         ]
 
-FT_BBox = FT_BBox_ # typedef FT_BBox
+# typedef FT_BBox
+FT_BBox = FT_BBox_
 
 class FT_Bitmap_(Structure):
     _fields_ = [
@@ -38,24 +40,26 @@ class FT_Bitmap_(Structure):
         ("pitch", c_int),
         ("buffer", POINTER(c_ubyte)),
         ("num_grays", c_short),
-        ("pixel_mode", c_char),
-        ("palette_mode", c_char),
+        ("pixel_mode", c_ubyte),
+        ("palette_mode", c_ubyte),
         ("palette", FT_Pointer),
         ]
 
-FT_Bitmap = FT_Bitmap_ # typedef FT_Bitmap
+# typedef FT_Bitmap
+FT_Bitmap = FT_Bitmap_
 
 class FT_Outline_(Structure):
     _fields_ = [
         ("n_contours", c_short),
         ("n_points", c_short),
         ("points", POINTER(FT_Vector)),
-        ("tags", POINTER(c_char)),
+        ("tags", POINTER(c_ubyte)),
         ("contours", POINTER(c_short)),
         ("flags", c_int),
         ]
 
-FT_Outline = FT_Outline_ # typedef FT_Outline
+# typedef FT_Outline
+FT_Outline = FT_Outline_
 
 FT_OUTLINE_NONE = 0x0
 FT_OUTLINE_OWNER = 0x1
@@ -89,7 +93,8 @@ class FT_Glyph_Format_(c_int):
     FT_GLYPH_FORMAT_OUTLINE = 1869968492
     FT_GLYPH_FORMAT_PLOTTER = 1886154612
 
-FT_Glyph_Format = FT_Glyph_Format_ # typedef FT_Glyph_Format
+# typedef FT_Glyph_Format
+FT_Glyph_Format = FT_Glyph_Format_
 
 FT_RASTER_FLAG_DEFAULT = 0x0
 FT_RASTER_FLAG_AA = 0x1
