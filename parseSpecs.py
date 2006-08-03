@@ -103,8 +103,10 @@ class OpenGLRegistryToCParts(object):
     def _assert(self):
         assert self.names is not None
         assert self.strings is not None
-        if self.invalid:
-            print "Invalid:", self.filename
+        #if self.invalid:
+        #    print "Invalid:", self.filename
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @token('name')
     def _parseNameSection(self, title, block):
@@ -119,49 +121,152 @@ class OpenGLRegistryToCParts(object):
         result = list(b for b in result if b and ' ' not in b)
         return result
 
-    @token('functions')
-    def _parseFunctionsSection(self, title, block):
-        #funcs = (b.strip() for b in block if b.strip())
-        #funcs = ' '.join(f for f in funcs if f)
-        #funcs = [f.strip()+';' for f in funcs.split(';') if f and not f.lower().startswith('none')]
+    re_token_line = re.compile(r'^\s*([A-Z][A-Z0-9_]+)\s+(\S+)\s$')
+    re_token_name = re.compile(r'[AWP]?GL[XU]?_\w+')
 
-        #self.functions = funcs
-        #for f in funcs:
-        #    print f
-        return
-        print
-        print '##', self.filename, self.names
-        for b in block:
-            print b,
-        print '## end'
-
-    re_token_line = re.compile('^\s*([A-Z][A-Z0-9_]+)\s+(\S+)\s$')
-    re_token_name = re.compile('[AWP]?GL[XU]?_\w+')
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @token('tokens')
     def _parseTokenSection(self, title, block):
         self.tokens = []
         matcher = self.re_token_line.match
-        tokenName = self.re_token_name.match
-        for b in block:
-            m = matcher(b)
-            if m is not None:
-                content = b[m.start(1):m.end(1)] + b[m.start(2):m.end(2)]
-                leftover = b[:m.start(1)] + b[m.end(1):m.start(2)] + b[m.end(2):]
-                assert len(content+leftover) == len(b), (m.groups(), b)
+        for line in block:
+            match = matcher(line)
+            if match is not None:
+                self._addTokenForMatch(match)
 
-                name, value = m.groups()
+    def _addTokenForMatch(self, match):
+        name, value = match.groups()
+        try: 
+            eval(value)
+            valid = True
+        except (NameError, ValueError, SyntaxError),e:
+            valid = False
+            self.invalid = True
 
-                try: 
-                    eval(value)
-                    valid = True
-                except (NameError, ValueError, SyntaxError),e:
-                    valid = False
-                    self.invalid = True
+        if not self.re_token_name.match(name):
+            name = 'GL_'+name
+        self.tokens.append((name, value, valid))
 
-                if not tokenName(name):
-                    name = 'GL_'+name
-                self.tokens.append((name, value, valid))
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    def _iterBlocksByGroup(self, block):
+        lines = []
+        for l in block:
+            if l.strip():
+                lines.append(l)
+            elif lines:
+                yield lines
+                lines = []
+        if lines:
+            yield lines
+
+
+    glTypeMap = dict(
+        boolean="GLboolean",
+        Boolean="GLboolean",
+        GLboolean="GLboolean",
+
+        DMbuffer="GLvoid*",
+
+        void='GLvoid',
+        GLvoid="GLvoid",
+
+        enum="GLenum",
+        GLenum="GLenum",
+        Glenum="GLenum",
+
+        bitfield="GLbitfield",
+        GLbitfield="GLbitfield",
+
+        byte="GLbyte",
+        GLbyte="GLbyte",
+        ubyte="GLubyte",
+        GLubyte="GLubyte",
+
+        clampf="GLclampf",
+        GLclampf="GLclampf",
+
+        clampd="GLclampd",
+        GLclampd="GLclampd",
+
+        double="GLdouble",
+        GLdouble="GLdouble",
+
+        float="GLfloat",
+        GLfloat="GLfloat",
+
+        half="GLhalf",
+        GLhalf="GLhalf",
+
+        int="GLint",
+        GLint="GLint",
+
+        uint="GLint",
+        GLuint="GLint",
+
+        short="GLshort",
+        GLshort="GLshort",
+
+        ushort="GLushort",
+        GLushort="GLushort",
+
+        sizei="GLsizei",
+        GLsizei="GLsizei",
+        )
+
+    re_func = re.compile(
+            r'^\s*(\w+[^()\n\r\f]*)'
+            r'\(([^)]*)\);?'
+            , re.MULTILINE)
+
+    def _checkBlockStartsWithNone(self, block):
+        for line in block[:10]:
+            line = line.strip().lower()
+            if line.startswith('none'):
+                return True
+            elif line: 
+                return False
+        return False
+
+    def _iterFuncsByGroup(self, block):
+        if self._checkBlockStartsWithNone(block):
+            return
+
+        n = 0
+        for lines in self._iterBlocksByGroup(block):
+            joined = ''.join(lines).strip()
+
+            for fn in self.re_func.finditer(joined):
+                pre, args = fn.groups()
+                pre, _, name = pre.strip().rpartition(' ')
+
+                if not name: 
+                    # pre is actually our name, so swap
+                    name, pre = pre, name
+                if name in self.glTypeMap:
+                    # or we have a function type declaration
+                    continue
+
+                pre = pre.replace('*', ' * ').split(' ')
+                args = [a.strip() for a in args.split(',')]
+
+                if '[' in name or '{' in name:
+                    for name in self._expandComplexName(name, args):
+                        yield name, (pre, name, args)
+                else:
+                    yield name, (pre, name, args)
+
+    def _expandComplexName(self, name, args):
+        print name, args
+        return []
+
+    @token('functions')
+    def _parseFunctionsSection(self, title, block):
+        self.functions = []
+        for fn in self._iterFuncsByGroup(block):
+            self.functions.append(fn)
+            #print fn[0]
 
     del token
 
@@ -170,14 +275,27 @@ class OpenGLRegistryToCParts(object):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def main():
-    if 1:
-        f = path('./specs/ARB/vertex_program.txt')
-        OpenGLRegistryToCParts("ARB", str(f), f.open('rb'))
+    if 0:
+        specials = map(path, [
+            './specs/EXT/framebuffer_object.txt',
+            #'./specs/ARB/vertex_program.txt',
+            #'./specs/ATI/envmap_bumpmap.txt',
+            #'./specs/ATI/text_fragment_shader.txt',
+            ])
+        for f in specials:
+            vendor = f.dirname().name
+            #print
+            #print vendor, f
+            OpenGLRegistryToCParts(vendor, str(f), f.open('rb'))
     else:
 
         for d in path('./specs').dirs():
+            vendor = d.name
             for f in d.files('*.txt'):
-                OpenGLRegistryToCParts(d.name, str(f), f.open('rb'))
+                #print
+                #print vendor, f
+                OpenGLRegistryToCParts(vendor, str(f), f.open('rb'))
+
 
 if __name__=='__main__':
     main()
