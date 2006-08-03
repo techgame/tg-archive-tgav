@@ -3,7 +3,6 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-import sys
 import os
 import urllib
 from  htmllib import HTMLParser
