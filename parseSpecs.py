@@ -170,12 +170,14 @@ class OpenGLRegistryToCParts(object):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def main():
-    #f = path('./specs/ARB/vertex_program.txt')
-    #OpenGLRegistryToCParts("ARB", str(f), f.open('rb'))
+    if 1:
+        f = path('./specs/ARB/vertex_program.txt')
+        OpenGLRegistryToCParts("ARB", str(f), f.open('rb'))
+    else:
 
-    for d in path('./specs').dirs():
-        for f in d.files('*.txt'):
-            OpenGLRegistryToCParts(d.name, str(f), f.open('rb'))
+        for d in path('./specs').dirs():
+            for f in d.files('*.txt'):
+                OpenGLRegistryToCParts(d.name, str(f), f.open('rb'))
 
 if __name__=='__main__':
     main()
