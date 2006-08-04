@@ -232,7 +232,7 @@ def gluBeginTrim(nurb, _api_=None):
     """
     return _api_(nurb)
     
-@bind(GLint, [GLenum, GLint, GLsizei, GLenum, GLenum, GLint, GLint, GLint, POINTER(None)])
+@bind(GLint, [GLenum, GLint, GLsizei, GLenum, GLenum, GLint, GLint, GLint, c_void_p])
 def gluBuild1DMipmapLevels(target, internalFormat, width, format, type, level, base, max, data, _api_=None): 
     """gluBuild1DMipmapLevels(target, internalFormat, width, format, type, level, base, max, data)
     
@@ -244,11 +244,11 @@ def gluBuild1DMipmapLevels(target, internalFormat, width, format, type, level, b
         level : GLint
         base : GLint
         max : GLint
-        data : POINTER(None)
+        data : c_void_p
     """
     return _api_(target, internalFormat, width, format, type, level, base, max, data)
     
-@bind(GLint, [GLenum, GLint, GLsizei, GLenum, GLenum, POINTER(None)])
+@bind(GLint, [GLenum, GLint, GLsizei, GLenum, GLenum, c_void_p])
 def gluBuild1DMipmaps(target, internalFormat, width, format, type, data, _api_=None): 
     """gluBuild1DMipmaps(target, internalFormat, width, format, type, data)
     
@@ -257,11 +257,11 @@ def gluBuild1DMipmaps(target, internalFormat, width, format, type, data, _api_=N
         width : GLsizei
         format : GLenum
         type : GLenum
-        data : POINTER(None)
+        data : c_void_p
     """
     return _api_(target, internalFormat, width, format, type, data)
     
-@bind(GLint, [GLenum, GLint, GLsizei, GLsizei, GLenum, GLenum, GLint, GLint, GLint, POINTER(None)])
+@bind(GLint, [GLenum, GLint, GLsizei, GLsizei, GLenum, GLenum, GLint, GLint, GLint, c_void_p])
 def gluBuild2DMipmapLevels(target, internalFormat, width, height, format, type, level, base, max, data, _api_=None): 
     """gluBuild2DMipmapLevels(target, internalFormat, width, height, format, type, level, base, max, data)
     
@@ -274,11 +274,11 @@ def gluBuild2DMipmapLevels(target, internalFormat, width, height, format, type, 
         level : GLint
         base : GLint
         max : GLint
-        data : POINTER(None)
+        data : c_void_p
     """
     return _api_(target, internalFormat, width, height, format, type, level, base, max, data)
     
-@bind(GLint, [GLenum, GLint, GLsizei, GLsizei, GLenum, GLenum, POINTER(None)])
+@bind(GLint, [GLenum, GLint, GLsizei, GLsizei, GLenum, GLenum, c_void_p])
 def gluBuild2DMipmaps(target, internalFormat, width, height, format, type, data, _api_=None): 
     """gluBuild2DMipmaps(target, internalFormat, width, height, format, type, data)
     
@@ -288,11 +288,11 @@ def gluBuild2DMipmaps(target, internalFormat, width, height, format, type, data,
         height : GLsizei
         format : GLenum
         type : GLenum
-        data : POINTER(None)
+        data : c_void_p
     """
     return _api_(target, internalFormat, width, height, format, type, data)
     
-@bind(GLint, [GLenum, GLint, GLsizei, GLsizei, GLsizei, GLenum, GLenum, GLint, GLint, GLint, POINTER(None)])
+@bind(GLint, [GLenum, GLint, GLsizei, GLsizei, GLsizei, GLenum, GLenum, GLint, GLint, GLint, c_void_p])
 def gluBuild3DMipmapLevels(target, internalFormat, width, height, depth, format, type, level, base, max, data, _api_=None): 
     """gluBuild3DMipmapLevels(target, internalFormat, width, height, depth, format, type, level, base, max, data)
     
@@ -306,11 +306,11 @@ def gluBuild3DMipmapLevels(target, internalFormat, width, height, depth, format,
         level : GLint
         base : GLint
         max : GLint
-        data : POINTER(None)
+        data : c_void_p
     """
     return _api_(target, internalFormat, width, height, depth, format, type, level, base, max, data)
     
-@bind(GLint, [GLenum, GLint, GLsizei, GLsizei, GLsizei, GLenum, GLenum, POINTER(None)])
+@bind(GLint, [GLenum, GLint, GLsizei, GLsizei, GLsizei, GLenum, GLenum, c_void_p])
 def gluBuild3DMipmaps(target, internalFormat, width, height, depth, format, type, data, _api_=None): 
     """gluBuild3DMipmaps(target, internalFormat, width, height, depth, format, type, data)
     
@@ -321,16 +321,16 @@ def gluBuild3DMipmaps(target, internalFormat, width, height, depth, format, type
         depth : GLsizei
         format : GLenum
         type : GLenum
-        data : POINTER(None)
+        data : c_void_p
     """
     return _api_(target, internalFormat, width, height, depth, format, type, data)
     
-@bind(GLboolean, [POINTER(GLubyte), POINTER(GLubyte)])
+@bind(GLboolean, [POINTER(c_ubyte), POINTER(c_ubyte)])
 def gluCheckExtension(extName, extString, _api_=None): 
     """gluCheckExtension(extName, extString)
     
-        extName : POINTER(GLubyte)
-        extString : POINTER(GLubyte)
+        extName : POINTER(c_ubyte)
+        extString : POINTER(c_ubyte)
     """
     return _api_(extName, extString)
     
@@ -415,7 +415,7 @@ def gluEndTrim(nurb, _api_=None):
     """
     return _api_(nurb)
     
-@bind(POINTER(GLubyte), [GLenum])
+@bind(POINTER(c_ubyte), [GLenum])
 def gluErrorString(error, _api_=None): 
     """gluErrorString(error)
     
@@ -423,17 +423,17 @@ def gluErrorString(error, _api_=None):
     """
     return _api_(error)
     
-@bind(None, [POINTER(GLUnurbs), GLenum, POINTER(GLfloat)])
+@bind(None, [POINTER(GLUnurbs), GLenum, POINTER(c_float)])
 def gluGetNurbsProperty(nurb, property, data, _api_=None): 
     """gluGetNurbsProperty(nurb, property, data)
     
         nurb : POINTER(GLUnurbs)
         property : GLenum
-        data : POINTER(GLfloat)
+        data : POINTER(c_float)
     """
     return _api_(nurb, property, data)
     
-@bind(POINTER(GLubyte), [GLenum])
+@bind(POINTER(c_ubyte), [GLenum])
 def gluGetString(name, _api_=None): 
     """gluGetString(name)
     
@@ -441,24 +441,24 @@ def gluGetString(name, _api_=None):
     """
     return _api_(name)
     
-@bind(None, [POINTER(GLUtesselator), GLenum, POINTER(GLdouble)])
+@bind(None, [POINTER(GLUtesselator), GLenum, POINTER(c_double)])
 def gluGetTessProperty(tess, which, data, _api_=None): 
     """gluGetTessProperty(tess, which, data)
     
         tess : POINTER(GLUtesselator)
         which : GLenum
-        data : POINTER(GLdouble)
+        data : POINTER(c_double)
     """
     return _api_(tess, which, data)
     
-@bind(None, [POINTER(GLUnurbs), POINTER(GLfloat), POINTER(GLfloat), POINTER(GLint)])
+@bind(None, [POINTER(GLUnurbs), POINTER(c_float), POINTER(c_float), POINTER(c_long)])
 def gluLoadSamplingMatrices(nurb, model, perspective, view, _api_=None): 
     """gluLoadSamplingMatrices(nurb, model, perspective, view)
     
         nurb : POINTER(GLUnurbs)
-        model : POINTER(GLfloat)
-        perspective : POINTER(GLfloat)
-        view : POINTER(GLint)
+        model : POINTER(c_float)
+        perspective : POINTER(c_float)
+        view : POINTER(c_long)
     """
     return _api_(nurb, model, perspective, view)
     
@@ -511,43 +511,43 @@ def gluNextContour(tess, type, _api_=None):
     """
     return _api_(tess, type)
     
-@bind(None, [POINTER(GLUnurbs), GLenum, POINTER(CFUNCTYPE(GLvoid, ))])
+@bind(None, [POINTER(GLUnurbs), GLenum, c_void_p])
 def gluNurbsCallback(nurb, which, CallBackFunc, _api_=None): 
     """gluNurbsCallback(nurb, which, CallBackFunc)
     
         nurb : POINTER(GLUnurbs)
         which : GLenum
-        CallBackFunc : POINTER(CFUNCTYPE(GLvoid, ))
+        CallBackFunc : c_void_p
     """
     return _api_(nurb, which, CallBackFunc)
     
-@bind(None, [POINTER(GLUnurbs), POINTER(GLvoid)])
+@bind(None, [POINTER(GLUnurbs), c_void_p])
 def gluNurbsCallbackData(nurb, userData, _api_=None): 
     """gluNurbsCallbackData(nurb, userData)
     
         nurb : POINTER(GLUnurbs)
-        userData : POINTER(GLvoid)
+        userData : c_void_p
     """
     return _api_(nurb, userData)
     
-@bind(None, [POINTER(GLUnurbs), POINTER(GLvoid)])
+@bind(None, [POINTER(GLUnurbs), c_void_p])
 def gluNurbsCallbackDataEXT(nurb, userData, _api_=None): 
     """gluNurbsCallbackDataEXT(nurb, userData)
     
         nurb : POINTER(GLUnurbs)
-        userData : POINTER(GLvoid)
+        userData : c_void_p
     """
     return _api_(nurb, userData)
     
-@bind(None, [POINTER(GLUnurbs), GLint, POINTER(GLfloat), GLint, POINTER(GLfloat), GLint, GLenum])
+@bind(None, [POINTER(GLUnurbs), GLint, POINTER(c_float), GLint, POINTER(c_float), GLint, GLenum])
 def gluNurbsCurve(nurb, knotCount, knots, stride, control, order, type, _api_=None): 
     """gluNurbsCurve(nurb, knotCount, knots, stride, control, order, type)
     
         nurb : POINTER(GLUnurbs)
         knotCount : GLint
-        knots : POINTER(GLfloat)
+        knots : POINTER(c_float)
         stride : GLint
-        control : POINTER(GLfloat)
+        control : POINTER(c_float)
         order : GLint
         type : GLenum
     """
@@ -563,18 +563,18 @@ def gluNurbsProperty(nurb, property, value, _api_=None):
     """
     return _api_(nurb, property, value)
     
-@bind(None, [POINTER(GLUnurbs), GLint, POINTER(GLfloat), GLint, POINTER(GLfloat), GLint, GLint, POINTER(GLfloat), GLint, GLint, GLenum])
+@bind(None, [POINTER(GLUnurbs), GLint, POINTER(c_float), GLint, POINTER(c_float), GLint, GLint, POINTER(c_float), GLint, GLint, GLenum])
 def gluNurbsSurface(nurb, sKnotCount, sKnots, tKnotCount, tKnots, sStride, tStride, control, sOrder, tOrder, type, _api_=None): 
     """gluNurbsSurface(nurb, sKnotCount, sKnots, tKnotCount, tKnots, sStride, tStride, control, sOrder, tOrder, type)
     
         nurb : POINTER(GLUnurbs)
         sKnotCount : GLint
-        sKnots : POINTER(GLfloat)
+        sKnots : POINTER(c_float)
         tKnotCount : GLint
-        tKnots : POINTER(GLfloat)
+        tKnots : POINTER(c_float)
         sStride : GLint
         tStride : GLint
-        control : POINTER(GLfloat)
+        control : POINTER(c_float)
         sOrder : GLint
         tOrder : GLint
         type : GLenum
@@ -617,7 +617,7 @@ def gluPerspective(fovy, aspect, zNear, zFar, _api_=None):
     """
     return _api_(fovy, aspect, zNear, zFar)
     
-@bind(None, [GLdouble, GLdouble, GLdouble, GLdouble, POINTER(GLint)])
+@bind(None, [GLdouble, GLdouble, GLdouble, GLdouble, POINTER(c_long)])
 def gluPickMatrix(x, y, delX, delY, viewport, _api_=None): 
     """gluPickMatrix(x, y, delX, delY, viewport)
     
@@ -625,45 +625,45 @@ def gluPickMatrix(x, y, delX, delY, viewport, _api_=None):
         y : GLdouble
         delX : GLdouble
         delY : GLdouble
-        viewport : POINTER(GLint)
+        viewport : POINTER(c_long)
     """
     return _api_(x, y, delX, delY, viewport)
     
-@bind(GLint, [GLdouble, GLdouble, GLdouble, POINTER(GLdouble), POINTER(GLdouble), POINTER(GLint), POINTER(GLdouble), POINTER(GLdouble), POINTER(GLdouble)])
+@bind(GLint, [GLdouble, GLdouble, GLdouble, POINTER(c_double), POINTER(c_double), POINTER(c_long), POINTER(c_double), POINTER(c_double), POINTER(c_double)])
 def gluProject(objX, objY, objZ, model, proj, view, winX, winY, winZ, _api_=None): 
     """gluProject(objX, objY, objZ, model, proj, view, winX, winY, winZ)
     
         objX : GLdouble
         objY : GLdouble
         objZ : GLdouble
-        model : POINTER(GLdouble)
-        proj : POINTER(GLdouble)
-        view : POINTER(GLint)
-        winX : POINTER(GLdouble)
-        winY : POINTER(GLdouble)
-        winZ : POINTER(GLdouble)
+        model : POINTER(c_double)
+        proj : POINTER(c_double)
+        view : POINTER(c_long)
+        winX : POINTER(c_double)
+        winY : POINTER(c_double)
+        winZ : POINTER(c_double)
     """
     return _api_(objX, objY, objZ, model, proj, view, winX, winY, winZ)
     
-@bind(None, [POINTER(GLUnurbs), GLint, POINTER(GLfloat), GLint, GLenum])
+@bind(None, [POINTER(GLUnurbs), GLint, POINTER(c_float), GLint, GLenum])
 def gluPwlCurve(nurb, count, data, stride, type, _api_=None): 
     """gluPwlCurve(nurb, count, data, stride, type)
     
         nurb : POINTER(GLUnurbs)
         count : GLint
-        data : POINTER(GLfloat)
+        data : POINTER(c_float)
         stride : GLint
         type : GLenum
     """
     return _api_(nurb, count, data, stride, type)
     
-@bind(None, [POINTER(GLUquadric), GLenum, POINTER(CFUNCTYPE(GLvoid, ))])
+@bind(None, [POINTER(GLUquadric), GLenum, c_void_p])
 def gluQuadricCallback(quad, which, CallBackFunc, _api_=None): 
     """gluQuadricCallback(quad, which, CallBackFunc)
     
         quad : POINTER(GLUquadric)
         which : GLenum
-        CallBackFunc : POINTER(CFUNCTYPE(GLvoid, ))
+        CallBackFunc : c_void_p
     """
     return _api_(quad, which, CallBackFunc)
     
@@ -703,7 +703,7 @@ def gluQuadricTexture(quad, texture, _api_=None):
     """
     return _api_(quad, texture)
     
-@bind(GLint, [GLenum, GLsizei, GLsizei, GLenum, POINTER(None), GLsizei, GLsizei, GLenum, POINTER(GLvoid)])
+@bind(GLint, [GLenum, GLsizei, GLsizei, GLenum, c_void_p, GLsizei, GLsizei, GLenum, c_void_p])
 def gluScaleImage(format, wIn, hIn, typeIn, dataIn, wOut, hOut, typeOut, dataOut, _api_=None): 
     """gluScaleImage(format, wIn, hIn, typeIn, dataIn, wOut, hOut, typeOut, dataOut)
     
@@ -711,11 +711,11 @@ def gluScaleImage(format, wIn, hIn, typeIn, dataIn, wOut, hOut, typeOut, dataOut
         wIn : GLsizei
         hIn : GLsizei
         typeIn : GLenum
-        dataIn : POINTER(None)
+        dataIn : c_void_p
         wOut : GLsizei
         hOut : GLsizei
         typeOut : GLenum
-        dataOut : POINTER(GLvoid)
+        dataOut : c_void_p
     """
     return _api_(format, wIn, hIn, typeIn, dataIn, wOut, hOut, typeOut, dataOut)
     
@@ -738,22 +738,22 @@ def gluTessBeginContour(tess, _api_=None):
     """
     return _api_(tess)
     
-@bind(None, [POINTER(GLUtesselator), POINTER(GLvoid)])
+@bind(None, [POINTER(GLUtesselator), c_void_p])
 def gluTessBeginPolygon(tess, data, _api_=None): 
     """gluTessBeginPolygon(tess, data)
     
         tess : POINTER(GLUtesselator)
-        data : POINTER(GLvoid)
+        data : c_void_p
     """
     return _api_(tess, data)
     
-@bind(None, [POINTER(GLUtesselator), GLenum, POINTER(CFUNCTYPE(GLvoid, ))])
+@bind(None, [POINTER(GLUtesselator), GLenum, c_void_p])
 def gluTessCallback(tess, which, CallBackFunc, _api_=None): 
     """gluTessCallback(tess, which, CallBackFunc)
     
         tess : POINTER(GLUtesselator)
         which : GLenum
-        CallBackFunc : POINTER(CFUNCTYPE(GLvoid, ))
+        CallBackFunc : c_void_p
     """
     return _api_(tess, which, CallBackFunc)
     
@@ -794,33 +794,33 @@ def gluTessProperty(tess, which, data, _api_=None):
     """
     return _api_(tess, which, data)
     
-@bind(None, [POINTER(GLUtesselator), POINTER(GLdouble), POINTER(GLvoid)])
+@bind(None, [POINTER(GLUtesselator), POINTER(c_double), c_void_p])
 def gluTessVertex(tess, location, data, _api_=None): 
     """gluTessVertex(tess, location, data)
     
         tess : POINTER(GLUtesselator)
-        location : POINTER(GLdouble)
-        data : POINTER(GLvoid)
+        location : POINTER(c_double)
+        data : c_void_p
     """
     return _api_(tess, location, data)
     
-@bind(GLint, [GLdouble, GLdouble, GLdouble, POINTER(GLdouble), POINTER(GLdouble), POINTER(GLint), POINTER(GLdouble), POINTER(GLdouble), POINTER(GLdouble)])
+@bind(GLint, [GLdouble, GLdouble, GLdouble, POINTER(c_double), POINTER(c_double), POINTER(c_long), POINTER(c_double), POINTER(c_double), POINTER(c_double)])
 def gluUnProject(winX, winY, winZ, model, proj, view, objX, objY, objZ, _api_=None): 
     """gluUnProject(winX, winY, winZ, model, proj, view, objX, objY, objZ)
     
         winX : GLdouble
         winY : GLdouble
         winZ : GLdouble
-        model : POINTER(GLdouble)
-        proj : POINTER(GLdouble)
-        view : POINTER(GLint)
-        objX : POINTER(GLdouble)
-        objY : POINTER(GLdouble)
-        objZ : POINTER(GLdouble)
+        model : POINTER(c_double)
+        proj : POINTER(c_double)
+        view : POINTER(c_long)
+        objX : POINTER(c_double)
+        objY : POINTER(c_double)
+        objZ : POINTER(c_double)
     """
     return _api_(winX, winY, winZ, model, proj, view, objX, objY, objZ)
     
-@bind(GLint, [GLdouble, GLdouble, GLdouble, GLdouble, POINTER(GLdouble), POINTER(GLdouble), POINTER(GLint), GLdouble, GLdouble, POINTER(GLdouble), POINTER(GLdouble), POINTER(GLdouble), POINTER(GLdouble)])
+@bind(GLint, [GLdouble, GLdouble, GLdouble, GLdouble, POINTER(c_double), POINTER(c_double), POINTER(c_long), GLdouble, GLdouble, POINTER(c_double), POINTER(c_double), POINTER(c_double), POINTER(c_double)])
 def gluUnProject4(winX, winY, winZ, clipW, model, proj, view, near, far, objX, objY, objZ, objW, _api_=None): 
     """gluUnProject4(winX, winY, winZ, clipW, model, proj, view, near, far, objX, objY, objZ, objW)
     
@@ -828,15 +828,15 @@ def gluUnProject4(winX, winY, winZ, clipW, model, proj, view, near, far, objX, o
         winY : GLdouble
         winZ : GLdouble
         clipW : GLdouble
-        model : POINTER(GLdouble)
-        proj : POINTER(GLdouble)
-        view : POINTER(GLint)
+        model : POINTER(c_double)
+        proj : POINTER(c_double)
+        view : POINTER(c_long)
         near : GLdouble
         far : GLdouble
-        objX : POINTER(GLdouble)
-        objY : POINTER(GLdouble)
-        objZ : POINTER(GLdouble)
-        objW : POINTER(GLdouble)
+        objX : POINTER(c_double)
+        objY : POINTER(c_double)
+        objZ : POINTER(c_double)
+        objW : POINTER(c_double)
     """
     return _api_(winX, winY, winZ, clipW, model, proj, view, near, far, objX, objY, objZ, objW)
     

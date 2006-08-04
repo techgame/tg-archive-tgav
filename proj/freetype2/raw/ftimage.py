@@ -40,8 +40,8 @@ class FT_Bitmap_(Structure):
         ("pitch", c_int),
         ("buffer", POINTER(c_ubyte)),
         ("num_grays", c_short),
-        ("pixel_mode", c_ubyte),
-        ("palette_mode", c_ubyte),
+        ("pixel_mode", c_char),
+        ("palette_mode", c_char),
         ("palette", FT_Pointer),
         ]
 
@@ -52,8 +52,8 @@ class FT_Outline_(Structure):
     _fields_ = [
         ("n_contours", c_short),
         ("n_points", c_short),
-        ("points", POINTER(FT_Vector)),
-        ("tags", POINTER(c_ubyte)),
+        ("points", POINTER(FT_Vector_)),
+        ("tags", c_char_p),
         ("contours", POINTER(c_short)),
         ("flags", c_int),
         ]

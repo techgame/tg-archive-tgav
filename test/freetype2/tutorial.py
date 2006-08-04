@@ -23,7 +23,7 @@ from TG.freetype2.raw import freetype
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def check(err):
-    if err: raise RuntimeError("Error: %s" % (err.value,))
+    if err: raise RuntimeError("Error: %s" % (err,))
 
 class Bitmap(object):
     def __init__(self, char, x, y, ax, bitmap):
@@ -110,6 +110,7 @@ if __name__=='__main__':
     face = freetype.FT_Face()
     if 1:
         faceFilename = '/Library/Fonts/Arial'
+        faceFilename = '/Library/Fonts/Zapfino.dfont'
         faceFilename = '/System/Library/Fonts/Monaco.dfont'
         faceFilename = '/System/Library/Fonts/AppleGothic.dfont'
         faceFilename = '/System/Library/Fonts/LucidaGrande.dfont'

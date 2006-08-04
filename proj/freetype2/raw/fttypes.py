@@ -72,7 +72,7 @@ class FT_Matrix_(Structure):
 FT_Matrix = FT_Matrix_
 
 # typedef FT_Generic_Finalizer
-FT_Generic_Finalizer = POINTER(CFUNCTYPE(None, FT_Pointer))
+FT_Generic_Finalizer = c_void_p
 
 class FT_Generic_(Structure):
     _fields_ = [

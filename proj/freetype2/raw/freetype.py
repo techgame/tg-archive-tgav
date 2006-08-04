@@ -116,12 +116,12 @@ class FT_FaceRec_(Structure):
         ("face_flags", FT_Long),
         ("style_flags", FT_Long),
         ("num_glyphs", FT_Long),
-        ("family_name", POINTER(FT_String)),
-        ("style_name", POINTER(FT_String)),
+        ("family_name", c_char_p),
+        ("style_name", c_char_p),
         ("num_fixed_sizes", FT_Int),
-        ("available_sizes", POINTER(FT_Bitmap_Size)),
+        ("available_sizes", POINTER(FT_Bitmap_Size_)),
         ("num_charmaps", FT_Int),
-        ("charmaps", POINTER(FT_CharMap)),
+        ("charmaps", POINTER(FT_CharMapRec_)),
         ("generic", FT_Generic),
         ("bbox", FT_BBox),
         ("units_per_EM", FT_UShort),
@@ -226,23 +226,23 @@ class FT_GlyphSlotRec_(Structure):
         ]
 FT_GlyphSlot.set_type(FT_GlyphSlotRec_)
 
-@bind(FT_Error, [POINTER(FT_Library)])
+@bind(FT_Error, [POINTER(FT_LibraryRec_)])
 def FT_Init_FreeType(alibrary, _api_=None): 
     """FT_Init_FreeType(alibrary)
     
-        alibrary : POINTER(FT_Library)
+        alibrary : POINTER(FT_LibraryRec_)
     """
     return _api_(alibrary)
     
 
-@bind(None, [FT_Library, POINTER(FT_Int), POINTER(FT_Int), POINTER(FT_Int)])
+@bind(None, [FT_Library, POINTER(c_int), POINTER(c_int), POINTER(c_int)])
 def FT_Library_Version(library, amajor, aminor, apatch, _api_=None): 
     """FT_Library_Version(library, amajor, aminor, apatch)
     
         library : FT_Library
-        amajor : POINTER(FT_Int)
-        aminor : POINTER(FT_Int)
-        apatch : POINTER(FT_Int)
+        amajor : POINTER(c_int)
+        aminor : POINTER(c_int)
+        apatch : POINTER(c_int)
     """
     return _api_(library, amajor, aminor, apatch)
     
@@ -274,71 +274,71 @@ FT_Parameter = FT_Parameter_
 class FT_Open_Args_(Structure):
     _fields_ = [
         ("flags", FT_UInt),
-        ("memory_base", POINTER(FT_Byte)),
+        ("memory_base", POINTER(c_ubyte)),
         ("memory_size", FT_Long),
-        ("pathname", POINTER(FT_String)),
+        ("pathname", c_char_p),
         ("stream", FT_Stream),
         ("driver", FT_Module),
         ("num_params", FT_Int),
-        ("params", POINTER(FT_Parameter)),
+        ("params", POINTER(FT_Parameter_)),
         ]
 
 # typedef FT_Open_Args
 FT_Open_Args = FT_Open_Args_
 
-@bind(FT_Error, [FT_Library, POINTER(c_char), FT_Long, POINTER(FT_Face)])
+@bind(FT_Error, [FT_Library, c_char_p, FT_Long, POINTER(FT_FaceRec_)])
 def FT_New_Face(library, filepathname, face_index, aface, _api_=None): 
     """FT_New_Face(library, filepathname, face_index, aface)
     
         library : FT_Library
-        filepathname : POINTER(c_char)
+        filepathname : c_char_p
         face_index : FT_Long
-        aface : POINTER(FT_Face)
+        aface : POINTER(FT_FaceRec_)
     """
     return _api_(library, filepathname, face_index, aface)
     
 
-@bind(FT_Error, [FT_Library, POINTER(FT_Byte), FT_Long, FT_Long, POINTER(FT_Face)])
+@bind(FT_Error, [FT_Library, POINTER(c_ubyte), FT_Long, FT_Long, POINTER(FT_FaceRec_)])
 def FT_New_Memory_Face(library, file_base, file_size, face_index, aface, _api_=None): 
     """FT_New_Memory_Face(library, file_base, file_size, face_index, aface)
     
         library : FT_Library
-        file_base : POINTER(FT_Byte)
+        file_base : POINTER(c_ubyte)
         file_size : FT_Long
         face_index : FT_Long
-        aface : POINTER(FT_Face)
+        aface : POINTER(FT_FaceRec_)
     """
     return _api_(library, file_base, file_size, face_index, aface)
     
 
-@bind(FT_Error, [FT_Library, POINTER(FT_Open_Args), FT_Long, POINTER(FT_Face)])
+@bind(FT_Error, [FT_Library, POINTER(FT_Open_Args_), FT_Long, POINTER(FT_FaceRec_)])
 def FT_Open_Face(library, args, face_index, aface, _api_=None): 
     """FT_Open_Face(library, args, face_index, aface)
     
         library : FT_Library
-        args : POINTER(FT_Open_Args)
+        args : POINTER(FT_Open_Args_)
         face_index : FT_Long
-        aface : POINTER(FT_Face)
+        aface : POINTER(FT_FaceRec_)
     """
     return _api_(library, args, face_index, aface)
     
 
-@bind(FT_Error, [FT_Face, POINTER(c_char)])
+@bind(FT_Error, [FT_Face, c_char_p])
 def FT_Attach_File(face, filepathname, _api_=None): 
     """FT_Attach_File(face, filepathname)
     
         face : FT_Face
-        filepathname : POINTER(c_char)
+        filepathname : c_char_p
     """
     return _api_(face, filepathname)
     
 
-@bind(FT_Error, [FT_Face, POINTER(FT_Open_Args)])
+@bind(FT_Error, [FT_Face, POINTER(FT_Open_Args_)])
 def FT_Attach_Stream(face, parameters, _api_=None): 
     """FT_Attach_Stream(face, parameters)
     
         face : FT_Face
-        parameters : POINTER(FT_Open_Args)
+        parameters : POINTER(FT_Open_Args_)
     """
     return _api_(face, parameters)
     
@@ -416,13 +416,13 @@ FT_LOAD_LINEAR_DESIGN = 0x2000
 FT_LOAD_SBITS_ONLY = 0x4000
 FT_LOAD_NO_AUTOHINT = 0x8000
 
-@bind(None, [FT_Face, POINTER(FT_Matrix), POINTER(FT_Vector)])
+@bind(None, [FT_Face, POINTER(FT_Matrix_), POINTER(FT_Vector_)])
 def FT_Set_Transform(face, matrix, delta, _api_=None): 
     """FT_Set_Transform(face, matrix, delta)
     
         face : FT_Face
-        matrix : POINTER(FT_Matrix)
-        delta : POINTER(FT_Vector)
+        matrix : POINTER(FT_Matrix_)
+        delta : POINTER(FT_Vector_)
     """
     return _api_(face, matrix, delta)
     
@@ -449,7 +449,7 @@ def FT_Render_Glyph(slot, render_mode, _api_=None):
     return _api_(slot, render_mode)
     
 
-@bind(FT_Error, [FT_Face, FT_UInt, FT_UInt, FT_UInt, POINTER(FT_Vector)])
+@bind(FT_Error, [FT_Face, FT_UInt, FT_UInt, FT_UInt, POINTER(FT_Vector_)])
 def FT_Get_Kerning(face, left_glyph, right_glyph, kern_mode, akerning, _api_=None): 
     """FT_Get_Kerning(face, left_glyph, right_glyph, kern_mode, akerning)
     
@@ -457,7 +457,7 @@ def FT_Get_Kerning(face, left_glyph, right_glyph, kern_mode, akerning, _api_=Non
         left_glyph : FT_UInt
         right_glyph : FT_UInt
         kern_mode : FT_UInt
-        akerning : POINTER(FT_Vector)
+        akerning : POINTER(FT_Vector_)
     """
     return _api_(face, left_glyph, right_glyph, kern_mode, akerning)
     
@@ -474,7 +474,7 @@ def FT_Get_Glyph_Name(face, glyph_index, buffer, buffer_max, _api_=None):
     return _api_(face, glyph_index, buffer, buffer_max)
     
 
-@bind(POINTER(c_char), [FT_Face])
+@bind(c_char_p, [FT_Face])
 def FT_Get_Postscript_Name(face, _api_=None): 
     """FT_Get_Postscript_Name(face)
     
@@ -522,33 +522,33 @@ def FT_Get_Char_Index(face, charcode, _api_=None):
     return _api_(face, charcode)
     
 
-@bind(FT_ULong, [FT_Face, POINTER(FT_UInt)])
+@bind(FT_ULong, [FT_Face, POINTER(c_uint)])
 def FT_Get_First_Char(face, agindex, _api_=None): 
     """FT_Get_First_Char(face, agindex)
     
         face : FT_Face
-        agindex : POINTER(FT_UInt)
+        agindex : POINTER(c_uint)
     """
     return _api_(face, agindex)
     
 
-@bind(FT_ULong, [FT_Face, FT_ULong, POINTER(FT_UInt)])
+@bind(FT_ULong, [FT_Face, FT_ULong, POINTER(c_uint)])
 def FT_Get_Next_Char(face, char_code, agindex, _api_=None): 
     """FT_Get_Next_Char(face, char_code, agindex)
     
         face : FT_Face
         char_code : FT_ULong
-        agindex : POINTER(FT_UInt)
+        agindex : POINTER(c_uint)
     """
     return _api_(face, char_code, agindex)
     
 
-@bind(FT_UInt, [FT_Face, POINTER(FT_String)])
+@bind(FT_UInt, [FT_Face, c_char_p])
 def FT_Get_Name_Index(face, glyph_name, _api_=None): 
     """FT_Get_Name_Index(face, glyph_name)
     
         face : FT_Face
-        glyph_name : POINTER(FT_String)
+        glyph_name : c_char_p
     """
     return _api_(face, glyph_name)
     
@@ -611,12 +611,12 @@ def FT_FloorFix(a, _api_=None):
     return _api_(a)
     
 
-@bind(None, [POINTER(FT_Vector), POINTER(FT_Matrix)])
+@bind(None, [POINTER(FT_Vector_), POINTER(FT_Matrix_)])
 def FT_Vector_Transform(vec, matrix, _api_=None): 
     """FT_Vector_Transform(vec, matrix)
     
-        vec : POINTER(FT_Vector)
-        matrix : POINTER(FT_Matrix)
+        vec : POINTER(FT_Vector_)
+        matrix : POINTER(FT_Matrix_)
     """
     return _api_(vec, matrix)
     
