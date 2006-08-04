@@ -7,6 +7,8 @@ import os
 import re
 
 from TG.common.path import path
+from gltypeHandling import glTypeMap
+from glextConfig import glextIgnore, glextForce
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -29,6 +31,10 @@ class OpenGLSpecPartParser(re.Scanner):
         self._parts = []
         self._title = ''
         self._block = []
+
+        firstLine = spec.partition('\n')[0].strip()
+        if firstLine not in ['', 'Name']:
+            self._parts.append(('@header', [firstLine]))
 
         spec = self.scan(spec)[1]
         if spec:
@@ -65,6 +71,7 @@ parser = OpenGLSpecPartParser()
 
 class OpenGLRegistryToCParts(object):
     partMapping = {
+        '@header': '@header',
         'Name': 'name',
         'Name String': 'strings',
         'Name Strings': 'strings',
@@ -85,11 +92,12 @@ class OpenGLRegistryToCParts(object):
         self.parseSpec(specFile.read())
 
     def parseSpec(self, spec):
-        self.names = None
-        self.strings = None
-        self.tokens = None
-        self.functions = None
-        self.invalid = False
+        self.names = []
+        self.strings = []
+        self.tokens = []
+        self.functions = []
+        self.skip = False
+        self.incomplete = False
 
         self._parts = {}
         for title, block in parser.parse(spec):
@@ -98,19 +106,51 @@ class OpenGLRegistryToCParts(object):
             if fn:
                 fn(self, title, block)
 
-        self._assert()
+            if self.skip:
+                break
+        else:
+            self._assert()
 
     def _assert(self):
         assert self.names is not None
         assert self.strings is not None
-        #if self.invalid:
-        #    print "Invalid:", self.filename
+
+    _skip = False
+    def getSkip(self):
+        if self.names:
+            return self._skip
+        else: return False
+    def setSkip(self, skip):
+        if not self.forceExtension():
+            self._skip = skip
+    skip = property(getSkip, setSkip)
+
+    def forceExtension(self):
+        for n in self.names:
+            if n in glextForce:
+                return True
+        return False
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    @token('@header')
+    def _parseHeaderSection(self, title, block):
+        for line in block:
+            line = line.lower()
+            if 'not complete' in line:
+                self.incomplete = True
+            elif 'incomplete' in line:
+                self.incomplete = True
 
     @token('name')
     def _parseNameSection(self, title, block):
         self.names = self._blockToIdentifiers(block)
+
+        for n in self.names:
+            if self.incomplete:
+                self.skip = True
+            elif glextIgnore.get(n, False):
+                self.skip = True
 
     @token('strings')
     def _parseStringsSection(self, title, block):
@@ -142,7 +182,7 @@ class OpenGLRegistryToCParts(object):
             valid = True
         except (NameError, ValueError, SyntaxError),e:
             valid = False
-            self.invalid = True
+            self.skip = True
 
         if not self.re_token_name.match(name):
             name = 'GL_'+name
@@ -162,59 +202,6 @@ class OpenGLRegistryToCParts(object):
             yield lines
 
 
-    glTypeMap = dict(
-        boolean="GLboolean",
-        Boolean="GLboolean",
-        GLboolean="GLboolean",
-
-        DMbuffer="GLvoid*",
-
-        void='GLvoid',
-        GLvoid="GLvoid",
-
-        enum="GLenum",
-        GLenum="GLenum",
-        Glenum="GLenum",
-
-        bitfield="GLbitfield",
-        GLbitfield="GLbitfield",
-
-        byte="GLbyte",
-        GLbyte="GLbyte",
-        ubyte="GLubyte",
-        GLubyte="GLubyte",
-
-        clampf="GLclampf",
-        GLclampf="GLclampf",
-
-        clampd="GLclampd",
-        GLclampd="GLclampd",
-
-        double="GLdouble",
-        GLdouble="GLdouble",
-
-        float="GLfloat",
-        GLfloat="GLfloat",
-
-        half="GLhalf",
-        GLhalf="GLhalf",
-
-        int="GLint",
-        GLint="GLint",
-
-        uint="GLint",
-        GLuint="GLint",
-
-        short="GLshort",
-        GLshort="GLshort",
-
-        ushort="GLushort",
-        GLushort="GLushort",
-
-        sizei="GLsizei",
-        GLsizei="GLsizei",
-        )
-
     re_func = re.compile(
             r'^\s*(\w+[^()\n\r\f]*)'
             r'\(([^)]*)\);?'
@@ -229,6 +216,7 @@ class OpenGLRegistryToCParts(object):
                 return False
         return False
 
+    validFnPrefixes = ('gl', 'glu', 'glx', 'wgl', 'agl')
     def _iterFuncsByGroup(self, block):
         if self._checkBlockStartsWithNone(block):
             return
@@ -244,9 +232,12 @@ class OpenGLRegistryToCParts(object):
                 if not name: 
                     # pre is actually our name, so swap
                     name, pre = pre, name
-                if name in self.glTypeMap:
+                if name in glTypeMap:
                     # or we have a function type declaration
                     continue
+
+                if not name.startswith(self.validFnPrefixes):
+                    name = 'gl'+name
 
                 pre = pre.replace('*', ' * ').split(' ')
                 args = [a.strip() for a in args.split(',')]
@@ -257,8 +248,14 @@ class OpenGLRegistryToCParts(object):
                 else:
                     yield name, (pre, name, args)
 
+    re_complexNameParts = re.compile(r'{\w+}v?|\[(?:\w|\|)+\]v?|\w+')
     def _expandComplexName(self, name, args):
-        print name, args
+        print self.names[0]
+        parts = self.re_complexNameParts.findall(name)
+        #print name, args
+        print name, parts
+        print
+
         return []
 
     @token('functions')
@@ -266,7 +263,6 @@ class OpenGLRegistryToCParts(object):
         self.functions = []
         for fn in self._iterFuncsByGroup(block):
             self.functions.append(fn)
-            #print fn[0]
 
     del token
 
@@ -288,8 +284,14 @@ def main():
             #print vendor, f
             OpenGLRegistryToCParts(vendor, str(f), f.open('rb'))
     else:
+        dirs = map(path, [
+                './specs/EXT/',
+                './specs/ARB/',
+                './specs/NV/',
+                './specs/ATI/',
+                ])
 
-        for d in path('./specs').dirs():
+        for d in dirs:
             vendor = d.name
             for f in d.files('*.txt'):
                 #print
