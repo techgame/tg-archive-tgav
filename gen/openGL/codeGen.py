@@ -30,7 +30,34 @@ analyzer = CodeAnalyzer(
 class FilterVisitor(AtomFilterVisitor):
     def onFunction(self, item):
         if item.extern and item.name.startswith('gl'):
+            if item.arguments:
+                if not max(arg.name for arg in item.arguments):
+                    self.patchFunctionArgNames(item)
+
             self.select(item)
+
+    def patchFunctionArgNames(self, item):
+        # we are missing the argument names for the functions in glext.
+        # For some reason, the authors of glext.h decided to only put
+        # the argument names on the typedefs.  Unfortunately, C can't
+        # keep the argument names for each function typdef because they
+        # only keep unique typedefs -- meaning that the names have to
+        # be thrown away.  So in TG.gccxml, we parse the
+        # post-preprocessed sources to grab the function pointer
+        # typdefs in order to grab the argument names out of them.
+        # Using these patches, we can now use the glext's convention
+        # for naming function pointers to patch the argument names back
+        # into the functions.
+
+        fnptrName = 'PFN%sPROC' % (item.name.upper(),)
+        patches = item.file.getPatchFor('FunctionType', fnptrName)
+        for patch in patches:
+            for arg, name in zip(item.arguments, patch.argNames):
+                if not arg.name:
+                    arg.name = name
+            break
+        else:
+            print 'Missing arg names!:', (item.name, fnptrName)
 
     def onPPInclude(self, item):
         print '"%s" includes "%s"' % (item.file.name, item.filename)
