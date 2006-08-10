@@ -36,7 +36,7 @@ class FilterVisitor(AtomFilterVisitor):
 
             self.select(item)
 
-    def patchFunctionArgNames(self, item):
+    def patchFunctionArgNames(self, funcItem):
         # we are missing the argument names for the functions in glext.
         # For some reason, the authors of glext.h decided to only put
         # the argument names on the typedefs.  Unfortunately, C can't
@@ -49,15 +49,28 @@ class FilterVisitor(AtomFilterVisitor):
         # for naming function pointers to patch the argument names back
         # into the functions.
 
-        fnptrName = 'PFN%sPROC' % (item.name.upper(),)
-        patches = item.file.getPatchFor('FunctionType', fnptrName)
+        fnName = funcItem.name
+
+        for fnName in (fnName, fnName+'ARB', fnName+'EXT'):
+            modName = 'PFN%sPROC' % (fnName.upper(),)
+            if self._applyFunctionNamePatch(funcItem, modName):
+                return True
+            
+            modName = '%sProcPtr' % (fnName,)
+            if self._applyFunctionNamePatch(funcItem, modName):
+                return True
+
+        return False
+
+    def _applyFunctionNamePatch(self, funcItem, patchName):
+        patches = self.ftPatches.get(patchName, [])
         for patch in patches:
-            for arg, name in zip(item.arguments, patch.argNames):
+            for arg, name in zip(funcItem.arguments, patch.argNames):
                 if not arg.name:
                     arg.name = name
-            break
+            return True
         else:
-            print 'Missing arg names!:', (item.name, fnptrName)
+            return False
 
     def onPPInclude(self, item):
         print '"%s" includes "%s"' % (item.file.name, item.filename)
@@ -98,8 +111,16 @@ class FilterVisitor(AtomFilterVisitor):
 
 def main():
     root = analyzer.loadModel()
+
+    ftPatches = {}
+    for fa in root.files.itervalues():
+        patchMap = fa.getPatchFor('FunctionType')
+        for key, lst in patchMap.iteritems():
+            ftPatches.setdefault(key, []).extend(lst)
+
     context = CCodeGenContext(root)
     context.atomFilter = FilterVisitor()
+    context.atomFilter.ftPatches = ftPatches
 
     ciFilesByName = dict((os.path.basename(f.name), f) for f in context if f)
 
