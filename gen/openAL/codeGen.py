@@ -21,7 +21,7 @@ from TG.gccxml.xforms.ctypes import utils
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 analyzer = CodeAnalyzer(
-        inc=['/System/Library/Frameworks/OpenAL.framework/Headers/'],
+        inc=['inc'],
         src=['src/genOpenAL.c'], 
         baseline=['src/baseline.c'])
 
@@ -47,10 +47,17 @@ class FilterVisitor(AtomFilterVisitor):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    filterConditionals = set([
-        'AL_NO_PROTOTYPES',
-        'ALC_NO_PROTOTYPES',
-        ])
+    filterConditionals = set([])
+
+    for prefix in ['AL', 'ALC', 'ALUT']:
+        for each in [
+                'AL_%s_H',
+                '%s_API', '%sAPI',
+                '%s_APIENTRY', '%sAPIENTRY',
+                '%s_ATTRIBUTE_DEPRECATED',
+                '%s_NO_PROTOTYPES', ]:
+            filterConditionals.add(each % prefix)
+
     def onPPConditional(self, item):
         if not item.isOpening():
             return 
@@ -58,7 +65,6 @@ class FilterVisitor(AtomFilterVisitor):
             return
 
         if item.body.startswith('AL'):
-            print repr(item), item.inOrder()
             self.select(item.inOrder())
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -78,20 +84,12 @@ def main():
     for ciFile in ciFilesByName.itervalues():
         ciFile.importAll('_ctypes_openal')
 
-    altypes = ciFilesByName['altypes.h']
-    altypes.importAll()
-
     al = ciFilesByName['al.h']
-    al.importAll(altypes)
-
-    alctypes = ciFilesByName['alctypes.h']
-    alctypes.importAll()
 
     alc = ciFilesByName['alc.h']
-    alc.importAll(altypes, alctypes)
 
     alut = ciFilesByName['alut.h']
-    alut.importAll(altypes, alctypes)
+    alut.importAll(al, alc)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # write output files

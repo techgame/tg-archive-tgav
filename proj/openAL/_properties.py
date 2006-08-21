@@ -68,6 +68,7 @@ class ALIDObject(ALObject):
                 raise ValueError("OpenAL ID is invalid")
         return self.__alid
     def _setALID(self, alid):
+        print alid, type(alid), repr(alid)
         alid = getattr(alid, 'value', alid)
         self.__alid = alid
         self._getALIDMap()[alid] = self
@@ -217,7 +218,7 @@ class alVectorObjectProperty(alVectorPropertyMixin, alObjectProperty):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class alPropertyS(alBasicReadProperty):
-    apiType = al.POINTER(al.ALubyte)
+    apiType = al.POINTER(al.ALchar)
     apiGet = staticmethod(al.alGetString)
 
     def __get__(self, obj, klass):
@@ -243,7 +244,7 @@ class alcPropertyI(alObjectReadProperty):
         return self.valueFromAPI(apiValue)
 
 class alcPropertyS(alObjectReadProperty):
-    apiType = alc.POINTER(alc.ALCubyte)
+    apiType = alc.POINTER(alc.ALCchar)
     apiGet = staticmethod(alc.alcGetString)
     
     def __get__(self, obj, klass):
