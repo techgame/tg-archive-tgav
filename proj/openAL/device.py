@@ -134,7 +134,7 @@ class Device(ALIDObject):
     _contextMap = None
     def _getContextMap(self):
         if self._contextMap is None:
-            self._setContextMap(weakref.WeakValueDictionary())
+            self._setContextMap({}) #weakref.WeakValueDictionary())
         return self._contextMap
     def _setContextMap(self, contextCollection):
         self._contextMap = contextCollection
@@ -157,7 +157,7 @@ class Device(ALIDObject):
 
     @classmethod
     def defaultDeviceName(klass):
-        cVal = alc.alcGetString(0, alc.ALC_DEFAULT_DEVICE_SPECIFIER)
+        cVal = alc.alcGetString(None, alc.ALC_DEFAULT_DEVICE_SPECIFIER)
         return alc.cast(cVal, alc.c_char_p).value
     
     @classmethod
@@ -166,7 +166,7 @@ class Device(ALIDObject):
 
     @classmethod
     def allDeviceNames(klass):
-        cVal = alc.alcGetString(0, alc.ALC_DEVICE_SPECIFIER)
+        cVal = alc.alcGetString(None, alc.ALC_DEVICE_SPECIFIER)
         return multiNullString(cVal)
 
     @classmethod

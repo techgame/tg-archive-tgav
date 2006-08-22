@@ -11,6 +11,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 from TG.openAL._properties import *
+from TG.openAL.constants import alFormatMap
 from TG.openAL.raw import al, alc
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -52,7 +53,7 @@ else:
 
         def open(self, name=None, frequency=44100, format=al.AL_FORMAT_STEREO16, count=1024):
             name = name and str(name) or None
-            format = al.alFormatMap.get(format, format)
+            format = alFormatMap.get(format, format)
 
             self.bufferCount = count
             self.entrySize = self.entrySizeMap[format]
@@ -88,7 +89,7 @@ else:
 
         @classmethod
         def defaultDeviceName(klass):
-            cVal = alc.alcGetString(0, alc.ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER)
+            cVal = alc.alcGetString(None, alc.ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER)
             return alc.cast(cVal, alc.c_char_p).value
 
         @classmethod
@@ -97,7 +98,7 @@ else:
 
         @classmethod
         def allDeviceNames(klass):
-            cVal = alc.alcGetString(0, alc.ALC_CAPTURE_DEVICE_SPECIFIER)
+            cVal = alc.alcGetString(None, alc.ALC_CAPTURE_DEVICE_SPECIFIER)
             return multiNullString(cVal)
 
         @classmethod
@@ -126,6 +127,7 @@ else:
                 count = self.bufferCount
             count = min(count, self.sampleCount)
             alc.alcCaptureSamples(self._alid_, self._buffer, count)
-            #print 'samples:', count, count*self.entrySize, self.sampleCount
-            return self._buffer[:count*self.entrySize]
+            if count:
+                return self._buffer[:count*self.entrySize]
+            else: return ''
 

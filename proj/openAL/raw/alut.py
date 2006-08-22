@@ -43,25 +43,25 @@ ALUT_WAVEFORM_IMPULSE = 0x104
 ALUT_LOADER_BUFFER = 0x300
 ALUT_LOADER_MEMORY = 0x301
 
-@bind(ALboolean, [POINTER(c_int), c_char_p])
+@alutBind(ALboolean, [POINTER(c_int), POINTER(c_char_p)])
 def alutInit(argcp, argv, _api_=None): 
     """alutInit(argcp, argv)
     
         argcp : POINTER(c_int)
-        argv : c_char_p
+        argv : POINTER(c_char_p)
     """
     return _api_(argcp, argv)
     
-@bind(ALboolean, [POINTER(c_int), c_char_p])
+@alutBind(ALboolean, [POINTER(c_int), POINTER(c_char_p)])
 def alutInitWithoutContext(argcp, argv, _api_=None): 
     """alutInitWithoutContext(argcp, argv)
     
         argcp : POINTER(c_int)
-        argv : c_char_p
+        argv : POINTER(c_char_p)
     """
     return _api_(argcp, argv)
     
-@bind(ALboolean, [])
+@alutBind(ALboolean, [])
 def alutExit(_api_=None): 
     """alutExit()
     
@@ -70,7 +70,7 @@ def alutExit(_api_=None):
     return _api_()
     
 
-@bind(ALenum, [])
+@alutBind(ALenum, [])
 def alutGetError(_api_=None): 
     """alutGetError()
     
@@ -78,7 +78,7 @@ def alutGetError(_api_=None):
     """
     return _api_()
     
-@bind(c_char_p, [ALenum])
+@alutBind(c_char_p, [ALenum])
 def alutGetErrorString(error, _api_=None): 
     """alutGetErrorString(error)
     
@@ -87,7 +87,7 @@ def alutGetErrorString(error, _api_=None):
     return _api_(error)
     
 
-@bind(ALuint, [c_char_p])
+@alutBind(ALuint, [c_char_p])
 def alutCreateBufferFromFile(fileName, _api_=None): 
     """alutCreateBufferFromFile(fileName)
     
@@ -95,7 +95,7 @@ def alutCreateBufferFromFile(fileName, _api_=None):
     """
     return _api_(fileName)
     
-@bind(ALuint, [c_void_p, ALsizei])
+@alutBind(ALuint, [c_void_p, ALsizei])
 def alutCreateBufferFromFileImage(data, length, _api_=None): 
     """alutCreateBufferFromFileImage(data, length)
     
@@ -104,7 +104,7 @@ def alutCreateBufferFromFileImage(data, length, _api_=None):
     """
     return _api_(data, length)
     
-@bind(ALuint, [])
+@alutBind(ALuint, [])
 def alutCreateBufferHelloWorld(_api_=None): 
     """alutCreateBufferHelloWorld()
     
@@ -112,7 +112,7 @@ def alutCreateBufferHelloWorld(_api_=None):
     """
     return _api_()
     
-@bind(ALuint, [ALenum, ALfloat, ALfloat, ALfloat])
+@alutBind(ALuint, [ALenum, ALfloat, ALfloat, ALfloat])
 def alutCreateBufferWaveform(waveshape, frequency, phase, duration, _api_=None): 
     """alutCreateBufferWaveform(waveshape, frequency, phase, duration)
     
@@ -124,7 +124,7 @@ def alutCreateBufferWaveform(waveshape, frequency, phase, duration, _api_=None):
     return _api_(waveshape, frequency, phase, duration)
     
 
-@bind(c_void_p, [c_char_p, POINTER(c_int), POINTER(c_int), POINTER(c_float)])
+@alutBind(c_void_p, [c_char_p, POINTER(c_int), POINTER(c_int), POINTER(c_float)])
 def alutLoadMemoryFromFile(fileName, format, size, frequency, _api_=None): 
     """alutLoadMemoryFromFile(fileName, format, size, frequency)
     
@@ -135,7 +135,7 @@ def alutLoadMemoryFromFile(fileName, format, size, frequency, _api_=None):
     """
     return _api_(fileName, format, size, frequency)
     
-@bind(c_void_p, [c_void_p, ALsizei, POINTER(c_int), POINTER(c_int), POINTER(c_float)])
+@alutBind(c_void_p, [c_void_p, ALsizei, POINTER(c_int), POINTER(c_int), POINTER(c_float)])
 def alutLoadMemoryFromFileImage(data, length, format, size, frequency, _api_=None): 
     """alutLoadMemoryFromFileImage(data, length, format, size, frequency)
     
@@ -147,7 +147,7 @@ def alutLoadMemoryFromFileImage(data, length, format, size, frequency, _api_=Non
     """
     return _api_(data, length, format, size, frequency)
     
-@bind(c_void_p, [POINTER(c_int), POINTER(c_int), POINTER(c_float)])
+@alutBind(c_void_p, [POINTER(c_int), POINTER(c_int), POINTER(c_float)])
 def alutLoadMemoryHelloWorld(format, size, frequency, _api_=None): 
     """alutLoadMemoryHelloWorld(format, size, frequency)
     
@@ -157,7 +157,7 @@ def alutLoadMemoryHelloWorld(format, size, frequency, _api_=None):
     """
     return _api_(format, size, frequency)
     
-@bind(c_void_p, [ALenum, ALfloat, ALfloat, ALfloat, POINTER(c_int), POINTER(c_int), POINTER(c_float)])
+@alutBind(c_void_p, [ALenum, ALfloat, ALfloat, ALfloat, POINTER(c_int), POINTER(c_int), POINTER(c_float)])
 def alutLoadMemoryWaveform(waveshape, frequency, phase, duration, format, size, freq, _api_=None): 
     """alutLoadMemoryWaveform(waveshape, frequency, phase, duration, format, size, freq)
     
@@ -172,7 +172,7 @@ def alutLoadMemoryWaveform(waveshape, frequency, phase, duration, format, size, 
     return _api_(waveshape, frequency, phase, duration, format, size, freq)
     
 
-@bind(c_char_p, [ALenum])
+@alutBind(c_char_p, [ALenum])
 def alutGetMIMETypes(loader, _api_=None): 
     """alutGetMIMETypes(loader)
     
@@ -181,7 +181,7 @@ def alutGetMIMETypes(loader, _api_=None):
     return _api_(loader)
     
 
-@bind(ALint, [])
+@alutBind(ALint, [])
 def alutGetMajorVersion(_api_=None): 
     """alutGetMajorVersion()
     
@@ -189,7 +189,7 @@ def alutGetMajorVersion(_api_=None):
     """
     return _api_()
     
-@bind(ALint, [])
+@alutBind(ALint, [])
 def alutGetMinorVersion(_api_=None): 
     """alutGetMinorVersion()
     
@@ -198,7 +198,7 @@ def alutGetMinorVersion(_api_=None):
     return _api_()
     
 
-@bind(ALboolean, [ALfloat])
+@alutBind(ALboolean, [ALfloat])
 def alutSleep(duration, _api_=None): 
     """alutSleep(duration)
     
@@ -209,25 +209,25 @@ def alutSleep(duration, _api_=None):
 
 #~ line: 110, skipped: 4 ~~~~~~
 
-@bind(None, [c_char_p, POINTER(c_int), c_void_p, POINTER(c_int), POINTER(c_int)])
+@alutBind(None, [c_char_p, POINTER(c_int), POINTER(c_void_p), POINTER(c_int), POINTER(c_int)])
 def alutLoadWAVFile(fileName, format, data, size, frequency, _api_=None): 
     """alutLoadWAVFile(fileName, format, data, size, frequency)
     
         fileName : c_char_p
         format : POINTER(c_int)
-        data : c_void_p
+        data : POINTER(c_void_p)
         size : POINTER(c_int)
         frequency : POINTER(c_int)
     """
     return _api_(fileName, format, data, size, frequency)
     
-@bind(None, [c_char_p, POINTER(c_int), c_void_p, POINTER(c_int), POINTER(c_int)])
+@alutBind(None, [c_char_p, POINTER(c_int), POINTER(c_void_p), POINTER(c_int), POINTER(c_int)])
 def alutLoadWAVMemory(buffer, format, data, size, frequency, _api_=None): 
     """alutLoadWAVMemory(buffer, format, data, size, frequency)
     
         buffer : c_char_p
         format : POINTER(c_int)
-        data : c_void_p
+        data : POINTER(c_void_p)
         size : POINTER(c_int)
         frequency : POINTER(c_int)
     """
@@ -236,7 +236,7 @@ def alutLoadWAVMemory(buffer, format, data, size, frequency, _api_=None):
 
 #~ line: 116, skipped: 5 ~~~~~~
 
-@bind(None, [ALenum, c_void_p, ALsizei, ALsizei])
+@alutBind(None, [ALenum, c_void_p, ALsizei, ALsizei])
 def alutUnloadWAV(format, data, size, frequency, _api_=None): 
     """alutUnloadWAV(format, data, size, frequency)
     

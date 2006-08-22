@@ -51,6 +51,7 @@ class Context(ALIDObject):
         else: attrs = None
 
         self._alid_ = alc.alcCreateContext(device._alid_, attrs)
+        self._device = device
         device._addContext(self)
         self._device = device
 

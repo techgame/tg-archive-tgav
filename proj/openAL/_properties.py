@@ -12,7 +12,7 @@
 
 import weakref
 from itertools import takewhile, count
-from ctypes import byref
+from ctypes import cast, byref, c_void_p, _SimpleCData, POINTER
 
 from TG.openAL.raw import al, alc
 
@@ -22,7 +22,7 @@ from TG.openAL.raw import al, alc
 
 def multiNullString(c):
     ic = iter(c or ())
-    result = (''.join(takewhile(lambda ic: ord(ic.value), ic)) for i in count())
+    result = (''.join(takewhile(ord, ic)) for i in count())
     result = takewhile(bool, result)
     result = list(result)
     return result
@@ -45,7 +45,7 @@ class ALIDObject(ALObject):
     @classmethod
     def _getALIDMap(klass):
         if klass.__alidToObj is None:
-            klass.__alidToObj = weakref.WeakValueDictionary()
+            klass.__alidToObj = {} #weakref.WeakValueDictionary()
         return klass.__alidToObj
 
     def __nonzero__(self):
@@ -68,8 +68,6 @@ class ALIDObject(ALObject):
                 raise ValueError("OpenAL ID is invalid")
         return self.__alid
     def _setALID(self, alid):
-        print alid, type(alid), repr(alid)
-        alid = getattr(alid, 'value', alid)
         self.__alid = alid
         self._getALIDMap()[alid] = self
     def _delALID(self):

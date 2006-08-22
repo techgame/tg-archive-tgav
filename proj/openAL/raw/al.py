@@ -19,7 +19,7 @@ AL_VERSION_1_1 = None # empty
 #~ line: 70, skipped: 4 ~~~~~~
 
 # typedef ALboolean
-ALboolean = c_char
+ALboolean = c_byte
 
 # typedef ALchar
 ALchar = c_char

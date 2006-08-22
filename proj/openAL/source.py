@@ -122,7 +122,7 @@ class Source(ALIDContextObject):
 
         sourceIds = (1*al.ALuint)()
         al.alGenSources(1, sourceIds)
-        self.createFromId(sourceIds[0].value)
+        self.createFromId(sourceIds[0])
 
     def createFromId(self, sourceId):
         self._alid_ = sourceId

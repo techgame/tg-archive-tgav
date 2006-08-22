@@ -2124,13 +2124,13 @@ def glAlphaFunc(func, ref, _api_=None):
     """
     return _api_(func, ref)
     
-@bind(GLboolean, [GLsizei, POINTER(c_ulong), POINTER(c_ubyte)])
+@bind(GLboolean, [GLsizei, POINTER(GLuint), POINTER(GLboolean)])
 def glAreTexturesResident(n, textures, residences, _api_=None): 
     """glAreTexturesResident(n, textures, residences)
     
         n : GLsizei
-        textures : POINTER(c_ulong)
-        residences : POINTER(c_ubyte)
+        textures : POINTER(GLuint)
+        residences : POINTER(GLboolean)
     """
     return _api_(n, textures, residences)
     
@@ -2159,7 +2159,7 @@ def glBindTexture(target, texture, _api_=None):
     """
     return _api_(target, texture)
     
-@bind(None, [GLsizei, GLsizei, GLfloat, GLfloat, GLfloat, GLfloat, POINTER(c_ubyte)])
+@bind(None, [GLsizei, GLsizei, GLfloat, GLfloat, GLfloat, GLfloat, POINTER(GLubyte)])
 def glBitmap(width, height, xorig, yorig, xmove, ymove, bitmap, _api_=None): 
     """glBitmap(width, height, xorig, yorig, xmove, ymove, bitmap)
     
@@ -2169,7 +2169,7 @@ def glBitmap(width, height, xorig, yorig, xmove, ymove, bitmap, _api_=None):
         yorig : GLfloat
         xmove : GLfloat
         ymove : GLfloat
-        bitmap : POINTER(c_ubyte)
+        bitmap : POINTER(GLubyte)
     """
     return _api_(width, height, xorig, yorig, xmove, ymove, bitmap)
     
@@ -2209,13 +2209,13 @@ def glCallList(list, _api_=None):
     """
     return _api_(list)
     
-@bind(None, [GLsizei, GLenum, c_void_p])
+@bind(None, [GLsizei, GLenum, POINTER(GLvoid)])
 def glCallLists(n, type, lists, _api_=None): 
     """glCallLists(n, type, lists)
     
         n : GLsizei
         type : GLenum
-        lists : c_void_p
+        lists : POINTER(GLvoid)
     """
     return _api_(n, type, lists)
     
@@ -2273,12 +2273,12 @@ def glClearStencil(s, _api_=None):
     """
     return _api_(s)
     
-@bind(None, [GLenum, POINTER(c_double)])
+@bind(None, [GLenum, POINTER(GLdouble)])
 def glClipPlane(plane, equation, _api_=None): 
     """glClipPlane(plane, equation)
     
         plane : GLenum
-        equation : POINTER(c_double)
+        equation : POINTER(GLdouble)
     """
     return _api_(plane, equation)
     
@@ -2292,11 +2292,11 @@ def glColor3b(red, green, blue, _api_=None):
     """
     return _api_(red, green, blue)
     
-@bind(None, [POINTER(c_byte)])
+@bind(None, [POINTER(GLbyte)])
 def glColor3bv(v, _api_=None): 
     """glColor3bv(v)
     
-        v : POINTER(c_byte)
+        v : POINTER(GLbyte)
     """
     return _api_(v)
     
@@ -2310,11 +2310,11 @@ def glColor3d(red, green, blue, _api_=None):
     """
     return _api_(red, green, blue)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glColor3dv(v, _api_=None): 
     """glColor3dv(v)
     
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(v)
     
@@ -2328,11 +2328,11 @@ def glColor3f(red, green, blue, _api_=None):
     """
     return _api_(red, green, blue)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glColor3fv(v, _api_=None): 
     """glColor3fv(v)
     
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(v)
     
@@ -2346,11 +2346,11 @@ def glColor3i(red, green, blue, _api_=None):
     """
     return _api_(red, green, blue)
     
-@bind(None, [POINTER(c_long)])
+@bind(None, [POINTER(GLint)])
 def glColor3iv(v, _api_=None): 
     """glColor3iv(v)
     
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(v)
     
@@ -2364,11 +2364,11 @@ def glColor3s(red, green, blue, _api_=None):
     """
     return _api_(red, green, blue)
     
-@bind(None, [POINTER(c_short)])
+@bind(None, [POINTER(GLshort)])
 def glColor3sv(v, _api_=None): 
     """glColor3sv(v)
     
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(v)
     
@@ -2382,11 +2382,11 @@ def glColor3ub(red, green, blue, _api_=None):
     """
     return _api_(red, green, blue)
     
-@bind(None, [POINTER(c_ubyte)])
+@bind(None, [POINTER(GLubyte)])
 def glColor3ubv(v, _api_=None): 
     """glColor3ubv(v)
     
-        v : POINTER(c_ubyte)
+        v : POINTER(GLubyte)
     """
     return _api_(v)
     
@@ -2400,11 +2400,11 @@ def glColor3ui(red, green, blue, _api_=None):
     """
     return _api_(red, green, blue)
     
-@bind(None, [POINTER(c_ulong)])
+@bind(None, [POINTER(GLuint)])
 def glColor3uiv(v, _api_=None): 
     """glColor3uiv(v)
     
-        v : POINTER(c_ulong)
+        v : POINTER(GLuint)
     """
     return _api_(v)
     
@@ -2418,11 +2418,11 @@ def glColor3us(red, green, blue, _api_=None):
     """
     return _api_(red, green, blue)
     
-@bind(None, [POINTER(c_ushort)])
+@bind(None, [POINTER(GLushort)])
 def glColor3usv(v, _api_=None): 
     """glColor3usv(v)
     
-        v : POINTER(c_ushort)
+        v : POINTER(GLushort)
     """
     return _api_(v)
     
@@ -2437,11 +2437,11 @@ def glColor4b(red, green, blue, alpha, _api_=None):
     """
     return _api_(red, green, blue, alpha)
     
-@bind(None, [POINTER(c_byte)])
+@bind(None, [POINTER(GLbyte)])
 def glColor4bv(v, _api_=None): 
     """glColor4bv(v)
     
-        v : POINTER(c_byte)
+        v : POINTER(GLbyte)
     """
     return _api_(v)
     
@@ -2456,11 +2456,11 @@ def glColor4d(red, green, blue, alpha, _api_=None):
     """
     return _api_(red, green, blue, alpha)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glColor4dv(v, _api_=None): 
     """glColor4dv(v)
     
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(v)
     
@@ -2475,11 +2475,11 @@ def glColor4f(red, green, blue, alpha, _api_=None):
     """
     return _api_(red, green, blue, alpha)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glColor4fv(v, _api_=None): 
     """glColor4fv(v)
     
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(v)
     
@@ -2494,11 +2494,11 @@ def glColor4i(red, green, blue, alpha, _api_=None):
     """
     return _api_(red, green, blue, alpha)
     
-@bind(None, [POINTER(c_long)])
+@bind(None, [POINTER(GLint)])
 def glColor4iv(v, _api_=None): 
     """glColor4iv(v)
     
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(v)
     
@@ -2513,11 +2513,11 @@ def glColor4s(red, green, blue, alpha, _api_=None):
     """
     return _api_(red, green, blue, alpha)
     
-@bind(None, [POINTER(c_short)])
+@bind(None, [POINTER(GLshort)])
 def glColor4sv(v, _api_=None): 
     """glColor4sv(v)
     
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(v)
     
@@ -2532,11 +2532,11 @@ def glColor4ub(red, green, blue, alpha, _api_=None):
     """
     return _api_(red, green, blue, alpha)
     
-@bind(None, [POINTER(c_ubyte)])
+@bind(None, [POINTER(GLubyte)])
 def glColor4ubv(v, _api_=None): 
     """glColor4ubv(v)
     
-        v : POINTER(c_ubyte)
+        v : POINTER(GLubyte)
     """
     return _api_(v)
     
@@ -2551,11 +2551,11 @@ def glColor4ui(red, green, blue, alpha, _api_=None):
     """
     return _api_(red, green, blue, alpha)
     
-@bind(None, [POINTER(c_ulong)])
+@bind(None, [POINTER(GLuint)])
 def glColor4uiv(v, _api_=None): 
     """glColor4uiv(v)
     
-        v : POINTER(c_ulong)
+        v : POINTER(GLuint)
     """
     return _api_(v)
     
@@ -2570,11 +2570,11 @@ def glColor4us(red, green, blue, alpha, _api_=None):
     """
     return _api_(red, green, blue, alpha)
     
-@bind(None, [POINTER(c_ushort)])
+@bind(None, [POINTER(GLushort)])
 def glColor4usv(v, _api_=None): 
     """glColor4usv(v)
     
-        v : POINTER(c_ushort)
+        v : POINTER(GLushort)
     """
     return _api_(v)
     
@@ -2598,18 +2598,18 @@ def glColorMaterial(face, mode, _api_=None):
     """
     return _api_(face, mode)
     
-@bind(None, [GLint, GLenum, GLsizei, c_void_p])
+@bind(None, [GLint, GLenum, GLsizei, POINTER(GLvoid)])
 def glColorPointer(size, type, stride, pointer, _api_=None): 
     """glColorPointer(size, type, stride, pointer)
     
         size : GLint
         type : GLenum
         stride : GLsizei
-        pointer : c_void_p
+        pointer : POINTER(GLvoid)
     """
     return _api_(size, type, stride, pointer)
     
-@bind(None, [GLenum, GLsizei, GLsizei, GLenum, GLenum, c_void_p])
+@bind(None, [GLenum, GLsizei, GLsizei, GLenum, GLenum, POINTER(GLvoid)])
 def glColorSubTable(target, start, count, format, type, data, _api_=None): 
     """glColorSubTable(target, start, count, format, type, data)
     
@@ -2618,11 +2618,11 @@ def glColorSubTable(target, start, count, format, type, data, _api_=None):
         count : GLsizei
         format : GLenum
         type : GLenum
-        data : c_void_p
+        data : POINTER(GLvoid)
     """
     return _api_(target, start, count, format, type, data)
     
-@bind(None, [GLenum, GLenum, GLsizei, GLenum, GLenum, c_void_p])
+@bind(None, [GLenum, GLenum, GLsizei, GLenum, GLenum, POINTER(GLvoid)])
 def glColorTable(target, internalformat, width, format, type, table, _api_=None): 
     """glColorTable(target, internalformat, width, format, type, table)
     
@@ -2631,31 +2631,31 @@ def glColorTable(target, internalformat, width, format, type, table, _api_=None)
         width : GLsizei
         format : GLenum
         type : GLenum
-        table : c_void_p
+        table : POINTER(GLvoid)
     """
     return _api_(target, internalformat, width, format, type, table)
     
-@bind(None, [GLenum, GLenum, POINTER(c_float)])
+@bind(None, [GLenum, GLenum, POINTER(GLfloat)])
 def glColorTableParameterfv(target, pname, params, _api_=None): 
     """glColorTableParameterfv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(target, pname, params)
     
-@bind(None, [GLenum, GLenum, POINTER(c_long)])
+@bind(None, [GLenum, GLenum, POINTER(GLint)])
 def glColorTableParameteriv(target, pname, params, _api_=None): 
     """glColorTableParameteriv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(target, pname, params)
     
-@bind(None, [GLenum, GLenum, GLsizei, GLenum, GLenum, c_void_p])
+@bind(None, [GLenum, GLenum, GLsizei, GLenum, GLenum, POINTER(GLvoid)])
 def glConvolutionFilter1D(target, internalformat, width, format, type, image, _api_=None): 
     """glConvolutionFilter1D(target, internalformat, width, format, type, image)
     
@@ -2664,11 +2664,11 @@ def glConvolutionFilter1D(target, internalformat, width, format, type, image, _a
         width : GLsizei
         format : GLenum
         type : GLenum
-        image : c_void_p
+        image : POINTER(GLvoid)
     """
     return _api_(target, internalformat, width, format, type, image)
     
-@bind(None, [GLenum, GLenum, GLsizei, GLsizei, GLenum, GLenum, c_void_p])
+@bind(None, [GLenum, GLenum, GLsizei, GLsizei, GLenum, GLenum, POINTER(GLvoid)])
 def glConvolutionFilter2D(target, internalformat, width, height, format, type, image, _api_=None): 
     """glConvolutionFilter2D(target, internalformat, width, height, format, type, image)
     
@@ -2678,7 +2678,7 @@ def glConvolutionFilter2D(target, internalformat, width, height, format, type, i
         height : GLsizei
         format : GLenum
         type : GLenum
-        image : c_void_p
+        image : POINTER(GLvoid)
     """
     return _api_(target, internalformat, width, height, format, type, image)
     
@@ -2692,13 +2692,13 @@ def glConvolutionParameterf(target, pname, params, _api_=None):
     """
     return _api_(target, pname, params)
     
-@bind(None, [GLenum, GLenum, POINTER(c_float)])
+@bind(None, [GLenum, GLenum, POINTER(GLfloat)])
 def glConvolutionParameterfv(target, pname, params, _api_=None): 
     """glConvolutionParameterfv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(target, pname, params)
     
@@ -2712,13 +2712,13 @@ def glConvolutionParameteri(target, pname, params, _api_=None):
     """
     return _api_(target, pname, params)
     
-@bind(None, [GLenum, GLenum, POINTER(c_long)])
+@bind(None, [GLenum, GLenum, POINTER(GLint)])
 def glConvolutionParameteriv(target, pname, params, _api_=None): 
     """glConvolutionParameteriv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(target, pname, params)
     
@@ -2873,12 +2873,12 @@ def glDeleteLists(list, range, _api_=None):
     """
     return _api_(list, range)
     
-@bind(None, [GLsizei, POINTER(c_ulong)])
+@bind(None, [GLsizei, POINTER(GLuint)])
 def glDeleteTextures(n, textures, _api_=None): 
     """glDeleteTextures(n, textures)
     
         n : GLsizei
-        textures : POINTER(c_ulong)
+        textures : POINTER(GLuint)
     """
     return _api_(n, textures)
     
@@ -2941,18 +2941,18 @@ def glDrawBuffer(mode, _api_=None):
     """
     return _api_(mode)
     
-@bind(None, [GLenum, GLsizei, GLenum, c_void_p])
+@bind(None, [GLenum, GLsizei, GLenum, POINTER(GLvoid)])
 def glDrawElements(mode, count, type, indices, _api_=None): 
     """glDrawElements(mode, count, type, indices)
     
         mode : GLenum
         count : GLsizei
         type : GLenum
-        indices : c_void_p
+        indices : POINTER(GLvoid)
     """
     return _api_(mode, count, type, indices)
     
-@bind(None, [GLsizei, GLsizei, GLenum, GLenum, c_void_p])
+@bind(None, [GLsizei, GLsizei, GLenum, GLenum, POINTER(GLvoid)])
 def glDrawPixels(width, height, format, type, pixels, _api_=None): 
     """glDrawPixels(width, height, format, type, pixels)
     
@@ -2960,11 +2960,11 @@ def glDrawPixels(width, height, format, type, pixels, _api_=None):
         height : GLsizei
         format : GLenum
         type : GLenum
-        pixels : c_void_p
+        pixels : POINTER(GLvoid)
     """
     return _api_(width, height, format, type, pixels)
     
-@bind(None, [GLenum, GLuint, GLuint, GLsizei, GLenum, c_void_p])
+@bind(None, [GLenum, GLuint, GLuint, GLsizei, GLenum, POINTER(GLvoid)])
 def glDrawRangeElements(mode, start, end, count, type, indices, _api_=None): 
     """glDrawRangeElements(mode, start, end, count, type, indices)
     
@@ -2973,7 +2973,7 @@ def glDrawRangeElements(mode, start, end, count, type, indices, _api_=None):
         end : GLuint
         count : GLsizei
         type : GLenum
-        indices : c_void_p
+        indices : POINTER(GLvoid)
     """
     return _api_(mode, start, end, count, type, indices)
     
@@ -2985,20 +2985,20 @@ def glEdgeFlag(flag, _api_=None):
     """
     return _api_(flag)
     
-@bind(None, [GLsizei, c_void_p])
+@bind(None, [GLsizei, POINTER(GLvoid)])
 def glEdgeFlagPointer(stride, pointer, _api_=None): 
     """glEdgeFlagPointer(stride, pointer)
     
         stride : GLsizei
-        pointer : c_void_p
+        pointer : POINTER(GLvoid)
     """
     return _api_(stride, pointer)
     
-@bind(None, [POINTER(c_ubyte)])
+@bind(None, [POINTER(GLboolean)])
 def glEdgeFlagv(flag, _api_=None): 
     """glEdgeFlagv(flag)
     
-        flag : POINTER(c_ubyte)
+        flag : POINTER(GLboolean)
     """
     return _api_(flag)
     
@@ -3042,11 +3042,11 @@ def glEvalCoord1d(u, _api_=None):
     """
     return _api_(u)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glEvalCoord1dv(u, _api_=None): 
     """glEvalCoord1dv(u)
     
-        u : POINTER(c_double)
+        u : POINTER(GLdouble)
     """
     return _api_(u)
     
@@ -3058,11 +3058,11 @@ def glEvalCoord1f(u, _api_=None):
     """
     return _api_(u)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glEvalCoord1fv(u, _api_=None): 
     """glEvalCoord1fv(u)
     
-        u : POINTER(c_float)
+        u : POINTER(GLfloat)
     """
     return _api_(u)
     
@@ -3075,11 +3075,11 @@ def glEvalCoord2d(u, v, _api_=None):
     """
     return _api_(u, v)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glEvalCoord2dv(u, _api_=None): 
     """glEvalCoord2dv(u)
     
-        u : POINTER(c_double)
+        u : POINTER(GLdouble)
     """
     return _api_(u)
     
@@ -3092,11 +3092,11 @@ def glEvalCoord2f(u, v, _api_=None):
     """
     return _api_(u, v)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glEvalCoord2fv(u, _api_=None): 
     """glEvalCoord2fv(u)
     
-        u : POINTER(c_float)
+        u : POINTER(GLfloat)
     """
     return _api_(u)
     
@@ -3139,13 +3139,13 @@ def glEvalPoint2(i, j, _api_=None):
     """
     return _api_(i, j)
     
-@bind(None, [GLsizei, GLenum, POINTER(c_float)])
+@bind(None, [GLsizei, GLenum, POINTER(GLfloat)])
 def glFeedbackBuffer(size, type, buffer, _api_=None): 
     """glFeedbackBuffer(size, type, buffer)
     
         size : GLsizei
         type : GLenum
-        buffer : POINTER(c_float)
+        buffer : POINTER(GLfloat)
     """
     return _api_(size, type, buffer)
     
@@ -3174,12 +3174,12 @@ def glFogf(pname, param, _api_=None):
     """
     return _api_(pname, param)
     
-@bind(None, [GLenum, POINTER(c_float)])
+@bind(None, [GLenum, POINTER(GLfloat)])
 def glFogfv(pname, params, _api_=None): 
     """glFogfv(pname, params)
     
         pname : GLenum
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(pname, params)
     
@@ -3192,12 +3192,12 @@ def glFogi(pname, param, _api_=None):
     """
     return _api_(pname, param)
     
-@bind(None, [GLenum, POINTER(c_long)])
+@bind(None, [GLenum, POINTER(GLint)])
 def glFogiv(pname, params, _api_=None): 
     """glFogiv(pname, params)
     
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(pname, params)
     
@@ -3230,101 +3230,101 @@ def glGenLists(range, _api_=None):
     """
     return _api_(range)
     
-@bind(None, [GLsizei, POINTER(c_ulong)])
+@bind(None, [GLsizei, POINTER(GLuint)])
 def glGenTextures(n, textures, _api_=None): 
     """glGenTextures(n, textures)
     
         n : GLsizei
-        textures : POINTER(c_ulong)
+        textures : POINTER(GLuint)
     """
     return _api_(n, textures)
     
-@bind(None, [GLenum, POINTER(c_ubyte)])
+@bind(None, [GLenum, POINTER(GLboolean)])
 def glGetBooleanv(pname, params, _api_=None): 
     """glGetBooleanv(pname, params)
     
         pname : GLenum
-        params : POINTER(c_ubyte)
+        params : POINTER(GLboolean)
     """
     return _api_(pname, params)
     
-@bind(None, [GLenum, POINTER(c_double)])
+@bind(None, [GLenum, POINTER(GLdouble)])
 def glGetClipPlane(plane, equation, _api_=None): 
     """glGetClipPlane(plane, equation)
     
         plane : GLenum
-        equation : POINTER(c_double)
+        equation : POINTER(GLdouble)
     """
     return _api_(plane, equation)
     
-@bind(None, [GLenum, GLenum, GLenum, c_void_p])
+@bind(None, [GLenum, GLenum, GLenum, POINTER(GLvoid)])
 def glGetColorTable(target, format, type, table, _api_=None): 
     """glGetColorTable(target, format, type, table)
     
         target : GLenum
         format : GLenum
         type : GLenum
-        table : c_void_p
+        table : POINTER(GLvoid)
     """
     return _api_(target, format, type, table)
     
-@bind(None, [GLenum, GLenum, POINTER(c_float)])
+@bind(None, [GLenum, GLenum, POINTER(GLfloat)])
 def glGetColorTableParameterfv(target, pname, params, _api_=None): 
     """glGetColorTableParameterfv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(target, pname, params)
     
-@bind(None, [GLenum, GLenum, POINTER(c_long)])
+@bind(None, [GLenum, GLenum, POINTER(GLint)])
 def glGetColorTableParameteriv(target, pname, params, _api_=None): 
     """glGetColorTableParameteriv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(target, pname, params)
     
-@bind(None, [GLenum, GLenum, GLenum, c_void_p])
+@bind(None, [GLenum, GLenum, GLenum, POINTER(GLvoid)])
 def glGetConvolutionFilter(target, format, type, image, _api_=None): 
     """glGetConvolutionFilter(target, format, type, image)
     
         target : GLenum
         format : GLenum
         type : GLenum
-        image : c_void_p
+        image : POINTER(GLvoid)
     """
     return _api_(target, format, type, image)
     
-@bind(None, [GLenum, GLenum, POINTER(c_float)])
+@bind(None, [GLenum, GLenum, POINTER(GLfloat)])
 def glGetConvolutionParameterfv(target, pname, params, _api_=None): 
     """glGetConvolutionParameterfv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(target, pname, params)
     
-@bind(None, [GLenum, GLenum, POINTER(c_long)])
+@bind(None, [GLenum, GLenum, POINTER(GLint)])
 def glGetConvolutionParameteriv(target, pname, params, _api_=None): 
     """glGetConvolutionParameteriv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(target, pname, params)
     
-@bind(None, [GLenum, POINTER(c_double)])
+@bind(None, [GLenum, POINTER(GLdouble)])
 def glGetDoublev(pname, params, _api_=None): 
     """glGetDoublev(pname, params)
     
         pname : GLenum
-        params : POINTER(c_double)
+        params : POINTER(GLdouble)
     """
     return _api_(pname, params)
     
@@ -3336,16 +3336,16 @@ def glGetError(_api_=None):
     """
     return _api_()
     
-@bind(None, [GLenum, POINTER(c_float)])
+@bind(None, [GLenum, POINTER(GLfloat)])
 def glGetFloatv(pname, params, _api_=None): 
     """glGetFloatv(pname, params)
     
         pname : GLenum
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(pname, params)
     
-@bind(None, [GLenum, GLboolean, GLenum, GLenum, c_void_p])
+@bind(None, [GLenum, GLboolean, GLenum, GLenum, POINTER(GLvoid)])
 def glGetHistogram(target, reset, format, type, values, _api_=None): 
     """glGetHistogram(target, reset, format, type, values)
     
@@ -3353,110 +3353,110 @@ def glGetHistogram(target, reset, format, type, values, _api_=None):
         reset : GLboolean
         format : GLenum
         type : GLenum
-        values : c_void_p
+        values : POINTER(GLvoid)
     """
     return _api_(target, reset, format, type, values)
     
-@bind(None, [GLenum, GLenum, POINTER(c_float)])
+@bind(None, [GLenum, GLenum, POINTER(GLfloat)])
 def glGetHistogramParameterfv(target, pname, params, _api_=None): 
     """glGetHistogramParameterfv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(target, pname, params)
     
-@bind(None, [GLenum, GLenum, POINTER(c_long)])
+@bind(None, [GLenum, GLenum, POINTER(GLint)])
 def glGetHistogramParameteriv(target, pname, params, _api_=None): 
     """glGetHistogramParameteriv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(target, pname, params)
     
-@bind(None, [GLenum, POINTER(c_long)])
+@bind(None, [GLenum, POINTER(GLint)])
 def glGetIntegerv(pname, params, _api_=None): 
     """glGetIntegerv(pname, params)
     
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(pname, params)
     
-@bind(None, [GLenum, GLenum, POINTER(c_float)])
+@bind(None, [GLenum, GLenum, POINTER(GLfloat)])
 def glGetLightfv(light, pname, params, _api_=None): 
     """glGetLightfv(light, pname, params)
     
         light : GLenum
         pname : GLenum
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(light, pname, params)
     
-@bind(None, [GLenum, GLenum, POINTER(c_long)])
+@bind(None, [GLenum, GLenum, POINTER(GLint)])
 def glGetLightiv(light, pname, params, _api_=None): 
     """glGetLightiv(light, pname, params)
     
         light : GLenum
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(light, pname, params)
     
-@bind(None, [GLenum, GLenum, POINTER(c_double)])
+@bind(None, [GLenum, GLenum, POINTER(GLdouble)])
 def glGetMapdv(target, query, v, _api_=None): 
     """glGetMapdv(target, query, v)
     
         target : GLenum
         query : GLenum
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(target, query, v)
     
-@bind(None, [GLenum, GLenum, POINTER(c_float)])
+@bind(None, [GLenum, GLenum, POINTER(GLfloat)])
 def glGetMapfv(target, query, v, _api_=None): 
     """glGetMapfv(target, query, v)
     
         target : GLenum
         query : GLenum
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(target, query, v)
     
-@bind(None, [GLenum, GLenum, POINTER(c_long)])
+@bind(None, [GLenum, GLenum, POINTER(GLint)])
 def glGetMapiv(target, query, v, _api_=None): 
     """glGetMapiv(target, query, v)
     
         target : GLenum
         query : GLenum
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(target, query, v)
     
-@bind(None, [GLenum, GLenum, POINTER(c_float)])
+@bind(None, [GLenum, GLenum, POINTER(GLfloat)])
 def glGetMaterialfv(face, pname, params, _api_=None): 
     """glGetMaterialfv(face, pname, params)
     
         face : GLenum
         pname : GLenum
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(face, pname, params)
     
-@bind(None, [GLenum, GLenum, POINTER(c_long)])
+@bind(None, [GLenum, GLenum, POINTER(GLint)])
 def glGetMaterialiv(face, pname, params, _api_=None): 
     """glGetMaterialiv(face, pname, params)
     
         face : GLenum
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(face, pname, params)
     
-@bind(None, [GLenum, GLboolean, GLenum, GLenum, c_void_p])
+@bind(None, [GLenum, GLboolean, GLenum, GLenum, POINTER(GLvoid)])
 def glGetMinmax(target, reset, format, type, values, _api_=None): 
     """glGetMinmax(target, reset, format, type, values)
     
@@ -3464,88 +3464,88 @@ def glGetMinmax(target, reset, format, type, values, _api_=None):
         reset : GLboolean
         format : GLenum
         type : GLenum
-        values : c_void_p
+        values : POINTER(GLvoid)
     """
     return _api_(target, reset, format, type, values)
     
-@bind(None, [GLenum, GLenum, POINTER(c_float)])
+@bind(None, [GLenum, GLenum, POINTER(GLfloat)])
 def glGetMinmaxParameterfv(target, pname, params, _api_=None): 
     """glGetMinmaxParameterfv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(target, pname, params)
     
-@bind(None, [GLenum, GLenum, POINTER(c_long)])
+@bind(None, [GLenum, GLenum, POINTER(GLint)])
 def glGetMinmaxParameteriv(target, pname, params, _api_=None): 
     """glGetMinmaxParameteriv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(target, pname, params)
     
-@bind(None, [GLenum, POINTER(c_float)])
+@bind(None, [GLenum, POINTER(GLfloat)])
 def glGetPixelMapfv(map, values, _api_=None): 
     """glGetPixelMapfv(map, values)
     
         map : GLenum
-        values : POINTER(c_float)
+        values : POINTER(GLfloat)
     """
     return _api_(map, values)
     
-@bind(None, [GLenum, POINTER(c_ulong)])
+@bind(None, [GLenum, POINTER(GLuint)])
 def glGetPixelMapuiv(map, values, _api_=None): 
     """glGetPixelMapuiv(map, values)
     
         map : GLenum
-        values : POINTER(c_ulong)
+        values : POINTER(GLuint)
     """
     return _api_(map, values)
     
-@bind(None, [GLenum, POINTER(c_ushort)])
+@bind(None, [GLenum, POINTER(GLushort)])
 def glGetPixelMapusv(map, values, _api_=None): 
     """glGetPixelMapusv(map, values)
     
         map : GLenum
-        values : POINTER(c_ushort)
+        values : POINTER(GLushort)
     """
     return _api_(map, values)
     
-@bind(None, [GLenum, c_void_p])
+@bind(None, [GLenum, POINTER(POINTER(GLvoid))])
 def glGetPointerv(pname, params, _api_=None): 
     """glGetPointerv(pname, params)
     
         pname : GLenum
-        params : c_void_p
+        params : POINTER(POINTER(GLvoid))
     """
     return _api_(pname, params)
     
-@bind(None, [POINTER(c_ubyte)])
+@bind(None, [POINTER(GLubyte)])
 def glGetPolygonStipple(mask, _api_=None): 
     """glGetPolygonStipple(mask)
     
-        mask : POINTER(c_ubyte)
+        mask : POINTER(GLubyte)
     """
     return _api_(mask)
     
-@bind(None, [GLenum, GLenum, GLenum, c_void_p, c_void_p, c_void_p])
+@bind(None, [GLenum, GLenum, GLenum, POINTER(GLvoid), POINTER(GLvoid), POINTER(GLvoid)])
 def glGetSeparableFilter(target, format, type, row, column, span, _api_=None): 
     """glGetSeparableFilter(target, format, type, row, column, span)
     
         target : GLenum
         format : GLenum
         type : GLenum
-        row : c_void_p
-        column : c_void_p
-        span : c_void_p
+        row : POINTER(GLvoid)
+        column : POINTER(GLvoid)
+        span : POINTER(GLvoid)
     """
     return _api_(target, format, type, row, column, span)
     
-@bind(POINTER(c_ubyte), [GLenum])
+@bind(POINTER(GLubyte), [GLenum])
 def glGetString(name, _api_=None): 
     """glGetString(name)
     
@@ -3553,57 +3553,57 @@ def glGetString(name, _api_=None):
     """
     return _api_(name)
     
-@bind(None, [GLenum, GLenum, POINTER(c_float)])
+@bind(None, [GLenum, GLenum, POINTER(GLfloat)])
 def glGetTexEnvfv(target, pname, params, _api_=None): 
     """glGetTexEnvfv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(target, pname, params)
     
-@bind(None, [GLenum, GLenum, POINTER(c_long)])
+@bind(None, [GLenum, GLenum, POINTER(GLint)])
 def glGetTexEnviv(target, pname, params, _api_=None): 
     """glGetTexEnviv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(target, pname, params)
     
-@bind(None, [GLenum, GLenum, POINTER(c_double)])
+@bind(None, [GLenum, GLenum, POINTER(GLdouble)])
 def glGetTexGendv(coord, pname, params, _api_=None): 
     """glGetTexGendv(coord, pname, params)
     
         coord : GLenum
         pname : GLenum
-        params : POINTER(c_double)
+        params : POINTER(GLdouble)
     """
     return _api_(coord, pname, params)
     
-@bind(None, [GLenum, GLenum, POINTER(c_float)])
+@bind(None, [GLenum, GLenum, POINTER(GLfloat)])
 def glGetTexGenfv(coord, pname, params, _api_=None): 
     """glGetTexGenfv(coord, pname, params)
     
         coord : GLenum
         pname : GLenum
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(coord, pname, params)
     
-@bind(None, [GLenum, GLenum, POINTER(c_long)])
+@bind(None, [GLenum, GLenum, POINTER(GLint)])
 def glGetTexGeniv(coord, pname, params, _api_=None): 
     """glGetTexGeniv(coord, pname, params)
     
         coord : GLenum
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(coord, pname, params)
     
-@bind(None, [GLenum, GLint, GLenum, GLenum, c_void_p])
+@bind(None, [GLenum, GLint, GLenum, GLenum, POINTER(GLvoid)])
 def glGetTexImage(target, level, format, type, pixels, _api_=None): 
     """glGetTexImage(target, level, format, type, pixels)
     
@@ -3611,49 +3611,49 @@ def glGetTexImage(target, level, format, type, pixels, _api_=None):
         level : GLint
         format : GLenum
         type : GLenum
-        pixels : c_void_p
+        pixels : POINTER(GLvoid)
     """
     return _api_(target, level, format, type, pixels)
     
-@bind(None, [GLenum, GLint, GLenum, POINTER(c_float)])
+@bind(None, [GLenum, GLint, GLenum, POINTER(GLfloat)])
 def glGetTexLevelParameterfv(target, level, pname, params, _api_=None): 
     """glGetTexLevelParameterfv(target, level, pname, params)
     
         target : GLenum
         level : GLint
         pname : GLenum
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(target, level, pname, params)
     
-@bind(None, [GLenum, GLint, GLenum, POINTER(c_long)])
+@bind(None, [GLenum, GLint, GLenum, POINTER(GLint)])
 def glGetTexLevelParameteriv(target, level, pname, params, _api_=None): 
     """glGetTexLevelParameteriv(target, level, pname, params)
     
         target : GLenum
         level : GLint
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(target, level, pname, params)
     
-@bind(None, [GLenum, GLenum, POINTER(c_float)])
+@bind(None, [GLenum, GLenum, POINTER(GLfloat)])
 def glGetTexParameterfv(target, pname, params, _api_=None): 
     """glGetTexParameterfv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(target, pname, params)
     
-@bind(None, [GLenum, GLenum, POINTER(c_long)])
+@bind(None, [GLenum, GLenum, POINTER(GLint)])
 def glGetTexParameteriv(target, pname, params, _api_=None): 
     """glGetTexParameteriv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(target, pname, params)
     
@@ -3685,13 +3685,13 @@ def glIndexMask(mask, _api_=None):
     """
     return _api_(mask)
     
-@bind(None, [GLenum, GLsizei, c_void_p])
+@bind(None, [GLenum, GLsizei, POINTER(GLvoid)])
 def glIndexPointer(type, stride, pointer, _api_=None): 
     """glIndexPointer(type, stride, pointer)
     
         type : GLenum
         stride : GLsizei
-        pointer : c_void_p
+        pointer : POINTER(GLvoid)
     """
     return _api_(type, stride, pointer)
     
@@ -3703,11 +3703,11 @@ def glIndexd(c, _api_=None):
     """
     return _api_(c)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glIndexdv(c, _api_=None): 
     """glIndexdv(c)
     
-        c : POINTER(c_double)
+        c : POINTER(GLdouble)
     """
     return _api_(c)
     
@@ -3719,11 +3719,11 @@ def glIndexf(c, _api_=None):
     """
     return _api_(c)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glIndexfv(c, _api_=None): 
     """glIndexfv(c)
     
-        c : POINTER(c_float)
+        c : POINTER(GLfloat)
     """
     return _api_(c)
     
@@ -3735,11 +3735,11 @@ def glIndexi(c, _api_=None):
     """
     return _api_(c)
     
-@bind(None, [POINTER(c_long)])
+@bind(None, [POINTER(GLint)])
 def glIndexiv(c, _api_=None): 
     """glIndexiv(c)
     
-        c : POINTER(c_long)
+        c : POINTER(GLint)
     """
     return _api_(c)
     
@@ -3751,11 +3751,11 @@ def glIndexs(c, _api_=None):
     """
     return _api_(c)
     
-@bind(None, [POINTER(c_short)])
+@bind(None, [POINTER(GLshort)])
 def glIndexsv(c, _api_=None): 
     """glIndexsv(c)
     
-        c : POINTER(c_short)
+        c : POINTER(GLshort)
     """
     return _api_(c)
     
@@ -3767,11 +3767,11 @@ def glIndexub(c, _api_=None):
     """
     return _api_(c)
     
-@bind(None, [POINTER(c_ubyte)])
+@bind(None, [POINTER(GLubyte)])
 def glIndexubv(c, _api_=None): 
     """glIndexubv(c)
     
-        c : POINTER(c_ubyte)
+        c : POINTER(GLubyte)
     """
     return _api_(c)
     
@@ -3783,13 +3783,13 @@ def glInitNames(_api_=None):
     """
     return _api_()
     
-@bind(None, [GLenum, GLsizei, c_void_p])
+@bind(None, [GLenum, GLsizei, POINTER(GLvoid)])
 def glInterleavedArrays(format, stride, pointer, _api_=None): 
     """glInterleavedArrays(format, stride, pointer)
     
         format : GLenum
         stride : GLsizei
-        pointer : c_void_p
+        pointer : POINTER(GLvoid)
     """
     return _api_(format, stride, pointer)
     
@@ -3826,12 +3826,12 @@ def glLightModelf(pname, param, _api_=None):
     """
     return _api_(pname, param)
     
-@bind(None, [GLenum, POINTER(c_float)])
+@bind(None, [GLenum, POINTER(GLfloat)])
 def glLightModelfv(pname, params, _api_=None): 
     """glLightModelfv(pname, params)
     
         pname : GLenum
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(pname, params)
     
@@ -3844,12 +3844,12 @@ def glLightModeli(pname, param, _api_=None):
     """
     return _api_(pname, param)
     
-@bind(None, [GLenum, POINTER(c_long)])
+@bind(None, [GLenum, POINTER(GLint)])
 def glLightModeliv(pname, params, _api_=None): 
     """glLightModeliv(pname, params)
     
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(pname, params)
     
@@ -3863,13 +3863,13 @@ def glLightf(light, pname, param, _api_=None):
     """
     return _api_(light, pname, param)
     
-@bind(None, [GLenum, GLenum, POINTER(c_float)])
+@bind(None, [GLenum, GLenum, POINTER(GLfloat)])
 def glLightfv(light, pname, params, _api_=None): 
     """glLightfv(light, pname, params)
     
         light : GLenum
         pname : GLenum
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(light, pname, params)
     
@@ -3883,13 +3883,13 @@ def glLighti(light, pname, param, _api_=None):
     """
     return _api_(light, pname, param)
     
-@bind(None, [GLenum, GLenum, POINTER(c_long)])
+@bind(None, [GLenum, GLenum, POINTER(GLint)])
 def glLightiv(light, pname, params, _api_=None): 
     """glLightiv(light, pname, params)
     
         light : GLenum
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(light, pname, params)
     
@@ -3926,19 +3926,19 @@ def glLoadIdentity(_api_=None):
     """
     return _api_()
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glLoadMatrixd(m, _api_=None): 
     """glLoadMatrixd(m)
     
-        m : POINTER(c_double)
+        m : POINTER(GLdouble)
     """
     return _api_(m)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glLoadMatrixf(m, _api_=None): 
     """glLoadMatrixf(m)
     
-        m : POINTER(c_float)
+        m : POINTER(GLfloat)
     """
     return _api_(m)
     
@@ -3958,7 +3958,7 @@ def glLogicOp(opcode, _api_=None):
     """
     return _api_(opcode)
     
-@bind(None, [GLenum, GLdouble, GLdouble, GLint, GLint, POINTER(c_double)])
+@bind(None, [GLenum, GLdouble, GLdouble, GLint, GLint, POINTER(GLdouble)])
 def glMap1d(target, u1, u2, stride, order, points, _api_=None): 
     """glMap1d(target, u1, u2, stride, order, points)
     
@@ -3967,11 +3967,11 @@ def glMap1d(target, u1, u2, stride, order, points, _api_=None):
         u2 : GLdouble
         stride : GLint
         order : GLint
-        points : POINTER(c_double)
+        points : POINTER(GLdouble)
     """
     return _api_(target, u1, u2, stride, order, points)
     
-@bind(None, [GLenum, GLfloat, GLfloat, GLint, GLint, POINTER(c_float)])
+@bind(None, [GLenum, GLfloat, GLfloat, GLint, GLint, POINTER(GLfloat)])
 def glMap1f(target, u1, u2, stride, order, points, _api_=None): 
     """glMap1f(target, u1, u2, stride, order, points)
     
@@ -3980,11 +3980,11 @@ def glMap1f(target, u1, u2, stride, order, points, _api_=None):
         u2 : GLfloat
         stride : GLint
         order : GLint
-        points : POINTER(c_float)
+        points : POINTER(GLfloat)
     """
     return _api_(target, u1, u2, stride, order, points)
     
-@bind(None, [GLenum, GLdouble, GLdouble, GLint, GLint, GLdouble, GLdouble, GLint, GLint, POINTER(c_double)])
+@bind(None, [GLenum, GLdouble, GLdouble, GLint, GLint, GLdouble, GLdouble, GLint, GLint, POINTER(GLdouble)])
 def glMap2d(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points, _api_=None): 
     """glMap2d(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points)
     
@@ -3997,11 +3997,11 @@ def glMap2d(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points, _a
         v2 : GLdouble
         vstride : GLint
         vorder : GLint
-        points : POINTER(c_double)
+        points : POINTER(GLdouble)
     """
     return _api_(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points)
     
-@bind(None, [GLenum, GLfloat, GLfloat, GLint, GLint, GLfloat, GLfloat, GLint, GLint, POINTER(c_float)])
+@bind(None, [GLenum, GLfloat, GLfloat, GLint, GLint, GLfloat, GLfloat, GLint, GLint, POINTER(GLfloat)])
 def glMap2f(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points, _api_=None): 
     """glMap2f(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points)
     
@@ -4014,7 +4014,7 @@ def glMap2f(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points, _a
         v2 : GLfloat
         vstride : GLint
         vorder : GLint
-        points : POINTER(c_float)
+        points : POINTER(GLfloat)
     """
     return _api_(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points)
     
@@ -4074,13 +4074,13 @@ def glMaterialf(face, pname, param, _api_=None):
     """
     return _api_(face, pname, param)
     
-@bind(None, [GLenum, GLenum, POINTER(c_float)])
+@bind(None, [GLenum, GLenum, POINTER(GLfloat)])
 def glMaterialfv(face, pname, params, _api_=None): 
     """glMaterialfv(face, pname, params)
     
         face : GLenum
         pname : GLenum
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(face, pname, params)
     
@@ -4094,13 +4094,13 @@ def glMateriali(face, pname, param, _api_=None):
     """
     return _api_(face, pname, param)
     
-@bind(None, [GLenum, GLenum, POINTER(c_long)])
+@bind(None, [GLenum, GLenum, POINTER(GLint)])
 def glMaterialiv(face, pname, params, _api_=None): 
     """glMaterialiv(face, pname, params)
     
         face : GLenum
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(face, pname, params)
     
@@ -4122,19 +4122,19 @@ def glMinmax(target, internalformat, sink, _api_=None):
     """
     return _api_(target, internalformat, sink)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glMultMatrixd(m, _api_=None): 
     """glMultMatrixd(m)
     
-        m : POINTER(c_double)
+        m : POINTER(GLdouble)
     """
     return _api_(m)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glMultMatrixf(m, _api_=None): 
     """glMultMatrixf(m)
     
-        m : POINTER(c_float)
+        m : POINTER(GLfloat)
     """
     return _api_(m)
     
@@ -4157,11 +4157,11 @@ def glNormal3b(nx, ny, nz, _api_=None):
     """
     return _api_(nx, ny, nz)
     
-@bind(None, [POINTER(c_byte)])
+@bind(None, [POINTER(GLbyte)])
 def glNormal3bv(v, _api_=None): 
     """glNormal3bv(v)
     
-        v : POINTER(c_byte)
+        v : POINTER(GLbyte)
     """
     return _api_(v)
     
@@ -4175,11 +4175,11 @@ def glNormal3d(nx, ny, nz, _api_=None):
     """
     return _api_(nx, ny, nz)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glNormal3dv(v, _api_=None): 
     """glNormal3dv(v)
     
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(v)
     
@@ -4193,11 +4193,11 @@ def glNormal3f(nx, ny, nz, _api_=None):
     """
     return _api_(nx, ny, nz)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glNormal3fv(v, _api_=None): 
     """glNormal3fv(v)
     
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(v)
     
@@ -4211,11 +4211,11 @@ def glNormal3i(nx, ny, nz, _api_=None):
     """
     return _api_(nx, ny, nz)
     
-@bind(None, [POINTER(c_long)])
+@bind(None, [POINTER(GLint)])
 def glNormal3iv(v, _api_=None): 
     """glNormal3iv(v)
     
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(v)
     
@@ -4229,21 +4229,21 @@ def glNormal3s(nx, ny, nz, _api_=None):
     """
     return _api_(nx, ny, nz)
     
-@bind(None, [POINTER(c_short)])
+@bind(None, [POINTER(GLshort)])
 def glNormal3sv(v, _api_=None): 
     """glNormal3sv(v)
     
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(v)
     
-@bind(None, [GLenum, GLsizei, c_void_p])
+@bind(None, [GLenum, GLsizei, POINTER(GLvoid)])
 def glNormalPointer(type, stride, pointer, _api_=None): 
     """glNormalPointer(type, stride, pointer)
     
         type : GLenum
         stride : GLsizei
-        pointer : c_void_p
+        pointer : POINTER(GLvoid)
     """
     return _api_(type, stride, pointer)
     
@@ -4268,33 +4268,33 @@ def glPassThrough(token, _api_=None):
     """
     return _api_(token)
     
-@bind(None, [GLenum, GLint, POINTER(c_float)])
+@bind(None, [GLenum, GLint, POINTER(GLfloat)])
 def glPixelMapfv(map, mapsize, values, _api_=None): 
     """glPixelMapfv(map, mapsize, values)
     
         map : GLenum
         mapsize : GLint
-        values : POINTER(c_float)
+        values : POINTER(GLfloat)
     """
     return _api_(map, mapsize, values)
     
-@bind(None, [GLenum, GLint, POINTER(c_ulong)])
+@bind(None, [GLenum, GLint, POINTER(GLuint)])
 def glPixelMapuiv(map, mapsize, values, _api_=None): 
     """glPixelMapuiv(map, mapsize, values)
     
         map : GLenum
         mapsize : GLint
-        values : POINTER(c_ulong)
+        values : POINTER(GLuint)
     """
     return _api_(map, mapsize, values)
     
-@bind(None, [GLenum, GLint, POINTER(c_ushort)])
+@bind(None, [GLenum, GLint, POINTER(GLushort)])
 def glPixelMapusv(map, mapsize, values, _api_=None): 
     """glPixelMapusv(map, mapsize, values)
     
         map : GLenum
         mapsize : GLint
-        values : POINTER(c_ushort)
+        values : POINTER(GLushort)
     """
     return _api_(map, mapsize, values)
     
@@ -4369,11 +4369,11 @@ def glPolygonOffset(factor, units, _api_=None):
     """
     return _api_(factor, units)
     
-@bind(None, [POINTER(c_ubyte)])
+@bind(None, [POINTER(GLubyte)])
 def glPolygonStipple(mask, _api_=None): 
     """glPolygonStipple(mask)
     
-        mask : POINTER(c_ubyte)
+        mask : POINTER(GLubyte)
     """
     return _api_(mask)
     
@@ -4409,13 +4409,13 @@ def glPopName(_api_=None):
     """
     return _api_()
     
-@bind(None, [GLsizei, POINTER(c_ulong), POINTER(c_float)])
+@bind(None, [GLsizei, POINTER(GLuint), POINTER(GLclampf)])
 def glPrioritizeTextures(n, textures, priorities, _api_=None): 
     """glPrioritizeTextures(n, textures, priorities)
     
         n : GLsizei
-        textures : POINTER(c_ulong)
-        priorities : POINTER(c_float)
+        textures : POINTER(GLuint)
+        priorities : POINTER(GLclampf)
     """
     return _api_(n, textures, priorities)
     
@@ -4460,11 +4460,11 @@ def glRasterPos2d(x, y, _api_=None):
     """
     return _api_(x, y)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glRasterPos2dv(v, _api_=None): 
     """glRasterPos2dv(v)
     
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(v)
     
@@ -4477,11 +4477,11 @@ def glRasterPos2f(x, y, _api_=None):
     """
     return _api_(x, y)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glRasterPos2fv(v, _api_=None): 
     """glRasterPos2fv(v)
     
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(v)
     
@@ -4494,11 +4494,11 @@ def glRasterPos2i(x, y, _api_=None):
     """
     return _api_(x, y)
     
-@bind(None, [POINTER(c_long)])
+@bind(None, [POINTER(GLint)])
 def glRasterPos2iv(v, _api_=None): 
     """glRasterPos2iv(v)
     
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(v)
     
@@ -4511,11 +4511,11 @@ def glRasterPos2s(x, y, _api_=None):
     """
     return _api_(x, y)
     
-@bind(None, [POINTER(c_short)])
+@bind(None, [POINTER(GLshort)])
 def glRasterPos2sv(v, _api_=None): 
     """glRasterPos2sv(v)
     
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(v)
     
@@ -4529,11 +4529,11 @@ def glRasterPos3d(x, y, z, _api_=None):
     """
     return _api_(x, y, z)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glRasterPos3dv(v, _api_=None): 
     """glRasterPos3dv(v)
     
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(v)
     
@@ -4547,11 +4547,11 @@ def glRasterPos3f(x, y, z, _api_=None):
     """
     return _api_(x, y, z)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glRasterPos3fv(v, _api_=None): 
     """glRasterPos3fv(v)
     
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(v)
     
@@ -4565,11 +4565,11 @@ def glRasterPos3i(x, y, z, _api_=None):
     """
     return _api_(x, y, z)
     
-@bind(None, [POINTER(c_long)])
+@bind(None, [POINTER(GLint)])
 def glRasterPos3iv(v, _api_=None): 
     """glRasterPos3iv(v)
     
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(v)
     
@@ -4583,11 +4583,11 @@ def glRasterPos3s(x, y, z, _api_=None):
     """
     return _api_(x, y, z)
     
-@bind(None, [POINTER(c_short)])
+@bind(None, [POINTER(GLshort)])
 def glRasterPos3sv(v, _api_=None): 
     """glRasterPos3sv(v)
     
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(v)
     
@@ -4602,11 +4602,11 @@ def glRasterPos4d(x, y, z, w, _api_=None):
     """
     return _api_(x, y, z, w)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glRasterPos4dv(v, _api_=None): 
     """glRasterPos4dv(v)
     
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(v)
     
@@ -4621,11 +4621,11 @@ def glRasterPos4f(x, y, z, w, _api_=None):
     """
     return _api_(x, y, z, w)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glRasterPos4fv(v, _api_=None): 
     """glRasterPos4fv(v)
     
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(v)
     
@@ -4640,11 +4640,11 @@ def glRasterPos4i(x, y, z, w, _api_=None):
     """
     return _api_(x, y, z, w)
     
-@bind(None, [POINTER(c_long)])
+@bind(None, [POINTER(GLint)])
 def glRasterPos4iv(v, _api_=None): 
     """glRasterPos4iv(v)
     
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(v)
     
@@ -4659,11 +4659,11 @@ def glRasterPos4s(x, y, z, w, _api_=None):
     """
     return _api_(x, y, z, w)
     
-@bind(None, [POINTER(c_short)])
+@bind(None, [POINTER(GLshort)])
 def glRasterPos4sv(v, _api_=None): 
     """glRasterPos4sv(v)
     
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(v)
     
@@ -4675,7 +4675,7 @@ def glReadBuffer(mode, _api_=None):
     """
     return _api_(mode)
     
-@bind(None, [GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, c_void_p])
+@bind(None, [GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, POINTER(GLvoid)])
 def glReadPixels(x, y, width, height, format, type, pixels, _api_=None): 
     """glReadPixels(x, y, width, height, format, type, pixels)
     
@@ -4685,7 +4685,7 @@ def glReadPixels(x, y, width, height, format, type, pixels, _api_=None):
         height : GLsizei
         format : GLenum
         type : GLenum
-        pixels : c_void_p
+        pixels : POINTER(GLvoid)
     """
     return _api_(x, y, width, height, format, type, pixels)
     
@@ -4700,12 +4700,12 @@ def glRectd(x1, y1, x2, y2, _api_=None):
     """
     return _api_(x1, y1, x2, y2)
     
-@bind(None, [POINTER(c_double), POINTER(c_double)])
+@bind(None, [POINTER(GLdouble), POINTER(GLdouble)])
 def glRectdv(v1, v2, _api_=None): 
     """glRectdv(v1, v2)
     
-        v1 : POINTER(c_double)
-        v2 : POINTER(c_double)
+        v1 : POINTER(GLdouble)
+        v2 : POINTER(GLdouble)
     """
     return _api_(v1, v2)
     
@@ -4720,12 +4720,12 @@ def glRectf(x1, y1, x2, y2, _api_=None):
     """
     return _api_(x1, y1, x2, y2)
     
-@bind(None, [POINTER(c_float), POINTER(c_float)])
+@bind(None, [POINTER(GLfloat), POINTER(GLfloat)])
 def glRectfv(v1, v2, _api_=None): 
     """glRectfv(v1, v2)
     
-        v1 : POINTER(c_float)
-        v2 : POINTER(c_float)
+        v1 : POINTER(GLfloat)
+        v2 : POINTER(GLfloat)
     """
     return _api_(v1, v2)
     
@@ -4740,12 +4740,12 @@ def glRecti(x1, y1, x2, y2, _api_=None):
     """
     return _api_(x1, y1, x2, y2)
     
-@bind(None, [POINTER(c_long), POINTER(c_long)])
+@bind(None, [POINTER(GLint), POINTER(GLint)])
 def glRectiv(v1, v2, _api_=None): 
     """glRectiv(v1, v2)
     
-        v1 : POINTER(c_long)
-        v2 : POINTER(c_long)
+        v1 : POINTER(GLint)
+        v2 : POINTER(GLint)
     """
     return _api_(v1, v2)
     
@@ -4760,12 +4760,12 @@ def glRects(x1, y1, x2, y2, _api_=None):
     """
     return _api_(x1, y1, x2, y2)
     
-@bind(None, [POINTER(c_short), POINTER(c_short)])
+@bind(None, [POINTER(GLshort), POINTER(GLshort)])
 def glRectsv(v1, v2, _api_=None): 
     """glRectsv(v1, v2)
     
-        v1 : POINTER(c_short)
-        v2 : POINTER(c_short)
+        v1 : POINTER(GLshort)
+        v2 : POINTER(GLshort)
     """
     return _api_(v1, v2)
     
@@ -4846,16 +4846,16 @@ def glScissor(x, y, width, height, _api_=None):
     """
     return _api_(x, y, width, height)
     
-@bind(None, [GLsizei, POINTER(c_ulong)])
+@bind(None, [GLsizei, POINTER(GLuint)])
 def glSelectBuffer(size, buffer, _api_=None): 
     """glSelectBuffer(size, buffer)
     
         size : GLsizei
-        buffer : POINTER(c_ulong)
+        buffer : POINTER(GLuint)
     """
     return _api_(size, buffer)
     
-@bind(None, [GLenum, GLenum, GLsizei, GLsizei, GLenum, GLenum, c_void_p, c_void_p])
+@bind(None, [GLenum, GLenum, GLsizei, GLsizei, GLenum, GLenum, POINTER(GLvoid), POINTER(GLvoid)])
 def glSeparableFilter2D(target, internalformat, width, height, format, type, row, column, _api_=None): 
     """glSeparableFilter2D(target, internalformat, width, height, format, type, row, column)
     
@@ -4865,8 +4865,8 @@ def glSeparableFilter2D(target, internalformat, width, height, format, type, row
         height : GLsizei
         format : GLenum
         type : GLenum
-        row : c_void_p
-        column : c_void_p
+        row : POINTER(GLvoid)
+        column : POINTER(GLvoid)
     """
     return _api_(target, internalformat, width, height, format, type, row, column)
     
@@ -4914,11 +4914,11 @@ def glTexCoord1d(s, _api_=None):
     """
     return _api_(s)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glTexCoord1dv(v, _api_=None): 
     """glTexCoord1dv(v)
     
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(v)
     
@@ -4930,11 +4930,11 @@ def glTexCoord1f(s, _api_=None):
     """
     return _api_(s)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glTexCoord1fv(v, _api_=None): 
     """glTexCoord1fv(v)
     
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(v)
     
@@ -4946,11 +4946,11 @@ def glTexCoord1i(s, _api_=None):
     """
     return _api_(s)
     
-@bind(None, [POINTER(c_long)])
+@bind(None, [POINTER(GLint)])
 def glTexCoord1iv(v, _api_=None): 
     """glTexCoord1iv(v)
     
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(v)
     
@@ -4962,11 +4962,11 @@ def glTexCoord1s(s, _api_=None):
     """
     return _api_(s)
     
-@bind(None, [POINTER(c_short)])
+@bind(None, [POINTER(GLshort)])
 def glTexCoord1sv(v, _api_=None): 
     """glTexCoord1sv(v)
     
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(v)
     
@@ -4979,11 +4979,11 @@ def glTexCoord2d(s, t, _api_=None):
     """
     return _api_(s, t)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glTexCoord2dv(v, _api_=None): 
     """glTexCoord2dv(v)
     
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(v)
     
@@ -4996,11 +4996,11 @@ def glTexCoord2f(s, t, _api_=None):
     """
     return _api_(s, t)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glTexCoord2fv(v, _api_=None): 
     """glTexCoord2fv(v)
     
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(v)
     
@@ -5013,11 +5013,11 @@ def glTexCoord2i(s, t, _api_=None):
     """
     return _api_(s, t)
     
-@bind(None, [POINTER(c_long)])
+@bind(None, [POINTER(GLint)])
 def glTexCoord2iv(v, _api_=None): 
     """glTexCoord2iv(v)
     
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(v)
     
@@ -5030,11 +5030,11 @@ def glTexCoord2s(s, t, _api_=None):
     """
     return _api_(s, t)
     
-@bind(None, [POINTER(c_short)])
+@bind(None, [POINTER(GLshort)])
 def glTexCoord2sv(v, _api_=None): 
     """glTexCoord2sv(v)
     
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(v)
     
@@ -5048,11 +5048,11 @@ def glTexCoord3d(s, t, r, _api_=None):
     """
     return _api_(s, t, r)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glTexCoord3dv(v, _api_=None): 
     """glTexCoord3dv(v)
     
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(v)
     
@@ -5066,11 +5066,11 @@ def glTexCoord3f(s, t, r, _api_=None):
     """
     return _api_(s, t, r)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glTexCoord3fv(v, _api_=None): 
     """glTexCoord3fv(v)
     
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(v)
     
@@ -5084,11 +5084,11 @@ def glTexCoord3i(s, t, r, _api_=None):
     """
     return _api_(s, t, r)
     
-@bind(None, [POINTER(c_long)])
+@bind(None, [POINTER(GLint)])
 def glTexCoord3iv(v, _api_=None): 
     """glTexCoord3iv(v)
     
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(v)
     
@@ -5102,11 +5102,11 @@ def glTexCoord3s(s, t, r, _api_=None):
     """
     return _api_(s, t, r)
     
-@bind(None, [POINTER(c_short)])
+@bind(None, [POINTER(GLshort)])
 def glTexCoord3sv(v, _api_=None): 
     """glTexCoord3sv(v)
     
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(v)
     
@@ -5121,11 +5121,11 @@ def glTexCoord4d(s, t, r, q, _api_=None):
     """
     return _api_(s, t, r, q)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glTexCoord4dv(v, _api_=None): 
     """glTexCoord4dv(v)
     
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(v)
     
@@ -5140,11 +5140,11 @@ def glTexCoord4f(s, t, r, q, _api_=None):
     """
     return _api_(s, t, r, q)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glTexCoord4fv(v, _api_=None): 
     """glTexCoord4fv(v)
     
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(v)
     
@@ -5159,11 +5159,11 @@ def glTexCoord4i(s, t, r, q, _api_=None):
     """
     return _api_(s, t, r, q)
     
-@bind(None, [POINTER(c_long)])
+@bind(None, [POINTER(GLint)])
 def glTexCoord4iv(v, _api_=None): 
     """glTexCoord4iv(v)
     
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(v)
     
@@ -5178,22 +5178,22 @@ def glTexCoord4s(s, t, r, q, _api_=None):
     """
     return _api_(s, t, r, q)
     
-@bind(None, [POINTER(c_short)])
+@bind(None, [POINTER(GLshort)])
 def glTexCoord4sv(v, _api_=None): 
     """glTexCoord4sv(v)
     
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(v)
     
-@bind(None, [GLint, GLenum, GLsizei, c_void_p])
+@bind(None, [GLint, GLenum, GLsizei, POINTER(GLvoid)])
 def glTexCoordPointer(size, type, stride, pointer, _api_=None): 
     """glTexCoordPointer(size, type, stride, pointer)
     
         size : GLint
         type : GLenum
         stride : GLsizei
-        pointer : c_void_p
+        pointer : POINTER(GLvoid)
     """
     return _api_(size, type, stride, pointer)
     
@@ -5207,13 +5207,13 @@ def glTexEnvf(target, pname, param, _api_=None):
     """
     return _api_(target, pname, param)
     
-@bind(None, [GLenum, GLenum, POINTER(c_float)])
+@bind(None, [GLenum, GLenum, POINTER(GLfloat)])
 def glTexEnvfv(target, pname, params, _api_=None): 
     """glTexEnvfv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(target, pname, params)
     
@@ -5227,13 +5227,13 @@ def glTexEnvi(target, pname, param, _api_=None):
     """
     return _api_(target, pname, param)
     
-@bind(None, [GLenum, GLenum, POINTER(c_long)])
+@bind(None, [GLenum, GLenum, POINTER(GLint)])
 def glTexEnviv(target, pname, params, _api_=None): 
     """glTexEnviv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(target, pname, params)
     
@@ -5247,13 +5247,13 @@ def glTexGend(coord, pname, param, _api_=None):
     """
     return _api_(coord, pname, param)
     
-@bind(None, [GLenum, GLenum, POINTER(c_double)])
+@bind(None, [GLenum, GLenum, POINTER(GLdouble)])
 def glTexGendv(coord, pname, params, _api_=None): 
     """glTexGendv(coord, pname, params)
     
         coord : GLenum
         pname : GLenum
-        params : POINTER(c_double)
+        params : POINTER(GLdouble)
     """
     return _api_(coord, pname, params)
     
@@ -5267,13 +5267,13 @@ def glTexGenf(coord, pname, param, _api_=None):
     """
     return _api_(coord, pname, param)
     
-@bind(None, [GLenum, GLenum, POINTER(c_float)])
+@bind(None, [GLenum, GLenum, POINTER(GLfloat)])
 def glTexGenfv(coord, pname, params, _api_=None): 
     """glTexGenfv(coord, pname, params)
     
         coord : GLenum
         pname : GLenum
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(coord, pname, params)
     
@@ -5287,17 +5287,17 @@ def glTexGeni(coord, pname, param, _api_=None):
     """
     return _api_(coord, pname, param)
     
-@bind(None, [GLenum, GLenum, POINTER(c_long)])
+@bind(None, [GLenum, GLenum, POINTER(GLint)])
 def glTexGeniv(coord, pname, params, _api_=None): 
     """glTexGeniv(coord, pname, params)
     
         coord : GLenum
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(coord, pname, params)
     
-@bind(None, [GLenum, GLint, GLenum, GLsizei, GLint, GLenum, GLenum, c_void_p])
+@bind(None, [GLenum, GLint, GLenum, GLsizei, GLint, GLenum, GLenum, POINTER(GLvoid)])
 def glTexImage1D(target, level, internalformat, width, border, format, type, pixels, _api_=None): 
     """glTexImage1D(target, level, internalformat, width, border, format, type, pixels)
     
@@ -5308,11 +5308,11 @@ def glTexImage1D(target, level, internalformat, width, border, format, type, pix
         border : GLint
         format : GLenum
         type : GLenum
-        pixels : c_void_p
+        pixels : POINTER(GLvoid)
     """
     return _api_(target, level, internalformat, width, border, format, type, pixels)
     
-@bind(None, [GLenum, GLint, GLenum, GLsizei, GLsizei, GLint, GLenum, GLenum, c_void_p])
+@bind(None, [GLenum, GLint, GLenum, GLsizei, GLsizei, GLint, GLenum, GLenum, POINTER(GLvoid)])
 def glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels, _api_=None): 
     """glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels)
     
@@ -5324,11 +5324,11 @@ def glTexImage2D(target, level, internalformat, width, height, border, format, t
         border : GLint
         format : GLenum
         type : GLenum
-        pixels : c_void_p
+        pixels : POINTER(GLvoid)
     """
     return _api_(target, level, internalformat, width, height, border, format, type, pixels)
     
-@bind(None, [GLenum, GLint, GLenum, GLsizei, GLsizei, GLsizei, GLint, GLenum, GLenum, c_void_p])
+@bind(None, [GLenum, GLint, GLenum, GLsizei, GLsizei, GLsizei, GLint, GLenum, GLenum, POINTER(GLvoid)])
 def glTexImage3D(target, level, internalformat, width, height, depth, border, format, type, pixels, _api_=None): 
     """glTexImage3D(target, level, internalformat, width, height, depth, border, format, type, pixels)
     
@@ -5341,7 +5341,7 @@ def glTexImage3D(target, level, internalformat, width, height, depth, border, fo
         border : GLint
         format : GLenum
         type : GLenum
-        pixels : c_void_p
+        pixels : POINTER(GLvoid)
     """
     return _api_(target, level, internalformat, width, height, depth, border, format, type, pixels)
     
@@ -5355,13 +5355,13 @@ def glTexParameterf(target, pname, param, _api_=None):
     """
     return _api_(target, pname, param)
     
-@bind(None, [GLenum, GLenum, POINTER(c_float)])
+@bind(None, [GLenum, GLenum, POINTER(GLfloat)])
 def glTexParameterfv(target, pname, params, _api_=None): 
     """glTexParameterfv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(target, pname, params)
     
@@ -5375,17 +5375,17 @@ def glTexParameteri(target, pname, param, _api_=None):
     """
     return _api_(target, pname, param)
     
-@bind(None, [GLenum, GLenum, POINTER(c_long)])
+@bind(None, [GLenum, GLenum, POINTER(GLint)])
 def glTexParameteriv(target, pname, params, _api_=None): 
     """glTexParameteriv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(target, pname, params)
     
-@bind(None, [GLenum, GLint, GLint, GLsizei, GLenum, GLenum, c_void_p])
+@bind(None, [GLenum, GLint, GLint, GLsizei, GLenum, GLenum, POINTER(GLvoid)])
 def glTexSubImage1D(target, level, xoffset, width, format, type, pixels, _api_=None): 
     """glTexSubImage1D(target, level, xoffset, width, format, type, pixels)
     
@@ -5395,11 +5395,11 @@ def glTexSubImage1D(target, level, xoffset, width, format, type, pixels, _api_=N
         width : GLsizei
         format : GLenum
         type : GLenum
-        pixels : c_void_p
+        pixels : POINTER(GLvoid)
     """
     return _api_(target, level, xoffset, width, format, type, pixels)
     
-@bind(None, [GLenum, GLint, GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, c_void_p])
+@bind(None, [GLenum, GLint, GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, POINTER(GLvoid)])
 def glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels, _api_=None): 
     """glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels)
     
@@ -5411,11 +5411,11 @@ def glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type
         height : GLsizei
         format : GLenum
         type : GLenum
-        pixels : c_void_p
+        pixels : POINTER(GLvoid)
     """
     return _api_(target, level, xoffset, yoffset, width, height, format, type, pixels)
     
-@bind(None, [GLenum, GLint, GLint, GLint, GLint, GLsizei, GLsizei, GLsizei, GLenum, GLenum, c_void_p])
+@bind(None, [GLenum, GLint, GLint, GLint, GLint, GLsizei, GLsizei, GLsizei, GLenum, GLenum, POINTER(GLvoid)])
 def glTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, pixels, _api_=None): 
     """glTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, pixels)
     
@@ -5429,7 +5429,7 @@ def glTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, dep
         depth : GLsizei
         format : GLenum
         type : GLenum
-        pixels : c_void_p
+        pixels : POINTER(GLvoid)
     """
     return _api_(target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, pixels)
     
@@ -5462,11 +5462,11 @@ def glVertex2d(x, y, _api_=None):
     """
     return _api_(x, y)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glVertex2dv(v, _api_=None): 
     """glVertex2dv(v)
     
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(v)
     
@@ -5479,11 +5479,11 @@ def glVertex2f(x, y, _api_=None):
     """
     return _api_(x, y)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glVertex2fv(v, _api_=None): 
     """glVertex2fv(v)
     
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(v)
     
@@ -5496,11 +5496,11 @@ def glVertex2i(x, y, _api_=None):
     """
     return _api_(x, y)
     
-@bind(None, [POINTER(c_long)])
+@bind(None, [POINTER(GLint)])
 def glVertex2iv(v, _api_=None): 
     """glVertex2iv(v)
     
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(v)
     
@@ -5513,11 +5513,11 @@ def glVertex2s(x, y, _api_=None):
     """
     return _api_(x, y)
     
-@bind(None, [POINTER(c_short)])
+@bind(None, [POINTER(GLshort)])
 def glVertex2sv(v, _api_=None): 
     """glVertex2sv(v)
     
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(v)
     
@@ -5531,11 +5531,11 @@ def glVertex3d(x, y, z, _api_=None):
     """
     return _api_(x, y, z)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glVertex3dv(v, _api_=None): 
     """glVertex3dv(v)
     
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(v)
     
@@ -5549,11 +5549,11 @@ def glVertex3f(x, y, z, _api_=None):
     """
     return _api_(x, y, z)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glVertex3fv(v, _api_=None): 
     """glVertex3fv(v)
     
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(v)
     
@@ -5567,11 +5567,11 @@ def glVertex3i(x, y, z, _api_=None):
     """
     return _api_(x, y, z)
     
-@bind(None, [POINTER(c_long)])
+@bind(None, [POINTER(GLint)])
 def glVertex3iv(v, _api_=None): 
     """glVertex3iv(v)
     
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(v)
     
@@ -5585,11 +5585,11 @@ def glVertex3s(x, y, z, _api_=None):
     """
     return _api_(x, y, z)
     
-@bind(None, [POINTER(c_short)])
+@bind(None, [POINTER(GLshort)])
 def glVertex3sv(v, _api_=None): 
     """glVertex3sv(v)
     
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(v)
     
@@ -5604,11 +5604,11 @@ def glVertex4d(x, y, z, w, _api_=None):
     """
     return _api_(x, y, z, w)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glVertex4dv(v, _api_=None): 
     """glVertex4dv(v)
     
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(v)
     
@@ -5623,11 +5623,11 @@ def glVertex4f(x, y, z, w, _api_=None):
     """
     return _api_(x, y, z, w)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glVertex4fv(v, _api_=None): 
     """glVertex4fv(v)
     
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(v)
     
@@ -5642,11 +5642,11 @@ def glVertex4i(x, y, z, w, _api_=None):
     """
     return _api_(x, y, z, w)
     
-@bind(None, [POINTER(c_long)])
+@bind(None, [POINTER(GLint)])
 def glVertex4iv(v, _api_=None): 
     """glVertex4iv(v)
     
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(v)
     
@@ -5661,22 +5661,22 @@ def glVertex4s(x, y, z, w, _api_=None):
     """
     return _api_(x, y, z, w)
     
-@bind(None, [POINTER(c_short)])
+@bind(None, [POINTER(GLshort)])
 def glVertex4sv(v, _api_=None): 
     """glVertex4sv(v)
     
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(v)
     
-@bind(None, [GLint, GLenum, GLsizei, c_void_p])
+@bind(None, [GLint, GLenum, GLsizei, POINTER(GLvoid)])
 def glVertexPointer(size, type, stride, pointer, _api_=None): 
     """glVertexPointer(size, type, stride, pointer)
     
         size : GLint
         type : GLenum
         stride : GLsizei
-        pointer : c_void_p
+        pointer : POINTER(GLvoid)
     """
     return _api_(size, type, stride, pointer)
     
@@ -5710,40 +5710,40 @@ def glSamplePass(arg_0, _api_=None):
     return _api_(arg_0)
     
 
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glLoadTransposeMatrixf(m, _api_=None): 
     """glLoadTransposeMatrixf(m)
     
-        m : POINTER(c_float)
+        m : POINTER(GLfloat)
     """
     return _api_(m)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glLoadTransposeMatrixd(m, _api_=None): 
     """glLoadTransposeMatrixd(m)
     
-        m : POINTER(c_double)
+        m : POINTER(GLdouble)
     """
     return _api_(m)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glMultTransposeMatrixf(m, _api_=None): 
     """glMultTransposeMatrixf(m)
     
-        m : POINTER(c_float)
+        m : POINTER(GLfloat)
     """
     return _api_(m)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glMultTransposeMatrixd(m, _api_=None): 
     """glMultTransposeMatrixd(m)
     
-        m : POINTER(c_double)
+        m : POINTER(GLdouble)
     """
     return _api_(m)
     
 
-@bind(None, [GLenum, GLint, GLenum, GLsizei, GLsizei, GLsizei, GLint, GLsizei, c_void_p])
+@bind(None, [GLenum, GLint, GLenum, GLsizei, GLsizei, GLsizei, GLint, GLsizei, POINTER(GLvoid)])
 def glCompressedTexImage3D(target, level, internalformat, width, height, depth, border, imageSize, data, _api_=None): 
     """glCompressedTexImage3D(target, level, internalformat, width, height, depth, border, imageSize, data)
     
@@ -5755,11 +5755,11 @@ def glCompressedTexImage3D(target, level, internalformat, width, height, depth, 
         depth : GLsizei
         border : GLint
         imageSize : GLsizei
-        data : c_void_p
+        data : POINTER(GLvoid)
     """
     return _api_(target, level, internalformat, width, height, depth, border, imageSize, data)
     
-@bind(None, [GLenum, GLint, GLenum, GLsizei, GLsizei, GLint, GLsizei, c_void_p])
+@bind(None, [GLenum, GLint, GLenum, GLsizei, GLsizei, GLint, GLsizei, POINTER(GLvoid)])
 def glCompressedTexImage2D(target, level, internalformat, width, height, border, imageSize, data, _api_=None): 
     """glCompressedTexImage2D(target, level, internalformat, width, height, border, imageSize, data)
     
@@ -5770,11 +5770,11 @@ def glCompressedTexImage2D(target, level, internalformat, width, height, border,
         height : GLsizei
         border : GLint
         imageSize : GLsizei
-        data : c_void_p
+        data : POINTER(GLvoid)
     """
     return _api_(target, level, internalformat, width, height, border, imageSize, data)
     
-@bind(None, [GLenum, GLint, GLenum, GLsizei, GLint, GLsizei, c_void_p])
+@bind(None, [GLenum, GLint, GLenum, GLsizei, GLint, GLsizei, POINTER(GLvoid)])
 def glCompressedTexImage1D(target, level, internalformat, width, border, imageSize, data, _api_=None): 
     """glCompressedTexImage1D(target, level, internalformat, width, border, imageSize, data)
     
@@ -5784,11 +5784,11 @@ def glCompressedTexImage1D(target, level, internalformat, width, border, imageSi
         width : GLsizei
         border : GLint
         imageSize : GLsizei
-        data : c_void_p
+        data : POINTER(GLvoid)
     """
     return _api_(target, level, internalformat, width, border, imageSize, data)
     
-@bind(None, [GLenum, GLint, GLint, GLint, GLint, GLsizei, GLsizei, GLsizei, GLenum, GLsizei, c_void_p])
+@bind(None, [GLenum, GLint, GLint, GLint, GLint, GLsizei, GLsizei, GLsizei, GLenum, GLsizei, POINTER(GLvoid)])
 def glCompressedTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, imageSize, data, _api_=None): 
     """glCompressedTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, imageSize, data)
     
@@ -5802,11 +5802,11 @@ def glCompressedTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, h
         depth : GLsizei
         format : GLenum
         imageSize : GLsizei
-        data : c_void_p
+        data : POINTER(GLvoid)
     """
     return _api_(target, level, xoffset, yoffset, zoffset, width, height, depth, format, imageSize, data)
     
-@bind(None, [GLenum, GLint, GLint, GLint, GLsizei, GLsizei, GLenum, GLsizei, c_void_p])
+@bind(None, [GLenum, GLint, GLint, GLint, GLsizei, GLsizei, GLenum, GLsizei, POINTER(GLvoid)])
 def glCompressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, imageSize, data, _api_=None): 
     """glCompressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, imageSize, data)
     
@@ -5818,11 +5818,11 @@ def glCompressedTexSubImage2D(target, level, xoffset, yoffset, width, height, fo
         height : GLsizei
         format : GLenum
         imageSize : GLsizei
-        data : c_void_p
+        data : POINTER(GLvoid)
     """
     return _api_(target, level, xoffset, yoffset, width, height, format, imageSize, data)
     
-@bind(None, [GLenum, GLint, GLint, GLsizei, GLenum, GLsizei, c_void_p])
+@bind(None, [GLenum, GLint, GLint, GLsizei, GLenum, GLsizei, POINTER(GLvoid)])
 def glCompressedTexSubImage1D(target, level, xoffset, width, format, imageSize, data, _api_=None): 
     """glCompressedTexSubImage1D(target, level, xoffset, width, format, imageSize, data)
     
@@ -5832,17 +5832,17 @@ def glCompressedTexSubImage1D(target, level, xoffset, width, format, imageSize, 
         width : GLsizei
         format : GLenum
         imageSize : GLsizei
-        data : c_void_p
+        data : POINTER(GLvoid)
     """
     return _api_(target, level, xoffset, width, format, imageSize, data)
     
-@bind(None, [GLenum, GLint, c_void_p])
+@bind(None, [GLenum, GLint, POINTER(GLvoid)])
 def glGetCompressedTexImage(target, level, img, _api_=None): 
     """glGetCompressedTexImage(target, level, img)
     
         target : GLenum
         level : GLint
-        img : c_void_p
+        img : POINTER(GLvoid)
     """
     return _api_(target, level, img)
     
@@ -5872,12 +5872,12 @@ def glMultiTexCoord1d(target, s, _api_=None):
     """
     return _api_(target, s)
     
-@bind(None, [GLenum, POINTER(c_double)])
+@bind(None, [GLenum, POINTER(GLdouble)])
 def glMultiTexCoord1dv(target, v, _api_=None): 
     """glMultiTexCoord1dv(target, v)
     
         target : GLenum
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(target, v)
     
@@ -5890,12 +5890,12 @@ def glMultiTexCoord1f(target, s, _api_=None):
     """
     return _api_(target, s)
     
-@bind(None, [GLenum, POINTER(c_float)])
+@bind(None, [GLenum, POINTER(GLfloat)])
 def glMultiTexCoord1fv(target, v, _api_=None): 
     """glMultiTexCoord1fv(target, v)
     
         target : GLenum
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(target, v)
     
@@ -5908,12 +5908,12 @@ def glMultiTexCoord1i(target, s, _api_=None):
     """
     return _api_(target, s)
     
-@bind(None, [GLenum, POINTER(c_long)])
+@bind(None, [GLenum, POINTER(GLint)])
 def glMultiTexCoord1iv(target, v, _api_=None): 
     """glMultiTexCoord1iv(target, v)
     
         target : GLenum
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(target, v)
     
@@ -5926,12 +5926,12 @@ def glMultiTexCoord1s(target, s, _api_=None):
     """
     return _api_(target, s)
     
-@bind(None, [GLenum, POINTER(c_short)])
+@bind(None, [GLenum, POINTER(GLshort)])
 def glMultiTexCoord1sv(target, v, _api_=None): 
     """glMultiTexCoord1sv(target, v)
     
         target : GLenum
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(target, v)
     
@@ -5945,12 +5945,12 @@ def glMultiTexCoord2d(target, s, t, _api_=None):
     """
     return _api_(target, s, t)
     
-@bind(None, [GLenum, POINTER(c_double)])
+@bind(None, [GLenum, POINTER(GLdouble)])
 def glMultiTexCoord2dv(target, v, _api_=None): 
     """glMultiTexCoord2dv(target, v)
     
         target : GLenum
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(target, v)
     
@@ -5964,12 +5964,12 @@ def glMultiTexCoord2f(target, s, t, _api_=None):
     """
     return _api_(target, s, t)
     
-@bind(None, [GLenum, POINTER(c_float)])
+@bind(None, [GLenum, POINTER(GLfloat)])
 def glMultiTexCoord2fv(target, v, _api_=None): 
     """glMultiTexCoord2fv(target, v)
     
         target : GLenum
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(target, v)
     
@@ -5983,12 +5983,12 @@ def glMultiTexCoord2i(target, s, t, _api_=None):
     """
     return _api_(target, s, t)
     
-@bind(None, [GLenum, POINTER(c_long)])
+@bind(None, [GLenum, POINTER(GLint)])
 def glMultiTexCoord2iv(target, v, _api_=None): 
     """glMultiTexCoord2iv(target, v)
     
         target : GLenum
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(target, v)
     
@@ -6002,12 +6002,12 @@ def glMultiTexCoord2s(target, s, t, _api_=None):
     """
     return _api_(target, s, t)
     
-@bind(None, [GLenum, POINTER(c_short)])
+@bind(None, [GLenum, POINTER(GLshort)])
 def glMultiTexCoord2sv(target, v, _api_=None): 
     """glMultiTexCoord2sv(target, v)
     
         target : GLenum
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(target, v)
     
@@ -6022,12 +6022,12 @@ def glMultiTexCoord3d(target, s, t, r, _api_=None):
     """
     return _api_(target, s, t, r)
     
-@bind(None, [GLenum, POINTER(c_double)])
+@bind(None, [GLenum, POINTER(GLdouble)])
 def glMultiTexCoord3dv(target, v, _api_=None): 
     """glMultiTexCoord3dv(target, v)
     
         target : GLenum
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(target, v)
     
@@ -6042,12 +6042,12 @@ def glMultiTexCoord3f(target, s, t, r, _api_=None):
     """
     return _api_(target, s, t, r)
     
-@bind(None, [GLenum, POINTER(c_float)])
+@bind(None, [GLenum, POINTER(GLfloat)])
 def glMultiTexCoord3fv(target, v, _api_=None): 
     """glMultiTexCoord3fv(target, v)
     
         target : GLenum
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(target, v)
     
@@ -6062,12 +6062,12 @@ def glMultiTexCoord3i(target, s, t, r, _api_=None):
     """
     return _api_(target, s, t, r)
     
-@bind(None, [GLenum, POINTER(c_long)])
+@bind(None, [GLenum, POINTER(GLint)])
 def glMultiTexCoord3iv(target, v, _api_=None): 
     """glMultiTexCoord3iv(target, v)
     
         target : GLenum
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(target, v)
     
@@ -6082,12 +6082,12 @@ def glMultiTexCoord3s(target, s, t, r, _api_=None):
     """
     return _api_(target, s, t, r)
     
-@bind(None, [GLenum, POINTER(c_short)])
+@bind(None, [GLenum, POINTER(GLshort)])
 def glMultiTexCoord3sv(target, v, _api_=None): 
     """glMultiTexCoord3sv(target, v)
     
         target : GLenum
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(target, v)
     
@@ -6103,12 +6103,12 @@ def glMultiTexCoord4d(target, s, t, r, q, _api_=None):
     """
     return _api_(target, s, t, r, q)
     
-@bind(None, [GLenum, POINTER(c_double)])
+@bind(None, [GLenum, POINTER(GLdouble)])
 def glMultiTexCoord4dv(target, v, _api_=None): 
     """glMultiTexCoord4dv(target, v)
     
         target : GLenum
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(target, v)
     
@@ -6124,12 +6124,12 @@ def glMultiTexCoord4f(target, s, t, r, q, _api_=None):
     """
     return _api_(target, s, t, r, q)
     
-@bind(None, [GLenum, POINTER(c_float)])
+@bind(None, [GLenum, POINTER(GLfloat)])
 def glMultiTexCoord4fv(target, v, _api_=None): 
     """glMultiTexCoord4fv(target, v)
     
         target : GLenum
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(target, v)
     
@@ -6145,12 +6145,12 @@ def glMultiTexCoord4i(target, s, t, r, q, _api_=None):
     """
     return _api_(target, s, t, r, q)
     
-@bind(None, [GLenum, POINTER(c_long)])
+@bind(None, [GLenum, POINTER(GLint)])
 def glMultiTexCoord4iv(target, v, _api_=None): 
     """glMultiTexCoord4iv(target, v)
     
         target : GLenum
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(target, v)
     
@@ -6166,12 +6166,12 @@ def glMultiTexCoord4s(target, s, t, r, q, _api_=None):
     """
     return _api_(target, s, t, r, q)
     
-@bind(None, [GLenum, POINTER(c_short)])
+@bind(None, [GLenum, POINTER(GLshort)])
 def glMultiTexCoord4sv(target, v, _api_=None): 
     """glMultiTexCoord4sv(target, v)
     
         target : GLenum
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(target, v)
     
@@ -6184,11 +6184,11 @@ def glFogCoordf(coord, _api_=None):
     """
     return _api_(coord)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glFogCoordfv(coord, _api_=None): 
     """glFogCoordfv(coord)
     
-        coord : POINTER(c_float)
+        coord : POINTER(GLfloat)
     """
     return _api_(coord)
     
@@ -6200,21 +6200,21 @@ def glFogCoordd(coord, _api_=None):
     """
     return _api_(coord)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glFogCoorddv(coord, _api_=None): 
     """glFogCoorddv(coord)
     
-        coord : POINTER(c_double)
+        coord : POINTER(GLdouble)
     """
     return _api_(coord)
     
-@bind(None, [GLenum, GLsizei, c_void_p])
+@bind(None, [GLenum, GLsizei, POINTER(GLvoid)])
 def glFogCoordPointer(type, stride, pointer, _api_=None): 
     """glFogCoordPointer(type, stride, pointer)
     
         type : GLenum
         stride : GLsizei
-        pointer : c_void_p
+        pointer : POINTER(GLvoid)
     """
     return _api_(type, stride, pointer)
     
@@ -6229,11 +6229,11 @@ def glSecondaryColor3b(red, green, blue, _api_=None):
     """
     return _api_(red, green, blue)
     
-@bind(None, [POINTER(c_byte)])
+@bind(None, [POINTER(GLbyte)])
 def glSecondaryColor3bv(v, _api_=None): 
     """glSecondaryColor3bv(v)
     
-        v : POINTER(c_byte)
+        v : POINTER(GLbyte)
     """
     return _api_(v)
     
@@ -6247,11 +6247,11 @@ def glSecondaryColor3d(red, green, blue, _api_=None):
     """
     return _api_(red, green, blue)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glSecondaryColor3dv(v, _api_=None): 
     """glSecondaryColor3dv(v)
     
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(v)
     
@@ -6265,11 +6265,11 @@ def glSecondaryColor3f(red, green, blue, _api_=None):
     """
     return _api_(red, green, blue)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glSecondaryColor3fv(v, _api_=None): 
     """glSecondaryColor3fv(v)
     
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(v)
     
@@ -6283,11 +6283,11 @@ def glSecondaryColor3i(red, green, blue, _api_=None):
     """
     return _api_(red, green, blue)
     
-@bind(None, [POINTER(c_long)])
+@bind(None, [POINTER(GLint)])
 def glSecondaryColor3iv(v, _api_=None): 
     """glSecondaryColor3iv(v)
     
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(v)
     
@@ -6301,11 +6301,11 @@ def glSecondaryColor3s(red, green, blue, _api_=None):
     """
     return _api_(red, green, blue)
     
-@bind(None, [POINTER(c_short)])
+@bind(None, [POINTER(GLshort)])
 def glSecondaryColor3sv(v, _api_=None): 
     """glSecondaryColor3sv(v)
     
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(v)
     
@@ -6319,11 +6319,11 @@ def glSecondaryColor3ub(red, green, blue, _api_=None):
     """
     return _api_(red, green, blue)
     
-@bind(None, [POINTER(c_ubyte)])
+@bind(None, [POINTER(GLubyte)])
 def glSecondaryColor3ubv(v, _api_=None): 
     """glSecondaryColor3ubv(v)
     
-        v : POINTER(c_ubyte)
+        v : POINTER(GLubyte)
     """
     return _api_(v)
     
@@ -6337,11 +6337,11 @@ def glSecondaryColor3ui(red, green, blue, _api_=None):
     """
     return _api_(red, green, blue)
     
-@bind(None, [POINTER(c_ulong)])
+@bind(None, [POINTER(GLuint)])
 def glSecondaryColor3uiv(v, _api_=None): 
     """glSecondaryColor3uiv(v)
     
-        v : POINTER(c_ulong)
+        v : POINTER(GLuint)
     """
     return _api_(v)
     
@@ -6355,22 +6355,22 @@ def glSecondaryColor3us(red, green, blue, _api_=None):
     """
     return _api_(red, green, blue)
     
-@bind(None, [POINTER(c_ushort)])
+@bind(None, [POINTER(GLushort)])
 def glSecondaryColor3usv(v, _api_=None): 
     """glSecondaryColor3usv(v)
     
-        v : POINTER(c_ushort)
+        v : POINTER(GLushort)
     """
     return _api_(v)
     
-@bind(None, [GLint, GLenum, GLsizei, c_void_p])
+@bind(None, [GLint, GLenum, GLsizei, POINTER(GLvoid)])
 def glSecondaryColorPointer(size, type, stride, pointer, _api_=None): 
     """glSecondaryColorPointer(size, type, stride, pointer)
     
         size : GLint
         type : GLenum
         stride : GLsizei
-        pointer : c_void_p
+        pointer : POINTER(GLvoid)
     """
     return _api_(size, type, stride, pointer)
     
@@ -6384,12 +6384,12 @@ def glPointParameterf(pname, param, _api_=None):
     """
     return _api_(pname, param)
     
-@bind(None, [GLenum, POINTER(c_float)])
+@bind(None, [GLenum, POINTER(GLfloat)])
 def glPointParameterfv(pname, params, _api_=None): 
     """glPointParameterfv(pname, params)
     
         pname : GLenum
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(pname, params)
     
@@ -6402,12 +6402,12 @@ def glPointParameteri(pname, param, _api_=None):
     """
     return _api_(pname, param)
     
-@bind(None, [GLenum, POINTER(c_long)])
+@bind(None, [GLenum, POINTER(GLint)])
 def glPointParameteriv(pname, params, _api_=None): 
     """glPointParameteriv(pname, params)
     
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(pname, params)
     
@@ -6424,25 +6424,25 @@ def glBlendFuncSeparate(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha, _api
     return _api_(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha)
     
 
-@bind(None, [GLenum, POINTER(c_long), POINTER(c_long), GLsizei])
+@bind(None, [GLenum, POINTER(GLint), POINTER(GLsizei), GLsizei])
 def glMultiDrawArrays(mode, first, count, primcount, _api_=None): 
     """glMultiDrawArrays(mode, first, count, primcount)
     
         mode : GLenum
-        first : POINTER(c_long)
-        count : POINTER(c_long)
+        first : POINTER(GLint)
+        count : POINTER(GLsizei)
         primcount : GLsizei
     """
     return _api_(mode, first, count, primcount)
     
-@bind(None, [GLenum, POINTER(c_long), GLenum, c_void_p, GLsizei])
+@bind(None, [GLenum, POINTER(GLsizei), GLenum, POINTER(POINTER(GLvoid)), GLsizei])
 def glMultiDrawElements(mode, count, type, indices, primcount, _api_=None): 
     """glMultiDrawElements(mode, count, type, indices, primcount)
     
         mode : GLenum
-        count : POINTER(c_long)
+        count : POINTER(GLsizei)
         type : GLenum
-        indices : c_void_p
+        indices : POINTER(POINTER(GLvoid))
         primcount : GLsizei
     """
     return _api_(mode, count, type, indices, primcount)
@@ -6457,11 +6457,11 @@ def glWindowPos2d(x, y, _api_=None):
     """
     return _api_(x, y)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glWindowPos2dv(v, _api_=None): 
     """glWindowPos2dv(v)
     
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(v)
     
@@ -6474,11 +6474,11 @@ def glWindowPos2f(x, y, _api_=None):
     """
     return _api_(x, y)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glWindowPos2fv(v, _api_=None): 
     """glWindowPos2fv(v)
     
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(v)
     
@@ -6491,11 +6491,11 @@ def glWindowPos2i(x, y, _api_=None):
     """
     return _api_(x, y)
     
-@bind(None, [POINTER(c_long)])
+@bind(None, [POINTER(GLint)])
 def glWindowPos2iv(v, _api_=None): 
     """glWindowPos2iv(v)
     
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(v)
     
@@ -6508,11 +6508,11 @@ def glWindowPos2s(x, y, _api_=None):
     """
     return _api_(x, y)
     
-@bind(None, [POINTER(c_short)])
+@bind(None, [POINTER(GLshort)])
 def glWindowPos2sv(v, _api_=None): 
     """glWindowPos2sv(v)
     
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(v)
     
@@ -6526,11 +6526,11 @@ def glWindowPos3d(x, y, z, _api_=None):
     """
     return _api_(x, y, z)
     
-@bind(None, [POINTER(c_double)])
+@bind(None, [POINTER(GLdouble)])
 def glWindowPos3dv(v, _api_=None): 
     """glWindowPos3dv(v)
     
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(v)
     
@@ -6544,11 +6544,11 @@ def glWindowPos3f(x, y, z, _api_=None):
     """
     return _api_(x, y, z)
     
-@bind(None, [POINTER(c_float)])
+@bind(None, [POINTER(GLfloat)])
 def glWindowPos3fv(v, _api_=None): 
     """glWindowPos3fv(v)
     
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(v)
     
@@ -6562,11 +6562,11 @@ def glWindowPos3i(x, y, z, _api_=None):
     """
     return _api_(x, y, z)
     
-@bind(None, [POINTER(c_long)])
+@bind(None, [POINTER(GLint)])
 def glWindowPos3iv(v, _api_=None): 
     """glWindowPos3iv(v)
     
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(v)
     
@@ -6580,30 +6580,30 @@ def glWindowPos3s(x, y, z, _api_=None):
     """
     return _api_(x, y, z)
     
-@bind(None, [POINTER(c_short)])
+@bind(None, [POINTER(GLshort)])
 def glWindowPos3sv(v, _api_=None): 
     """glWindowPos3sv(v)
     
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(v)
     
 
-@bind(None, [GLsizei, POINTER(c_ulong)])
+@bind(None, [GLsizei, POINTER(GLuint)])
 def glGenQueries(n, ids, _api_=None): 
     """glGenQueries(n, ids)
     
         n : GLsizei
-        ids : POINTER(c_ulong)
+        ids : POINTER(GLuint)
     """
     return _api_(n, ids)
     
-@bind(None, [GLsizei, POINTER(c_ulong)])
+@bind(None, [GLsizei, POINTER(GLuint)])
 def glDeleteQueries(n, ids, _api_=None): 
     """glDeleteQueries(n, ids)
     
         n : GLsizei
-        ids : POINTER(c_ulong)
+        ids : POINTER(GLuint)
     """
     return _api_(n, ids)
     
@@ -6632,33 +6632,33 @@ def glEndQuery(target, _api_=None):
     """
     return _api_(target)
     
-@bind(None, [GLenum, GLenum, POINTER(c_long)])
+@bind(None, [GLenum, GLenum, POINTER(GLint)])
 def glGetQueryiv(target, pname, params, _api_=None): 
     """glGetQueryiv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(target, pname, params)
     
-@bind(None, [GLuint, GLenum, POINTER(c_long)])
+@bind(None, [GLuint, GLenum, POINTER(GLint)])
 def glGetQueryObjectiv(id, pname, params, _api_=None): 
     """glGetQueryObjectiv(id, pname, params)
     
         id : GLuint
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(id, pname, params)
     
-@bind(None, [GLuint, GLenum, POINTER(c_ulong)])
+@bind(None, [GLuint, GLenum, POINTER(GLuint)])
 def glGetQueryObjectuiv(id, pname, params, _api_=None): 
     """glGetQueryObjectuiv(id, pname, params)
     
         id : GLuint
         pname : GLenum
-        params : POINTER(c_ulong)
+        params : POINTER(GLuint)
     """
     return _api_(id, pname, params)
     
@@ -6672,21 +6672,21 @@ def glBindBuffer(target, buffer, _api_=None):
     """
     return _api_(target, buffer)
     
-@bind(None, [GLsizei, POINTER(c_ulong)])
+@bind(None, [GLsizei, POINTER(GLuint)])
 def glDeleteBuffers(n, buffers, _api_=None): 
     """glDeleteBuffers(n, buffers)
     
         n : GLsizei
-        buffers : POINTER(c_ulong)
+        buffers : POINTER(GLuint)
     """
     return _api_(n, buffers)
     
-@bind(None, [GLsizei, POINTER(c_ulong)])
+@bind(None, [GLsizei, POINTER(GLuint)])
 def glGenBuffers(n, buffers, _api_=None): 
     """glGenBuffers(n, buffers)
     
         n : GLsizei
-        buffers : POINTER(c_ulong)
+        buffers : POINTER(GLuint)
     """
     return _api_(n, buffers)
     
@@ -6698,40 +6698,40 @@ def glIsBuffer(buffer, _api_=None):
     """
     return _api_(buffer)
     
-@bind(None, [GLenum, GLsizeiptr, c_void_p, GLenum])
+@bind(None, [GLenum, GLsizeiptr, POINTER(GLvoid), GLenum])
 def glBufferData(target, size, data, usage, _api_=None): 
     """glBufferData(target, size, data, usage)
     
         target : GLenum
         size : GLsizeiptr
-        data : c_void_p
+        data : POINTER(GLvoid)
         usage : GLenum
     """
     return _api_(target, size, data, usage)
     
-@bind(None, [GLenum, GLintptr, GLsizeiptr, c_void_p])
+@bind(None, [GLenum, GLintptr, GLsizeiptr, POINTER(GLvoid)])
 def glBufferSubData(target, offset, size, data, _api_=None): 
     """glBufferSubData(target, offset, size, data)
     
         target : GLenum
         offset : GLintptr
         size : GLsizeiptr
-        data : c_void_p
+        data : POINTER(GLvoid)
     """
     return _api_(target, offset, size, data)
     
-@bind(None, [GLenum, GLintptr, GLsizeiptr, c_void_p])
+@bind(None, [GLenum, GLintptr, GLsizeiptr, POINTER(GLvoid)])
 def glGetBufferSubData(target, offset, size, data, _api_=None): 
     """glGetBufferSubData(target, offset, size, data)
     
         target : GLenum
         offset : GLintptr
         size : GLsizeiptr
-        data : c_void_p
+        data : POINTER(GLvoid)
     """
     return _api_(target, offset, size, data)
     
-@bind(c_void_p, [GLenum, GLenum])
+@bind(POINTER(GLvoid), [GLenum, GLenum])
 def glMapBuffer(target, access, _api_=None): 
     """glMapBuffer(target, access)
     
@@ -6748,33 +6748,33 @@ def glUnmapBuffer(target, _api_=None):
     """
     return _api_(target)
     
-@bind(None, [GLenum, GLenum, POINTER(c_long)])
+@bind(None, [GLenum, GLenum, POINTER(GLint)])
 def glGetBufferParameteriv(target, pname, params, _api_=None): 
     """glGetBufferParameteriv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(target, pname, params)
     
-@bind(None, [GLenum, GLenum, c_void_p])
+@bind(None, [GLenum, GLenum, POINTER(POINTER(GLvoid))])
 def glGetBufferPointerv(target, pname, params, _api_=None): 
     """glGetBufferPointerv(target, pname, params)
     
         target : GLenum
         pname : GLenum
-        params : c_void_p
+        params : POINTER(POINTER(GLvoid))
     """
     return _api_(target, pname, params)
     
 
-@bind(None, [GLsizei, POINTER(c_ulong)])
+@bind(None, [GLsizei, POINTER(GLenum)])
 def glDrawBuffers(n, bufs, _api_=None): 
     """glDrawBuffers(n, bufs)
     
         n : GLsizei
-        bufs : POINTER(c_ulong)
+        bufs : POINTER(GLenum)
     """
     return _api_(n, bufs)
     
@@ -6787,12 +6787,12 @@ def glVertexAttrib1d(index, x, _api_=None):
     """
     return _api_(index, x)
     
-@bind(None, [GLuint, POINTER(c_double)])
+@bind(None, [GLuint, POINTER(GLdouble)])
 def glVertexAttrib1dv(index, v, _api_=None): 
     """glVertexAttrib1dv(index, v)
     
         index : GLuint
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(index, v)
     
@@ -6805,12 +6805,12 @@ def glVertexAttrib1f(index, x, _api_=None):
     """
     return _api_(index, x)
     
-@bind(None, [GLuint, POINTER(c_float)])
+@bind(None, [GLuint, POINTER(GLfloat)])
 def glVertexAttrib1fv(index, v, _api_=None): 
     """glVertexAttrib1fv(index, v)
     
         index : GLuint
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(index, v)
     
@@ -6823,12 +6823,12 @@ def glVertexAttrib1s(index, x, _api_=None):
     """
     return _api_(index, x)
     
-@bind(None, [GLuint, POINTER(c_short)])
+@bind(None, [GLuint, POINTER(GLshort)])
 def glVertexAttrib1sv(index, v, _api_=None): 
     """glVertexAttrib1sv(index, v)
     
         index : GLuint
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(index, v)
     
@@ -6842,12 +6842,12 @@ def glVertexAttrib2d(index, x, y, _api_=None):
     """
     return _api_(index, x, y)
     
-@bind(None, [GLuint, POINTER(c_double)])
+@bind(None, [GLuint, POINTER(GLdouble)])
 def glVertexAttrib2dv(index, v, _api_=None): 
     """glVertexAttrib2dv(index, v)
     
         index : GLuint
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(index, v)
     
@@ -6861,12 +6861,12 @@ def glVertexAttrib2f(index, x, y, _api_=None):
     """
     return _api_(index, x, y)
     
-@bind(None, [GLuint, POINTER(c_float)])
+@bind(None, [GLuint, POINTER(GLfloat)])
 def glVertexAttrib2fv(index, v, _api_=None): 
     """glVertexAttrib2fv(index, v)
     
         index : GLuint
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(index, v)
     
@@ -6880,12 +6880,12 @@ def glVertexAttrib2s(index, x, y, _api_=None):
     """
     return _api_(index, x, y)
     
-@bind(None, [GLuint, POINTER(c_short)])
+@bind(None, [GLuint, POINTER(GLshort)])
 def glVertexAttrib2sv(index, v, _api_=None): 
     """glVertexAttrib2sv(index, v)
     
         index : GLuint
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(index, v)
     
@@ -6900,12 +6900,12 @@ def glVertexAttrib3d(index, x, y, z, _api_=None):
     """
     return _api_(index, x, y, z)
     
-@bind(None, [GLuint, POINTER(c_double)])
+@bind(None, [GLuint, POINTER(GLdouble)])
 def glVertexAttrib3dv(index, v, _api_=None): 
     """glVertexAttrib3dv(index, v)
     
         index : GLuint
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(index, v)
     
@@ -6920,12 +6920,12 @@ def glVertexAttrib3f(index, x, y, z, _api_=None):
     """
     return _api_(index, x, y, z)
     
-@bind(None, [GLuint, POINTER(c_float)])
+@bind(None, [GLuint, POINTER(GLfloat)])
 def glVertexAttrib3fv(index, v, _api_=None): 
     """glVertexAttrib3fv(index, v)
     
         index : GLuint
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(index, v)
     
@@ -6940,39 +6940,39 @@ def glVertexAttrib3s(index, x, y, z, _api_=None):
     """
     return _api_(index, x, y, z)
     
-@bind(None, [GLuint, POINTER(c_short)])
+@bind(None, [GLuint, POINTER(GLshort)])
 def glVertexAttrib3sv(index, v, _api_=None): 
     """glVertexAttrib3sv(index, v)
     
         index : GLuint
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(index, v)
     
-@bind(None, [GLuint, POINTER(c_byte)])
+@bind(None, [GLuint, POINTER(GLbyte)])
 def glVertexAttrib4Nbv(index, v, _api_=None): 
     """glVertexAttrib4Nbv(index, v)
     
         index : GLuint
-        v : POINTER(c_byte)
+        v : POINTER(GLbyte)
     """
     return _api_(index, v)
     
-@bind(None, [GLuint, POINTER(c_long)])
+@bind(None, [GLuint, POINTER(GLint)])
 def glVertexAttrib4Niv(index, v, _api_=None): 
     """glVertexAttrib4Niv(index, v)
     
         index : GLuint
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(index, v)
     
-@bind(None, [GLuint, POINTER(c_short)])
+@bind(None, [GLuint, POINTER(GLshort)])
 def glVertexAttrib4Nsv(index, v, _api_=None): 
     """glVertexAttrib4Nsv(index, v)
     
         index : GLuint
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(index, v)
     
@@ -6988,39 +6988,39 @@ def glVertexAttrib4Nub(index, x, y, z, w, _api_=None):
     """
     return _api_(index, x, y, z, w)
     
-@bind(None, [GLuint, POINTER(c_ubyte)])
+@bind(None, [GLuint, POINTER(GLubyte)])
 def glVertexAttrib4Nubv(index, v, _api_=None): 
     """glVertexAttrib4Nubv(index, v)
     
         index : GLuint
-        v : POINTER(c_ubyte)
+        v : POINTER(GLubyte)
     """
     return _api_(index, v)
     
-@bind(None, [GLuint, POINTER(c_ulong)])
+@bind(None, [GLuint, POINTER(GLuint)])
 def glVertexAttrib4Nuiv(index, v, _api_=None): 
     """glVertexAttrib4Nuiv(index, v)
     
         index : GLuint
-        v : POINTER(c_ulong)
+        v : POINTER(GLuint)
     """
     return _api_(index, v)
     
-@bind(None, [GLuint, POINTER(c_ushort)])
+@bind(None, [GLuint, POINTER(GLushort)])
 def glVertexAttrib4Nusv(index, v, _api_=None): 
     """glVertexAttrib4Nusv(index, v)
     
         index : GLuint
-        v : POINTER(c_ushort)
+        v : POINTER(GLushort)
     """
     return _api_(index, v)
     
-@bind(None, [GLuint, POINTER(c_byte)])
+@bind(None, [GLuint, POINTER(GLbyte)])
 def glVertexAttrib4bv(index, v, _api_=None): 
     """glVertexAttrib4bv(index, v)
     
         index : GLuint
-        v : POINTER(c_byte)
+        v : POINTER(GLbyte)
     """
     return _api_(index, v)
     
@@ -7036,12 +7036,12 @@ def glVertexAttrib4d(index, x, y, z, w, _api_=None):
     """
     return _api_(index, x, y, z, w)
     
-@bind(None, [GLuint, POINTER(c_double)])
+@bind(None, [GLuint, POINTER(GLdouble)])
 def glVertexAttrib4dv(index, v, _api_=None): 
     """glVertexAttrib4dv(index, v)
     
         index : GLuint
-        v : POINTER(c_double)
+        v : POINTER(GLdouble)
     """
     return _api_(index, v)
     
@@ -7057,21 +7057,21 @@ def glVertexAttrib4f(index, x, y, z, w, _api_=None):
     """
     return _api_(index, x, y, z, w)
     
-@bind(None, [GLuint, POINTER(c_float)])
+@bind(None, [GLuint, POINTER(GLfloat)])
 def glVertexAttrib4fv(index, v, _api_=None): 
     """glVertexAttrib4fv(index, v)
     
         index : GLuint
-        v : POINTER(c_float)
+        v : POINTER(GLfloat)
     """
     return _api_(index, v)
     
-@bind(None, [GLuint, POINTER(c_long)])
+@bind(None, [GLuint, POINTER(GLint)])
 def glVertexAttrib4iv(index, v, _api_=None): 
     """glVertexAttrib4iv(index, v)
     
         index : GLuint
-        v : POINTER(c_long)
+        v : POINTER(GLint)
     """
     return _api_(index, v)
     
@@ -7087,43 +7087,43 @@ def glVertexAttrib4s(index, x, y, z, w, _api_=None):
     """
     return _api_(index, x, y, z, w)
     
-@bind(None, [GLuint, POINTER(c_short)])
+@bind(None, [GLuint, POINTER(GLshort)])
 def glVertexAttrib4sv(index, v, _api_=None): 
     """glVertexAttrib4sv(index, v)
     
         index : GLuint
-        v : POINTER(c_short)
+        v : POINTER(GLshort)
     """
     return _api_(index, v)
     
-@bind(None, [GLuint, POINTER(c_ubyte)])
+@bind(None, [GLuint, POINTER(GLubyte)])
 def glVertexAttrib4ubv(index, v, _api_=None): 
     """glVertexAttrib4ubv(index, v)
     
         index : GLuint
-        v : POINTER(c_ubyte)
+        v : POINTER(GLubyte)
     """
     return _api_(index, v)
     
-@bind(None, [GLuint, POINTER(c_ulong)])
+@bind(None, [GLuint, POINTER(GLuint)])
 def glVertexAttrib4uiv(index, v, _api_=None): 
     """glVertexAttrib4uiv(index, v)
     
         index : GLuint
-        v : POINTER(c_ulong)
+        v : POINTER(GLuint)
     """
     return _api_(index, v)
     
-@bind(None, [GLuint, POINTER(c_ushort)])
+@bind(None, [GLuint, POINTER(GLushort)])
 def glVertexAttrib4usv(index, v, _api_=None): 
     """glVertexAttrib4usv(index, v)
     
         index : GLuint
-        v : POINTER(c_ushort)
+        v : POINTER(GLushort)
     """
     return _api_(index, v)
     
-@bind(None, [GLuint, GLint, GLenum, GLboolean, GLsizei, c_void_p])
+@bind(None, [GLuint, GLint, GLenum, GLboolean, GLsizei, POINTER(GLvoid)])
 def glVertexAttribPointer(index, size, type, normalized, stride, pointer, _api_=None): 
     """glVertexAttribPointer(index, size, type, normalized, stride, pointer)
     
@@ -7132,7 +7132,7 @@ def glVertexAttribPointer(index, size, type, normalized, stride, pointer, _api_=
         type : GLenum
         normalized : GLboolean
         stride : GLsizei
-        pointer : c_void_p
+        pointer : POINTER(GLvoid)
     """
     return _api_(index, size, type, normalized, stride, pointer)
     
@@ -7152,43 +7152,43 @@ def glDisableVertexAttribArray(index, _api_=None):
     """
     return _api_(index)
     
-@bind(None, [GLuint, GLenum, POINTER(c_double)])
+@bind(None, [GLuint, GLenum, POINTER(GLdouble)])
 def glGetVertexAttribdv(index, pname, params, _api_=None): 
     """glGetVertexAttribdv(index, pname, params)
     
         index : GLuint
         pname : GLenum
-        params : POINTER(c_double)
+        params : POINTER(GLdouble)
     """
     return _api_(index, pname, params)
     
-@bind(None, [GLuint, GLenum, POINTER(c_float)])
+@bind(None, [GLuint, GLenum, POINTER(GLfloat)])
 def glGetVertexAttribfv(index, pname, params, _api_=None): 
     """glGetVertexAttribfv(index, pname, params)
     
         index : GLuint
         pname : GLenum
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(index, pname, params)
     
-@bind(None, [GLuint, GLenum, POINTER(c_long)])
+@bind(None, [GLuint, GLenum, POINTER(GLint)])
 def glGetVertexAttribiv(index, pname, params, _api_=None): 
     """glGetVertexAttribiv(index, pname, params)
     
         index : GLuint
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(index, pname, params)
     
-@bind(None, [GLuint, GLenum, c_void_p])
+@bind(None, [GLuint, GLenum, POINTER(POINTER(GLvoid))])
 def glGetVertexAttribPointerv(index, pname, pointer, _api_=None): 
     """glGetVertexAttribPointerv(index, pname, pointer)
     
         index : GLuint
         pname : GLenum
-        pointer : c_void_p
+        pointer : POINTER(POINTER(GLvoid))
     """
     return _api_(index, pname, pointer)
     
@@ -7217,14 +7217,14 @@ def glCreateShader(type, _api_=None):
     """
     return _api_(type)
     
-@bind(None, [GLuint, GLsizei, c_char_p, POINTER(c_long)])
+@bind(None, [GLuint, GLsizei, POINTER(POINTER(GLchar)), POINTER(GLint)])
 def glShaderSource(shader, count, string, length, _api_=None): 
     """glShaderSource(shader, count, string, length)
     
         shader : GLuint
         count : GLsizei
-        string : c_char_p
-        length : POINTER(c_long)
+        string : POINTER(POINTER(GLchar))
+        length : POINTER(GLint)
     """
     return _api_(shader, count, string, length)
     
@@ -7369,116 +7369,116 @@ def glUniform4i(location, v0, v1, v2, v3, _api_=None):
     """
     return _api_(location, v0, v1, v2, v3)
     
-@bind(None, [GLint, GLsizei, POINTER(c_float)])
+@bind(None, [GLint, GLsizei, POINTER(GLfloat)])
 def glUniform1fv(location, count, value, _api_=None): 
     """glUniform1fv(location, count, value)
     
         location : GLint
         count : GLsizei
-        value : POINTER(c_float)
+        value : POINTER(GLfloat)
     """
     return _api_(location, count, value)
     
-@bind(None, [GLint, GLsizei, POINTER(c_float)])
+@bind(None, [GLint, GLsizei, POINTER(GLfloat)])
 def glUniform2fv(location, count, value, _api_=None): 
     """glUniform2fv(location, count, value)
     
         location : GLint
         count : GLsizei
-        value : POINTER(c_float)
+        value : POINTER(GLfloat)
     """
     return _api_(location, count, value)
     
-@bind(None, [GLint, GLsizei, POINTER(c_float)])
+@bind(None, [GLint, GLsizei, POINTER(GLfloat)])
 def glUniform3fv(location, count, value, _api_=None): 
     """glUniform3fv(location, count, value)
     
         location : GLint
         count : GLsizei
-        value : POINTER(c_float)
+        value : POINTER(GLfloat)
     """
     return _api_(location, count, value)
     
-@bind(None, [GLint, GLsizei, POINTER(c_float)])
+@bind(None, [GLint, GLsizei, POINTER(GLfloat)])
 def glUniform4fv(location, count, value, _api_=None): 
     """glUniform4fv(location, count, value)
     
         location : GLint
         count : GLsizei
-        value : POINTER(c_float)
+        value : POINTER(GLfloat)
     """
     return _api_(location, count, value)
     
-@bind(None, [GLint, GLsizei, POINTER(c_long)])
+@bind(None, [GLint, GLsizei, POINTER(GLint)])
 def glUniform1iv(location, count, value, _api_=None): 
     """glUniform1iv(location, count, value)
     
         location : GLint
         count : GLsizei
-        value : POINTER(c_long)
+        value : POINTER(GLint)
     """
     return _api_(location, count, value)
     
-@bind(None, [GLint, GLsizei, POINTER(c_long)])
+@bind(None, [GLint, GLsizei, POINTER(GLint)])
 def glUniform2iv(location, count, value, _api_=None): 
     """glUniform2iv(location, count, value)
     
         location : GLint
         count : GLsizei
-        value : POINTER(c_long)
+        value : POINTER(GLint)
     """
     return _api_(location, count, value)
     
-@bind(None, [GLint, GLsizei, POINTER(c_long)])
+@bind(None, [GLint, GLsizei, POINTER(GLint)])
 def glUniform3iv(location, count, value, _api_=None): 
     """glUniform3iv(location, count, value)
     
         location : GLint
         count : GLsizei
-        value : POINTER(c_long)
+        value : POINTER(GLint)
     """
     return _api_(location, count, value)
     
-@bind(None, [GLint, GLsizei, POINTER(c_long)])
+@bind(None, [GLint, GLsizei, POINTER(GLint)])
 def glUniform4iv(location, count, value, _api_=None): 
     """glUniform4iv(location, count, value)
     
         location : GLint
         count : GLsizei
-        value : POINTER(c_long)
+        value : POINTER(GLint)
     """
     return _api_(location, count, value)
     
-@bind(None, [GLint, GLsizei, GLboolean, POINTER(c_float)])
+@bind(None, [GLint, GLsizei, GLboolean, POINTER(GLfloat)])
 def glUniformMatrix2fv(location, count, transpose, value, _api_=None): 
     """glUniformMatrix2fv(location, count, transpose, value)
     
         location : GLint
         count : GLsizei
         transpose : GLboolean
-        value : POINTER(c_float)
+        value : POINTER(GLfloat)
     """
     return _api_(location, count, transpose, value)
     
-@bind(None, [GLint, GLsizei, GLboolean, POINTER(c_float)])
+@bind(None, [GLint, GLsizei, GLboolean, POINTER(GLfloat)])
 def glUniformMatrix3fv(location, count, transpose, value, _api_=None): 
     """glUniformMatrix3fv(location, count, transpose, value)
     
         location : GLint
         count : GLsizei
         transpose : GLboolean
-        value : POINTER(c_float)
+        value : POINTER(GLfloat)
     """
     return _api_(location, count, transpose, value)
     
-@bind(None, [GLint, GLsizei, GLboolean, POINTER(c_float)])
+@bind(None, [GLint, GLsizei, GLboolean, POINTER(GLfloat)])
 def glUniformMatrix4fv(location, count, transpose, value, _api_=None): 
     """glUniformMatrix4fv(location, count, transpose, value)
     
         location : GLint
         count : GLsizei
         transpose : GLboolean
-        value : POINTER(c_float)
+        value : POINTER(GLfloat)
     """
     return _api_(location, count, transpose, value)
     
@@ -7498,143 +7498,143 @@ def glIsProgram(program, _api_=None):
     """
     return _api_(program)
     
-@bind(None, [GLuint, GLenum, POINTER(c_long)])
+@bind(None, [GLuint, GLenum, POINTER(GLint)])
 def glGetShaderiv(shader, pname, params, _api_=None): 
     """glGetShaderiv(shader, pname, params)
     
         shader : GLuint
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(shader, pname, params)
     
-@bind(None, [GLuint, GLenum, POINTER(c_long)])
+@bind(None, [GLuint, GLenum, POINTER(GLint)])
 def glGetProgramiv(program, pname, params, _api_=None): 
     """glGetProgramiv(program, pname, params)
     
         program : GLuint
         pname : GLenum
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(program, pname, params)
     
-@bind(None, [GLuint, GLsizei, POINTER(c_long), POINTER(c_ulong)])
+@bind(None, [GLuint, GLsizei, POINTER(GLsizei), POINTER(GLuint)])
 def glGetAttachedShaders(program, maxCount, count, shaders, _api_=None): 
     """glGetAttachedShaders(program, maxCount, count, shaders)
     
         program : GLuint
         maxCount : GLsizei
-        count : POINTER(c_long)
-        shaders : POINTER(c_ulong)
+        count : POINTER(GLsizei)
+        shaders : POINTER(GLuint)
     """
     return _api_(program, maxCount, count, shaders)
     
-@bind(None, [GLuint, GLsizei, POINTER(c_long), c_char_p])
+@bind(None, [GLuint, GLsizei, POINTER(GLsizei), POINTER(GLchar)])
 def glGetShaderInfoLog(shader, bufSize, length, infoLog, _api_=None): 
     """glGetShaderInfoLog(shader, bufSize, length, infoLog)
     
         shader : GLuint
         bufSize : GLsizei
-        length : POINTER(c_long)
-        infoLog : c_char_p
+        length : POINTER(GLsizei)
+        infoLog : POINTER(GLchar)
     """
     return _api_(shader, bufSize, length, infoLog)
     
-@bind(None, [GLuint, GLsizei, POINTER(c_long), c_char_p])
+@bind(None, [GLuint, GLsizei, POINTER(GLsizei), POINTER(GLchar)])
 def glGetProgramInfoLog(program, bufSize, length, infoLog, _api_=None): 
     """glGetProgramInfoLog(program, bufSize, length, infoLog)
     
         program : GLuint
         bufSize : GLsizei
-        length : POINTER(c_long)
-        infoLog : c_char_p
+        length : POINTER(GLsizei)
+        infoLog : POINTER(GLchar)
     """
     return _api_(program, bufSize, length, infoLog)
     
-@bind(GLint, [GLuint, c_char_p])
+@bind(GLint, [GLuint, POINTER(GLchar)])
 def glGetUniformLocation(program, name, _api_=None): 
     """glGetUniformLocation(program, name)
     
         program : GLuint
-        name : c_char_p
+        name : POINTER(GLchar)
     """
     return _api_(program, name)
     
-@bind(None, [GLuint, GLuint, GLsizei, POINTER(c_long), POINTER(c_long), POINTER(c_ulong), c_char_p])
+@bind(None, [GLuint, GLuint, GLsizei, POINTER(GLsizei), POINTER(GLsizei), POINTER(GLenum), POINTER(GLchar)])
 def glGetActiveUniform(program, index, bufSize, length, size, type, name, _api_=None): 
     """glGetActiveUniform(program, index, bufSize, length, size, type, name)
     
         program : GLuint
         index : GLuint
         bufSize : GLsizei
-        length : POINTER(c_long)
-        size : POINTER(c_long)
-        type : POINTER(c_ulong)
-        name : c_char_p
+        length : POINTER(GLsizei)
+        size : POINTER(GLsizei)
+        type : POINTER(GLenum)
+        name : POINTER(GLchar)
     """
     return _api_(program, index, bufSize, length, size, type, name)
     
-@bind(None, [GLuint, GLint, POINTER(c_float)])
+@bind(None, [GLuint, GLint, POINTER(GLfloat)])
 def glGetUniformfv(program, location, params, _api_=None): 
     """glGetUniformfv(program, location, params)
     
         program : GLuint
         location : GLint
-        params : POINTER(c_float)
+        params : POINTER(GLfloat)
     """
     return _api_(program, location, params)
     
-@bind(None, [GLuint, GLint, POINTER(c_long)])
+@bind(None, [GLuint, GLint, POINTER(GLint)])
 def glGetUniformiv(program, location, params, _api_=None): 
     """glGetUniformiv(program, location, params)
     
         program : GLuint
         location : GLint
-        params : POINTER(c_long)
+        params : POINTER(GLint)
     """
     return _api_(program, location, params)
     
-@bind(None, [GLuint, GLsizei, POINTER(c_long), c_char_p])
+@bind(None, [GLuint, GLsizei, POINTER(GLsizei), POINTER(GLchar)])
 def glGetShaderSource(shader, bufSize, length, source, _api_=None): 
     """glGetShaderSource(shader, bufSize, length, source)
     
         shader : GLuint
         bufSize : GLsizei
-        length : POINTER(c_long)
-        source : c_char_p
+        length : POINTER(GLsizei)
+        source : POINTER(GLchar)
     """
     return _api_(shader, bufSize, length, source)
     
-@bind(None, [GLuint, GLuint, c_char_p])
+@bind(None, [GLuint, GLuint, POINTER(GLchar)])
 def glBindAttribLocation(program, index, name, _api_=None): 
     """glBindAttribLocation(program, index, name)
     
         program : GLuint
         index : GLuint
-        name : c_char_p
+        name : POINTER(GLchar)
     """
     return _api_(program, index, name)
     
-@bind(None, [GLuint, GLuint, GLsizei, POINTER(c_long), POINTER(c_long), POINTER(c_ulong), c_char_p])
+@bind(None, [GLuint, GLuint, GLsizei, POINTER(GLsizei), POINTER(GLsizei), POINTER(GLenum), POINTER(GLchar)])
 def glGetActiveAttrib(program, index, bufSize, length, size, type, name, _api_=None): 
     """glGetActiveAttrib(program, index, bufSize, length, size, type, name)
     
         program : GLuint
         index : GLuint
         bufSize : GLsizei
-        length : POINTER(c_long)
-        size : POINTER(c_long)
-        type : POINTER(c_ulong)
-        name : c_char_p
+        length : POINTER(GLsizei)
+        size : POINTER(GLsizei)
+        type : POINTER(GLenum)
+        name : POINTER(GLchar)
     """
     return _api_(program, index, bufSize, length, size, type, name)
     
-@bind(GLint, [GLuint, c_char_p])
+@bind(GLint, [GLuint, POINTER(GLchar)])
 def glGetAttribLocation(program, name, _api_=None): 
     """glGetAttribLocation(program, name)
     
         program : GLuint
-        name : c_char_p
+        name : POINTER(GLchar)
     """
     return _api_(program, name)
     
