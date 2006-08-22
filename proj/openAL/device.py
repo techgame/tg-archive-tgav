@@ -101,29 +101,39 @@ class Device(ALIDObject):
     def __del__(self):
         self.close()
 
+    _mapping = {}
+    def _setAsParam(self, asParam):
+        ALIDObject._setAsParam(self, asParam)
+        self._mapping[asParam] = self
+
+    @classmethod
+    def _fromDevicePtr(klass, asParam):
+        return klass._mapping[asParam]
+
     def open(self, name=None):
         name = name and str(name) or None
-        self._alid_ = alc.alcOpenDevice(name)
-        return self._hasALID()
+        self._setAsParam(alc.alcOpenDevice(name))
+        return self._hasAsParam()
 
     __dealocating = False
     def close(self):
-        if self._hasALID() and not self.__dealocating:
+        if self._hasAsParam() and not self.__dealocating:
             self.__dealocating = True
             try:
                 self._delContexts()
-                alc.alcCloseDevice(self._alid_)
+                alc.alcCloseDevice(self)
             finally:
-                del self._alid_
+                self._delAsParam()
     destroy = close
 
     @classmethod
     def fromCurrentContext(klass):
-        return klass.fromALID(alc.alcGetCurrentContext())
+        return klass.fromContext(alc.alcGetCurrentContext())
 
     @classmethod
     def fromContext(klass, context):
-        return klass.fromALID(context._alid_)
+        device = alc.alcGetContextsDevice(context)
+        return klass._fromDevicePtr(device)
 
     def newContext(self, attrs=[], makeCurrent=True):
         context = self.ContextFactory(self, attrs)
@@ -145,9 +155,9 @@ class Device(ALIDObject):
             del self._contextMap
 
     def _addContext(self, context):
-        self._getContextMap()[context._alid_] = context
+        self._getContextMap()[context] = context
     def _removeContext(self, context):
-        self._getContextMap().pop(context._alid_)
+        self._getContextMap().pop(context)
     
     def getVersion(self):
         return '%s.%s' % (self.versionMajor, self.versionMinor)

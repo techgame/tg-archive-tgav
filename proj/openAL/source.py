@@ -103,7 +103,7 @@ class Source(ALIDContextObject):
         return "<%s.%s alid: %s state: %s>" % (
                 self.__class__.__module__,
                 self.__class__.__name__,
-                self._getALID(True), self.getStateStr())
+                self._as_parameter_, self.getStateStr())
 
     def __del__(self):
         try:
@@ -117,7 +117,7 @@ class Source(ALIDContextObject):
         return True
 
     def create(self):
-        if self._hasALID():
+        if self._hasAsParam():
             raise Exception("Source has already been created")
 
         sourceIds = (1*al.ALuint)()
@@ -125,26 +125,26 @@ class Source(ALIDContextObject):
         self.createFromId(sourceIds[0])
 
     def createFromId(self, sourceId):
-        self._alid_ = sourceId
-        self.getObjContext().addSource(self)
+        self._setAsParam(sourceId)
+        self._context.addSource(self)
 
     def destroy(self):
-        if self._hasALID():
-            i = self.withObjContext()
+        if self._hasAsParam():
+            i = self.inContext()
             try:
-                self.destroyFromId(self._alid_)
+                self.destroyFromId(self)
             finally:
-                del self._alid_
+                self._delAsParam()
                 i.next()
 
     def destroyFromId(self, sourceId):
         self.stop(True)
 
         sourceIds = (1*al.ALuint)()
-        sourceIds[:] = [sourceId]
+        sourceIds[:] = [getattr(sourceId, '_as_parameter_', sourceId)]
         al.alDeleteSources(1, sourceIds)
 
-        ctx = self.getObjContext()
+        ctx = self._context
         if ctx is not None:
             ctx.removeSource(self)
 
@@ -165,8 +165,8 @@ class Source(ALIDContextObject):
                 buffers = buffers[0]
 
         bufids = (al.ALuint * len(buffers))()
-        bufids[:] = [buf._alid_ for buf in buffers]
-        al.alSourceQueueBuffers(self._alid_, len(bufids), bufids)
+        bufids[:] = [buf._as_parameter_ for buf in buffers]
+        al.alSourceQueueBuffers(self, len(bufids), bufids)
         for buf in buffers:
             self.onQueueBuffer(buf)
     enqueue = queue
@@ -178,8 +178,8 @@ class Source(ALIDContextObject):
 
         buffers = [buf for buf in buffers if buf in self.getBufferQueue()]
         bufids = (al.ALuint * len(buffers))()
-        bufids[:] = [buf._alid_ for buf in buffers]
-        al.alSourceUnqueueBuffers(self._alid_, len(bufids), bufids)
+        bufids[:] = [buf._as_parameter_ for buf in buffers]
+        al.alSourceUnqueueBuffers(self, len(bufids), bufids)
 
         for buf in buffers:
             self.onDequeueBuffer(buf)
@@ -215,15 +215,15 @@ class Source(ALIDContextObject):
     def play(self, *buffers):
         if buffers:
             self.queue(*buffers)
-        al.alSourcePlay(self._alid_)
+        al.alSourcePlay(self)
     def pause(self):
-        al.alSourcePause(self._alid_)
+        al.alSourcePause(self)
     def stop(self, dequeueAll=True):
-        al.alSourceStop(self._alid_)
+        al.alSourceStop(self)
         if dequeueAll:
             self.dequeueAll()
     def rewind(self):
-        al.alSourceRewind(self._alid_)
+        al.alSourceRewind(self)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -238,7 +238,7 @@ class Source(ALIDContextObject):
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def getStateStr(self):
-        if self._hasALID():
+        if self._hasAsParam():
             return self.stateToString[self.state]
         else: return "uninitialized"
     
@@ -272,7 +272,7 @@ class SourceCollection(object):
 
     def getSourceIds(self):
         srcids = (al.ALuint * len(self))()
-        srcids[:] =  [s._alid_ for s in self.getSources()]
+        srcids[:] =  [s._as_parameter_ for s in self.getSources()]
         return srcids
 
     def __len__(self):

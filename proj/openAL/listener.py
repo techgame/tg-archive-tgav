@@ -51,7 +51,7 @@ class Listener(ALContextObject):
         self.destroy()
 
     def create(self):
-        self._captureContextALID()
+        self._captureCurrentContext()
 
     def destroy(self):
         pass
@@ -59,9 +59,12 @@ class Listener(ALContextObject):
     def getDirection(self):
         return self.orientation[0:3]
     def setDirection(self, direction, up=None):
-        i = self.withObjContext()
-        up = list(up or self.getUp())
-        self.orientation = list(direction) + up
+        i = self.inContext()
+        try:
+            up = list(up or self.getUp())
+            self.orientation = list(direction) + up
+        finally:
+            i.next()
     direction = property(getDirection, setDirection)
 
     def getUp(self):

@@ -34,101 +34,73 @@ def multiNullString(c):
 class ALObject(object):
     pass
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 class ALIDObject(ALObject):
-    __alid = None
-    __alidToObj = None
-
-    @classmethod
-    def fromALID(klass, alid):
-        return klass._getALIDMap().get(alid)
-
-    @classmethod
-    def _getALIDMap(klass):
-        if klass.__alidToObj is None:
-            klass.__alidToObj = {} #weakref.WeakValueDictionary()
-        return klass.__alidToObj
+    _as_parameter_ = None
 
     def __nonzero__(self):
-        return self._hasALID()
+        return bool(self._as_parameter_)
 
-    def _hasALID(self):
-        return self.__alid > 0
+    def _hasAsParam(self):
+        return self._as_parameter_ is not None
+    def _getAsParam(self):
+        return self._as_parameter_
+    def _setAsParam(self, asParam):
+        self._as_parameter_ = asParam
+    def _delAsParam(self):
+        del self._as_parameter_
 
-    def _getALID(self, orNone=False):
-        if not self.__alid:
-            if self.__alid is None:
-                if orNone:
-                    return None
-                raise ValueError("OpenAL ID has not been created")
-            elif self.__alid is False:
-                if orNone:
-                    return None
-                raise ValueError("OpenAL ID has been destroyed")
-            else:
-                raise ValueError("OpenAL ID is invalid")
-        return self.__alid
-    def _setALID(self, alid):
-        self.__alid = alid
-        self._getALIDMap()[alid] = self
-    def _delALID(self):
-        self.__alid = False
-    _alid_ = property(_getALID, _setALID, _delALID)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class ALContextObject(ALObject):
-    def getObjContext(self):
+    _context = None
+    def _captureCurrentContext(self):
         from context import Context
-        return Context.fromALID(self._contextALID)
+        self._context = weakref.proxy(Context.getCurrent())
 
-    _contextALID = None
-    def _captureContextALID(self):
-        self._contextALID = alc.alcGetCurrentContext()
-
-    def withObjContext(self):
-        i = self._withContext(self._contextALID)
+    def inContext(self):
+        i = self._inContext(self._context)
         i.next()
         return i
 
     @staticmethod
-    def _withContext(alidContext):
-        if not isinstance(alidContext, (int, long)):
-            alidContext = alidContext._alid_
-        alidCurrent = alc.alcGetCurrentContext()
+    def _inContext(context):
+        current = alc.alcGetCurrentContext()
 
-        if alidContext == alidCurrent:
+        if context == current:
             yield True
-            yield False
         else:
-            alc.alcMakeContextCurrent(alidContext)
+            alc.alcMakeContextCurrent(context)
             yield True
-            alc.alcMakeContextCurrent(alidCurrent)
-            yield False
+            alc.alcMakeContextCurrent(current)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class ALIDContextObject(ALContextObject, ALIDObject):
-    def _setALID(self, alid):
-        self._captureContextALID()
-        ALIDObject._setALID(self, alid)
-    _alid_ = property(ALIDObject._getALID, _setALID, ALIDObject._delALID)
-
+    def _setAsParam(self, asParam):
+        self._captureCurrentContext()
+        ALIDObject._setAsParam(self, asParam)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ AL Basic Properties
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class alBasicReadProperty(object):
-    enum = None
+    _as_parameter_ = None
     apiType = None
     apiGet = None
     byref = staticmethod(byref)
 
     def __init__(self, propertyEnum):
-        self.enum = propertyEnum
+        self._as_parameter_ = propertyEnum
 
     def __get__(self, obj, klass):
         if obj is None: 
             return self
 
         apiValue = self.apiValue()
-        self.apiGet(self.enum, self.byref(apiValue))
+        self.apiGet(self, self.byref(apiValue))
         return self.valueFromAPI(apiValue)
 
     def apiValue(self, *args):
@@ -147,7 +119,7 @@ class alBasicProperty(alBasicReadProperty):
 
     def __set__(self, obj, value):
         apiValue = self.apiValue(self.valueToAPI(value))
-        self.apiSet(self.enum, apiValue)
+        self.apiSet(self, apiValue)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ AL Vector Properties
@@ -157,11 +129,12 @@ class alVectorPropertyMixin(object):
     enumToCount = {}
     count = None
     apiVectorType = None # set on first use from count or enum and enumToCount
+    byref = staticmethod(lambda x: x)
 
     def apiValue(self, *args):
         apiVectorType = self.apiVectorType
         if apiVectorType is None:
-            count = self.count or self.enumToCount[self.enum]
+            count = self.count or self.enumToCount[self._as_parameter_]
             apiVectorType = (self.apiType * count)
             self.apiVectorType = apiVectorType
         result = apiVectorType()
@@ -191,7 +164,7 @@ class alObjectReadProperty(alBasicReadProperty):
             return klass
 
         apiValue = self.apiValue()
-        self.apiGet(obj._alid_, self.enum, self.byref(apiValue))
+        self.apiGet(obj, self, self.byref(apiValue))
         return self.valueFromAPI(apiValue)
 
 class alObjectProperty(alObjectReadProperty):
@@ -200,7 +173,7 @@ class alObjectProperty(alObjectReadProperty):
 
     def __set__(self, obj, value):
         apiValue = self.apiValue(self.valueToAPI(value))
-        self.apiSet(obj._alid_, self.enum, apiValue)
+        self.apiSet(obj, self, apiValue)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ AL Vector Object Properties
@@ -223,7 +196,7 @@ class alPropertyS(alBasicReadProperty):
         if obj is None: 
             return self
 
-        apiValue = self.apiGet(self.enum)
+        apiValue = self.apiGet(self)
         return self.valueFromAPI(apiValue)
     
     def valueFromAPI(self, cVal):
@@ -238,7 +211,7 @@ class alcPropertyI(alObjectReadProperty):
             return self
 
         apiValue = self.apiValue()
-        self.apiGet(obj._alid_, self.enum, 1, self.byref(apiValue))
+        self.apiGet(obj, self, 1, self.byref(apiValue))
         return self.valueFromAPI(apiValue)
 
 class alcPropertyS(alObjectReadProperty):
@@ -249,7 +222,7 @@ class alcPropertyS(alObjectReadProperty):
         if obj is None: 
             return self
 
-        apiValue = self.apiGet(obj._alid_, self.enum)
+        apiValue = self.apiGet(obj, self)
         return self.valueFromAPI(apiValue)
     
     def valueFromAPI(self, cVal):

@@ -60,14 +60,26 @@ else:
             self.frequency = frequency
             self.format = format
             self._buffer = al.c_buffer(self.bufferCount*self.entrySize, 0)
-            self._alid_ = alc.alcCaptureOpenDevice(name, int(frequency), int(format), len(self._buffer))
+            self._setAsParam(alc.alcCaptureOpenDevice(name, int(frequency), int(format), len(self._buffer)))
 
+            from device import Device
+            Device.fromCurrentContext()._addContext(self)
+
+        __dealocating = False
         def close(self):
-            if self._hasALID():
+            if self._hasAsParam() and not self.__dealocating:
+                self.__dealocating = True
                 try:
-                    alc.alcCaptureCloseDevice(self._alid_)
+                    alc.alcCaptureCloseDevice(self)
+
+                    del self.bufferCount
+                    del self.entrySize
+                    del self.frequency
+                    del self.format
+                    del self._buffer
                 finally:
-                    del self._alid_
+                    self._delAsParam()
+        destroy = close
 
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -117,16 +129,16 @@ else:
             self._isCapturing = isCapturing
 
         def start(self):
-            alc.alcCaptureStart(self._alid_)
+            alc.alcCaptureStart(self)
             self._setCapturing(True)
         def stop(self):
-            alc.alcCaptureStop(self._alid_)
+            alc.alcCaptureStop(self)
             self._setCapturing(False)
         def samples(self, count=None):
             if count is None: 
                 count = self.bufferCount
             count = min(count, self.sampleCount)
-            alc.alcCaptureSamples(self._alid_, self._buffer, count)
+            alc.alcCaptureSamples(self, self._buffer, count)
             if count:
                 return self._buffer[:count*self.entrySize]
             else: return ''

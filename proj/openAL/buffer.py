@@ -58,8 +58,8 @@ class Buffer(ALIDContextObject):
         result = "<%s.%s alid: %s" % (
                 self.__class__.__module__,
                 self.__class__.__name__,
-                self._getALID(True))
-        if self._hasALID():
+                self._as_parameter_)
+        if self._hasAsParam():
             result += " freq: %s bits: %s channels: %s size: %s>" % (
                     self.frequency, self.bits, self.channels, self.size)
         else: 
@@ -75,7 +75,7 @@ class Buffer(ALIDContextObject):
             raise
 
     def create(self):
-        if self._hasALID():
+        if self._hasAsParam():
             raise Exception("Buffer has already been created")
 
         bufferIds = (1*al.ALuint)()
@@ -84,25 +84,25 @@ class Buffer(ALIDContextObject):
         return self
 
     def createFromId(self, bufferId):
-        self._alid_ = bufferId
-        self.getObjContext().addBuffer(self)
+        self._setAsParam(bufferId)
+        self._context.addBuffer(self)
         return self
 
     def destroy(self):
-        if self._hasALID():
-            i = self.withObjContext()
+        if self._hasAsParam():
+            i = self.inContext()
             try:
-                self.destroyFromId(self._alid_)
+                self.destroyFromId(self)
             finally:
-                del self._alid_
+                self._delAsParam()
                 i.next()
 
     def destroyFromId(self, bufferId):
         bufferIds = (1*al.ALuint)()
-        bufferIds[:] = [bufferId]
+        bufferIds[:] = [bufferId._as_parameter_]
         al.alDeleteBuffers(1, bufferIds)
 
-        ctx = self.getObjContext()
+        ctx = self._context
         if ctx is not None:
             ctx.removeBuffer(self)
 
@@ -122,7 +122,7 @@ class Buffer(ALIDContextObject):
     def setDataRaw(self, data, size, format, frequency):
         format = format or self.format
         frequency = frequency or self.frequency
-        al.alBufferData(self._alid_, format, data, size, frequency)
+        al.alBufferData(self, format, data, size, frequency)
         return self
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -217,7 +217,6 @@ class Buffer(ALIDContextObject):
     loadData = loadWaveData
 
     def loadPCMData(self, format, pcmData, size, freqency):
-        #pcmData = al.POINTER(al.ALvoid)()
         if not isinstance(format, al.ALenum):
             format = al.ALenum(format)
         if not isinstance(size, al.ALsizei):
@@ -226,6 +225,6 @@ class Buffer(ALIDContextObject):
             freqency = al.ALsizei(freqency)
 
         self.dequeue()
-        al.alBufferData(self._alid_, format, pcmData, size, freqency)
+        al.alBufferData(self, format, pcmData, size, freqency)
         return self
 

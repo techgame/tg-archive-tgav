@@ -30,6 +30,15 @@ class Context(ALIDObject):
             traceback.print_exc()
             raise
 
+    _mapping = {}
+    def _setAsParam(self, asParam):
+        ALIDObject._setAsParam(self, asParam)
+        self._mapping[asParam] = self
+    
+    @classmethod
+    def _fromContextPtr(klass, asParam):
+        return klass._mapping[asParam]
+
     def create(self, device=None, attrs=[]):
         """Attrs is a packed list of:
             ALC_FREQUENCY:
@@ -43,56 +52,52 @@ class Context(ALIDObject):
             ALC_STEREO_SOURCES:
                 A hint indicating how many sources should be capable of supporting stereo data 
         """
-        if self._hasALID():
+        if self._hasAsParam():
             raise Exception("Context already initialized")
 
         if attrs:
             attrs = map(int, attrs) + [0]
         else: attrs = None
 
-        self._alid_ = alc.alcCreateContext(device._alid_, attrs)
+        self._setAsParam(alc.alcCreateContext(device, attrs))
         self._device = device
         device._addContext(self)
         self._device = device
 
     __dealocating = False
     def destroy(self):
-        if self._hasALID() and not self.__dealocating:
+        if self._hasAsParam() and not self.__dealocating:
             self.__dealocating = True
             try:
                 self.makeCurrent()
                 self.delSources()
                 self.delBuffers()
 
-                alc.alcDestroyContext(self._alid_)
+                alc.alcDestroyContext(self)
 
             finally:
-                del self._alid_
+                self._delAsParam()
                 self._device = None
 
     def makeCurrent(self):
-        return self._makeCurrentALID(self._alid_)
-
-    @classmethod
-    def _makeCurrentALID(klass, alid):
-        return bool(alc.alcMakeContextCurrent(alid))
+        return bool(alc.alcMakeContextCurrent(self))
 
     def process(self):
-        alc.alcProcessContext(self._alid_)
+        alc.alcProcessContext(self)
     def suspend(self):
-        alc.alcSuspendContext(self._alid_)
+        alc.alcSuspendContext(self)
 
     @classmethod
     def getCurrent(klass):
-        return klass.fromALID(alc.alcGetCurrentContext())
+        return klass._fromContextPtr(alc.alcGetCurrentContext())
     def getDevice(self):
         result = self._device
         if result is None:
-            result = Device.fromALID(alc.alcGetContextsDevice(self._alid_))
+            result = Device.fromContext(self)
         return result
 
     def getAttrs(self):
-        return self._getAttrsFor(self._alid_)
+        return self._getAttrsFor(self)
 
     @classmethod
     def getDefaultAttrs(self):
