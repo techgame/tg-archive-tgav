@@ -28,7 +28,7 @@ def alCheckError(result, func, args):
     alErr = alGetError()
     if alErr != 0:
         import errors
-        raise errors.ALException(alErr, (result, func.__name__, args))
+        raise errors.ALException(alErr, '%s%r -> %r' % (func.__name__, args, result))
     return result
 
 def alcCheckDeviceError(result, func, args):
@@ -39,7 +39,7 @@ def alcCheckDeviceError(result, func, args):
 
         if alcErr != 0:
             import errors
-            raise errors.ALCException(alcErr, (result, func.__name__, args))
+            raise errors.ALCException(alcErr, '%s%r -> %r' % (func.__name__, args, result))
     return result
 
 def alcCheckContextError(result, func, args):
@@ -51,7 +51,7 @@ def alcCheckContextError(result, func, args):
 
         if alcErr != 0:
             import errors
-            raise errors.ALCException(alcErr, (result, func.__name__, args))
+            raise errors.ALCException(alcErr, '%s%r -> %r' % (func.__name__, args, result))
     return result
 
 def _getErrorCheckForFn(fn):
