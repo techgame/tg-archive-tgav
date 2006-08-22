@@ -12,9 +12,6 @@ Icon?
 .*.swp
 .*.swo
 \.svn/
-demo
-doc
-sandbox
 
 syntax: regexp
 ^gen/.*/build/.*
