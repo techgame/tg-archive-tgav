@@ -1,15 +1,36 @@
-class FaceGlyph(object):
+#!/usr/bin/env python
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
+##~ Copyright (C) 2002-2006  TechGame Networks, LLC.              ##
+##~                                                               ##
+##~ This library is free software; you can redistribute it        ##
+##~ and/or modify it under the terms of the BSD style License as  ##
+##~ found in the LICENSE file included with this distribution.    ##
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ Imports 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+from raw import freetype as FT
+import ctypes
+from ctypes import byref, cast, c_void_p
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ Definitions 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+class FreetypeFaceGlyph(object):
     #~ FreeType API interation ~~~~~~~~~~~~~~~~~~~~~~~~~~
     _as_parameter_ = None
     _as_parameter_type_ = FT.FT_GlyphSlot
 
     def __init__(self, glyph, face):
         self._as_parameter_ = glyph
-        self._face = face
+        self.face = face
 
     @property
     def _glyph(self):
-        return self._as_parameter_
+        return self._as_parameter_[0]
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -24,8 +45,7 @@ class FaceGlyph(object):
         return self._glyph.linearVertAdvance # FT_Fixed
     @property
     def advance(self):
-        adv = self._glyph.advance # FT_Vector
-        return (adv.x, adv.y)
+        return self._glyph.advance # FT_Vector
     @property
     def format(self):
         return self._glyph.format # FT_Glyph_Format
@@ -71,7 +91,7 @@ class FaceGlyph(object):
         self._renderMode = renderMode
     renderMode = property(getRenderMode, setRenderMode)
 
-    _ft_renderGlyph = FT_Render_Glyph
+    _ft_renderGlyph = FT.FT_Render_Glyph
     def render(self, renderMode=None):
         if renderMode is None: 
             renderMode = self.renderMode

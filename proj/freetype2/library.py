@@ -18,7 +18,7 @@ from ctypes import byref, cast, c_void_p
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class Library(object):
+class FreetypeLibrary(object):
     _as_parameter_ = None
     _as_parameter_type_ = FT.FT_Library
     _ft_init = staticmethod(FT.FT_Init_FreeType)
@@ -30,7 +30,9 @@ class Library(object):
     def __new__(klass, useSingleton=True, *args, **kw):
         if not useSingleton or klass.singleton is None:
             self = object.__new__(klass, *args, **kw)
-        else: self = klass.singleton
+            klass.singleton = self
+        else: 
+            self = klass.singleton
         return self
 
     def __init__(self):

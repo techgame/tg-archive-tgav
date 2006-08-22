@@ -219,7 +219,7 @@ class FT_GlyphSlotRec_(Structure):
         ]
 FT_GlyphSlot.set_type(FT_GlyphSlotRec_)
 
-@bind(FT_Error, [POINTER(FT_Library)])
+@bind(FT_Error, [POINTER(FT_Library)], True)
 def FT_Init_FreeType(alibrary, _api_=None): 
     """FT_Init_FreeType(alibrary)
     
@@ -240,7 +240,7 @@ def FT_Library_Version(library, amajor, aminor, apatch, _api_=None):
     return _api_(library, amajor, aminor, apatch)
     
 
-@bind(FT_Error, [FT_Library])
+@bind(FT_Error, [FT_Library], True)
 def FT_Done_FreeType(library, _api_=None): 
     """FT_Done_FreeType(library)
     
@@ -279,7 +279,7 @@ class FT_Open_Args_(Structure):
 # typedef FT_Open_Args
 FT_Open_Args = FT_Open_Args_
 
-@bind(FT_Error, [FT_Library, c_char_p, FT_Long, POINTER(FT_Face)])
+@bind(FT_Error, [FT_Library, c_char_p, FT_Long, POINTER(FT_Face)], True)
 def FT_New_Face(library, filepathname, face_index, aface, _api_=None): 
     """FT_New_Face(library, filepathname, face_index, aface)
     
@@ -291,7 +291,7 @@ def FT_New_Face(library, filepathname, face_index, aface, _api_=None):
     return _api_(library, filepathname, face_index, aface)
     
 
-@bind(FT_Error, [FT_Library, POINTER(c_ubyte), FT_Long, FT_Long, POINTER(FT_Face)])
+@bind(FT_Error, [FT_Library, POINTER(c_ubyte), FT_Long, FT_Long, POINTER(FT_Face)], True)
 def FT_New_Memory_Face(library, file_base, file_size, face_index, aface, _api_=None): 
     """FT_New_Memory_Face(library, file_base, file_size, face_index, aface)
     
@@ -304,7 +304,7 @@ def FT_New_Memory_Face(library, file_base, file_size, face_index, aface, _api_=N
     return _api_(library, file_base, file_size, face_index, aface)
     
 
-@bind(FT_Error, [FT_Library, POINTER(FT_Open_Args), FT_Long, POINTER(FT_Face)])
+@bind(FT_Error, [FT_Library, POINTER(FT_Open_Args), FT_Long, POINTER(FT_Face)], True)
 def FT_Open_Face(library, args, face_index, aface, _api_=None): 
     """FT_Open_Face(library, args, face_index, aface)
     
@@ -316,7 +316,7 @@ def FT_Open_Face(library, args, face_index, aface, _api_=None):
     return _api_(library, args, face_index, aface)
     
 
-@bind(FT_Error, [FT_Face, c_char_p])
+@bind(FT_Error, [FT_Face, c_char_p], True)
 def FT_Attach_File(face, filepathname, _api_=None): 
     """FT_Attach_File(face, filepathname)
     
@@ -326,7 +326,7 @@ def FT_Attach_File(face, filepathname, _api_=None):
     return _api_(face, filepathname)
     
 
-@bind(FT_Error, [FT_Face, POINTER(FT_Open_Args)])
+@bind(FT_Error, [FT_Face, POINTER(FT_Open_Args)], True)
 def FT_Attach_Stream(face, parameters, _api_=None): 
     """FT_Attach_Stream(face, parameters)
     
@@ -336,7 +336,7 @@ def FT_Attach_Stream(face, parameters, _api_=None):
     return _api_(face, parameters)
     
 
-@bind(FT_Error, [FT_Face])
+@bind(FT_Error, [FT_Face], True)
 def FT_Done_Face(face, _api_=None): 
     """FT_Done_Face(face)
     
@@ -345,7 +345,7 @@ def FT_Done_Face(face, _api_=None):
     return _api_(face)
     
 
-@bind(FT_Error, [FT_Face, FT_F26Dot6, FT_F26Dot6, FT_UInt, FT_UInt])
+@bind(FT_Error, [FT_Face, FT_F26Dot6, FT_F26Dot6, FT_UInt, FT_UInt], True)
 def FT_Set_Char_Size(face, char_width, char_height, horz_resolution, vert_resolution, _api_=None): 
     """FT_Set_Char_Size(face, char_width, char_height, horz_resolution, vert_resolution)
     
@@ -358,7 +358,7 @@ def FT_Set_Char_Size(face, char_width, char_height, horz_resolution, vert_resolu
     return _api_(face, char_width, char_height, horz_resolution, vert_resolution)
     
 
-@bind(FT_Error, [FT_Face, FT_UInt, FT_UInt])
+@bind(FT_Error, [FT_Face, FT_UInt, FT_UInt], True)
 def FT_Set_Pixel_Sizes(face, pixel_width, pixel_height, _api_=None): 
     """FT_Set_Pixel_Sizes(face, pixel_width, pixel_height)
     
@@ -369,7 +369,7 @@ def FT_Set_Pixel_Sizes(face, pixel_width, pixel_height, _api_=None):
     return _api_(face, pixel_width, pixel_height)
     
 
-@bind(FT_Error, [FT_Face, FT_UInt, FT_Int32])
+@bind(FT_Error, [FT_Face, FT_UInt, FT_Int32], True)
 def FT_Load_Glyph(face, glyph_index, load_flags, _api_=None): 
     """FT_Load_Glyph(face, glyph_index, load_flags)
     
@@ -380,7 +380,7 @@ def FT_Load_Glyph(face, glyph_index, load_flags, _api_=None):
     return _api_(face, glyph_index, load_flags)
     
 
-@bind(FT_Error, [FT_Face, FT_ULong, FT_Int32])
+@bind(FT_Error, [FT_Face, FT_ULong, FT_Int32], True)
 def FT_Load_Char(face, char_code, load_flags, _api_=None): 
     """FT_Load_Char(face, char_code, load_flags)
     
@@ -432,7 +432,7 @@ class FT_Render_Mode_(c_int):
 # typedef FT_Render_Mode
 FT_Render_Mode = FT_Render_Mode_
 
-@bind(FT_Error, [FT_GlyphSlot, FT_Render_Mode])
+@bind(FT_Error, [FT_GlyphSlot, FT_Render_Mode], True)
 def FT_Render_Glyph(slot, render_mode, _api_=None): 
     """FT_Render_Glyph(slot, render_mode)
     
@@ -442,7 +442,7 @@ def FT_Render_Glyph(slot, render_mode, _api_=None):
     return _api_(slot, render_mode)
     
 
-@bind(FT_Error, [FT_Face, FT_UInt, FT_UInt, FT_UInt, POINTER(FT_Vector)])
+@bind(FT_Error, [FT_Face, FT_UInt, FT_UInt, FT_UInt, POINTER(FT_Vector)], True)
 def FT_Get_Kerning(face, left_glyph, right_glyph, kern_mode, akerning, _api_=None): 
     """FT_Get_Kerning(face, left_glyph, right_glyph, kern_mode, akerning)
     
@@ -455,7 +455,7 @@ def FT_Get_Kerning(face, left_glyph, right_glyph, kern_mode, akerning, _api_=Non
     return _api_(face, left_glyph, right_glyph, kern_mode, akerning)
     
 
-@bind(FT_Error, [FT_Face, FT_UInt, FT_Pointer, FT_UInt])
+@bind(FT_Error, [FT_Face, FT_UInt, FT_Pointer, FT_UInt], True)
 def FT_Get_Glyph_Name(face, glyph_index, buffer, buffer_max, _api_=None): 
     """FT_Get_Glyph_Name(face, glyph_index, buffer, buffer_max)
     
@@ -476,7 +476,7 @@ def FT_Get_Postscript_Name(face, _api_=None):
     return _api_(face)
     
 
-@bind(FT_Error, [FT_Face, FT_Encoding])
+@bind(FT_Error, [FT_Face, FT_Encoding], True)
 def FT_Select_Charmap(face, encoding, _api_=None): 
     """FT_Select_Charmap(face, encoding)
     
@@ -486,7 +486,7 @@ def FT_Select_Charmap(face, encoding, _api_=None):
     return _api_(face, encoding)
     
 
-@bind(FT_Error, [FT_Face, FT_CharMap])
+@bind(FT_Error, [FT_Face, FT_CharMap], True)
 def FT_Set_Charmap(face, charmap, _api_=None): 
     """FT_Set_Charmap(face, charmap)
     

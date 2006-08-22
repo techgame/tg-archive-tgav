@@ -15,38 +15,30 @@ from raw import freetype as FT
 import ctypes
 from ctypes import byref, cast, c_void_p
 
-from library import Library
-from glyph import FaceGlyph
+from library import FreetypeLibrary
+from glyph import FreetypeFaceGlyph
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class Face(object):
+class FreetypeFace(object):
     faceIndex = 0
     loadFlags = FT.FT_LOAD_RENDER
     renderMode = FT.FT_Render_Mode.FT_RENDER_MODE_NORMAL
-    kerningMode = FT.FT_KERNING_DEFAULT
 
     #~ FreeType API interation ~~~~~~~~~~~~~~~~~~~~~~~~~~
     _as_parameter_ = None
     _as_parameter_type_ = FT.FT_Face
 
     _ft_new_face = staticmethod(FT.FT_New_Face)
-    _ft_done_face = FT.FT_Done_Face
-
-    _ft_setCharSize = FT.FT_Set_Char_Size
-    _ft_setPixelSizes = FT.FT_Set_Pixel_Sizes
-
-    _ft_loadGlyph = FT.FT_Load_Glyph
-    _ft_loadChar = FT.FT_Load_Char
-
     def __init__(self, fontFilename, faceIndex=0, ftLibrary=None):
-        self.faceIndex = faceIndex
         self._as_parameter_ = self._as_parameter_type_()
-        ftLibrary = ftLibrary or Library()
-        self._ft_new_face(ftLibrary, fontFilename, self.faceIndex, byref(self._as_parameter_))
+        ftLibrary = ftLibrary or FreetypeLibrary()
+        self._ft_new_face(ftLibrary, fontFilename, faceIndex, byref(self._as_parameter_))
+        self.library = ftLibrary
 
+    _ft_done_face = FT.FT_Done_Face
     def __del__(self):
         if self._as_parameter_ is not None:
             self._ft_done_face()
@@ -54,7 +46,7 @@ class Face(object):
 
     @property
     def _face(self):
-        return self._as_parameter_
+        return self._as_parameter_[0]
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -144,7 +136,7 @@ class Face(object):
 
     @property
     def glyph(self):
-        return FaceGlyph(self._face.glyph)
+        return FreetypeFaceGlyph(self._face.glyph, self)
 
     @property
     def size(self):
@@ -161,6 +153,7 @@ class Face(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    _ft_setCharSize = FT.FT_Set_Char_Size
     def setCharSize(self, size, dpi):
         if isinstance(size, tuple): 
             width, height = size
@@ -170,6 +163,7 @@ class Face(object):
         else: wdpi = hdpi = dpi
         self._ft_setCharSize(width, height, wdpi, hdpi)
 
+    _ft_setPixelSizes = FT.FT_Set_Pixel_Sizes
     def setPixelSize(self, size):
         if isinstance(size, tuple): 
             width, height = size
@@ -178,17 +172,18 @@ class Face(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    _ft_loadGlyph = FT.FT_Load_Glyph
     def loadGlyph(self, char, flags=None):
         if flags is None: 
             flags = self.loadFlags 
         self._ft_loadGlyph(ord(char), flags)
         return self.getGlyph()
 
+    _ft_loadChar = FT.FT_Load_Char
     def loadChar(self, char, flags=None):
         if flags is None: 
             flags = self.loadFlags 
         self._ft_loadChar(ord(char), flags)
-        return self.getChar()
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -200,7 +195,7 @@ class Face(object):
     def getKerning(self, left, right, kernMode=None):
         aKerning = FT.FT_Vector()
         self._ft_getKerning(ord(left), ord(right), kernMode, byref(aKerning))
-        return (aKerning.x, aKerning.y)
+        return aKerning
 
     _ft_getGlyphName = FT.FT_Get_Glyph_Name
     def getGlyphName(self, char):
@@ -237,7 +232,7 @@ class Face(object):
             yield unichr(charCode), glyphIndex.value
             charCode = self._ft_getNextChar(charCode, glyphIndexRef)
 
-    _ft_getNameIndex = FT_Get_Name_Index
+    _ft_getNameIndex = FT.FT_Get_Name_Index
     def getNameIndex(self, name):
         return self._ft_getNameIndex(self, name)
 
