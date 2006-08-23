@@ -176,9 +176,8 @@ class Buffer(ALIDContextObject):
         data = al.POINTER(al.ALvoid)()
         size = al.ALsizei(0)
         freqency = al.ALsizei(0)
-        loop = al.ALboolean(0)
 
-        alut.alutLoadWAVFile(str(filename), al.byref(format), al.byref(data), al.byref(size), al.byref(freqency))#, al.byref(loop))
+        alut.alutLoadWAVFile(str(filename), al.byref(format), al.byref(data), al.byref(size), al.byref(freqency))
         try:
             self.loadPCMData(format, data, size, freqency)
         finally:
@@ -206,9 +205,8 @@ class Buffer(ALIDContextObject):
         data = al.POINTER(al.ALvoid)()
         size = al.ALsizei(0)
         freqency = al.ALsizei(0)
-        loop = al.ALboolean('\x00')
 
-        alut.alutLoadWAVMemory(waveRaw, al.byref(format), al.byref(data), al.byref(size), al.byref(freqency))#, al.byref(loop))
+        alut.alutLoadWAVMemory(waveRaw, al.byref(format), al.byref(data), al.byref(size), al.byref(freqency))
         try:
             self.loadPCMData(format, data, size, freqency)
         finally:

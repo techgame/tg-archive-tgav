@@ -22,13 +22,15 @@ errorFuncNames = set(['alGetError', 'alcGetError', 'alcGetContextsDevice'])
 alGetError = None
 alcGetError = None
 alcGetContextsDevice = None
+alutGetError = None
+alutGetErrorString = None
 
 def alCheckError(result, func, args):
     #print '>>> %s%r -> %r ' % (func.__name__, args, result)
     alErr = alGetError()
     if alErr != 0:
         import errors
-        raise errors.ALException(alErr, '%s%r -> %r' % (func.__name__, args, result))
+        raise errors.ALException(alErr, callInfo=(func, args, result))
     return result
 
 def alcCheckDeviceError(result, func, args):
@@ -39,7 +41,7 @@ def alcCheckDeviceError(result, func, args):
 
         if alcErr != 0:
             import errors
-            raise errors.ALCException(alcErr, '%s%r -> %r' % (func.__name__, args, result))
+            raise errors.ALCException(alcErr, callInfo=(func, args, result))
     return result
 
 def alcCheckContextError(result, func, args):
@@ -51,7 +53,15 @@ def alcCheckContextError(result, func, args):
 
         if alcErr != 0:
             import errors
-            raise errors.ALCException(alcErr, '%s%r -> %r' % (func.__name__, args, result))
+            raise errors.ALCException(alcErr, callInfo=(func, args, result))
+    return result
+
+def alutCheckError(result, func, args):
+    #print '>>> %s%r -> %r ' % (func.__name__, args, result)
+    alutErr = alutGetError()
+    if alutErr != 0:
+        import errors
+        raise errors.ALUTException(alutErr, alutGetErrorString(alutErr), callInfo=(func, args, result))
     return result
 
 def _getErrorCheckForFn(fn):
@@ -93,6 +103,17 @@ def bind(restype, argtypes, errcheck=None):
 
 def alutBind(restype, argtypes, errcheck=None):
     def bindFuncTypes(fn):
+        fnErrCheck = errcheck
+        if fn.__name__ in errorFuncNames:
+            bindErrorFunc = True
+        else:
+            bindErrorFunc = False
+            if not errcheck:
+                fnErrCheck = _getErrorCheckForFn(fn)
+
+        if bindErrorFunc:
+            _bindError(result)
+
         return _ctypes_support.attachToLibFn(fn, restype, argtypes, errcheck, alutLib)
     return bindFuncTypes
 
