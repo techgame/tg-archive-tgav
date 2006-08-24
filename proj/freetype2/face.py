@@ -63,6 +63,26 @@ class FreetypeFace(object):
         return self._face.face_flags
 
     @property
+    def faceFlagsList(self):
+        faceFlags = self.faceFlags
+        return [flag for mask, flag in self.faceFlagsMap.iteritems() if faceFlags & mask]
+
+    faceFlagsMap = {
+        FT.FT_FACE_FLAG_SCALABLE: 'scalable',
+        FT.FT_FACE_FLAG_FIXED_SIZES: 'fixed_sizes',
+        FT.FT_FACE_FLAG_FIXED_WIDTH: 'fixed_width',
+        FT.FT_FACE_FLAG_SFNT: 'sfnt',
+        FT.FT_FACE_FLAG_HORIZONTAL: 'horizontal',
+        FT.FT_FACE_FLAG_VERTICAL: 'vertical',
+        FT.FT_FACE_FLAG_KERNING: 'kerning',
+        FT.FT_FACE_FLAG_FAST_GLYPHS: 'fast_glyphs',
+        FT.FT_FACE_FLAG_MULTIPLE_MASTERS: 'multiple_masters',
+        FT.FT_FACE_FLAG_GLYPH_NAMES: 'glyph_names',
+        FT.FT_FACE_FLAG_EXTERNAL_STREAM:'external_stream',
+    }
+    #faceFlagsMap.update((v,k) for k,v in faceFlagsMap.iteritems())
+
+    @property
     def styleFlags(self):
         return self._face.style_flags
 
@@ -157,17 +177,17 @@ class FreetypeFace(object):
     def setCharSize(self, size, dpi):
         if isinstance(size, tuple): 
             width, height = size
-        else: width = height = size
+        else: width, height = size, 0
         if isinstance(dpi, tuple): 
             wdpi, hdpi = dpi
-        else: wdpi = hdpi = dpi
+        else: wdpi, hdpi = dpi, 0
         self._ft_setCharSize(width, height, wdpi, hdpi)
 
     _ft_setPixelSizes = FT.FT_Set_Pixel_Sizes
     def setPixelSize(self, size):
         if isinstance(size, tuple): 
             width, height = size
-        else: width = height = size
+        else: width, height = size, 0
         self._ft_setPixelSizes(width, height)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -176,7 +196,9 @@ class FreetypeFace(object):
     def loadGlyph(self, char, flags=None):
         if flags is None: 
             flags = self.loadFlags 
-        self._ft_loadGlyph(ord(char), flags)
+        if isinstance(char, basestring):
+            char = self.getCharIndex(char)
+        self._ft_loadGlyph(char, flags)
         return self.glyph
 
     def iterGlyphs(self, chars, flags=None):
@@ -194,31 +216,55 @@ class FreetypeFace(object):
         for char in chars:
             yield char, self.loadChar(char, flags)
 
+    _ft_getKerning = FT.FT_Get_Kerning
+    def getKerning(self, left, right, kernMode=0):
+        aKerning = FT.FT_Vector()
+        if isinstance(left, basestring):
+            left = self.getCharIndex(left)
+        if isinstance(right, basestring):
+            right = self.getCharIndex(right)
+        self._ft_getKerning(left, right, kernMode, byref(aKerning))
+        return (aKerning.x, aKerning.y)
+
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     _ft_setTransform = FT.FT_Set_Transform
     def setTransform(self, matrix, delta):
         self._ft_setTransform(matrix, delta)
 
-    _ft_getKerning = FT.FT_Get_Kerning
-    def getKerning(self, left, right, kernMode=None):
-        aKerning = FT.FT_Vector()
-        self._ft_getKerning(ord(left), ord(right), kernMode, byref(aKerning))
-        return aKerning
-
-    _ft_getGlyphName = FT.FT_Get_Glyph_Name
-    def getGlyphName(self, char):
-        buffer = ctypes.create_string_buffer(255)
-        self._ft_getGlyphName(ord(char), buffer, len(buffer))
-        return buffer.value
-
     _ft_getPostscriptName = FT.FT_Get_Postscript_Name
     def getPostscriptName(self):
         return self._ft_getPostscriptName()
 
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    _ft_selectCharmap = FT.FT_Select_Charmap
+    def selectCharmap(self, encoding):
+        self._ft_selectCharmap(encoding)
+
+    _ft_setCharmap = FT.FT_Set_Charmap
+    def getCharmap(self):
+        return self.charmap
+    def setCharmap(self, charmap):
+        self._ft_setCharmap(charmap)
+
+    _ft_getCharmapIndex = staticmethod(FT.FT_Get_Charmap_Index)
+    def getCharmapIndex(self, charmap):
+        return self._ft_getCharmapIndex(charmap)
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     _ft_getCharIndex = FT.FT_Get_Char_Index
     def getCharIndex(self, char):
         return self._ft_getCharIndex(ord(char))
+
+    _ft_getGlyphName = FT.FT_Get_Glyph_Name
+    def getGlyphName(self, glyphIndex):
+        if isinstance(glyphIndex, basestring):
+            glyphIndex = self.getCharIndex(glyphIndex)
+        buffer = ctypes.create_string_buffer(255)
+        self._ft_getGlyphName(glyphIndex, buffer, len(buffer))
+        return buffer.value
 
     _ft_getFirstChar = FT.FT_Get_First_Char
     def getFirstChar(self):
@@ -243,7 +289,7 @@ class FreetypeFace(object):
 
     _ft_getNameIndex = FT.FT_Get_Name_Index
     def getNameIndex(self, name):
-        return self._ft_getNameIndex(self, name)
+        return self._ft_getNameIndex(name)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Main 

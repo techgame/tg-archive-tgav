@@ -45,7 +45,8 @@ class FreetypeFaceGlyph(object):
         return self._glyph.linearVertAdvance # FT_Fixed
     @property
     def advance(self):
-        return self._glyph.advance # FT_Vector
+        adv = self._glyph.advance # FT_Vector
+        return (adv.x, adv.y)
     @property
     def format(self):
         return self._glyph.format # FT_Glyph_Format
