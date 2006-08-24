@@ -129,18 +129,16 @@ if __name__=='__main__':
     fontBaseline >>= 6
     fontHeight >>= 6
 
-    glyph = face.glyph
-
     fontMap = {}
 
     def loadChar(char):
         if char not in fontMap:
-            face.loadChar(char)
-            fontMap[char] = getBitmapFromGlyph(char, face.glyph)
+            fontMap[char] = getBitmapFromGlyph(char, face.loadChar(char))
         return fontMap[char]
 
     import string
-    loadChar(' ')
+    #loadChar(' ')
+    map(loadChar, string.printable)
 
     while 1:
         bFlip = int(raw_input("Flip [0]> ") or 0)

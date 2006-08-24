@@ -177,13 +177,22 @@ class FreetypeFace(object):
         if flags is None: 
             flags = self.loadFlags 
         self._ft_loadGlyph(ord(char), flags)
-        return self.getGlyph()
+        return self.glyph
+
+    def iterGlyphs(self, chars, flags=None):
+        for char in chars:
+            yield char, self.loadGlyph(char, flags)
 
     _ft_loadChar = FT.FT_Load_Char
     def loadChar(self, char, flags=None):
         if flags is None: 
             flags = self.loadFlags 
         self._ft_loadChar(ord(char), flags)
+        return self.glyph
+
+    def iterChars(self, chars, flags=None):
+        for char in chars:
+            yield char, self.loadChar(char, flags)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -223,7 +232,7 @@ class FreetypeFace(object):
         charCode = self._ft_getNextChar(ord(char), byref(glyphIndex))
         return unichr(charCode), glyphIndex.value
 
-    def iterChars(self):
+    def iterCharCodes(self):
         glyphIndex = c_uint(0)
         glyphIndexRef = byref(glyphIndex)
 

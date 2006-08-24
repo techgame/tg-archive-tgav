@@ -10336,8 +10336,8 @@ if 1: # ifndef GL_EXT_vertex_shader ("inc/OpenGL/glext.h":5838)
         return _api_(op, res, arg1, arg2, arg3)
         
     @bind(None, [GLuint, GLuint, GLenum, GLenum, GLenum, GLenum])
-    def glSwizzleEXT(res, in, outX, outY, outZ, outW, _api_=None): 
-        """glSwizzleEXT(res, in, outX, outY, outZ, outW)
+    def glSwizzleEXT(res, in_, outX, outY, outZ, outW, _api_=None): 
+        """glSwizzleEXT(res, in_, outX, outY, outZ, outW)
         
             res : GLuint
             in : GLuint
@@ -10346,11 +10346,11 @@ if 1: # ifndef GL_EXT_vertex_shader ("inc/OpenGL/glext.h":5838)
             outZ : GLenum
             outW : GLenum
         """
-        return _api_(res, in, outX, outY, outZ, outW)
+        return _api_(res, in_, outX, outY, outZ, outW)
         
     @bind(None, [GLuint, GLuint, GLenum, GLenum, GLenum, GLenum])
-    def glWriteMaskEXT(res, in, outX, outY, outZ, outW, _api_=None): 
-        """glWriteMaskEXT(res, in, outX, outY, outZ, outW)
+    def glWriteMaskEXT(res, in_, outX, outY, outZ, outW, _api_=None): 
+        """glWriteMaskEXT(res, in_, outX, outY, outZ, outW)
         
             res : GLuint
             in : GLuint
@@ -10359,7 +10359,7 @@ if 1: # ifndef GL_EXT_vertex_shader ("inc/OpenGL/glext.h":5838)
             outZ : GLenum
             outW : GLenum
         """
-        return _api_(res, in, outX, outY, outZ, outW)
+        return _api_(res, in_, outX, outY, outZ, outW)
         
     @bind(None, [GLuint, GLuint, GLuint])
     def glInsertComponentEXT(res, src, num, _api_=None): 

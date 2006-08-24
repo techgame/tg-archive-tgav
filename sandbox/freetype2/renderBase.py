@@ -54,7 +54,7 @@ xmlSkin = XMLSkin("""<?xml version='1.0'?>
                         </event>                        
                         <event type="EVT_ERASE_BACKGROUND"/>
 
-                        <timer ctxobj='model.repaintTimer' seconds='1/35.'>
+                        <timer ctxobj='model.repaintTimer' seconds='1./ctx.model.fps'>
                             refresh = ctx.model.refresh
                             canvas = ctx.canvas
                             <event>
@@ -77,6 +77,7 @@ class RenderSkinModelBase(wxSkinModel):
     xmlSkin = xmlSkin
     frameTitle = 'GLCanvas'
     fpsFormat = '%.1f fps (true), %.0f fps (%.5f:%.5f render:swap)'
+    fps = 60
 
     if sys.platform.startswith('win'):
         timestamp = staticmethod(time.clock)
