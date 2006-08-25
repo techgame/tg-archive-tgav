@@ -46,6 +46,7 @@ class GLFreetypeFace(FreetypeFontFace):
         return texture
 
     def _newTexure(self, size):
+        #working: texture: GL_INTENSITY, texEnv: GL_MODULTE, glBlendFunc: (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         texture = Texture(GL_TEXTURE_2D, GL_INTENSITY,
                 wrap=gl.GL_CLAMP, genMipmaps=True,
                 magFilter=gl.GL_LINEAR, minFilter=gl.GL_LINEAR_MIPMAP_LINEAR)
