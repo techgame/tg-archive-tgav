@@ -324,6 +324,8 @@ class Texture(GLObject):
     target = 0 # GL_TEXTURE_1D, GL_TEXTURE_2D, etc.
     format = None # GL_RGBA, GL_INTENSITY, etc.
 
+    width = height = depth = None # these are set from setImage and setCompressedImage
+
     def __init__(self, *args, **kwargs):
         if args:
             self.create(*args, **kwargs)
@@ -396,14 +398,17 @@ class Texture(GLObject):
         data.setImageOn(self, level, **kw)
     def setImage1d(self, data, level=0):
         for _ in data.select():
+            self.width, self.height, self.depth = data.width, 0, 0
             gl.glTexImage1D(self.target, level, self.format, 
                 data.width, data.border, data.format, data.dataType, data.ptr)
     def setImage2d(self, data, level=0):
         for _ in data.select():
+            self.width, self.height, self.depth = data.width, data.height, 0
             gl.glTexImage2D(self.target, level, self.format, 
                 data.width, data.height, data.border, data.format, data.dataType, data.ptr)
     def setImage3d(self, data, level=0):
         for _ in data.select():
+            self.width, self.height, self.depth = data.width, data.height, data.depth
             gl.glTexImage3D(self.target, level, self.format, 
                 data.width, data.height, data.depth, data.border, data.format, data.dataType, data.ptr)
 
@@ -430,14 +435,17 @@ class Texture(GLObject):
         data.setCompressedImageOn(self, level, **kw)
     def setCompressedImage1d(self, data, level=0):
         for _ in data.select():
+            self.width, self.height, self.depth = data.width, 0, 0
             gl.glCompressedTexImage1D(self.target, level, self.format, 
                     data.width, data.border, data.format, data.dataType, data.ptr)
     def setCompressedImage2d(self, data, level=0):
         for _ in data.select():
+            self.width, self.height, self.depth = data.width, data.height, 0
             gl.glCompressedTexImage2D(self.target, level, self.format, 
                 data.width, data.height, data.border, data.format, data.dataType, data.ptr)
     def setCompressedImage3d(self, data, level=0):
         for _ in data.select():
+            self.width, self.height, self.depth = data.width, data.height, data.depth
             gl.glCompressedTexImage3D(self.target, level, self.format, 
                 data.width, data.height, data.depth, data.border, data.format, data.dataType, data.ptr)
 

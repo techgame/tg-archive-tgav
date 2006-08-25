@@ -11,6 +11,7 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+import string
 import array
 
 from ctypes import byref, c_void_p
@@ -30,10 +31,13 @@ from TG.openGL.raw.glu import *
 class RenderSkinModel(RenderSkinModelBase):
     fonts = {
             'Arial':'/Library/Fonts/Arial',
-            'Zapfino':'/Library/Fonts/Zapfino.dfont',
             'Monaco':'/System/Library/Fonts/Monaco.dfont',
             'AppleGothic':'/System/Library/Fonts/AppleGothic.dfont',
             'LucidaGrande':'/System/Library/Fonts/LucidaGrande.dfont',
+
+            'Zapfino':'/Library/Fonts/Zapfino.dfont',
+            'Herculanum': '/Library/Fonts/Herculanum.dfont',
+            'Papyrus': '/Library/Fonts/Papyrus.dfont',
             }
 
     def glCheck(self):
@@ -43,7 +47,7 @@ class RenderSkinModel(RenderSkinModelBase):
         return True
 
     def renderInit(self, glCanvas, renderStart):
-        glClearColor(0.0, 0.0, 0.0, 0.0)
+        glClearColor(0.05, 0.05, 0.05, 0.0)
 
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_COLOR_MATERIAL)
@@ -73,10 +77,9 @@ class RenderSkinModel(RenderSkinModelBase):
 
         self.loadCheckerBoard()
 
-        fontFilename = self.fonts['LucidaGrande']
-        fontFilename = self.fonts['Zapfino']
+        fontFilename = self.fonts['Papyrus']
         print fontFilename
-        self.loadFontTexture(fontFilename, 24)
+        self.loadFontTexture(fontFilename, 128)
 
         glBindTexture(GL_TEXTURE_2D, 0)
         glPixelStorei(GL_UNPACK_ALIGNMENT, 4)
@@ -98,24 +101,29 @@ class RenderSkinModel(RenderSkinModelBase):
 
     def loadFontTexture(self, fontFilename, fontSize):
         font = GLFreetypeFace(fontFilename, fontSize)
-        self.fontTexture = font.load()
-        font.loadChars('gary')
+        self.fontTexture = font.loadChars(string.lowercase+string.uppercase)
 
+    bPixelSized = True
     sized = False
     def renderResize(self, glCanvas):
         (w,h) = glCanvas.GetSize()
         if not w or not h: return
 
+        self.viewPortSize = w, h
         glViewport (0, 0, w, h)
         glMatrixMode (GL_PROJECTION)
         glLoadIdentity ()
 
-        ho = 20./h
-        wo = 20./w
-        #gluOrtho2D(-1-wo, 1+wo, -1-ho, 1+ho)
-        gluOrtho2D(-10, w+10, -10, h+10)
-        self.viewLR = 0, w
-        self.viewBT = 0, h
+        if self.bPixelSized:
+            gluOrtho2D(0, w, 0, h)
+        else:
+            if w > h:
+                nw, nh = float(w)/h, 1.
+            else:
+                nw, nh = 1., float(h)/w
+            ho = nh/20.
+            wo = nw/20.
+            gluOrtho2D(-nw-wo, nw+wo, -nh-ho, nh+ho)
 
         #gluPerspective(60, float(w)/h, 1, 100)
         glMatrixMode (GL_MODELVIEW)
@@ -142,31 +150,49 @@ class RenderSkinModel(RenderSkinModelBase):
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE)
         if self.checkerBoard:
             glBindTexture(GL_TEXTURE_2D, self.checkerBoard)
+
+            vl, vr = -1., 1.
+            vb, vt = -1., 1.
+
         else:
             glBindTexture(GL_TEXTURE_2D, self.fontTexture)
+            fw,fh = self.fontTexture.width, self.fontTexture.height
+            if self.bPixelSized:
+                size = self.viewPortSize
+                vl = (size[0] - fw)/2.
+                vr = vl + fw
 
-        vl, vr = self.viewLR
-        vb, vt = self.viewBT
+                vt = size[1] - max(0, (size[1] - fh)/2.)
+                vb = vt - fh
+
+            else:
+                if fw>fh:
+                    fw,fh = 1, fh/float(fw)
+                else:
+                    fw,fh = fw/float(fh), 1
+                vl, vr = -fw, fw
+                vb, vt = -fh, fh
+
         glBegin(GL_QUADS)
 
-        glVertex3s(vl, vt, 0)
+        glVertex3f(vl, vt, 0)
         glTexCoord2s(0, 1)
         glColor3f(0.5, 1, 1)
         glNormal3s(0, 0, 1)
 
-        glVertex3s(vl, vb, 0)
+        glVertex3f(vl, vb, 0)
         glTexCoord2s(1, 1)
         glColor3f(0.5, 0.5, 1)
         glNormal3s(0, 0, 1)
 
-        glVertex3s(vr, vb, 0)
+        glVertex3f(vr, vb, 0)
         glTexCoord2s(1, 0)
         glColor3f(1, 0.5, 1)
         glNormal3s(0, 0, 1)
 
-        glVertex3s(vr, vt, 0)
+        glVertex3f(vr, vt, 0)
         glTexCoord2s(0, 0)
-        #glColor3f(1, 1, 1)
+        glColor3f(1, 1, 1)
         glNormal3s(0, 0, 1)
 
         glEnd()

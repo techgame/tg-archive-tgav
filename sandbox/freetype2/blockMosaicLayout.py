@@ -117,7 +117,7 @@ class BlockMosaicAlg(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    
-    def _rebuildBlockStack(self, blocks):
+    def _orderBlocksByHeight(self, blocks):
         blocksByHeight = {}
         for block in blocks:
             w, h = block.size
@@ -129,8 +129,8 @@ class BlockMosaicAlg(object):
         self._lockModify()
 
         blocks = self.blocks
-        self.blocksByHeight = self._rebuildBlockStack(blocks)
-        heights = sorted(self.blocksByHeight.keys())
+        blocksByHeight = self._orderBlocksByHeight(blocks)
+        heights = sorted(blocksByHeight.keys())
         self._heightGrps = [list(g) for g in self._avgDeltaGroups(heights)]
 
         self._blockArea = sum(b.getArea(self.borders) for b in blocks)
@@ -144,16 +144,8 @@ class BlockMosaicAlg(object):
 
         width, height = self._blockWMaxP2 << 1, self._blockHMaxP2
 
-        widthList = [sum(w for w, b in widthMap) for h, widthMap in self.blocksByHeight.iteritems()]
+        widthList = [sum(w for w, b in widthMap) for h, widthMap in blocksByHeight.iteritems()]
         widthP2List = map(self._nextPowerOf2, widthList)
-
-        if 1:
-            self._wNarrow = sum(widthList)/len(widthList)
-            self._wNarrowP2 = self._nextPowerOf2(self._wNarrow)
-            self._hNarrowP2 = self._blockAreaP2 / self._wNarrowP2
-
-            if (self._wNarrowP2 > width) and (self._hNarrowP2 > height):
-                return (self._wNarrowP2, self._hNarrowP2)
 
         if 1:
             self._wWide = sum(widthP2List)/len(widthP2List) 
@@ -162,6 +154,14 @@ class BlockMosaicAlg(object):
 
             if (self._wWideP2 > width) and (self._hWideP2 > height):
                 return (self._wWideP2, self._hWideP2)
+
+        if 1:
+            self._wNarrow = sum(widthList)/len(widthList)
+            self._wNarrowP2 = self._nextPowerOf2(self._wNarrow)
+            self._hNarrowP2 = self._blockAreaP2 / self._wNarrowP2
+
+            if (self._wNarrowP2 > width) and (self._hNarrowP2 > height):
+                return (self._wNarrowP2, self._hNarrowP2)
 
         if 1:
             self._wWidest = max(widthP2List)
@@ -185,19 +185,15 @@ class BlockMosaicAlg(object):
 
     def layout(self):
         self._lockModify()
-        width, height = self._calcSizeStats()
-    
-        if 1:
-            print 'tw, th:', (width, height)
-            #print self._heightGrps
+        size = self._calcSizeStats()
+        return self.layoutSize(size)
 
-        rgn = self.BlockFactory.fromSize((width, height))
-        for b in self.layoutRegion(rgn):
-            yield b
-        rgn.printUnused(('LastRow', 'Bottom'))
+    def layoutSize(self, size):
+        rgn = self.BlockFactory.fromSize(size)
+        return rgn, self.iterLayoutRegion(rgn)
 
-    def layoutRegion(self, rgn):
-        heightMap = self.blocksByHeight
+    def iterLayoutRegion(self, rgn):
+        heightMap = self._orderBlocksByHeight(self.blocks)
 
         bOutOfRoom = False
         hMax = 0
@@ -260,8 +256,6 @@ class BlockMosaicAlg(object):
                         bOutOfRoom = (y+hMax > rgn.h)
                         if bOutOfRoom: 
                             if widthMap:
-                                print 'HRoom:', rgn.h - (y+hMax)
-                                rgn.printUnused()
                                 raise Exception("Layout Error: no more room")
                             else: break
 
