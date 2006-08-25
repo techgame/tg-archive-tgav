@@ -91,21 +91,6 @@ class GLFreetypeFace(FreetypeFontFace):
 #~ Main 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def groupByDelta(v):
-    dv = [e1-e0 for e0, e1 in zip(v[:-1], v[1:])] + [0]
-    dAvg = sum(dv, 0.)/len(dv)
-
-    p = v[0]
-    r = [p]
-    for n in heights[1:]:
-        if n-p > dAvg:
-            yield r
-            r = []
-        r.append(n)
-        p = n
-
-    if r: yield r
-
 if __name__=='__main__':
     fonts = {
             'Arial':'/Library/Fonts/Arial',
@@ -116,113 +101,21 @@ if __name__=='__main__':
             'AppleGothic':'/System/Library/Fonts/AppleGothic.dfont',
             'StoneSans': '/Library/Fonts/Stone Sans ITC TT'
             }
-    fft = GLFreetypeFace(fonts['LucidaGrande'], 128)
+    fft = GLFreetypeFace(fonts['LucidaGrande'], 64)
     #fft.printInfo()
     #fft.printGlyphStats('AV')
     #fft.printKerning('fi')
 
-    twos = [1<<s for s in xrange(31)]
-    nextPower2 = lambda v: twos[bisect_right(twos, v)]
+    from blockMosaicLayout import BlockMosaicAlg
 
-    maxTextureWidth = 2048
-    maxTextureHeight = 2048
-    maxTextureArea = maxTextureWidth * maxTextureHeight
+    alg = BlockMosaicAlg()
+    alg.maxSize = (2048, 2048)
 
     sizes = fft.loadSizes(string.uppercase + string.lowercase)
-    area = sum((2+e[0])*(2+e[1]) for e in sizes.itervalues())
-    wMin = min(e[0] for e in sizes.itervalues())
-    hMin = min(e[1] for e in sizes.itervalues())
-    wMax = max(e[0] for e in sizes.itervalues())
-    hMax = max(e[1] for e in sizes.itervalues())
+    for char, bmSize in sizes.iteritems():
+        alg.addBlock(bmSize, char)
 
-    areaP2, wMaxp2, hMaxp2 = map(nextPower2, (area, wMax, hMax))
-    assert areaP2 <= maxTextureArea
-
-    heightMap = {}
-    for c, (w, h) in sizes.iteritems():
-        heightMap.setdefault(h, []).append((w, c))
-
-    heights = sorted(heightMap.keys())
-
-    gHeights = [list(g) for g in groupByDelta(heights)]
-
-    hwSumMap = {}
-    widthsP2 = []
-    for h, wcm in heightMap.iteritems():
-        wcm.sort()
-        w = sum(e[0] for e in wcm)
-        wp2 = nextPower2(w)
-        widthsP2.append(wp2)
-        hwSumMap[h] = (wp2, w, wp2-w)
-
-    avgWidth = sum(widthsP2) / len(widthsP2)
-    avgWidthP2 = nextPower2(avgWidth)
-
-    def layout(totalW, totalH):
-        hMax = 0
-        waste = 0
-        x = y = 0
-        for hGrp in gHeights:
-            print
-            print 'HGrp:', hGrp
-            for h in hGrp:
-                #print '  Height:', h, 'y:', y
-                widthMap = heightMap[h]
-
-                if not widthMap:
-                    continue
-
-                if h > hMax:
-                    heightWaste = (h-hMax)*x
-
-                    endWaste = (totalW-x) * hMax
-                    if endWaste < heightWaste:
-                        print 'We should make a new row instead:', (endWaste, heightWaste)
-
-                    waste += heightWaste
-                    hMax = h
-                else: heightWaste = 0
-
-                elemH = h
-                while widthMap:
-                    widthRemain = totalW-x
-                    i = bisect_right(widthMap, (widthRemain,'\xffff')) - 1
-                    if i >= 0:
-                        elemW, elemC = widthMap.pop(i)
-                        yield (elemC, (x, y), (elemW, elemH))
-
-                        # advance to next available
-                        x += elemW + 2
-                    else:
-                        endWaste = hMax*widthRemain
-                        waste += endWaste
-                        #print '    row:', (x, totalW)
-                        print '    waste:', (heightWaste, endWaste, (widthRemain, hMax))
-                        #print '      widths:', widthRemain, [e[0] for e in widthMap]
-                        #print
-                        x = 0
-                        y += hMax + 2
-                        hMax = h
-                        #print '  Height:', h, 'y:', y
-
-        print 'Remaining Blocks:'
-        print '    Last Row:', (totalW-x, hMax, (totalW-x)*hMax)
-        print '    Bottom:', (totalW, totalH-(y+hMax), totalW*(totalH-(y+hMax)))
-
-
-    if 1:
-        print area, (wMin, wMax), (hMin, hMax)
-        print areaP2, wMaxp2, hMaxp2
-        print 'Area:', area, 'areaP2:', areaP2, 'max:', maxTextureArea, 'ratio: 1 /', maxTextureArea/areaP2
-        print 'Avg Width:', avgWidth, nextPower2(avgWidth), areaP2/avgWidthP2
-
-    if 1:
-        list(layout(avgWidthP2, areaP2/avgWidthP2))
-
-    if 0:
-        print 
-        for h, (widthP2, width, unused) in sorted(hwSumMap.items()):
-            print '    h: %6s wp2: %6s width: %6s unused: %6s' % (h, widthP2, width, unused)
-        print
-        print
+    for e in alg.layout():
+        if 0: 
+            print e.key, e.pos, e.size
 
