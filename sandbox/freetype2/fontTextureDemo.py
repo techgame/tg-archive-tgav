@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #!/usr/local/bin/python2.5
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ##~ Copyright (C) 2002-2004  TechGame Networks, LLC.
@@ -16,13 +17,14 @@ import array
 
 from ctypes import byref, c_void_p
 
-from TG.openGL import texture
-from fontTexture import GLFreetypeFace
-from renderBase import *
+from TG.tgavUtility.renderBase import RenderSkinModelBase
 
+from TG.openGL import texture
 from TG.openGL.raw import gl, glu
 from TG.openGL.raw.gl import *
 from TG.openGL.raw.glu import *
+
+from fontTexture import GLFreetypeFace
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Constants / Variables / Etc. 
@@ -63,7 +65,10 @@ class RenderSkinModel(RenderSkinModelBase):
         #glCullFace(GL_BACK)
         #glEnable(GL_CULL_FACE)
 
-        glClearColor(0.05, 0.05, 0.05, 0.0)
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
+        glClearColor(8/255., 8/255., 8/255., 8/255.)
         glClear (GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -80,12 +85,9 @@ class RenderSkinModel(RenderSkinModelBase):
 
         self.loadCheckerBoard()
 
-        fontFilename = self.fonts['AppleGothic']
+        fontFilename = self.fonts['Papyrus']
         print fontFilename
         self.loadFontTexture(fontFilename, 48)
-
-        glBindTexture(GL_TEXTURE_2D, 0)
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 4)
 
     checkerBoard = None
     def loadCheckerBoard(self):
@@ -143,21 +145,14 @@ class RenderSkinModel(RenderSkinModelBase):
         if not self.sized: return
 
         c = renderStart*5
-        cc = abs(0.2 - (c/60.) % 0.4)
-        #cc = 0.05
-        glClearColor(cc, cc, cc, 0)
 
+        #cc = abs(0.2 - (c/60.) % 0.4)
+        #cc = 8/255
+        #glClearColor(cc, cc, cc, 0)
         glClear (GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
-        glEnable(GL_BLEND)
         glEnable(GL_TEXTURE_2D)
         glPushMatrix()
-
-        #glRotatef((c*4) % 360.0, 0, 0, 1)
-        #glRotatef((c*3) % 360.0, 0, 1, 0)
-        #glRotatef((c*5) % 360.0, 0, 1, 0)
-
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
         size = self.viewPortSize
         vl, vr = 0., size[0]
@@ -179,7 +174,7 @@ class RenderSkinModel(RenderSkinModelBase):
             glBindTexture(GL_TEXTURE_2D, self.checkerBoard)
 
             glBegin(GL_QUADS)
-            self.makeWhite(vl, vr, vt, vb)
+            self.makeWhite(vl, vr, vb, vt)
             glEnd()
 
         glPopMatrix()
@@ -208,12 +203,12 @@ class RenderSkinModel(RenderSkinModelBase):
                 vb, vt = 0, fh
 
             glBegin(GL_QUADS)
-            self.makeColor(vl, vr, vt, vb, c=(.5, .5, 1., 1.))
-            #self.makeWhite(vl, vr, vt, vb)
-            #self.makeRect(vl, vr, vt, vb)
+            self.makeColor(vl, vr, vb, vt, c=(.5, .5, 1., 1.))
+            #self.makeWhite(vl, vr, vb, vt)
+            #self.makeRect(vl, vr, vb, vt)
             glEnd()
             glBegin(GL_LINE_LOOP)
-            self.makeRect(vl, vr, vt, vb)
+            self.makeRect(vl, vr, vb, vt)
             glEnd()
 
             if 0:
@@ -222,55 +217,39 @@ class RenderSkinModel(RenderSkinModelBase):
                 glTranslatef(-(vr+vl)/2, -(vt+vb)/2, 0.)
 
                 glBegin(GL_QUADS)
-                self.makeRect(vl, vr, vt, vb)
+                self.makeRect(vl, vr, vb, vt)
                 glEnd()
 
         glPopMatrix()
 
         glDisable(GL_TEXTURE_2D)
 
-    def makeWhite(self, vl, vr, vt, vb):
-        self.makeColor(vl, vr, vt, vb, c=(1., 1., 1., 1.))
-    def makeBlack(self, vl, vr, vt, vb):
-        self.makeColor(vl, vr, vt, vb, c=(0., 0., 0., 1.))
+    def makeWhite(self, vl, vr, vb, vt):
+        self.makeColor(vl, vr, vb, vt, c=(1., 1., 1., 1.))
+    def makeBlack(self, vl, vr, vb, vt):
+        self.makeColor(vl, vr, vb, vt, c=(0., 0., 0., 1.))
 
-    def makeColor(self, vl, vr, vt, vb, c=(1., 1., 1., 1.)):
-        glColor4f(*c)
-        glNormal3s(0, 0, 1)
+    def makeColor(self, vl, vr, vb, vt, c=(1., 1., 1., 1.)):
+        glColor4f(*c);
+        glNormal3s(0, 0, 1);
 
-        glVertex3f(vl, vt, 0)
-        glTexCoord2s(0, 1)
+        glVertex3f(vl, vt, 0); glTexCoord2s(0, 1); 
+        glVertex3f(vl, vb, 0); glTexCoord2s(1, 1); 
+        glVertex3f(vr, vb, 0); glTexCoord2s(1, 0); 
+        glVertex3f(vr, vt, 0); glTexCoord2s(0, 0);
 
-        glVertex3f(vl, vb, 0)
-        glTexCoord2s(1, 1)
+    def makeRect(self, vl, vr, vb, vt, a=1.0):
+        glNormal3s(0, 0, 1);
 
-        glVertex3f(vr, vb, 0)
-        glTexCoord2s(1, 0)
-
-        glVertex3f(vr, vt, 0)
-        glTexCoord2s(0, 0)
-
-    def makeRect(self, vl, vr, vt, vb, a=1.0):
-        glNormal3s(0, 0, 1)
-
-        glVertex3f(vl, vt, 0)
-        glTexCoord2s(0, 1)
-        glColor4f(0.5, 1., 1., a)
-
-        glVertex3f(vl, vb, 0)
-        glTexCoord2s(1, 1)
-        glColor4f(0.5, 0.5, 1., a)
-
-        glVertex3f(vr, vb, 0)
-        glTexCoord2s(1, 0)
-        glColor4f(1., 0.5, 1., a)
-
-        glVertex3f(vr, vt, 0)
-        glTexCoord2s(0, 0)
-        glColor4f(1., 1., 1., a)
+        glVertex3f(vl, vt, 0); glTexCoord2s(0, 1); glColor4f(0.5, 1., 1., a);
+        glVertex3f(vl, vb, 0); glTexCoord2s(1, 1); glColor4f(0.5, 0.5, 1., a);
+        glVertex3f(vr, vb, 0); glTexCoord2s(1, 0); glColor4f(1., 0.5, 1., a);
+        glVertex3f(vr, vt, 0); glTexCoord2s(0, 0); glColor4f(1., 1., 1., a);
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ Main 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-if __name__ == '__main__':
+if __name__=='__main__':
     RenderSkinModel().skinModel()
 
