@@ -75,14 +75,15 @@ class Block(object):
         self.unused.append(anUnusedRgn)
         return anUnusedRgn
 
-    def printUnused(self, exclude=(), title='Unused:'):
-        print title
+    def printUnused(self, exclude=()):
+        print "Font Texture size:", self.size
+        print '  Unused Regions:'
         total = 0
         for r in self.unused:
             if r.key in exclude: continue
             total += r.area
-            print '  %5s <+ %5s' % (total, r.area), ':', r.key, 's:', r.size, 'p:', r.pos
-        print '-- unused :', total, 'ratio:', total/float(self.area) 
+            print '    %5s <+ %5s' % (total, r.area), ':', r.key, 's:', r.size, 'p:', r.pos
+        print '  -- unused :', total, 'ratio:', total/float(self.area) 
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

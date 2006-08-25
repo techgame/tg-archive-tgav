@@ -89,7 +89,7 @@ class GLFreetypeFace(FreetypeFontFace):
             rgn.w <<= 1
             rgn, iLayout = alg.layoutSize(rgn.size)
             charLayout = dict((e.key, e.pos) for e in iLayout)
-        #rgn.printUnused(('LastRow', 'Bottom'))
+        rgn.printUnused()#('LastRow', 'Bottom'))
 
         return rgn.size, charLayout
 

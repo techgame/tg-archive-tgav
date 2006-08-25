@@ -42,7 +42,9 @@ class RenderSkinModel(RenderSkinModelBase):
             'Papyrus': '/Library/Fonts/Papyrus.dfont',
 
             'AppleGothic':'/System/Library/Fonts/AppleGothic.dfont',
-            'StoneSans': '/Library/Fonts/Stone Sans ITC TT'
+            'StoneSans': '/Library/Fonts/Stone Sans ITC TT',
+
+            'Helvetica': '/System/Library/Fonts/Helvetica.dfont',
             }
 
     def glCheck(self):
@@ -85,9 +87,9 @@ class RenderSkinModel(RenderSkinModelBase):
 
         self.loadCheckerBoard()
 
-        fontFilename = self.fonts['Papyrus']
+        fontFilename = self.fonts['Helvetica']
         print fontFilename
-        self.loadFontTexture(fontFilename, 48)
+        self.loadFontTexture(fontFilename, 24)
 
     checkerBoard = None
     def loadCheckerBoard(self):

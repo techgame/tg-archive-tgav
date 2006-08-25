@@ -12,7 +12,7 @@
 
 import ctypes
 from ctypes import cast, byref, c_void_p
-from raw import gl, glu
+from raw import gl, glu, glext
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -426,7 +426,10 @@ class Texture(GLObject):
     def setImage2d(self, data, level=0):
         for _ in data.select():
             self.width, self.height, self.depth = data.width, data.height, 0
+            assert gl.glGetError() == 0
             gl.glTexImage2D(self.target, level, self.format, 
+                data.width, data.height, data.border, data.format, data.dataType, data.ptr)
+            assert gl.glGetError() == 0, (self.target, level, self.format, 
                 data.width, data.height, data.border, data.format, data.dataType, data.ptr)
         return data
     def setImage3d(self, data, level=0):
@@ -501,4 +504,37 @@ class Texture(GLObject):
             gl.glCompressedTexSubImage3D(self.target, level, data.x, data.y, data.z, 
                 data.width, data.height, data.depth, data.format, data.dataType, data.ptr)
         return data
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    _maxTextureSizeByTarget = {}
+
+    _textureTargetToMaxPName = {
+        gl.GL_TEXTURE_1D: gl.GL_MAX_TEXTURE_SIZE,
+        gl.GL_TEXTURE_2D: gl.GL_MAX_TEXTURE_SIZE,
+        gl.GL_TEXTURE_3D: gl.GL_MAX_3D_TEXTURE_SIZE,
+        gl.GL_TEXTURE_CUBE_MAP: gl.GL_MAX_CUBE_MAP_TEXTURE_SIZE,
+        glext.GL_TEXTURE_RECTANGLE_ARB: glext.GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB,
+        }
+
+    def maxTextureSize(self):
+        r = self._maxTextureSizeByTarget.get(self.target, None)
+        if r is None:
+            pname = self._textureTargetToMaxPName[self.target]
+            i = ctypes.c_int(0)
+            gl.glGetIntegerv(pname, byref(i))
+            r = i.value
+            self._maxTextureSizeByTarget[self.target] = r
+        return r
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    _powersOfTwo = [1<<s for s in xrange(31)]
+
+    @staticmethod
+    def _idxNextPowerOf2(v, powersOfTwo=_powersOfTwo):
+        return bisect_left(powersOfTwo, v)
+    @staticmethod
+    def _nextPowerOf2(v, powersOfTwo=_powersOfTwo):
+        return powersOfTwo[bisect_left(powersOfTwo, v)]
 

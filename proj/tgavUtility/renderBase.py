@@ -35,6 +35,24 @@ xmlSkin = XMLSkin("""<?xml version='1.0'?>
 
     <frame>
         ctx.model.setFrame(obj)
+        <menubar>
+            <menu text='View'>
+                <item text='Full Screen\tCtrl-F' help='Shows My Frame on the entire screen'>
+                    <event>
+                        if ctx.frame.IsFullScreen():
+                            ctx.frame.ShowFullScreen(False)
+                        else:
+                            ctx.frame.ShowFullScreen(True)
+                    </event>
+                    <event type='EVT_UPDATE_UI'>
+                        if ctx.frame.IsFullScreen():
+                            obj.SetText('Restore from Full Screen\tCtrl-F')
+                        else:
+                            obj.SetText('Full Screen\tCtrl-F')
+                    </event>
+                </item>
+            </menu>
+        </menubar>
 
         <layout>
             <panel>
