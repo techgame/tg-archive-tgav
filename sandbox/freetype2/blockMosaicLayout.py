@@ -81,7 +81,7 @@ class Block(object):
         for r in self.unused:
             if r.key in exclude: continue
             total += r.area
-            print '  %5s <+ %5s' % (total, r.area), ':', r.key, r.size, r.pos
+            print '  %5s <+ %5s' % (total, r.area), ':', r.key, 's:', r.size, 'p:', r.pos
         print '-- unused :', total, 'ratio:', total/float(self.area) 
 
 
@@ -142,26 +142,10 @@ class BlockMosaicAlg(object):
         if self._blockAreaP2 > self.maxArea:
             raise Exception("Layout not possible. Required layout area is larger than maximum area available")
 
-        width, height = self._blockWMaxP2 << 1, self._blockHMaxP2
+        width, height = self._blockWMaxP2, self._blockHMaxP2
 
         widthList = [sum(w for w, b in widthMap) for h, widthMap in blocksByHeight.iteritems()]
         widthP2List = map(self._nextPowerOf2, widthList)
-
-        if 1:
-            self._wWide = sum(widthP2List)/len(widthP2List) 
-            self._wWideP2 = self._nextPowerOf2(self._wWide)
-            self._hWideP2 = self._blockAreaP2 / self._wWideP2
-
-            if (self._wWideP2 > width) and (self._hWideP2 > height):
-                return (self._wWideP2, self._hWideP2)
-
-        if 1:
-            self._wNarrow = sum(widthList)/len(widthList)
-            self._wNarrowP2 = self._nextPowerOf2(self._wNarrow)
-            self._hNarrowP2 = self._blockAreaP2 / self._wNarrowP2
-
-            if (self._wNarrowP2 > width) and (self._hNarrowP2 > height):
-                return (self._wNarrowP2, self._hNarrowP2)
 
         if 1:
             self._wWidest = max(widthP2List)
@@ -172,6 +156,22 @@ class BlockMosaicAlg(object):
                 return (self._wWidestP2, self._hWidestP2)
 
         if 1:
+            self._wWide = sum(widthP2List)/len(widthP2List) 
+            self._wWideP2 = self._nextPowerOf2(self._wWide)
+            self._hWideP2 = self._blockAreaP2 / self._wWideP2
+
+            if (self._wWideP2 > width) and (self._hWideP2 > height):
+                return (self._wWideP2, self._hWideP2)
+
+        if 0:
+            self._wNarrow = sum(widthList)/len(widthList)
+            self._wNarrowP2 = self._nextPowerOf2(self._wNarrow)
+            self._hNarrowP2 = self._blockAreaP2 / self._wNarrowP2
+
+            if (self._wNarrowP2 > width) and (self._hNarrowP2 > height):
+                return (self._wNarrowP2, self._hNarrowP2)
+
+        if 0:
             self._wMaxWidth = self.maxSize[0]
             self._wMaxWidthP2 = self._nextPowerOf2(self._wMaxWidth)
             self._hMaxWidthP2 = self._blockAreaP2 / self._wMaxWidthP2
@@ -179,7 +179,8 @@ class BlockMosaicAlg(object):
             if (self._wMaxWidthP2 > width) and (self._hMaxWidthP2 > height):
                 return (self._wMaxWidthP2, self._hMaxWidthP2)
 
-        return width, (self._blockAreaP2 / width) << 1
+        width <<= 3
+        return width, (self._blockAreaP2 / width)
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -197,7 +198,7 @@ class BlockMosaicAlg(object):
 
         bOutOfRoom = False
         hMax = 0
-        x = y = 0
+        x = y = self.borders
         for heightGrp in self._heightGrps:
             for elemH in heightGrp:
                 widthMap = heightMap[elemH]
@@ -227,7 +228,6 @@ class BlockMosaicAlg(object):
                         # adjust it's layout position
                         block.pos = (x, y)
                         # and yield it
-
                         yield block
 
                         # advance horizontally
