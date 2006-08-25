@@ -17,11 +17,13 @@ from face import FreetypeFace
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def asFreq(d):
+def _asFreq(d):
     freq = dict()
     for e in d: 
         freq[e] = freq.get(e, 0) + 1
     return ', '.join('%s:%s' % e for e in freq.iteritems())
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class FreetypeFontFace(object):
     FreetypeFaceFactory = FreetypeFace
@@ -148,10 +150,10 @@ class FreetypeFontFace(object):
             print
 
         print
-        print 'widths: ', sum(widths), (min(widths), max(widths)), asFreq(widths)
-        print 'heights:', sum(heights), (min(heights), max(heights)), asFreq(heights)
-        print 'horiAdv:', sum(horiAdv), (min(horiAdv), max(horiAdv)), asFreq(horiAdv)
-        print 'vertAdv:', sum(vertAdv), (min(vertAdv), max(vertAdv)), asFreq(vertAdv)
+        print 'widths: ', sum(widths), (min(widths), max(widths)), _asFreq(widths)
+        print 'heights:', sum(heights), (min(heights), max(heights)), _asFreq(heights)
+        print 'horiAdv:', sum(horiAdv), (min(horiAdv), max(horiAdv)), _asFreq(horiAdv)
+        print 'vertAdv:', sum(vertAdv), (min(vertAdv), max(vertAdv)), _asFreq(vertAdv)
         print
 
     def printKerning(self, chars):

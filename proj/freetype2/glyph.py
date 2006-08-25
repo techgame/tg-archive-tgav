@@ -83,6 +83,13 @@ class FreetypeFaceGlyph(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    @property
+    def bitmapSize(self):
+        bm = self.bitmap
+        return (bm.width, bm.rows)
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     _renderMode = None
     def getRenderMode(self):
         if self._renderMode is None:

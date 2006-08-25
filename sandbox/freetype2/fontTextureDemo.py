@@ -99,6 +99,7 @@ class RenderSkinModel(RenderSkinModelBase):
     def loadFontTexture(self, fontFilename, fontSize):
         font = GLFreetypeFace(fontFilename, fontSize)
         self.fontTexture = font.load()
+        font.loadChars('gary')
 
     sized = False
     def renderResize(self, glCanvas):

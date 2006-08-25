@@ -187,8 +187,7 @@ class TextureImageBasic(GLObject):
         self.texData(array, array.buffer_info()[0])
     def texBlank(self):
         # setup the alignment properly
-        ps = self.newPixelStore()
-        ps.alignment = self.getDataTypeSize()
+        ps = self.newPixelStore(alignment=1)
         byteCount = self.getSizeInBytes()
         data = (ctypes.c_ubyte*byteCount)()
         self.texCData(data)
@@ -211,8 +210,8 @@ class TextureImageBasic(GLObject):
         return self._pixelStore
     def setPixelStore(self, pixelStore):
         self._pixelStore = pixelStore
-    def newPixelStore(self):
-        pixelStore = PixelStore()
+    def newPixelStore(self, *args, **kw):
+        pixelStore = PixelStore(*args, **kw)
         self.setPixelStore(pixelStore)
         return pixelStore
     pixelStore = property(getPixelStore, setPixelStore)
