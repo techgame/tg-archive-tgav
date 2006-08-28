@@ -23,7 +23,7 @@ from TG.skinning.toolkits.wx import wxSkinModel, XMLSkin
 xmlSkin = XMLSkin("""<?xml version='1.0'?>
 <skin xmlns='TG.skinning.toolkits.wx'>
     <style>
-        frame {frame-main:1; locking:0; size:1024,768; show: True}
+        frame {frame-main:1; locking:0; show: True}
         frame>layout {layout-cfg:1,EXPAND}
         frame>layout>panel {layout-cfg:1,EXPAND}
 
@@ -79,10 +79,13 @@ xmlSkin = XMLSkin("""<?xml version='1.0'?>
                                 refresh(canvas)
                             </event>
                         </timer>
+
+                        <event type='EVT_MOUSE_EVENTS' run='ctx.model.onMouse(evt)' />
                     </opengl-canvas>
                 </layout>
             </panel>
         </layout>
+        obj.SetClientSize(ctx.model.clientSize)
     </frame>
 </skin>
 """)
@@ -93,6 +96,7 @@ xmlSkin = XMLSkin("""<?xml version='1.0'?>
 
 class RenderSkinModelBase(wxSkinModel):
     xmlSkin = xmlSkin
+    clientSize = (800, 800)
     frameTitle = 'GLCanvas'
     fpsFormat = '%.1f fps (true), %.0f fps (%.5f:%.5f render:swap)'
     fps = 60
@@ -127,13 +131,19 @@ class RenderSkinModelBase(wxSkinModel):
             fpsEffective = totalEntries / (timeRender + timeSwap)
 
             fpsStr = self.fpsFormat % (fpsTrue, fpsEffective, timeRender/totalEntries, timeSwap/totalEntries)
-            print '\r', fpsStr.ljust(75),
+            self._printFPS(fpsStr)
             sys.stdout.flush()
 
             self.timingLogRender[:] = self.timingLogRender[-self._historyKeep:]
             self.timingLogSwap[:] = self.timingLogSwap[-self._historyKeep:]
             self._historyLen = len(self.timingLogRender)
             self._lastUpdate = renderFinish
+
+    def _printFPS(self, fpsStr):
+        print '\r', fpsStr.ljust(75),
+
+    def onMouse(self, evt):
+        pass
 
     def initialize(self, glCanvas):
         self._lastUpdate = self.timestamp()

@@ -342,11 +342,12 @@ class Texture(GLObject):
     target = 0 # GL_TEXTURE_1D, GL_TEXTURE_2D, etc.
     format = None # GL_RGBA, GL_INTENSITY, etc.
 
-    width = height = depth = None # these are set from setImage and setCompressedImage
-
     def __init__(self, *args, **kwargs):
         if args:
             self.create(*args, **kwargs)
+
+    def __del__(self):
+        self.release()
 
     def create(self, target, format, **kwargs):
         if not self._as_parameter_ is None:
@@ -359,6 +360,15 @@ class Texture(GLObject):
 
         self.select().next()
         self.set(**kwargs)
+        
+
+    def release(self):
+        if not self._as_parameter_:
+            return
+
+        gl.glDeleteTextures(1, byref(self._as_parameter_))
+
+        self._as_parameter_ = None
 
     def select(self, unit=None):
         if unit is not None:
@@ -395,20 +405,36 @@ class Texture(GLObject):
     filter = property(fset=setFilter)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #~ Size & Dimensios
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    size = None # set when data is set into setImageND or setCompressedImageND
+
+    @property
+    def width(self): return self.size[0]
+    @property
+    def height(self): return self.size[1]
+    @property
+    def depth(self): return self.size[2]
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     #~ Texture Data
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     TextureImage1DFactory = TextureImage1D
-    def data1d(self, *args, **kw):
-        return self.TextureImage1DFactory(*args, **kw)
+    @classmethod
+    def data1d(klass, *args, **kw):
+        return klass.TextureImage1DFactory(*args, **kw)
 
     TextureImage2DFactory = TextureImage2D
-    def data2d(self, *args, **kw):
-        return self.TextureImage2DFactory(*args, **kw)
+    @classmethod
+    def data2d(klass, *args, **kw):
+        return klass.TextureImage2DFactory(*args, **kw)
 
     TextureImage3DFactory = TextureImage3D
-    def data3d(self, *args, **kw):
-        return self.TextureImage3DFactory(*args, **kw)
+    @classmethod
+    def data3d(klass, *args, **kw):
+        return klass.TextureImage3DFactory(*args, **kw)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     #~ Tex Image Setting
@@ -419,22 +445,19 @@ class Texture(GLObject):
         return self
     def setImage1d(self, data, level=0):
         for _ in data.select():
-            self.width, self.height, self.depth = data.width, 0, 0
+            self.size = data.size
             gl.glTexImage1D(self.target, level, self.format, 
                 data.width, data.border, data.format, data.dataType, data.ptr)
         return data
     def setImage2d(self, data, level=0):
         for _ in data.select():
-            self.width, self.height, self.depth = data.width, data.height, 0
-            assert gl.glGetError() == 0
+            self.size = data.size
             gl.glTexImage2D(self.target, level, self.format, 
-                data.width, data.height, data.border, data.format, data.dataType, data.ptr)
-            assert gl.glGetError() == 0, (self.target, level, self.format, 
                 data.width, data.height, data.border, data.format, data.dataType, data.ptr)
         return data
     def setImage3d(self, data, level=0):
         for _ in data.select():
-            self.width, self.height, self.depth = data.width, data.height, data.depth
+            self.size = data.size
             gl.glTexImage3D(self.target, level, self.format, 
                 data.width, data.height, data.depth, data.border, data.format, data.dataType, data.ptr)
         return data
@@ -467,19 +490,19 @@ class Texture(GLObject):
         return self
     def setCompressedImage1d(self, data, level=0):
         for _ in data.select():
-            self.width, self.height, self.depth = data.width, 0, 0
+            self.size = data.size
             gl.glCompressedTexImage1D(self.target, level, self.format, 
                     data.width, data.border, data.format, data.dataType, data.ptr)
         return data
     def setCompressedImage2d(self, data, level=0):
         for _ in data.select():
-            self.width, self.height, self.depth = data.width, data.height, 0
+            self.size = data.size
             gl.glCompressedTexImage2D(self.target, level, self.format, 
                 data.width, data.height, data.border, data.format, data.dataType, data.ptr)
         return data
     def setCompressedImage3d(self, data, level=0):
         for _ in data.select():
-            self.width, self.height, self.depth = data.width, data.height, data.depth
+            self.size = data.size
             gl.glCompressedTexImage3D(self.target, level, self.format, 
                 data.width, data.height, data.depth, data.border, data.format, data.dataType, data.ptr)
         return data
