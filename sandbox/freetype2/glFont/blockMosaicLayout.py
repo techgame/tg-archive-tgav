@@ -31,6 +31,9 @@ class Block(object):
     x = y = w = h = 0
     key = None
 
+    def __nonzero__(self):
+        return (self.w>0 and self.h>0)
+
     maxSentinal = maxSentinal
     def __cmp__(self, other):
         if (other is self.maxSentinal): 
@@ -90,7 +93,7 @@ class BlockMosaicAlg(object):
     borders = 1
 
     def __init__(self, maxSize=None):
-        self._layoutRgn = self.LayoutRegionFactory()
+        self._blocks = []
         if maxSize:
             self.maxSize = maxSize
 
@@ -98,63 +101,8 @@ class BlockMosaicAlg(object):
 
     def addBlock(self, size, key=None):
         block = self.BlockFactory.fromSize(size, key)
-        self._layoutRgn.addBlock(block)
+        self._blocks.append(block)
         return block
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    def getMaxWidth(self):
-        return self._layoutRgn.getMaxWidth()
-    def setMaxWidth(self, maxWidth):
-        return self._layoutRgn.setMaxWidth(maxWidth)
-    maxWidth = property(getMaxWidth, setMaxWidth)
-
-    def getMaxHeight(self):
-        return self._layoutRgn.getMaxHeight()
-    def setMaxHeight(self, maxHeight):
-        return self._layoutRgn.setMaxHeight(maxHeight)
-    maxHeight = property(getMaxHeight, setMaxHeight)
-
-    def getMaxSize(self):
-        return self._layoutRgn.getMaxSize()
-    def setMaxSize(self, maxSize):
-        return self._layoutRgn.setMaxSize(maxSize)
-    maxSize = property(getMaxSize, setMaxSize)
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    def layout(self, borders=NotImplemented):
-        return self.layoutSize(self.getMaxSize(), borders)
-
-    def layoutSize(self, size, borders=NotImplemented):
-        return self._layoutRegion(self._layoutRgn, size, borders)
-
-    def _layoutRegion(self, rgn, size, borders=NotImplemented):
-        if borders is NotImplemented:
-            borders = self.borders
-
-        rgn.setRgnFromSize(size)
-        return rgn, rgn.iterLayout(borders)
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#~ Layout Regions
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-class LayoutRegion(object):
-    maxSentinal = maxSentinal
-
-    RegionFactory = Block
-    UnusedRegionFactory = None
-    NarrowRegionFactory = RegionFactory
-    BlockRegionFactory = RegionFactory
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    def addBlock(self, block):
-        raise NotImplementedError('Subclass Responsibility: %r' % (self,))
-
-    def iterLayout(self, borders=1):
-        raise NotImplementedError('Subclass Responsibility: %r' % (self,))
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -183,39 +131,80 @@ class LayoutRegion(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    def layout(self, borders=NotImplemented):
+        return self.layoutSize(self.getMaxSize(), borders)
+
+    def layoutSize(self, size, borders=NotImplemented):
+        rgn = self.LayoutRegionFactory(size)
+        return self.layoutRegion(rgn, borders)
+
+    def layoutRegion(self, rgn, borders=NotImplemented):
+        rgn.setBlocks(self._blocks)
+
+        if borders is NotImplemented: 
+            borders = self.borders
+        return rgn, rgn.iterLayout(borders)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ Layout Regions
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+class LayoutRegion(object):
+    maxSentinal = maxSentinal
+
+    RegionFactory = Block.fromPosSize
+    NarrowRegionFactory = RegionFactory
+    BlockRegionFactory = RegionFactory
+    UnusedRegionFactory = None
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    def __init__(self, size, blocks=None):
+        self.setRgnFromSize(size)
+        if blocks:
+            self.setBlocks(blocks)
+
+    def layout(self, borders=1):
+        raise NotImplementedError('Subclass Responsibility: %r' % (self,))
+
+    def iterLayout(self, borders):
+        result, remaining = self.layout(borders)
+        return iter(result)
+
+    def setBlocks(self, blocks):
+        raise NotImplementedError('Subclass Responsibility: %r' % (self,))
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     _rgn = None
     def getRgn(self):
-        if self._rgn is None:
-            self.setRgnFromSize()
         return self._rgn
     def setRgn(self, rgn):
         self._rgn = rgn
     rgn = property(getRgn, setRgn)
 
-    def setRgnFromSize(self, size=None):
-        if size is None: 
-            size = self.getMaxSize()
-        self.rgn = self.RegionFactory.fromSize(size)
+    def setRgnFromSize(self, size):
+        self.setRgnFromPosSize((0,0), size)
     def setRgnFromPosSize(self, pos, size):
-        self.rgn = self.RegionFactory.fromPosSize(pos, size)
+        self.rgn = self.RegionFactory(pos, size)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     minKeepDim = 10
     unused = None
 
-    def addUnusedGrowRgn(self, pos, size, key=None):
-        if self.UnusedRegionFactory is not None:
-            rgn = self.UnusedRegionFactory.fromPosSize(pos, size, key)
-            return self.addUnusedRgn(rgn, None)
+    def addUnusedBlockRgn(self, pos, size, key=None):
+        rgn = self.BlockRegionFactory(pos, size, key)
+        return self.addUnusedRgn(rgn, True)
 
     def addUnusedNarrowRgn(self, pos, size, key=None):
-        rgn = self.NarrowRegionFactory.fromPosSize(pos, size, key)
+        rgn = self.NarrowRegionFactory(pos, size, key)
         return self.addUnusedRgn(rgn, False)
 
-    def addUnusedBlockRgn(self, pos, size, key=None):
-        rgn = self.BlockRegionFactory.fromPosSize(pos, size, key)
-        return self.addUnusedRgn(rgn, True)
+    def addUnusedWasteRgn(self, pos, size, key=None):
+        if self.UnusedRegionFactory is not None:
+            rgn = self.UnusedRegionFactory(pos, size, key)
+            return self.addUnusedRgn(rgn, None)
 
     def addUnusedRgn(self, rgn, rgnIsBlock):
         if min(rgn.size) < self.minKeepDim: 
@@ -256,25 +245,139 @@ class LayoutRegion(object):
         if r: yield r
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ Horizontal Layouts
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class VerticalLayoutRegion(LayoutRegion):
-    def __init__(self):
-        self._blocksByHeight = {}
+class HorizontalLayoutRegion(LayoutRegion):
+    pass
 
-    def addBlock(self, block):
-        widthMap = self._blocksByHeight.setdefault(block.h, [])
-        insort(widthMap, (block.w, block))
-        return block
+class HorizontalRowLayoutRegion(HorizontalLayoutRegion):
+    def setBlocks(self, blocks):
+        self._blocks = sorted([(b.w, b) for b in blocks])
 
-    def _avgDeltaHeights(self):
-        return self._avgDeltaGroups(sorted(self._blocksByHeight.keys()))
+    def layout(self, borders=1):
+        result = []
+        rgn = self.getRgn()
+
+        maxSentinal = self.maxSentinal
+        x = borders; y = borders
+        rowWidth = rgn.w - x
+        hMax = 0
+
+        widthMap = self._blocks
+        while widthMap:
+            # Use bisect to find a block that is smaller than the remaining row width
+            i = bisect_right(widthMap, (rowWidth, maxSentinal)) - 1
+
+            if i >= 0:
+                # we found one, pop it off
+                elemW, block = widthMap.pop(i)
+
+                # adjust it's layout position
+                block.offset((x, y), fromRgn=rgn)
+                hMax = max(block.h, hMax)
+
+                # and return it
+                result.append(block)
+
+                # advance horizontally
+                x += elemW + borders*2
+                rowWidth = rgn.w - x
+
+            else:
+                break
+
+        # mark the rest of this row as unused
+        endRng = self.addUnusedNarrowRgn((x, y), (rowWidth, hMax), key='Row')
+
+        x = 0; y += hMax
+        bottomRgn = self.addUnusedBlockRgn((x, y), (rgn.w - x, rgn.h - y), key='Bottom')
+
+        remaining = [b[1] for b in self._blocks]
+        return result, remaining
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+class HorizontalBlockLayoutRegion(HorizontalLayoutRegion):
+    def setBlocks(self, blocks):
+        blocksByWidth = {}
+        for b in blocks:
+            blocksByWidth.setdefault(b.w, []).append(b)
+        self._blocksByWidth = blocksByWidth
+
+    def _avgDeltaWidths(self):
+        return self._avgDeltaGroups(sorted(self._blocksByWidth.keys()))
+
+    def layout(self, borders=1):
+        rgn = self.getRgn()
+        raise NotImplementedError()
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ Vertical Layouts
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+class VerticalLayoutRegion(LayoutRegion):
+    pass
+
+class VerticalColumnLayoutRegion(VerticalLayoutRegion):
+    def setBlocks(self, blocks):
+        self._blocks = sorted([(b.h, b) for b in blocks])
+
+    def layout(self, borders=1):
+        result = []
+        rgn = self.getRgn()
+
+        maxSentinal = self.maxSentinal
+        x = borders; y = borders
+        colHeight = rgn.h - y
+        wMax = 0
+
+        heightMap = self._blocks
+        while heightMap:
+            # Use bisect to find a block that is smaller than the remaining row heightMap
+            i = bisect_right(heightMap, (colHeight, maxSentinal)) - 1
+
+            if i >= 0:
+                # we found one, pop it off
+                elemH, block = heightMap.pop(i)
+
+                # adjust it's layout position
+                block.offset((x, y), fromRgn=rgn)
+                wMax = max(block.w, wMax)
+
+                # and return it
+                result.append(block)
+
+                # advance vertically
+                y += elemH + borders*2
+                colHeight = rgn.h - y
+
+            else:
+                break
+
+        # mark the rest of this row as unused
+        endRng = self.addUnusedNarrowRgn((x, y), (wMax, colHeight), key='Column')
+
+        y = 0; x += wMax
+        bottomRgn = self.addUnusedBlockRgn((x, y), (rgn.w - x, rgn.h - y), key='Right')
+
+        remaining = [b[1] for b in self._blocks]
+        return result, remaining
 
 class VerticalBlockLayoutRegion(VerticalLayoutRegion):
     bBreakGroups = True
 
-    def iterLayout(self, borders=1):
+    def setBlocks(self, blocks):
+        blocksByHeight = {}
+        for b in blocks:
+            blocksByHeight.setdefault(b.h, []).append((b.w, b))
+        self._blocksByHeight = blocksByHeight
+
+    def _avgDeltaHeights(self):
+        return self._avgDeltaGroups(sorted(self._blocksByHeight.keys()))
+
+    def layout(self, borders=1):
+        result = []
         rgn = self.getRgn()
 
         heightMap = self._blocksByHeight
@@ -292,7 +395,7 @@ class VerticalBlockLayoutRegion(VerticalLayoutRegion):
 
                 if elemH > hMax:
                     # mark the height delta as unused
-                    heightRgn = self.addUnusedGrowRgn((x, y), (x, (elemH-hMax)))
+                    heightRgn = self.addUnusedWasteRgn((x, y), (x, (elemH-hMax)))
                     hMax = elemH
                 elif elemH < hMax:
                     raise LayoutException("Heights are not in increasing order")
@@ -313,8 +416,8 @@ class VerticalBlockLayoutRegion(VerticalLayoutRegion):
                         # adjust it's layout position
                         block.offset((x, y), fromRgn=rgn)
 
-                        # and yield it
-                        yield block
+                        # and return it
+                        result.append(block)
 
                         # advance horizontally
                         x += elemW + borders*2
@@ -328,7 +431,7 @@ class VerticalBlockLayoutRegion(VerticalLayoutRegion):
 
                     if bNewRow:
                         # mark the rest of this row as unused
-                        endRng = self.addUnusedNarrowRgn((x, y), (rowWidth, hMax), key='Cap')
+                        endRng = self.addUnusedNarrowRgn((x, y), (rowWidth, hMax), key='Row')
 
                         # advance to the beginning of the next row
                         y += hMax + borders*2
@@ -358,7 +461,11 @@ class VerticalBlockLayoutRegion(VerticalLayoutRegion):
         x = 0; y += hMax
         bottomRgn = self.addUnusedBlockRgn((x, y), (rgn.w - x, rgn.h - y), key='Bottom')
 
+        return result, []
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 BlockMosaicAlg.LayoutRegionFactory = VerticalBlockLayoutRegion
+#BlockMosaicAlg.LayoutRegionFactory = HorizontalRowLayoutRegion
+#BlockMosaicAlg.LayoutRegionFactory = VerticalColumnLayoutRegion
 
