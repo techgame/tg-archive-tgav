@@ -540,14 +540,18 @@ class Texture(GLObject):
         glext.GL_TEXTURE_RECTANGLE_ARB: glext.GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB,
         }
 
-    def maxTextureSize(self):
-        r = self._maxTextureSizeByTarget.get(self.target, None)
+    def getMaxTextureSize(self):
+        return self.getMaxTextureSizeFor(self.target)
+
+    @classmethod
+    def getMaxTextureSizeFor(klass, target):
+        r = klass._maxTextureSizeByTarget.get(target, None)
         if r is None:
-            pname = self._textureTargetToMaxPName[self.target]
+            pname = klass._textureTargetToMaxPName[target]
             i = ctypes.c_int(0)
             gl.glGetIntegerv(pname, byref(i))
             r = i.value
-            self._maxTextureSizeByTarget[self.target] = r
+            klass._maxTextureSizeByTarget[target] = r
         return r
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

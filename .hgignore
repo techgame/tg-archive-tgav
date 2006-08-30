@@ -15,3 +15,4 @@ Icon?
 
 syntax: regexp
 ^gen/.*/build/.*
+^sandbox/openGL/imgDemo/.*\.png
