@@ -168,7 +168,7 @@ class alObjectReadProperty(alBasicReadProperty):
         return self.valueFromAPI(apiValue)
 
 class alObjectProperty(alObjectReadProperty):
-    valueToAPI = lambda x: x
+    valueToAPI = lambda self, x: x
     apiSet = None
 
     def __set__(self, obj, value):
