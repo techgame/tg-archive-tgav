@@ -10,6 +10,7 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+from bisect import bisect_left
 import ctypes
 from ctypes import cast, byref, c_void_p
 from raw import gl, glu, glext
@@ -559,9 +560,9 @@ class Texture(GLObject):
     _powersOfTwo = [1<<s for s in xrange(31)]
 
     @staticmethod
-    def _idxNextPowerOf2(v, powersOfTwo=_powersOfTwo):
+    def idxNextPowerOf2(v, powersOfTwo=_powersOfTwo):
         return bisect_left(powersOfTwo, v)
     @staticmethod
-    def _nextPowerOf2(v, powersOfTwo=_powersOfTwo):
+    def nextPowerOf2(v, powersOfTwo=_powersOfTwo):
         return powersOfTwo[bisect_left(powersOfTwo, v)]
 

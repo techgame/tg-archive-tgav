@@ -24,7 +24,7 @@ from TG.openGL.raw import gl, glu
 from TG.openGL.raw.gl import *
 from TG.openGL.raw.glu import *
 
-from fontTexture import GLFreetypeFace
+import fontTexture
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Constants / Variables / Etc. 
@@ -61,15 +61,18 @@ class RenderSkinModel(RenderSkinModelBase):
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
         glClearColor(8/255., 8/255., 8/255., 8/255.)
-        glClear (GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
+        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
-        fontFilename = self.fonts['Helvetica']
+        fontFilename = self.fonts['Zapfino']
         print fontFilename
         self.loadFontTexture(fontFilename, 24)
 
     def loadFontTexture(self, fontFilename, fontSize):
-        font = GLFreetypeFace(fontFilename, fontSize)
-        self.fontTexture = font.loadChars(string.printable)
+        if 0:
+            self.font = fontTexture.GLFreetypeFaceRect(fontFilename, fontSize)
+        else:
+            self.font = fontTexture.GLFreetypeFace2D(fontFilename, fontSize)
+        self.font.loadChars(string.printable)
 
     viewPortSize = None
     def renderResize(self, glCanvas):
@@ -91,54 +94,28 @@ class RenderSkinModel(RenderSkinModelBase):
     def renderContent(self, glCanvas, renderStart):
         if self.viewPortSize is None: return
 
-        glClear (GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
+        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
-        size = self.viewPortSize
-        vl, vr = 0., size[0]
-        vb, vt = 0., size[1]
+        glColor4f(1., 1., 1., 1.)
 
-        for e in self.fontTexture.select():
-            if 0:
-                glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
-            elif 0:
-                glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
-            else:
-                glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE)
-            fw,fh = self.fontTexture.width, self.fontTexture.height
+        if 0:
+            gl.glTexEnvf(gl.GL_TEXTURE_ENV, gl.GL_TEXTURE_ENV_MODE, gl.GL_MODULATE)
+        elif 0:
+            gl.glTexEnvf(gl.GL_TEXTURE_ENV, gl.GL_TEXTURE_ENV_MODE, gl.GL_DECAL)
+        else:
+            gl.glTexEnvf(gl.GL_TEXTURE_ENV, gl.GL_TEXTURE_ENV_MODE, gl.GL_REPLACE)
 
-            size = self.viewPortSize
-            vl = (size[0] - fw)/2.
-            vr = vl + fw
+        self.font.drawFontTexture()
 
-            vt = size[1] - max(0, (size[1] - fh)/2.)
-            vb = vt - fh
+        glPushMatrix()
+        glTranslatef(400, 400, 0.5)
 
-            glBegin(GL_QUADS)
-            self.makeColor(vl, vr, vb, vt, c=(.5, .5, 1., 1.))
-            #self.makeWhite(vl, vr, vb, vt)
-            glEnd()
+        self.font.drawString('Great!')
+        #self.font.drawChar('g')
+        #self.font.drawChar('r')
+        #self.font.drawChar('e')
 
-    def makeWhite(self, vl, vr, vb, vt):
-        self.makeColor(vl, vr, vb, vt, c=(1., 1., 1., 1.))
-    def makeBlack(self, vl, vr, vb, vt):
-        self.makeColor(vl, vr, vb, vt, c=(0., 0., 0., 1.))
-
-    def makeColor(self, vl, vr, vb, vt, c=(1., 1., 1., 1.)):
-        glColor4f(*c);
-        glNormal3s(0, 0, 1);
-
-        glVertex3f(vl, vt, 0); glTexCoord2s(0, 1); 
-        glVertex3f(vl, vb, 0); glTexCoord2s(1, 1); 
-        glVertex3f(vr, vb, 0); glTexCoord2s(1, 0); 
-        glVertex3f(vr, vt, 0); glTexCoord2s(0, 0);
-
-    def makeRect(self, vl, vr, vb, vt, a=1.0):
-        glNormal3s(0, 0, 1);
-
-        glVertex3f(vl, vt, 0); glTexCoord2s(0, 1); glColor4f(0.5, 1., 1., a);
-        glVertex3f(vl, vb, 0); glTexCoord2s(1, 1); glColor4f(0.5, 0.5, 1., a);
-        glVertex3f(vr, vb, 0); glTexCoord2s(1, 0); glColor4f(1., 0.5, 1., a);
-        glVertex3f(vr, vt, 0); glTexCoord2s(0, 0); glColor4f(1., 1., 1., a);
+        glPopMatrix()
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Main 

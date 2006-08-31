@@ -142,9 +142,7 @@ class BlockMosaicAlg(object):
         if borders is NotImplemented: 
             borders = self.borders
 
-        result, remaining = rgn.layoutBlocks(self._blocks, borders)
-        assert len(remaining) == 0
-        return rgn, iter(result)
+        return rgn.layoutBlocks(self._blocks, borders)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Layout Regions
@@ -290,8 +288,9 @@ class HorizontalRowLayoutRegion(HorizontalLayoutRegion):
         y = cy+hMax
         bottomRgn = self.addUnusedBlockRgn((0, y), (rgn.w, rgn.h-y), key='Bottom')
 
+        usedSize = (rgn.w, y)
         remaining = [b[1] for b in self._blocks]
-        return result, remaining
+        return usedSize, result, remaining
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -352,11 +351,12 @@ class VerticalColumnLayoutRegion(VerticalLayoutRegion):
         x = cx + wMax
         bottomRgn = self.addUnusedBlockRgn((x,0), (rgn.w-x, rgn.h), key='Right')
 
+        usedSize = (x, rgn.h)
         remaining = [b[1] for b in self._blocks]
-        return result, remaining
+        return usedSize, result, remaining
 
 class VerticalBlockLayoutRegion(VerticalLayoutRegion):
-    bBreakGroups = True
+    bBreakGroups = False
 
     def setBlocks(self, blocks):
         blocksByHeight = {}
@@ -450,7 +450,9 @@ class VerticalBlockLayoutRegion(VerticalLayoutRegion):
         x = 0; y += hMax
         bottomRgn = self.addUnusedBlockRgn((x, y), (rgn.w - x, rgn.h - y), key='Bottom')
 
-        return result, []
+        usedSize = (rgn.w, y)
+        remaining = [b[1] for wm in self._blocksByHeight.itervalues() for b in wm]
+        return usedSize, result, remaining
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
