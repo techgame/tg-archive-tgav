@@ -139,11 +139,12 @@ class BlockMosaicAlg(object):
         return self.layoutRegion(rgn, borders)
 
     def layoutRegion(self, rgn, borders=NotImplemented):
-        rgn.setBlocks(self._blocks)
-
         if borders is NotImplemented: 
             borders = self.borders
-        return rgn, rgn.iterLayout(borders)
+
+        result, remaining = rgn.layoutBlocks(self._blocks, borders)
+        assert len(remaining) == 0
+        return rgn, iter(result)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Layout Regions
@@ -164,14 +165,14 @@ class LayoutRegion(object):
         if blocks:
             self.setBlocks(blocks)
 
-    def layout(self, borders=1):
-        raise NotImplementedError('Subclass Responsibility: %r' % (self,))
-
-    def iterLayout(self, borders):
-        result, remaining = self.layout(borders)
-        return iter(result)
+    def layoutBlocks(self, blocks, borders=1):
+        self.setBlocks(blocks)
+        return self.layout(borders)
 
     def setBlocks(self, blocks):
+        raise NotImplementedError('Subclass Responsibility: %r' % (self,))
+
+    def layout(self, borders=1):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -258,40 +259,36 @@ class HorizontalRowLayoutRegion(HorizontalLayoutRegion):
     def layout(self, borders=1):
         result = []
         rgn = self.getRgn()
-
         maxSentinal = self.maxSentinal
-        x = borders; y = borders
-        rowWidth = rgn.w - x
+        widthMap = self._blocks
+
+        cx = borders; cy = borders
         hMax = 0
 
-        widthMap = self._blocks
         while widthMap:
             # Use bisect to find a block that is smaller than the remaining row width
-            i = bisect_right(widthMap, (rowWidth, maxSentinal)) - 1
+            i = bisect_right(widthMap, (rgn.w - cx, maxSentinal)) - 1
 
-            if i >= 0:
-                # we found one, pop it off
-                elemW, block = widthMap.pop(i)
+            if i < 0: break
 
-                # adjust it's layout position
-                block.offset((x, y), fromRgn=rgn)
-                hMax = max(block.h, hMax)
+            # we found one, pop it off
+            elemW, block = widthMap.pop(i)
 
-                # and return it
-                result.append(block)
+            # adjust it's layout position
+            block.offset((cx, cy), fromRgn=rgn)
+            hMax = max(block.h, hMax)
 
-                # advance horizontally
-                x += elemW + borders*2
-                rowWidth = rgn.w - x
+            # and return it
+            result.append(block)
 
-            else:
-                break
+            # advance horizontally
+            cx += elemW + borders*2
 
         # mark the rest of this row as unused
-        endRng = self.addUnusedNarrowRgn((x, y), (rowWidth, hMax), key='Row')
+        endRng = self.addUnusedNarrowRgn((cx, cy), (rgn.w-cx, hMax), key='Row')
 
-        x = 0; y += hMax
-        bottomRgn = self.addUnusedBlockRgn((x, y), (rgn.w - x, rgn.h - y), key='Bottom')
+        y = cy+hMax
+        bottomRgn = self.addUnusedBlockRgn((0, y), (rgn.w, rgn.h-y), key='Bottom')
 
         remaining = [b[1] for b in self._blocks]
         return result, remaining
@@ -326,40 +323,34 @@ class VerticalColumnLayoutRegion(VerticalLayoutRegion):
     def layout(self, borders=1):
         result = []
         rgn = self.getRgn()
-
         maxSentinal = self.maxSentinal
-        x = borders; y = borders
-        colHeight = rgn.h - y
-        wMax = 0
-
         heightMap = self._blocks
+
+        cx = borders; cy = borders
+        wMax = 0
         while heightMap:
             # Use bisect to find a block that is smaller than the remaining row heightMap
-            i = bisect_right(heightMap, (colHeight, maxSentinal)) - 1
+            i = bisect_right(heightMap, (rgn.h-cy, maxSentinal)) - 1
+            if i < 0: break
 
-            if i >= 0:
-                # we found one, pop it off
-                elemH, block = heightMap.pop(i)
+            # we found one, pop it off
+            elemH, block = heightMap.pop(i)
 
-                # adjust it's layout position
-                block.offset((x, y), fromRgn=rgn)
-                wMax = max(block.w, wMax)
+            # adjust it's layout position
+            block.offset((cx, cy), fromRgn=rgn)
+            wMax = max(block.w, wMax)
 
-                # and return it
-                result.append(block)
+            # and return it
+            result.append(block)
 
-                # advance vertically
-                y += elemH + borders*2
-                colHeight = rgn.h - y
-
-            else:
-                break
+            # advance vertically
+            cy += elemH + borders*2
 
         # mark the rest of this row as unused
-        endRng = self.addUnusedNarrowRgn((x, y), (wMax, colHeight), key='Column')
+        endRng = self.addUnusedNarrowRgn((cx, cy), (wMax, rgn.h - cy), key='Column')
 
-        y = 0; x += wMax
-        bottomRgn = self.addUnusedBlockRgn((x, y), (rgn.w - x, rgn.h - y), key='Right')
+        x = cx + wMax
+        bottomRgn = self.addUnusedBlockRgn((x,0), (rgn.w-x, rgn.h), key='Right')
 
         remaining = [b[1] for b in self._blocks]
         return result, remaining
@@ -401,8 +392,7 @@ class VerticalBlockLayoutRegion(VerticalLayoutRegion):
                     raise LayoutException("Heights are not in increasing order")
 
                 bOutOfRoom = (y+hMax > rgn.h)
-                if bOutOfRoom: 
-                    raise LayoutRoomException("Layout Error: no more room")
+                if bOutOfRoom: break
 
                 rowWidth = rgn.w - x
                 while widthMap:
@@ -440,10 +430,9 @@ class VerticalBlockLayoutRegion(VerticalLayoutRegion):
                         rowWidth = rgn.w - x
 
                         bOutOfRoom = (y+hMax > rgn.h)
-                        if bOutOfRoom: 
-                            if widthMap:
-                                raise LayoutRoomException("Layout Error: no more room")
-                            else: break
+                        if bOutOfRoom: break
+                if bOutOfRoom: break
+            if bOutOfRoom: break
 
             if self.bBreakGroups and (0 < rowWidth < x):
                 # mark the rest of this row as unused

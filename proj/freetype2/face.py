@@ -19,6 +19,13 @@ from library import FreetypeLibrary
 from glyph import FreetypeFaceGlyph
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ Constants / Variiables / Etc. 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ptDiv = float(1<<6)
+ptDiv16 = float(1<<16)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -43,6 +50,11 @@ class FreetypeFace(object):
         if self._as_parameter_ is not None:
             self._ft_done_face()
         self._as_parameter_ = None
+
+    def __contains__(self, key):
+        if isinstance(key, basestring):
+            return self.isCharAvailable(key)
+        return False
 
     @property
     def _face(self):
@@ -193,28 +205,42 @@ class FreetypeFace(object):
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     _ft_loadGlyph = FT.FT_Load_Glyph
-    def loadGlyph(self, char, flags=None):
+    def loadGlyph(self, glyphIndex, flags=None):
         if flags is None: 
             flags = self.loadFlags 
-        if isinstance(char, basestring):
-            char = self.getCharIndex(char)
-        self._ft_loadGlyph(char, flags)
-        return self.glyph
+        if isinstance(glyphIndex, basestring):
+            glyphIndex = self.getCharIndex(glyphIndex)
+        self._ft_loadGlyph(glyphIndex, flags)
+        glyph = self.glyph
+        glyph.index = glyphIndex
+        return glyph
+
+    def iterUniqueGlyphs(self, chars, flags=None):
+        indexes = frozenset(self.iterCharIndexes(chars))
+        for glyphIndex in indexes:
+            glyph = self.loadGlyph(glyphIndex, flags)
+            yield glyphIndex, glyph
 
     def iterGlyphs(self, chars, flags=None):
-        for char in chars:
-            yield char, self.loadGlyph(char, flags)
+        for char, glyphIndex in self.iterCharIndexes(chars, True):
+            glyph = self.loadGlyph(glyphIndex, flags)
+            if glyph or char in (0, 'x00'):
+                yield char, glyph
 
     _ft_loadChar = FT.FT_Load_Char
     def loadChar(self, char, flags=None):
         if flags is None: 
             flags = self.loadFlags 
         self._ft_loadChar(ord(char), flags)
-        return self.glyph
+        glyph = self.glyph
+        glyph.index = self.getCharIndex(char)
+        return glyph
 
     def iterChars(self, chars, flags=None):
         for char in chars:
-            yield char, self.loadChar(char, flags)
+            glyph = self.loadChar(char, flags)
+            if glyph or char == '\x00':
+                yield char, glyph
 
     _ft_getKerning = FT.FT_Get_Kerning
     def getKerning(self, left, right, kernMode=0):
@@ -225,6 +251,26 @@ class FreetypeFace(object):
             right = self.getCharIndex(right)
         self._ft_getKerning(left, right, kernMode, byref(aKerning))
         return (aKerning.x, aKerning.y)
+
+    def iterKerning(self, chars, kernMode=0):
+        left = None
+        for right in self.iterCharIndexes(chars):
+            if left is None:
+                yield (0, 0)
+            else:
+                self._ft_getKerning(left, right, kernMode, byref(aKerning))
+                yield (aKerning.x, aKerning.y)
+            left = right
+
+    def iterKerningSwapped(self, chars, kernMode=0):
+        right = None
+        for left in self.iterCharIndexes(chars):
+            if right is None:
+                yield (0, 0)
+            else:
+                self._ft_getKerning(left, right, kernMode, byref(aKerning))
+                yield (aKerning.x, aKerning.y)
+            right = left
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -257,6 +303,20 @@ class FreetypeFace(object):
     _ft_getCharIndex = FT.FT_Get_Char_Index
     def getCharIndex(self, char):
         return self._ft_getCharIndex(ord(char))
+    def iterCharIndexes(self, chars, bMapping=False):
+        if bMapping:
+            return ((char, self._ft_getCharIndex(ord(char))) for char in chars)
+        else:
+            return (self._ft_getCharIndex(ord(char)) for char in chars)
+
+    def charIndexMap(self, chars, mapping=None):
+        if mapping is None: 
+            mapping = dict()
+        mapping.update(self.iterCharIndexes(chars, True))
+        return mapping
+
+    def isCharAvailable(self, char):
+        return 0 < self.getCharIndex(char)
 
     _ft_getGlyphName = FT.FT_Get_Glyph_Name
     def getGlyphName(self, glyphIndex):
@@ -290,6 +350,29 @@ class FreetypeFace(object):
     _ft_getNameIndex = FT.FT_Get_Name_Index
     def getNameIndex(self, name):
         return self._ft_getNameIndex(name)
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    def printInfo(self, out=None):
+        face = self
+        print >> out, 'name:', face.getPostscriptName(), 'family:', face.familyName, 'style:', face.styleName
+        print >> out, '  faces:', face.numFaces, '(%s)' % (face.faceIndex,), 'glyph count:', face.numGlyphs
+        print >> out, '  flags:', hex(face.faceFlags), '=', ' | '.join(face.faceFlagsList)
+        print >> out, '  metrics:'
+        print >> out, '    units per em:', face.unitsPerEM
+        print >> out, '    ascender:', face.ascender / ptDiv, 'descender:', face.descender / ptDiv, 'height:', face.height / ptDiv
+        print >> out, '    bbox:', [(face.bbox.xMin/ptDiv, face.bbox.xMax/ptDiv), (face.bbox.yMin/ptDiv, face.bbox.yMax/ptDiv)]
+        print >> out, '    underline pos:', face.underlinePosition/ptDiv, 'thickness:', face.underlineThickness/ptDiv
+        print >> out, '    max advance width:', face.maxAdvanceWidth/ptDiv, 'height:', face.maxAdvanceHeight/ptDiv
+        cm = face.charmap[0]
+        print >> out, '  charmaps:'
+        print >> out, '    current id:', cm.encoding.value, 'index:', face.getCharmapIndex(face.charmap), 'plat_id:', cm.platform_id, 'encoding_id:',cm.encoding_id
+        print >> out, '    others(%s):' % (face.numCharmaps,)
+        for index, cm in enumerate(face.charmaps[:face.numCharmaps]):
+            cm = cm[0]
+            print >> out, '      id:', cm.encoding.value, 'index:', index, 'plat_id:', cm.platform_id, 'encoding_id:', cm.encoding_id
+        print >> out
+
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Main 

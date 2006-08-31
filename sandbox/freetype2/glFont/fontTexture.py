@@ -26,6 +26,8 @@ from TG.openGL.raw.glext import GL_TEXTURE_RECTANGLE_ARB
 
 from TG.openGL.texture import Texture
 
+from blockMosaicLayout import BlockMosaicAlg
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -70,8 +72,9 @@ class GLFreetypeFace(FreetypeFontFace):
         data = self.data
         pixelStore = self.data.newPixelStore(alignment=1, rowLength=0)
 
-        for char, pos in charLayout.iteritems():
-            glyph = self.face.loadChar(char)
+        for glyphIndex, pos in charLayout.iteritems():
+            glyph = self.face.loadGlyph(glyphIndex)
+            glyph.render()
             pixelStore.rowLength = glyph.bitmap.pitch
             data.posSize = (pos, glyph.bitmapSize)
             data.texCData(glyph.bitmap.buffer)
@@ -81,19 +84,18 @@ class GLFreetypeFace(FreetypeFontFace):
         return texture
 
     def layoutMosaic(self, chars):
-        from blockMosaicLayout import BlockMosaicAlg
-
         alg = BlockMosaicAlg()
-        alg.maxWidth = 256
-        #alg.maxWidth = Texture.getMaxTextureSizeFor(self.texTarget)
+        alg.maxWidth = Texture.getMaxTextureSizeFor(self.texTarget)
 
-        for char, glyph in self.face.iterGlyphs(chars):
-            alg.addBlock(glyph.bitmapSize, key=char)
+        chars = u'\x00 \t\n\r' + chars
+        self.charMap = self.face.charIndexMap(chars)
 
+        for glyphIndex, glyph in self.face.iterUniqueGlyphs(chars):
+            alg.addBlock(glyph.bitmapSize, key=glyphIndex)
         rgn, iLayout = alg.layout()
         
-        charLayout = dict((e.key, e.pos) for e in iLayout)
-        rgn.printUnused()#('LastRow', 'Bottom'))
+        #rgn.printUnused()#('LastRow', 'Bottom'))
 
+        charLayout = dict((e.key, e.pos) for e in iLayout)
         return rgn.rgn.size, charLayout
 

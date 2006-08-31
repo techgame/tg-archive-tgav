@@ -16,6 +16,13 @@ import ctypes
 from ctypes import byref, cast, c_void_p
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ Constants / Variiables / Etc. 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ptDiv = float(1<<6)
+ptDiv16 = float(1<<16)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -23,11 +30,16 @@ class FreetypeFaceGlyph(object):
     #~ FreeType API interation ~~~~~~~~~~~~~~~~~~~~~~~~~~
     _as_parameter_ = None
     _as_parameter_type_ = FT.FT_GlyphSlot
+    index = -1
 
     def __init__(self, glyph, face):
         self._as_parameter_ = glyph
         self.face = face
 
+    def __nonzero__(self):
+        if self._as_parameter_:
+            return bool(self.index)
+        else: return False
     @property
     def _glyph(self):
         return self._as_parameter_[0]
@@ -93,7 +105,7 @@ class FreetypeFaceGlyph(object):
     _renderMode = None
     def getRenderMode(self):
         if self._renderMode is None:
-            return self._face._renderMode
+            return self.face.renderMode
         return self._renderMode
     def setRenderMode(self, renderMode):
         self._renderMode = renderMode
@@ -104,4 +116,18 @@ class FreetypeFaceGlyph(object):
         if renderMode is None: 
             renderMode = self.renderMode
         self._ft_renderGlyph(renderMode)
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    def printInfo(self, out=None):
+        print 'glyphIndex:', self.index, 'name:', repr(self.face.getGlyphName(self.index))
+        if self.numSubglyphs:
+            print >> out, '    subglyphs:', self.numSubglyphs
+        print >> out, '    advance:', (self.advance[0]>>6, self.advance[1]>>6), 'linear:', (self.linearHoriAdvance/ptDiv16, self.linearVertAdvance/ptDiv16)
+        print '    (x, y), (w, h):', (self.bitmapLeft, self.bitmapTop), (self.bitmap.width, self.bitmap.rows)
+
+        metrics = self.metrics
+        print >> out, '    metrics:', (metrics.width/ptDiv, metrics.height/ptDiv)
+        print >> out, '        hori:', (metrics.horiBearingX/ptDiv, metrics.horiBearingY/ptDiv, metrics.horiAdvance/ptDiv)
+        print >> out, '        vert:', (metrics.vertBearingX/ptDiv, metrics.vertBearingY/ptDiv, metrics.vertAdvance/ptDiv)
 

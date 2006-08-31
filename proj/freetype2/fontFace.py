@@ -14,6 +14,13 @@ from itertools import izip
 from face import FreetypeFace
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ Constants / Variiables / Etc. 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ptDiv = float(1<<6)
+ptDiv16 = float(1<<16)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -67,96 +74,4 @@ class FreetypeFontFace(object):
         self._setFaceSize(fontSize)
     def _setFaceSize(self, fontSize):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
-
-    def iterKerning(self, chars, floating=True):
-        face = self.face
-        if floating:
-            ptDiv = float(1<<6)
-            l = chars[0]
-            for r in chars[1:]:
-                kh, kv = face.getKerning(l, r)
-                yield (kh/ptDiv, kv/ptDiv)
-                l = r
-        else:
-            l = chars[0]
-            for r in chars[1:]:
-                kh, kv = face.getKerning(l, r)
-                yield (kh>>6, kv>>6)
-                l = r
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    def printInfo(self):
-        ptDiv = float(1<<6)
-        face = self.face
-        print 'names:'
-        print '    file:', self.filename
-        print '    postscript:', face.getPostscriptName()
-        print '    family:', face.familyName
-        print '    style:', face.styleName
-        print
-
-        print 'face flags:', hex(face.faceFlags), ', '.join(face.faceFlagsList)
-        print 'number faces:', face.numFaces, '(%s)' % (face.faceIndex,)
-        print 'number glyphs:', face.numGlyphs
-        print
-
-        cm = face.charmap[0]
-        print 'charmap encoding:', cm.encoding.value, 'index:', face.getCharmapIndex(face.charmap), 'plat_id:', cm.platform_id, 'encoding_id:',cm.encoding_id
-        print 'number charmaps:', face.numCharmaps
-        for cm in face.charmaps[:face.numCharmaps]:
-            cm = cm[0]
-            print '    encoding:', cm.encoding.value, 'plat_id:', cm.platform_id, 'encoding_id:',cm.encoding_id
-        print
-
-        print 'metrics:'
-        print '    units per em:', face.unitsPerEM
-        print '    ascender:', face.ascender / ptDiv, 'descender:', face.descender / ptDiv, 'height:', face.height / ptDiv
-        print '    bbox:', [(face.bbox.xMin/ptDiv, face.bbox.xMax/ptDiv), (face.bbox.yMin/ptDiv, face.bbox.yMax/ptDiv)]
-        print '    underline pos:', face.underlinePosition/ptDiv, 'thickness:', face.underlineThickness/ptDiv
-        print '    max advance width:', face.maxAdvanceWidth/ptDiv, 'height:', face.maxAdvanceHeight/ptDiv
-        print
-        #metrics = self.face.size[0].metrics
-        #maxFontHeight = (metrics.ascender - metrics.descender) >> 6
-        #maxFontWidth = (metrics.max_advance)>>6
-
-    def printGlyphStats(self, chars):
-        horiAdv = []
-        vertAdv = []
-        widths = []
-        heights = []
-    
-        ptDiv = float(1<<6)
-        ptDiv16 = float(1<<16)
-        face = self.face
-        for char, glyph in face.iterGlyphs(chars):
-            print 'char:', repr(char), 'name:', repr(face.getGlyphName(char))
-            if glyph.numSubglyphs:
-                print '    subglyphs:', glyph.numSubglyphs
-            print '    advance:', (glyph.advance[0]>>6, glyph.advance[1]>>6), 'linear:', (glyph.linearHoriAdvance/ptDiv16, glyph.linearVertAdvance/ptDiv16)
-            print '    (x, y), (w, h):', (glyph.bitmapLeft, glyph.bitmapTop), (glyph.bitmap.width, glyph.bitmap.rows)
-
-            metrics = glyph.metrics
-            print '    metrics:', (metrics.width/ptDiv, metrics.height/ptDiv)
-            print '        hori:', (metrics.horiBearingX/ptDiv, metrics.horiBearingY/ptDiv, metrics.horiAdvance/ptDiv)
-            print '        vert:', (metrics.vertBearingX/ptDiv, metrics.vertBearingY/ptDiv, metrics.vertAdvance/ptDiv)
-
-            assert glyph.bitmap.num_grays == 256, bitmap.num_grays
-
-            horiAdv.append(glyph.advance[0]>>6)
-            vertAdv.append(glyph.advance[1]>>6)
-            widths.append(glyph.bitmap.width)
-            heights.append(glyph.bitmap.rows)
-            print
-
-        print
-        print 'widths: ', sum(widths), (min(widths), max(widths)), _asFreq(widths)
-        print 'heights:', sum(heights), (min(heights), max(heights)), _asFreq(heights)
-        print 'horiAdv:', sum(horiAdv), (min(horiAdv), max(horiAdv)), _asFreq(horiAdv)
-        print 'vertAdv:', sum(vertAdv), (min(vertAdv), max(vertAdv)), _asFreq(vertAdv)
-        print
-
-    def printKerning(self, chars):
-        for k in self.iterKerning(chars):
-            print k
 
