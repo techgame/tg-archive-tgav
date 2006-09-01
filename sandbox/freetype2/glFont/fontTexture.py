@@ -33,6 +33,8 @@ class GLFreetypeFaceBasic(FreetypeFontFace):
     texTarget = None #gl.GL_TEXTURE_2D or glext.GL_TEXTURE_RECTANGLE_ARB
     texFormat = gl.GL_INTENSITY
 
+    pointSize=1./64.
+
     def _initFace(self, face):
         self.setFontSize(self.getFontSize())
 
@@ -99,7 +101,7 @@ class GLFreetypeFaceBasic(FreetypeFontFace):
 
             # compile the glyph to an openGL list so everything is stored on the graphics card
             glListIdx = glLists.pop(0)
-            self._compileGlyph(glListIdx, glyph, block.pos, block.size)
+            self._compileGlyph(glListIdx, glyph, block)
             if gl.glIsList(glListIdx):
                 mapping[glyphIndex] = glListIdx
 
@@ -134,25 +136,48 @@ class GLFreetypeFaceBasic(FreetypeFontFace):
     def _drawTextureRect(self):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
 
+    @classmethod
+    def selectScale(klass):
+        gl.glPushMatrix()
+        gl.glScalef(klass.pointSize, klass.pointSize, 1)
+        yield
+        gl.glPopMatrix()
+
+    def select(self):
+        for e in self.texture.select():
+            gl.glPushMatrix()
+            yield self
+            gl.glPopMatrix()
+
+    def drawBreak(self, advance=True):
+        gl.glPopMatrix()
+        vAdvance = self.face.size[0].metrics.height
+        #vAdvance =  self.face.ascender - self.face.descender
+        #vAdvance =  self.face.bbox.yMax - self.face.bbox.yMin
+        #print 'advance:', vAdvance/64., self.face.bbox.xMin/64., self.face.bbox.xMax/64., self.face.bbox.yMin/64., self.face.bbox.yMax/64.
+        gl.glTranslatef(0, -vAdvance, 0)
+        gl.glPushMatrix()
+
     def drawString(self, chars):
         glListIds = [self._indexGLListMap.get(i) for i in self.face.iterCharIndexes(chars)]
         glListIds = (c_uint*len(glListIds))(*glListIds)
-        for e in self.texture.select():
-            gl.glCallLists(len(glListIds), gl.GL_UNSIGNED_INT, glListIds)
+        gl.glCallLists(len(glListIds), gl.GL_UNSIGNED_INT, glListIds)
 
-    def drawChar(self, char):
-        glyph = self.face.loadGlyph(char)
-        block = self._layoutMap[glyph.index]
+    def drawStringSlow(self, chars, fromRight=False):
+        if fromRight:
+            chars = chars[::-1]
+        loadGlyph = self.face.loadGlyph
+        layoutMap = self._layoutMap
 
-        for e in self.texture.select():
-            self._drawGlyphRect(glyph, block.pos, block.size)
+        for glyphIndex in self.face.iterCharIndexes(chars):
+            self._drawGlyphRect(loadGlyph(glyphIndex), layoutMap[glyphIndex], fromRight)
 
-    def _compileGlyph(self, glListId, glyph, pos, size):
+    def _compileGlyph(self, glListId, glyph, block):
         gl.glNewList(glListId, gl.GL_COMPILE)
-        self._drawGlyphRect(glyph, pos, size)
+        self._drawGlyphRect(glyph, block)
         gl.glEndList()
 
-    def _drawGlyphRect(self, glyph, pos, size):
+    def _drawGlyphRect(self, glyph, block):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -165,46 +190,55 @@ class GLFreetypeFace2D(GLFreetypeFaceBasic):
         GLFreetypeFaceBasic._clearTexureData(self, texture, size)
 
     def _drawTextureRect(self):
-        width, height = self.size
+        texW, texH = self.size
 
         gl.glBegin(gl.GL_QUADS)
         gl.glTexCoord2s(0, 0)
-        gl.glVertex2f(0, height)
+        gl.glVertex2s(0, texH)
 
         gl.glTexCoord2s(0, 1)
-        gl.glVertex2f(0, 0)
+        gl.glVertex2s(0, 0)
 
         gl.glTexCoord2s(1, 1)
-        gl.glVertex2f(width, 0)
+        gl.glVertex2s(texW, 0)
 
         gl.glTexCoord2s(1, 0)
-        gl.glVertex2f(width, height)
+        gl.glVertex2s(texW, texH)
         gl.glEnd()
 
-    def _drawGlyphRect(self, glyph, pos, size):
-        texW, texH = map(float, self.size)
-        tx0 = pos[0]/texW
-        ty0 = pos[1]/texH
-        tx1 = (pos[0] + size[0])/texW
-        ty1 = (pos[1] + size[1])/texH
+    def _drawGlyphRect(self, glyph, block, fromRight=False):
+        m = glyph.metrics
+        x0 = m.horiBearingX
+        x1 = x0 + m.width
+        y1 = m.horiBearingY
+        y0 = y1 - m.height
+        ax, ay = glyph.advance
 
-        width, height = size
+        texW, texH = map(float, self.size)
+        tx0 = block.x/texW
+        ty0 = block.y/texH
+        tx1 = block.x1/texW
+        ty1 = block.y1/texH
+
+        if fromRight:
+            gl.glTranslatef(-ax, -ay, 0)
 
         gl.glBegin(gl.GL_QUADS)
         gl.glTexCoord2f(tx0, ty0)
-        gl.glVertex2f(0, height)
+        gl.glVertex2f(x0, y1)
 
         gl.glTexCoord2f(tx0, ty1)
-        gl.glVertex2f(0, 0)
+        gl.glVertex2f(x0, y0)
 
         gl.glTexCoord2f(tx1, ty1)
-        gl.glVertex2f(width, 0)
+        gl.glVertex2f(x1, y0)
 
         gl.glTexCoord2f(tx1, ty0)
-        gl.glVertex2f(width, height)
+        gl.glVertex2f(x1, y1)
         gl.glEnd()
 
-        gl.glTranslatef(width, 0, 0)
+        if not fromRight:
+            gl.glTranslatef(ax, ay, 0)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -212,49 +246,52 @@ class GLFreetypeFaceRect(GLFreetypeFaceBasic):
     texTarget = glext.GL_TEXTURE_RECTANGLE_ARB
 
     def _drawTextureRect(self):
-        width, height = self.size
+        texW, texH = self.size
 
         gl.glBegin(gl.GL_QUADS)
         gl.glTexCoord2s(0, 0)
-        gl.glVertex2s(0, height)
+        gl.glVertex2s(0, texH)
 
-        gl.glTexCoord2s(0, height)
+        gl.glTexCoord2s(0, texH)
         gl.glVertex2s(0, 0)
 
-        gl.glTexCoord2s(width, height)
-        gl.glVertex2s(width, 0)
+        gl.glTexCoord2s(texW, texH)
+        gl.glVertex2s(texW, 0)
 
-        gl.glTexCoord2s(width, 0)
-        gl.glVertex2s(width, height)
+        gl.glTexCoord2s(texW, 0)
+        gl.glVertex2s(texW, texH)
         gl.glEnd()
 
-    def _drawGlyphRect(self, glyph, pos, size):
-        tx0 = pos[0]
-        ty0 = pos[1]
-        tx1 = tx0 + size[0]
-        ty1 = ty0 + size[1]
+    def _drawGlyphRect(self, glyph, block, fromRight=False):
+        m = glyph.metrics
+        x0 = m.horiBearingX
+        x1 = x0 + m.width
+        y1 = m.horiBearingY
+        y0 = y1 - m.height
+        ax, ay = glyph.advance
 
-        width, height = size
+        tx0 = block.x
+        ty0 = block.y
+        tx1 = block.x1
+        ty1 = block.y1
 
-        x0 = glyph.bitmapLeft
-        x1 = x0 + width
-        y0 = glyph.bitmapTop - height
-        y1 = y0 + height
+        if fromRight:
+            gl.glTranslatef(-ax, -ay, 0)
 
         gl.glBegin(gl.GL_QUADS)
         gl.glTexCoord2s(tx0, ty0)
-        gl.glVertex2s(x0, y1)
+        gl.glVertex2f(x0, y1)
 
         gl.glTexCoord2s(tx0, ty1)
-        gl.glVertex2s(x0, y0)
+        gl.glVertex2f(x0, y0)
 
         gl.glTexCoord2s(tx1, ty1)
-        gl.glVertex2s(x1, y0)
+        gl.glVertex2f(x1, y0)
 
         gl.glTexCoord2s(tx1, ty0)
-        gl.glVertex2s(x1, y1)
+        gl.glVertex2f(x1, y1)
         gl.glEnd()
 
-        ax, ay =  glyph.advance
-        gl.glTranslatef(ax/64., ay/64., 0)
+        if not fromRight:
+            gl.glTranslatef(ax, ay, 0)
 

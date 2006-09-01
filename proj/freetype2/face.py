@@ -359,8 +359,9 @@ class FreetypeFace(object):
         print >> out, '  faces:', face.numFaces, '(%s)' % (face.faceIndex,), 'glyph count:', face.numGlyphs
         print >> out, '  flags:', hex(face.faceFlags), '=', ' | '.join(face.faceFlagsList)
         print >> out, '  metrics:'
-        print >> out, '    units per em:', face.unitsPerEM
+        print >> out, '    units per em:', face.unitsPerEM/ptDiv
         print >> out, '    ascender:', face.ascender / ptDiv, 'descender:', face.descender / ptDiv, 'height:', face.height / ptDiv
+        print >> out, '    size:', face.size[0].metrics.height/ptDiv
         print >> out, '    bbox:', [(face.bbox.xMin/ptDiv, face.bbox.xMax/ptDiv), (face.bbox.yMin/ptDiv, face.bbox.yMax/ptDiv)]
         print >> out, '    underline pos:', face.underlinePosition/ptDiv, 'thickness:', face.underlineThickness/ptDiv
         print >> out, '    max advance width:', face.maxAdvanceWidth/ptDiv, 'height:', face.maxAdvanceHeight/ptDiv

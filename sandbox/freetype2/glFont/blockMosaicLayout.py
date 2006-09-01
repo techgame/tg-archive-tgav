@@ -28,7 +28,7 @@ class LayoutRoomException(LayoutException):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class Block(object):
-    x = y = w = h = 0
+    x = y = x1 = y1 = w = h = 0
     key = None
 
     def __nonzero__(self):
@@ -60,28 +60,46 @@ class Block(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    def getRect(self):
+        return (self.x, self.y, self.x1, self.y1)
     def getPos(self):
         return self.x, self.y
     def setPos(self, pos):
         self.x, self.y = pos
+        self._updatePos2()
     pos = property(getPos, setPos)
+
+    def getPos1(self):
+        return self.x1, self.y1
+    def setPos1(self, pos):
+        self.x1, self.y1 = pos
+        self._updateSize()
+    pos1 = property(getPos1, setPos1)
 
     def offset(self, pos, fromRgn=None):
         if fromRgn is not None:
-            self.x = fromRgn.x + pos[0]
-            self.y = fromRgn.y + pos[1]
-        else:
-            self.pos = pos
+            pos = tuple(l+r for l,r in zip(pos, fromRgn.pos))
+        self.pos = pos
 
     def getSize(self):
         return self.w, self.h
     def setSize(self, size):
         self.w, self.h = size
+        self._updatePos2()
     size = property(getSize, setSize)
 
     def getArea(self, borders=0):
         return (self.w + borders*2)*(self.h + borders*2)
     area = property(getArea)
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    def _updateSize(self):
+        self.w = self.x1 - self.x
+        self.h = self.y1 - self.y
+    def _updatePos2(self):
+        self.x1 = self.x + self.w
+        self.y1 = self.y + self.h
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Block Mosic Algorithm
