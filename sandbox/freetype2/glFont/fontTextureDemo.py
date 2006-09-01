@@ -54,6 +54,7 @@ class RenderSkinModel(RenderSkinModelBase):
         return True
 
     def renderInit(self, glCanvas, renderStart):
+        glDepthFunc(GL_LEQUAL)
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_COLOR_MATERIAL)
 
@@ -65,10 +66,10 @@ class RenderSkinModel(RenderSkinModelBase):
 
         fontFilename = self.fonts['Zapfino']
         print fontFilename
-        self.loadFontTexture(fontFilename, 24)
+        self.loadFontTexture(fontFilename, 12)
 
     def loadFontTexture(self, fontFilename, fontSize):
-        if 0:
+        if 1:
             self.font = fontTexture.GLFreetypeFaceRect(fontFilename, fontSize)
         else:
             self.font = fontTexture.GLFreetypeFace2D(fontFilename, fontSize)
@@ -84,7 +85,7 @@ class RenderSkinModel(RenderSkinModelBase):
 
         glMatrixMode (GL_PROJECTION)
         glLoadIdentity ()
-        gluOrtho2D(0, w, 0, h)
+        gluOrtho2D(0, w, -h/2, h/2)
 
         glMatrixMode (GL_MODELVIEW)
         glLoadIdentity ()
@@ -105,17 +106,15 @@ class RenderSkinModel(RenderSkinModelBase):
         else:
             gl.glTexEnvf(gl.GL_TEXTURE_ENV, gl.GL_TEXTURE_ENV_MODE, gl.GL_REPLACE)
 
-        self.font.drawFontTexture()
+        #self.font.drawFontTexture()
 
         glPushMatrix()
-        glTranslatef(400, 400, 0.5)
-
-        self.font.drawString('Great!')
-        #self.font.drawChar('g')
-        #self.font.drawChar('r')
-        #self.font.drawChar('e')
-
+        self.font.drawString(self.fpsStr)
         glPopMatrix()
+
+    fpsStr = 'Not set'
+    def _printFPS(self, fpsStr):
+        self.fpsStr = fpsStr
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Main 

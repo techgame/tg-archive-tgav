@@ -130,17 +130,20 @@ class RenderSkinModelBase(wxSkinModel):
             #fpsSwap = totalEntries / timeSwap
             fpsEffective = totalEntries / (timeRender + timeSwap)
 
-            fpsStr = self.fpsFormat % (fpsTrue, fpsEffective, timeRender/totalEntries, timeSwap/totalEntries)
-            self._printFPS(fpsStr)
-            sys.stdout.flush()
+            self._updateFPSInfo(fpsTrue, fpsEffective, timeRender, timeSwap, totalEntries)
 
             self.timingLogRender[:] = self.timingLogRender[-self._historyKeep:]
             self.timingLogSwap[:] = self.timingLogSwap[-self._historyKeep:]
             self._historyLen = len(self.timingLogRender)
             self._lastUpdate = renderFinish
 
+    def _updateFPSInfo(self, fpsTrue, fpsEffective, timeRender, timeSwap, totalEntries):
+        fpsStr = self.fpsFormat % (fpsTrue, fpsEffective, timeRender/totalEntries, timeSwap/totalEntries)
+        self._printFPS(fpsStr)
+
     def _printFPS(self, fpsStr):
         print '\r', fpsStr.ljust(75),
+        sys.stdout.flush()
 
     def onMouse(self, evt):
         pass

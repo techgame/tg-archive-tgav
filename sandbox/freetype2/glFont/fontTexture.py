@@ -109,8 +109,10 @@ class GLFreetypeFaceBasic(FreetypeFontFace):
 
     def layoutMosaic(self, chars):
         alg = BlockMosaicAlg()
-        alg.maxWidth = Texture.getMaxTextureSizeFor(self.texTarget)
-        #alg.maxWidth = 256
+        if 1:
+            alg.maxWidth = Texture.getMaxTextureSizeFor(self.texTarget)
+        else:
+            alg.maxWidth = 512
 
         chars = u'\x00 \t\n\r' + chars
         self.charMap = self.face.charIndexMap(chars)
@@ -119,7 +121,7 @@ class GLFreetypeFaceBasic(FreetypeFontFace):
             alg.addBlock(glyph.bitmapSize, key=glyphIndex)
 
         usedSize, glyphLayout, unplaced = alg.layout()
-        assert len(unplaced) == 0
+        assert len(unplaced) == 0, unplaced
 
         return usedSize, glyphLayout
 
@@ -234,19 +236,25 @@ class GLFreetypeFaceRect(GLFreetypeFaceBasic):
 
         width, height = size
 
+        x0 = glyph.bitmapLeft
+        x1 = x0 + width
+        y0 = glyph.bitmapTop - height
+        y1 = y0 + height
+
         gl.glBegin(gl.GL_QUADS)
         gl.glTexCoord2s(tx0, ty0)
-        gl.glVertex2s(0, height)
+        gl.glVertex2s(x0, y1)
 
         gl.glTexCoord2s(tx0, ty1)
-        gl.glVertex2s(0, 0)
+        gl.glVertex2s(x0, y0)
 
         gl.glTexCoord2s(tx1, ty1)
-        gl.glVertex2s(width, 0)
+        gl.glVertex2s(x1, y0)
 
         gl.glTexCoord2s(tx1, ty0)
-        gl.glVertex2s(width, height)
+        gl.glVertex2s(x1, y1)
         gl.glEnd()
 
-        gl.glTranslatef(width, 0, 0)
+        ax, ay =  glyph.advance
+        gl.glTranslatef(ax/64., ay/64., 0)
 
