@@ -31,7 +31,8 @@ from blockMosaicLayout import BlockMosaicAlg
 class GLFreetypeFaceBasic(FreetypeFontFace):
     bUseMipmaps = False
     texTarget = None #gl.GL_TEXTURE_2D or glext.GL_TEXTURE_RECTANGLE_ARB
-    texFormat = gl.GL_INTENSITY
+    texFormat = gl.GL_ALPHA
+    dataFormat = gl.GL_ALPHA
 
     pointSize=1./64.
 
@@ -71,7 +72,7 @@ class GLFreetypeFaceBasic(FreetypeFontFace):
     def _clearTexureData(self, texture, size):
         self.size = size
 
-        self.data = texture.data2d(size=size, format=gl.GL_LUMINANCE, dataType=gl.GL_UNSIGNED_BYTE)
+        self.data = texture.data2d(size=size, format=self.dataFormat, dataType=gl.GL_UNSIGNED_BYTE)
         self.data.texBlank()
         self.data.setImageOn(texture)
         self.data.texClear()
