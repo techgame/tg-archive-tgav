@@ -105,7 +105,7 @@ def main():
         print
     print
 
-    utils.includeSupportIn(context.getOutputFilename('_ctypes_support.py'), copySource=False)
+    utils.includeSupportIn(context.getOutputFilename('_ctypes_support.py'), copySource=True)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
