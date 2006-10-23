@@ -30,7 +30,9 @@ class FreetypeLibrary(object):
     def __new__(klass, useSingleton=True, *args, **kw):
         if not useSingleton or klass.singleton is None:
             self = object.__new__(klass, *args, **kw)
-            klass.singleton = self
+            if klass.singleton is None:
+                # Don't change the singleton...
+                klass.singleton = self
         else: 
             self = klass.singleton
         return self

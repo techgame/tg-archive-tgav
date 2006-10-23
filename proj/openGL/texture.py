@@ -93,10 +93,10 @@ class PixelStore(GLObject):
     def create(self, pack=False, **kwattrs):
         self.formatAttrs = {}
         self.pack = pack
-        self.set(**kwattrs)
+        self.update(kwattrs)
 
-    def set(self, **kwattrs):
-        for name, value in kwattrs.iteritems():
+    def update(self, attrs):
+        for name, value in attrs.iteritems():
             setattr(self, name, value)
 
     def select(self):
@@ -171,7 +171,9 @@ class TextureImageBasic(GLObject):
     ptr = property(getPointer)
 
     _rawData = None
-    def texData(self, rawData, pointer):
+    def texData(self, rawData, pointer, pixelStoreSettings):
+        if pixelStoreSettings:
+            self.updatePixelStore(pixelStoreSettings)
         self._rawData = rawData
         if not pointer:
             self._pointer = c_void_p(None)
@@ -180,16 +182,16 @@ class TextureImageBasic(GLObject):
         else:
             self._pointer = cast(pointer, c_void_p)
 
-    def texClear(self):
-        self.texData(None, None)
-    def texString(self, strdata):
-        self.texData(strdata, strdata)
+    def texClear(self, pixelStoreSettings=None):
+        self.texData(None, None, pixelStoreSettings)
+    def texString(self, strdata, pixelStoreSettings=None):
+        self.texData(strdata, strdata, pixelStoreSettings)
     strdata = property(fset=texString)
-    def texCData(self, cdata):
-        self.texData(cdata, cdata)
+    def texCData(self, cdata, pixelStoreSettings=None):
+        self.texData(cdata, cdata, pixelStoreSettings)
     cdata = property(fset=texCData)
-    def texArray(self, array):
-        self.texData(array, array.buffer_info()[0])
+    def texArray(self, array, pixelStoreSettings=None):
+        self.texData(array, array.buffer_info()[0], pixelStoreSettings)
     array = property(fset=texArray)
 
     def texBlank(self):
@@ -216,12 +218,17 @@ class TextureImageBasic(GLObject):
             self.newPixelStore()
         return self._pixelStore
     def setPixelStore(self, pixelStore):
+        if isinstance(pixelStore, dict):
+            self.updatePixelStore(pixelStore)
         self._pixelStore = pixelStore
+    pixelStore = property(getPixelStore, setPixelStore)
     def newPixelStore(self, *args, **kw):
         pixelStore = PixelStore(*args, **kw)
         self.setPixelStore(pixelStore)
         return pixelStore
-    pixelStore = property(getPixelStore, setPixelStore)
+    def updatePixelStore(self, settings):
+        ps = self.getPixelStore()
+        ps.update(settings)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -267,13 +274,16 @@ class TextureImage1D(TextureImageBasic):
         texture.setImage1d(self, level, **kw)
         return texture
     def setSubImageOn(self, texture, level=0, **kw):
-        texture.setSubImage1d(self, level, **kw)
+        if kw: self.set(**kw)
+        texture.setSubImage1d(self, level)
         return texture
     def setCompressedImageOn(self, texture, level=0, **kw):
-        texture.setCompressedImage1d(self, level, **kw)
+        if kw: self.set(**kw)
+        texture.setCompressedImage1d(self, level)
         return texture
     def setCompressedSubImageOn(self, texture, level=0, **kw):
-        texture.setCompressedSubImage1d(self, level, **kw)
+        if kw: self.set(**kw)
+        texture.setCompressedSubImage1d(self, level)
         return texture
 
 class TextureImage2D(TextureImageBasic):
@@ -296,13 +306,16 @@ class TextureImage2D(TextureImageBasic):
         texture.setImage2d(self, level, **kw)
         return texture
     def setSubImageOn(self, texture, level=0, **kw):
-        texture.setSubImage2d(self, level, **kw)
+        if kw: self.set(**kw)
+        texture.setSubImage2d(self, level)
         return texture
     def setCompressedImageOn(self, texture, level=0, **kw):
-        texture.setCompressedImage2d(self, level, **kw)
+        if kw: self.set(**kw)
+        texture.setCompressedImage2d(self, level)
         return texture
     def setCompressedSubImageOn(self, texture, level=0, **kw):
-        texture.setCompressedSubImage2d(self, level, **kw)
+        if kw: self.set(**kw)
+        texture.setCompressedSubImage2d(self, level)
         return texture
 
 class TextureImage3D(TextureImageBasic):
@@ -325,13 +338,16 @@ class TextureImage3D(TextureImageBasic):
         texture.setImage3d(self, level, **kw)
         return texture
     def setSubImageOn(self, texture, level=0, **kw):
-        texture.setSubImage3d(self, level, **kw)
+        if kw: self.set(**kw)
+        texture.setSubImage3d(self, level)
         return texture
     def setCompressedImageOn(self, texture, level=0, **kw):
-        texture.setCompressedImage3d(self, level, **kw)
+        if kw: self.set(**kw)
+        texture.setCompressedImage3d(self, level)
         return texture
     def setCompressedSubImageOn(self, texture, level=0, **kw):
-        texture.setCompressedSubImage3d(self, level, **kw)
+        if kw: self.set(**kw)
+        texture.setCompressedSubImage3d(self, level)
         return texture
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -344,7 +360,7 @@ class Texture(GLObject):
     format = None # GL_RGBA, GL_INTENSITY, etc.
 
     def __init__(self, *args, **kwargs):
-        if args:
+        if args or kwargs:
             self.create(*args, **kwargs)
 
     def __del__(self):
@@ -401,8 +417,12 @@ class Texture(GLObject):
     minFilter = glTexParamProperty(gl.GL_TEXTURE_MIN_FILTER)
     
     def setFilter(self, filter):
-        self.magFilter = filter
-        self.minFilter = filter
+        if isinstance(filter, tuple):
+            self.magFilter = filter[0]
+            self.minFilter = filter[1]
+        else:
+            self.magFilter = filter
+            self.minFilter = filter
     filter = property(fset=setFilter)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

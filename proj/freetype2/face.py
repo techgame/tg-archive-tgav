@@ -185,6 +185,12 @@ class FreetypeFace(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    def setSize(self, size, dpi=None):
+        if dpi is None:
+            return self.setPixelSize(size)
+        else:
+            return self.setCharSize(size, dpi)
+
     _ft_setCharSize = FT.FT_Set_Char_Size
     def setCharSize(self, size, dpi):
         if isinstance(size, tuple): 
