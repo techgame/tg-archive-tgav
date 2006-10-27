@@ -26,87 +26,53 @@ from TG.openGL.raw import gl, glu, glext
 
 class FontTextureBase(Texture):
     LayoutAlgorithm = BlockMosaicAlg
-    texParams = dict(
-            #target=0,
-            format=gl.GL_ALPHA,
-            wrap=gl.GL_CLAMP,
 
+    target = None
+    format = gl.GL_ALPHA
+
+    texParams = Texture.texParams.copy()
+    texParams.update(
+            wrap=gl.GL_CLAMP,
             genMipmaps=True,
-            filter=(gl.GL_LINEAR, gl.GL_LINEAR_MIPMAP_LINEAR),
+            magFilter=gl.GL_LINEAR,
+            minFilter=gl.GL_LINEAR_MIPMAP_LINEAR,
             )
     dataFormat = gl.GL_ALPHA
     dataType = gl.GL_UNSIGNED_BYTE
     pointSize = (1./64., 1./64.)
 
-    def __init__(self, ftFace):
-        Texture.__init__(self, **self.texParams)
-        self._setupMipmaps()
-        self.ftFace = ftFace
+    @classmethod
+    def fromFace(klass, ftFace):
+        self = klass()
+        self.renderFace(ftFace)
+        return self
 
     @classmethod
-    def fromFont(klass, ftFont):
-        return klass(ftFont.face)
-
-    @classmethod
-    def fromFilenameAndSize(klass, filename, size, dpi=None):
+    def fromFilename(klass, filename, size, dpi=None):
         ftFace = FreetypeFace(filename)
         ftFace.setSize(size, dpi)
-        return klass(ftFace)
+        return klass.fromFace(ftFace)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def _setupMipmaps(self):
-        self.set(genMipmaps=True, filter=self.texFilter)
+    def renderFace(self, ftFace, charset=string.printable):
+        size, layout = self._layoutMosaic(charset, ftFace)
+        size = self.validSizeForTarget(size)
 
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        data = self._blankTexture(size)
+        self._renderMosaic(data, layout, ftFace)
 
-    _size = None
-    def getSize(self):
-        return self._size
-    def setSize(self, size):
-        if size == self._size:
-            return
-        self._size = size
-        self._invalidate()
+    def _blankTexture(self, size):
+        data = self.data2d(size=size, format=self.dataFormat, dataType=self.dataType)
+        data.texBlank()
+        data.setImageOn(self)
+        return data
 
-    def _setLayoutSize(self, size):
-        self._size = size
-    size = property(getSize, setSize)
+    def _layoutMosaic(self, charset, ftFace):
+        maxSize = self.getMaxTextureSize()
+        alg = self.LayoutAlgorithm((maxSize, maxSize))
 
-    _chars = string.printable
-    def getChars(self):
-        return self._chars
-    def setChars(self, chars):
-        if chars == self._chars:
-            return
-        self._chars = chars
-        self._invalidate()
-    chars = property(getChars, setChars)
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    def _invalidate(self):
-        self._clear()
-        size, layout = self._layoutMosaic(self.getChars(), self.ftFace)
-        self._setLayoutSize(size)
-        self._renderMosaic(layout, ftFace)
-
-    def _clear(self):
-        self.data = texture.data2d(size=self.size, format=self.dataFormat, dataType=self.dataType)
-        self.data.texBlank()
-        self.data.setImageOn(self)
-        self.data.texClear()
-        if gl.glGetError(): 
-            raise RuntimeError("GL: %s" % (gl.glGetError(),))
-        return self.data
-
-    def _layoutMosaic(self, chars, ftFace):
-        alg = self.LayoutAlgorithm(self.getMaxTextureSize())
-
-        chars = u'\x00 \t\n\r' + chars
-        self._charMap = ftFace.charIndexMap(chars)
-
-        for glyphIndex, glyph in ftFace.iterUniqueGlyphs(chars):
+        for glyphIndex, glyph in ftFace.iterUniqueGlyphs(charset):
             alg.addBlock(glyph.bitmapSize, key=glyphIndex)
 
         usedSize, glyphLayout, unplacedGlyphs = alg.layout()
@@ -116,15 +82,14 @@ class FontTextureBase(Texture):
 
         return usedSize, glyphLayout
 
-    def _renderMosaic(self, glyphLayout, ftFace):
-        data = self.data
+    def _renderMosaic(self, data, glyphLayout, ftFace):
         data.newPixelStore(alignment=1, rowLength=0)
 
         for block in glyphLayout:
             glyph = ftFace.loadGlyph(block.key)
             glyph.render()
             data.texCData(glyph.bitmap.buffer, dict(rowLength=glyph.bitmap.pitch))
-            data.setSubImageOn(texture, pos=block.pos, size=block.size)
+            data.setSubImageOn(self, pos=block.pos, size=block.size)
 
         data.texClear()
 
@@ -151,8 +116,8 @@ class FontTextureBase(Texture):
             texCoords[i] = getTexCoordsFor(block, tw, th)
 
             glyph = loadGlyph(glyphIndex)
-            verticies[i] = getVerticisFor(glyph)
-            advance[i] = glyph.advance
+            verticies[i] = getVerticisFor(glyph, ptw, pth)
+            advance[i] = getAdvanceFor(glyph, ptw, pth)
 
     def _getTexCoordsFor(self, block, tw, th):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
@@ -174,8 +139,7 @@ class FontTextureBase(Texture):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class FontTextureRect(FontTextureBase):
-    texParams = FontTextureBase.copy()
-    texParams.update(target=gl.GL_TEXTURE_RECTANGLE_ARB)
+    target = glext.GL_TEXTURE_RECTANGLE_ARB
 
     def _getTexCoordsFor(self, block, tw, th):
         x0, y0 = block.pos
@@ -183,20 +147,12 @@ class FontTextureRect(FontTextureBase):
         y1 = y0 + block.size[1]
         return [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
 
+FontTexture = FontTextureRect
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class FontTexture2D(FontTextureBase):
-    texParams = FontTextureBase.copy()
-    texParams.update(target=gl.GL_TEXTURE_2D)
-
-    def setSize(self, size):
-        size = tuple(map(Texture.nextPowerOf2, size))
-        return FontTextureBase.setSize(self, size)
-    size = property(FontTextureBase.getSize, setSize)
-
-    def _setLayoutSize(self, size):
-        size = tuple(map(Texture.nextPowerOf2, size))
-        return FontTextureBase._setLayoutSize(self, size)
+    target = gl.GL_TEXTURE_2D
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

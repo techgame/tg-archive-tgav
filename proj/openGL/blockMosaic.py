@@ -396,6 +396,7 @@ class VerticalBlockLayoutRegion(VerticalLayoutRegion):
         bOutOfRoom = False
         hMax = 0
         x = y = borders
+        xMax = x
         for heightGrp in heightGrps:
             for elemH in heightGrp:
                 widthMap = heightMap[elemH]
@@ -429,6 +430,7 @@ class VerticalBlockLayoutRegion(VerticalLayoutRegion):
 
                         # advance horizontally
                         x += elemW + borders*2
+                        xMax = max(x, xMax)
                         rowWidth = rgn.w - x
 
                         bNewRow = rowWidth < (elemW >> 1)
@@ -468,7 +470,7 @@ class VerticalBlockLayoutRegion(VerticalLayoutRegion):
         x = 0; y += hMax
         bottomRgn = self.addUnusedBlockRgn((x, y), (rgn.w - x, rgn.h - y), key='Bottom')
 
-        usedSize = (rgn.w, y)
+        usedSize = (xMax, y)
         remaining = [b[1] for wm in self._blocksByHeight.itervalues() for b in wm]
         return usedSize, result, remaining
 

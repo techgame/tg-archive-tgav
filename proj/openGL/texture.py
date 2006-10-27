@@ -19,11 +19,6 @@ from raw import gl, glu, glext
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class GLObject(object):
-    def set(self, **kwattr):
-        for n,v in kwattr.iteritems():
-            setattr(self, n, v)
-
 class glTexParamProperty(object):
     _as_parameter_ = None
         
@@ -43,7 +38,7 @@ class glTexParamProperty(object):
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class PixelStore(GLObject):
+class PixelStore(object):
     alignment = 4
     swapBytes = False
     lsbFirst = False
@@ -74,7 +69,7 @@ class PixelStore(GLObject):
     def __setattr__(self, name, value):
         if name in self.fmtPNames:
             self[name] = value
-        return GLObject.__setattr__(self, name, value)
+        return object.__setattr__(self, name, value)
 
     def __getitem__(self, name):
         pname = self.fmtPNames[name][self.pack]
@@ -83,7 +78,7 @@ class PixelStore(GLObject):
         pname = self.fmtPNames[name][self.pack]
         restoreValue = getattr(self.__class__, name)
         self.formatAttrs[pname] = (value, restoreValue)
-        GLObject.__setattr__(self, name, value)
+        object.__setattr__(self, name, value)
     def __delitem__(self, name):
         pname = self.fmtPNames[name][self.pack]
         del self.formatAttrs[pname]
@@ -93,28 +88,27 @@ class PixelStore(GLObject):
     def create(self, pack=False, **kwattrs):
         self.formatAttrs = {}
         self.pack = pack
-        self.update(kwattrs)
+        self.set(kwattrs)
 
-    def update(self, attrs):
-        for name, value in attrs.iteritems():
-            setattr(self, name, value)
+    def set(self, val=None, **kwattr):
+        for n,v in (val or kwattr).iteritems():
+            setattr(self, n, v)
 
     def select(self):
-        formatAttrs = self.formatAttrs
-        for pname, value in formatAttrs.iteritems():
+        for pname, value in self.formatAttrs.iteritems():
             gl.glPixelStorei(pname, value[0])
+        return self
 
-        yield True
-
-        for pname, value in formatAttrs.iteritems():
+    def deselect(self):
+        for pname, value in self.formatAttrs.iteritems():
             gl.glPixelStorei(pname, value[1])
-    __iter__ = select
+        return self
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Texture Image
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class TextureImageBasic(GLObject):
+class TextureImageBasic(object):
     format = None # GL_COLOR_INDEX,  GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA,  GL_RGB,  GL_BGR  GL_RGBA, GL_BGRA, GL_LUMINANCE, GL_LUMINANCE_ALPHA
     dataType = None # GL_UNSIGNED_BYTE, GL_BYTE, GL_BITMAP, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_FLOAT, ...
     border = False
@@ -148,7 +142,11 @@ class TextureImageBasic(GLObject):
         self.create(*args, **kwattrs)
 
     def create(self, *args, **kwattrs):
-        self.set(**kwattrs)
+        self.set(kwattrs)
+
+    def set(self, val=None, **kwattr):
+        for n,v in (val or kwattr).iteritems():
+            setattr(self, n, v)
 
     def getDataTypeSize(self):
         return self._dataTypeSizeMap[self.dataType]
@@ -228,7 +226,7 @@ class TextureImageBasic(GLObject):
         return pixelStore
     def updatePixelStore(self, settings):
         ps = self.getPixelStore()
-        ps.update(settings)
+        ps.set(settings)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -246,11 +244,14 @@ class TextureImageBasic(GLObject):
     def select(self):
         pixelStore = self._pixelStore
         if pixelStore is not None:
-            for e in pixelStore.select():
-                yield True
-        else:
-            yield True
-    __iter__ = select
+            pixelStore.select()
+        return self
+
+    def deselect(self):
+        pixelStore = self._pixelStore
+        if pixelStore is not None:
+            pixelStore.deselect()
+        return self
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -274,15 +275,15 @@ class TextureImage1D(TextureImageBasic):
         texture.setImage1d(self, level, **kw)
         return texture
     def setSubImageOn(self, texture, level=0, **kw):
-        if kw: self.set(**kw)
+        if kw: self.set(kw)
         texture.setSubImage1d(self, level)
         return texture
     def setCompressedImageOn(self, texture, level=0, **kw):
-        if kw: self.set(**kw)
+        if kw: self.set(kw)
         texture.setCompressedImage1d(self, level)
         return texture
     def setCompressedSubImageOn(self, texture, level=0, **kw):
-        if kw: self.set(**kw)
+        if kw: self.set(kw)
         texture.setCompressedSubImage1d(self, level)
         return texture
 
@@ -306,15 +307,15 @@ class TextureImage2D(TextureImageBasic):
         texture.setImage2d(self, level, **kw)
         return texture
     def setSubImageOn(self, texture, level=0, **kw):
-        if kw: self.set(**kw)
+        if kw: self.set(kw)
         texture.setSubImage2d(self, level)
         return texture
     def setCompressedImageOn(self, texture, level=0, **kw):
-        if kw: self.set(**kw)
+        if kw: self.set(kw)
         texture.setCompressedImage2d(self, level)
         return texture
     def setCompressedSubImageOn(self, texture, level=0, **kw):
-        if kw: self.set(**kw)
+        if kw: self.set(kw)
         texture.setCompressedSubImage2d(self, level)
         return texture
 
@@ -338,15 +339,15 @@ class TextureImage3D(TextureImageBasic):
         texture.setImage3d(self, level, **kw)
         return texture
     def setSubImageOn(self, texture, level=0, **kw):
-        if kw: self.set(**kw)
+        if kw: self.set(kw)
         texture.setSubImage3d(self, level)
         return texture
     def setCompressedImageOn(self, texture, level=0, **kw):
-        if kw: self.set(**kw)
+        if kw: self.set(kw)
         texture.setCompressedImage3d(self, level)
         return texture
     def setCompressedSubImageOn(self, texture, level=0, **kw):
-        if kw: self.set(**kw)
+        if kw: self.set(kw)
         texture.setCompressedSubImage3d(self, level)
         return texture
 
@@ -354,10 +355,12 @@ class TextureImage3D(TextureImageBasic):
 #~ Texture object itself
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class Texture(GLObject):
+class Texture(object):
     _as_parameter_ = None # GLenum returned from glGenTextures
     target = 0 # GL_TEXTURE_1D, GL_TEXTURE_2D, etc.
     format = None # GL_RGBA, GL_INTENSITY, etc.
+
+    texParams = dict()
 
     def __init__(self, *args, **kwargs):
         if args or kwargs:
@@ -366,38 +369,56 @@ class Texture(GLObject):
     def __del__(self):
         self.release()
 
-    def create(self, target, format, **kwargs):
+    def create(self, target=None, **kwargs):
         if not self._as_parameter_ is None:
             raise Exception("Create has already been called for this instance")
 
-        self._as_parameter_ = gl.GLenum(0)
-        self.target = target
-        self.format = format
-        gl.glGenTextures(1, byref(self._as_parameter_))
+        if target is not None:
+            self.target = target
 
-        self.select().next()
-        self.set(**kwargs)
+        self._genId()
+        self.bind()
+        self.set(self.texParams)
+        self.set(kwargs)
         
+    def set(self, val=None, **kwattr):
+        for n,v in (val or kwattr).iteritems():
+            setattr(self, n, v)
 
     def release(self):
-        if not self._as_parameter_:
+        if self._as_parameter_ is None:
             return
 
-        gl.glDeleteTextures(1, byref(self._as_parameter_))
+        self.unbind()
+        self._delId()
 
-        self._as_parameter_ = None
+    def _genId(self):
+        if self._as_parameter_ is None:
+            p = gl.GLenum(0)
+            gl.glGenTextures(1, byref(p))
+            self._as_parameter_ = p
+    def _delId(self):
+        p = self._as_parameter_
+        if p is not None:
+            gl.glDeleteTextures(1, byref(p))
+            self._as_parameter_ = None
+
+    def bind(self):
+        gl.glBindTexture(self.target, self)
+    def unbind(self):
+        gl.glBindTexture(self.target, None)
 
     def select(self, unit=None):
         if unit is not None:
             gl.glActiveTexture(unit)
-        gl.glEnable(self.target)
         gl.glBindTexture(self.target, self)
+        gl.glEnable(self.target)
+        return self
 
-        yield True
-
+    def deselect(self):
         gl.glBindTexture(self.target, 0)
         gl.glDisable(self.target)
-    __iter__ = select
+        return self
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -465,22 +486,31 @@ class Texture(GLObject):
         data.setImageOn(self, level, **kw)
         return self
     def setImage1d(self, data, level=0):
-        for _ in data.select():
+        data.select()
+        try:
             self.size = data.size
             gl.glTexImage1D(self.target, level, self.format, 
                 data.width, data.border, data.format, data.dataType, data.ptr)
+        finally:
+            data.deselect()
         return data
     def setImage2d(self, data, level=0):
-        for _ in data.select():
+        data.select()
+        try:
             self.size = data.size
             gl.glTexImage2D(self.target, level, self.format, 
                 data.width, data.height, data.border, data.format, data.dataType, data.ptr)
+        finally:
+            data.deselect()
         return data
     def setImage3d(self, data, level=0):
-        for _ in data.select():
+        data.select()
+        try:
             self.size = data.size
             gl.glTexImage3D(self.target, level, self.format, 
                 data.width, data.height, data.depth, data.border, data.format, data.dataType, data.ptr)
+        finally:
+            data.deselect()
         return data
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -489,19 +519,28 @@ class Texture(GLObject):
         data.setSubImageOn(self, level, **kw)
         return self
     def setSubImage1d(self, data, level=0):
-        for _ in data.select():
+        data.select()
+        try:
             gl.glTexSubImage1D(self.target, level, data.x,
                 data.width, data.format, data.dataType, data.ptr)
+        finally:
+            data.deselect()
         return data
     def setSubImage2d(self, data, level=0):
-        for _ in data.select():
+        data.select()
+        try:
             gl.glTexSubImage2D(self.target, level, data.x, data.y, 
                 data.width, data.height, data.format, data.dataType, data.ptr)
+        finally:
+            data.deselect()
         return data
     def setSubImage3d(self, data, level=0):
-        for _ in data.select():
+        data.select()
+        try:
             gl.glTexSubImage3D(self.target, level, data.x, data.y, data.z, 
                 data.width, data.height, data.depth, data.format, data.dataType, data.ptr)
+        finally:
+            data.deselect()
         return data
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -510,22 +549,31 @@ class Texture(GLObject):
         data.setCompressedImageOn(self, level, **kw)
         return self
     def setCompressedImage1d(self, data, level=0):
-        for _ in data.select():
+        data.select()
+        try:
             self.size = data.size
             gl.glCompressedTexImage1D(self.target, level, self.format, 
                     data.width, data.border, data.format, data.dataType, data.ptr)
+        finally:
+            data.deselect()
         return data
     def setCompressedImage2d(self, data, level=0):
-        for _ in data.select():
+        data.select()
+        try:
             self.size = data.size
             gl.glCompressedTexImage2D(self.target, level, self.format, 
                 data.width, data.height, data.border, data.format, data.dataType, data.ptr)
+        finally:
+            data.deselect()
         return data
     def setCompressedImage3d(self, data, level=0):
-        for _ in data.select():
+        data.select()
+        try:
             self.size = data.size
             gl.glCompressedTexImage3D(self.target, level, self.format, 
                 data.width, data.height, data.depth, data.border, data.format, data.dataType, data.ptr)
+        finally:
+            data.deselect()
         return data
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -534,19 +582,28 @@ class Texture(GLObject):
         data.setCompressedSubImageOn(self, level, **kw)
         return self
     def setCompressedSubImage1d(self, data, level=0):
-        for _ in data.select():
+        data.select()
+        try:
             gl.glCompressedTexSubImage1D(self.target, level, data.x,
                 data.width, data.format, data.dataType, data.ptr)
+        finally:
+            data.deselect()
         return data
     def setCompressedSubImage2d(self, data, level=0):
-        for _ in data.select():
+        data.select()
+        try:
             gl.glCompressedTexSubImage2D(self.target, level, data.x, data.y, 
                 data.width, data.height, data.format, data.dataType, data.ptr)
+        finally:
+            data.deselect()
         return data
     def setCompressedSubImage3d(self, data, level=0):
-        for _ in data.select():
+        data.select()
+        try:
             gl.glCompressedTexSubImage3D(self.target, level, data.x, data.y, data.z, 
                 data.width, data.height, data.depth, data.format, data.dataType, data.ptr)
+        finally:
+            data.deselect()
         return data
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -577,6 +634,14 @@ class Texture(GLObject):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    _textureTargetRequiresPowersOfTwo = {
+        gl.GL_TEXTURE_1D: True,
+        gl.GL_TEXTURE_2D: True,
+        gl.GL_TEXTURE_3D: True,
+        gl.GL_TEXTURE_CUBE_MAP: True,
+
+        glext.GL_TEXTURE_RECTANGLE_ARB: False,
+        }
     _powersOfTwo = [1<<s for s in xrange(31)]
 
     @staticmethod
@@ -585,4 +650,9 @@ class Texture(GLObject):
     @staticmethod
     def nextPowerOf2(v, powersOfTwo=_powersOfTwo):
         return powersOfTwo[bisect_left(powersOfTwo, v)]
+
+    def validSizeForTarget(self, size):
+        if self._textureTargetRequiresPowersOfTwo.get(self.target, False):
+            return tuple(self.nextPowerOf2(s) for s in size)
+        else: return size
 

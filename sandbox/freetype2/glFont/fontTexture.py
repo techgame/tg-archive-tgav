@@ -22,7 +22,7 @@ from TG.freetype2.fontFace import FreetypeFontFace
 from TG.openGL.texture import Texture
 from TG.openGL.raw import gl, glu, glext
 
-from blockMosaicLayout import BlockMosaicAlg
+from TG.openGL.blockMosaic import BlockMosaicAlg
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -131,8 +131,8 @@ class GLFreetypeFaceBasic(FreetypeFontFace):
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def drawFontTexture(self):
-        for e in self.texture.select():
-            self._drawTextureRect()
+        self.texture.select()
+        self._drawTextureRect()
 
     def _drawTextureRect(self):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
@@ -145,10 +145,10 @@ class GLFreetypeFaceBasic(FreetypeFontFace):
         gl.glPopMatrix()
 
     def select(self):
-        for e in self.texture.select():
-            gl.glPushMatrix()
-            yield self
-            gl.glPopMatrix()
+        self.texture.select()
+        gl.glPushMatrix()
+        yield self
+        gl.glPopMatrix()
 
     def drawBreak(self, advance=True):
         gl.glPopMatrix()
