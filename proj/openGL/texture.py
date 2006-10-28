@@ -367,7 +367,12 @@ class Texture(object):
             self.create(*args, **kwargs)
 
     def __del__(self):
-        self.release()
+        try:
+            self.release()
+        except:
+            import traceback
+            traceback.print_exc()
+            raise
 
     def create(self, target=None, **kwargs):
         if not self._as_parameter_ is None:
@@ -406,7 +411,7 @@ class Texture(object):
     def bind(self):
         gl.glBindTexture(self.target, self)
     def unbind(self):
-        gl.glBindTexture(self.target, None)
+        gl.glBindTexture(self.target, 0)
 
     def select(self, unit=None):
         if unit is not None:

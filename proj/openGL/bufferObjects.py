@@ -61,7 +61,7 @@ class BufferBase(object):
     def bind(self):
         self.glBindBuffer(self.target, self)
     def unbind(self):
-        self.glBindBuffer(self.target, None)
+        self.glBindBuffer(self.target, 0)
 
     glBufferData = staticmethod(gl.glBufferData)
     def sendData(self, data, usage=None):
