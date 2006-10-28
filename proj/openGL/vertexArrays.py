@@ -12,8 +12,7 @@
 
 from functools import partial
 
-import numpy
-from numpy import ndarray
+from numpy import ndarray, array
 
 from TG.openGL.raw import gl
 
@@ -29,6 +28,10 @@ class ArrayBase(ndarray):
         float32=gl.GL_FLOAT,
         float64=gl.GL_DOUBLE,
         )
+
+    def __new__(klass, data, dtype=None, copy=False):
+        data = array(data, dtype, copy=copy, order='C', ndmin=1)
+        return data.view(klass)
 
     def __init__(self, *args, **kw):
         self._config()
@@ -47,6 +50,9 @@ class ArrayBase(ndarray):
     def enable(self):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
 
+    def glArrayPointer(self, count, dataFormat, stride, ptr):
+        raise NotImplementedError('Subclass Responsibility: %r' % (self,))
+
     def bind(self):
         self.glArrayPointer(len(self), self.dataFormat, 0, self)
 
@@ -63,13 +69,13 @@ class ArrayBase(ndarray):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class VertexArray(ArrayBase):
-    glArrayType = GL_VERTEX_ARRAY
+    glArrayType = gl.GL_VERTEX_ARRAY
     glArrayPointer = staticmethod(gl.glVertexPointer)
     enable = staticmethod(partial(gl.glEnableClientState, glArrayType))
     disable = staticmethod(partial(gl.glDisableClientState, glArrayType))
 
 class TexCoordArray(ArrayBase):
-    glArrayType = GL_TEXCOORD_ARRAY
+    glArrayType = gl.GL_TEXTURE_COORD_ARRAY
     glArrayPointer = staticmethod(gl.glTexCoordPointer)
     enable = staticmethod(partial(gl.glEnableClientState, glArrayType))
     disable = staticmethod(partial(gl.glDisableClientState, glArrayType))
@@ -86,37 +92,37 @@ class MultiTexCoordArray(TexCoordArray):
         self.glArrayPointer(0, self.dataFormat, 0, None)
 
 class NormalArray(ArrayBase):
-    glArrayType = GL_NORMAL_ARRAY
+    glArrayType = gl.GL_NORMAL_ARRAY
     glArrayPointer = staticmethod(gl.glNormalPointer)
     enable = staticmethod(partial(gl.glEnableClientState, glArrayType))
     disable = staticmethod(partial(gl.glDisableClientState, glArrayType))
 
 class ColorArray(ArrayBase):
-    glArrayType = GL_COLOR_ARRAY
+    glArrayType = gl.GL_COLOR_ARRAY
     glArrayPointer = staticmethod(gl.glColorPointer)
     enable = staticmethod(partial(gl.glEnableClientState, glArrayType))
     disable = staticmethod(partial(gl.glDisableClientState, glArrayType))
 
 class SecondaryColorArray(ArrayBase):
-    glArrayType = GL_SECONDARY_COLOR_ARRAY
+    glArrayType = gl.GL_SECONDARY_COLOR_ARRAY
     glArrayPointer = staticmethod(gl.glSecondaryColorPointer)
     enable = staticmethod(partial(gl.glEnableClientState, glArrayType))
     disable = staticmethod(partial(gl.glDisableClientState, glArrayType))
 
 class ColorIndexArray(ArrayBase):
-    glArrayType = GL_INDEX_ARRAY
+    glArrayType = gl.GL_INDEX_ARRAY
     glArrayPointer = staticmethod(gl.glIndexPointer)
     enable = staticmethod(partial(gl.glEnableClientState, glArrayType))
     disable = staticmethod(partial(gl.glDisableClientState, glArrayType))
 
 class FogCoordArray(ArrayBase):
-    glArrayType = GL_FOGCOORD_ARRAY
+    glArrayType = gl.GL_FOG_COORD_ARRAY
     glArrayPointer = staticmethod(gl.glFogCoordPointer)
     enable = staticmethod(partial(gl.glEnableClientState, glArrayType))
     disable = staticmethod(partial(gl.glDisableClientState, glArrayType))
 
 class EdgeFlagArray(ArrayBase):
-    glArrayType = GL_EDGE_FLAG_ARRAY
+    glArrayType = gl.GL_EDGE_FLAG_ARRAY
     glArrayPointer = staticmethod(gl.glEdgeFlagPointer)
     enable = staticmethod(partial(gl.glEnableClientState, glArrayType))
     disable = staticmethod(partial(gl.glDisableClientState, glArrayType))
