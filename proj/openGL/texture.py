@@ -25,16 +25,18 @@ class glTexParamProperty(object):
     def __init__(self, propertyEnum):
         self._as_parameter_ = propertyEnum
 
+    glGetTexParameteriv = staticmethod(gl.glGetTexParameteriv)
     def __get__(self, obj, klass):
         if obj is None: 
             return self
 
         cValue = GLint(0)
-        gl.glGetTexParameteriv(obj.target, self, byref(cValue))
+        self.glGetTexParameteriv(obj.target, self, byref(cValue))
         return cValue.value
 
+    glTexParameteri = staticmethod(gl.glTexParameteri)
     def __set__(self, obj, value):
-        gl.glTexParameteri(obj.target, self, value)
+        self.glTexParameteri(obj.target, self, value)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -94,14 +96,15 @@ class PixelStore(object):
         for n,v in (val or kwattr).iteritems():
             setattr(self, n, v)
 
+    glPixelStorei = staticmethod(gl.glPixelStorei)
     def select(self):
         for pname, value in self.formatAttrs.iteritems():
-            gl.glPixelStorei(pname, value[0])
+            self.glPixelStorei(pname, value[0])
         return self
 
     def deselect(self):
         for pname, value in self.formatAttrs.iteritems():
-            gl.glPixelStorei(pname, value[1])
+            self.glPixelStorei(pname, value[1])
         return self
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -397,32 +400,43 @@ class Texture(object):
         self.unbind()
         self._delId()
 
+    glGenTextures = staticmethod(gl.glGenTextures)
     def _genId(self):
         if self._as_parameter_ is None:
             p = gl.GLenum(0)
-            gl.glGenTextures(1, byref(p))
+            self.glGenTextures(1, byref(p))
             self._as_parameter_ = p
+    glDeleteTextures = staticmethod(gl.glDeleteTextures)
     def _delId(self):
         p = self._as_parameter_
         if p is not None:
-            gl.glDeleteTextures(1, byref(p))
+            self.glDeleteTextures(1, byref(p))
             self._as_parameter_ = None
 
+    glBindTexture = staticmethod(gl.glBindTexture)
     def bind(self):
-        gl.glBindTexture(self.target, self)
+        self.glBindTexture(self.target, self)
     def unbind(self):
-        gl.glBindTexture(self.target, 0)
+        self.glBindTexture(self.target, 0)
 
+    glEnable = staticmethod(gl.glEnable)
+    def enable(self):
+        self.glEnable(self.target)
+    glDisable = staticmethod(gl.glDisable)
+    def disable(self):
+        self.glDisable(self.target)
+
+    glActiveTexture = staticmethod(gl.glActiveTexture)
     def select(self, unit=None):
         if unit is not None:
-            gl.glActiveTexture(unit)
-        gl.glBindTexture(self.target, self)
-        gl.glEnable(self.target)
+            self.glActiveTexture(unit)
+        self.bind()
+        self.enable()
         return self
 
     def deselect(self):
-        gl.glBindTexture(self.target, 0)
-        gl.glDisable(self.target)
+        self.unbind()
+        self.disable()
         return self
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

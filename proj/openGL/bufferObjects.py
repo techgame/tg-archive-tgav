@@ -78,15 +78,17 @@ class BufferBase(object):
         self.unbind()
         self._delId()
 
+    glGenBuffers = staticmethod(gl.glGenBuffers)
     def _genId(self):
         if self._as_parameter_ is None:
             p = gl.GLenum(0)
-            gl.glGenBuffers(1, byref(p))
+            self.glGenBuffers(1, byref(p))
             self._as_parameter_ = p
+    glDeleteBuffers = staticmethod(gl.glDeleteBuffers)
     def _delId(self):
         p = self._as_parameter_
         if p is not None:
-            gl.glDeleteBuffers(1, byref(p))
+            self.glDeleteBuffers(1, byref(p))
             self._as_parameter_ = None
 
     glBindBuffer = staticmethod(gl.glBindBuffer)

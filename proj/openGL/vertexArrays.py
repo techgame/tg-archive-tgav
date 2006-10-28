@@ -23,8 +23,14 @@ from TG.openGL.raw import gl
 class ArrayBase(ndarray):
     dataFormat = None
     dataFormatMap = dict(
+        uint8=gl.GL_UNSIGNED_BYTE,
+        uint16=gl.GL_UNSIGNED_SHORT,
+        uint32=gl.GL_UNSIGNED_INT,
+
+        int8=gl.GL_BYTE,
         int16=gl.GL_SHORT,
         int32=gl.GL_INT,
+
         float32=gl.GL_FLOAT,
         float64=gl.GL_DOUBLE,
         )
@@ -81,7 +87,7 @@ class TexCoordArray(ArrayBase):
     disable = staticmethod(partial(gl.glDisableClientState, glArrayType))
 
 class MultiTexCoordArray(TexCoordArray):
-    glClientActiveTexture = gl.glClientActiveTexture
+    glClientActiveTexture = staticmethod(gl.glClientActiveTexture)
     texUnit = gl.GL_TEXTURE0
 
     def bind(self):
