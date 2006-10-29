@@ -39,14 +39,14 @@ class ArrayBase(ndarray):
         data = array(data, dtype, copy=copy, order='C', ndmin=1)
         return data.view(klass)
 
-    def __init__(self, *args, **kw):
+    def __init__(self, data=None, dtype=None, copy=False):
         self._config()
 
     def _config(self):
         self._as_parameter_ = self.ctypes._as_parameter_
-        self._configDataFormat()
+        self._inferDataFormat()
 
-    def _configDataFormat(self):
+    def _inferDataFormat(self):
         self.dataFormat = self.dataFormatMap[self.dtype.name]
 
     def select(self):

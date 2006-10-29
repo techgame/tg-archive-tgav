@@ -192,7 +192,7 @@ class TextureImageBasic(object):
         self.texData(cdata, cdata, pixelStoreSettings)
     cdata = property(fset=texCData)
     def texArray(self, array, pixelStoreSettings=None):
-        self.texData(array, array.buffer_info()[0], pixelStoreSettings)
+        self.texData(array, array.ctypes, pixelStoreSettings)
     array = property(fset=texArray)
 
     def texBlank(self):

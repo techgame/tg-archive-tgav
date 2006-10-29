@@ -11,9 +11,69 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 from ctypes import c_void_p
-from numpy import asarray, uint32
+from numpy import ndarray, array, uint32
 
 from TG.openGL.raw import gl
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ Constants / Variiables / Etc. 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+drawModeMap = {
+    None: gl.GL_POINTS,
+    gl.GL_POINTS: gl.GL_POINTS,
+    'points': gl.GL_POINTS,
+
+    gl.GL_LINES: gl.GL_LINES,
+    'lines': gl.GL_LINES,
+    gl.GL_LINE_LOOP: gl.GL_LINE_LOOP,
+    'lineLoop': gl.GL_LINE_LOOP,
+    gl.GL_LINE_STRIP: gl.GL_LINE_STRIP,
+    'lineStrip': gl.GL_LINE_STRIP,
+
+    gl.GL_TRIANGLES: gl.GL_TRIANGLES,
+    'triangles': gl.GL_TRIANGLES,
+    gl.GL_TRIANGLE_STRIP: gl.GL_TRIANGLE_STRIP,
+    'triangleStrip': gl.GL_TRIANGLE_STRIP,
+    gl.GL_TRIANGLE_FAN: gl.GL_TRIANGLE_FAN,
+    'triangleFan': gl.GL_TRIANGLE_FAN,
+
+    gl.GL_QUADS: gl.GL_QUADS,
+    'quads': gl.GL_QUADS,
+    gl.GL_QUAD_STRIP: gl.GL_QUAD_STRIP,
+    'quadStrip': gl.GL_QUAD_STRIP,
+    }
+
+dataFormatMap = {
+    gl.GL_BYTE: gl.GL_BYTE, 
+    'char': gl.GL_BYTE,
+    'byte': gl.GL_BYTE,
+    'int8': gl.GL_BYTE,
+
+    gl.GL_SHORT: gl.GL_SHORT,
+    'short': gl.GL_SHORT,
+    'int16': gl.GL_SHORT,
+
+    gl.GL_INT: gl.GL_INT,
+    'int': gl.GL_INT,
+    'int32': gl.GL_INT,
+
+    gl.GL_UNSIGNED_BYTE: gl.GL_UNSIGNED_BYTE,
+    'uint8': gl.GL_UNSIGNED_BYTE,
+    'ubyte': gl.GL_UNSIGNED_BYTE,
+    'uchar': gl.GL_UNSIGNED_BYTE,
+    'unsignedByte': gl.GL_UNSIGNED_BYTE,
+
+    gl.GL_UNSIGNED_SHORT: gl.GL_UNSIGNED_SHORT,
+    'ushort': gl.GL_UNSIGNED_SHORT,
+    'unsignedShort': gl.GL_UNSIGNED_SHORT,
+    'uint16': gl.GL_UNSIGNED_SHORT,
+
+    gl.GL_UNSIGNED_INT: gl.GL_UNSIGNED_INT,
+    'uint': gl.GL_UNSIGNED_INT,
+    'unsignedInt': gl.GL_UNSIGNED_INT,
+    'uint32': gl.GL_UNSIGNED_INT,
+    }
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -21,43 +81,15 @@ from TG.openGL.raw import gl
 
 class DrawBlockBase(object):
     mode = None
-    modeMap = {
-        None: gl.GL_POINTS,
-        gl.GL_POINTS: gl.GL_POINTS,
-        'points': gl.GL_POINTS,
-
-        gl.GL_LINES: gl.GL_LINES,
-        'lines': gl.GL_LINES,
-        gl.GL_LINE_LOOP: gl.GL_LINE_LOOP,
-        'lineLoop': gl.GL_LINE_LOOP,
-        gl.GL_LINE_STRIP: gl.GL_LINE_STRIP,
-        'lineStrip': gl.GL_LINE_STRIP,
-
-        gl.GL_TRIANGLES: gl.GL_TRIANGLES,
-        'triangles': gl.GL_TRIANGLES,
-        gl.GL_TRIANGLE_STRIP: gl.GL_TRIANGLE_STRIP,
-        'triangleStrip': gl.GL_TRIANGLE_STRIP,
-        gl.GL_TRIANGLE_FAN: gl.GL_TRIANGLE_FAN,
-        'triangleFan': gl.GL_TRIANGLE_FAN,
-
-        gl.GL_QUADS: gl.GL_QUADS,
-        'quads': gl.GL_QUADS,
-        gl.GL_QUAD_STRIP: gl.GL_QUAD_STRIP,
-        'quadStrip': gl.GL_QUAD_STRIP,
-        }
-
-    dataFormatMap = dict(
-        uint8=gl.GL_UNSIGNED_BYTE,
-        uint16=gl.GL_UNSIGNED_SHORT,
-        uint32=gl.GL_UNSIGNED_INT,
-        )
+    modeMap = drawModeMap
+    dataFormatMap = dataFormatMap
 
     def setMode(self, mode=None):
         self.mode = self.modeMap[mode or self.mode]
 
     @staticmethod
     def asElementArray(data, dtype=None):
-        return asarray(data, dtype, copy=False, order='C', ndmin=1, subok=True)
+        return array(data, dtype, copy=False, order='C', ndmin=1, subok=True)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -65,11 +97,15 @@ class DrawArrays(DrawBlockBase):
     first = 0
     count = 0
 
-    def __init__(self, mode=None, first=0, count=0):
+    def __init__(self, mode=None, first=0, count=None):
         self.setMode(mode)
-        self.setRange(first, count)
+        self.setSpan(first, count)
 
-    def setRange(self, first, count):
+    def setSpan(self, first=0, count=None):
+        if first > 0 and count is None:
+            count = first
+            first = 0
+
         self.first = first
         self.count = count
 
@@ -102,71 +138,77 @@ class MultiDrawArrays(DrawBlockBase):
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class DrawElements(DrawBlockBase):
+class DrawElements(ndarray, DrawBlockBase):
     dataFormat = None
     indicies = None
 
-    def __init__(self, mode=None, indices=None, dataFormat=None):
-        self.setMode(mode)
-        if indices:
-            self.setIndices(indices, dataFormat)
-        elif dataFormat:
-            self.dataFormat = dataFormat
+    def __new__(klass, mode=None, data=None, dtype=None, copy=False):
+        data = array(data, dtype, copy=copy, order='C', ndmin=1)
+        return data.view(klass)
 
-    _indices = None
-    def getIndices(self):
-        return self._indices
-    def setIndices(self, indices, dataFormat=None):
-        dataFormat = dataFormat or self.dataFormat
-        self._indices = self.asElementArray(indices, dataFormat)
-        if not dataFormat:
-            dataFormat = dataFormat or self._inferDataFormat()
-        self.dataFormat = dataFormat
-    indices = property(getIndices, setIndices)
+    def __init__(self, mode=None, data=None, dtype=None, copy=False):
+        self._config()
+        self.setMode(mode)
+
+    def _config(self):
+        self._as_parameter_ = self.ctypes._as_parameter_
+        self._inferDataFormat()
 
     def _inferDataFormat(self):
-        return self.dataFormatMap[self._indices.dtype.name]
+        self.dataFormat = self.dataFormatMap[self.dtype.name]
 
     glDrawElements = staticmethod(gl.glDrawElements)
     def render(self):
-        indices = self._indices
-        self.glDrawElements(self.mode, len(indices), self.dataFormat, indices.ctypes)
-
-class DrawRangeElements(DrawElements):
-    first = 0
-    count = 0
-
-    def __init__(self, mode=None, start=0, count=0, indices=None, dataFormat=None):
-        DrawElements.__init__(self, mode, indices, dataFormat)
-        self.setRange(start, count)
-
-    def setRange(self, first, count):
-        self.first = first
-        self.count = count
-
-    glDrawRangeElements = staticmethod(gl.glDrawRangeElements)
-    def render(self):
-        self.glDrawRangeElements(self.mode, self.start, self.count, len(indices), self.dataFormat, indices.ctypes)
+        self.glDrawElements(self.mode, len(self), self.dataFormat, self)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class MultiDrawElements(DrawBlockBase):
-    def __init__(self, mode=None, indices=None):
-        self.indices = indices
+class DrawRangeElements(DrawElements):
+    start = 0
+    end = 0
+
+    def __new__(klass, mode=None, start=0, end=0, data=None, dtype=None, copy=False):
+        data = array(data, dtype, copy=copy, order='C', ndmin=1)
+        return data.view(klass)
+
+    def __init__(self, mode=None, start=0, end=0, data=None, dtype=None, copy=False):
+        DrawElements.__init__(self, mode, data, dtype, copy)
+        self.setRange(start, end)
+
+    def setRange(self, start, end):
+        self.start = start
+        self.end = end
+
+    glDrawRangeElements = staticmethod(gl.glDrawRangeElements)
+    def render(self):
+        self.glDrawRangeElements(self.mode, self.start, self.end, len(self), self.dataFormat, self)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+class MultiDrawElementsBase(DrawBlockBase):
+    def __init__(self, mode=None, entries=None):
+        self.createEntries()
+        self.setMode(mode)
+        if entries is not None:
+            self.updateEntries(entries)
 
     _cacheInvalid = True
-    _indices = None
-    def getIndices(self, invalidateCache=True):
+    _entries = None
+    def getEntries(self, invalidateCache=True):
         if invalidateCache:
             self._cacheInvalid = True
-        return self._indices
-    def setIndices(self, indices):
-        self._indices = indices
+        return self._entries
+    def setEntries(self, entries):
+        self._entries = entries
         self._cacheInvalid = True
-    indices = property(getIndices, setIndices)
+    entries = property(getEntries, setEntries)
         
+    def updateEntries(self, entries):
+        raise NotImplementedError('Subclass Responsibility: %r' % (self,))
+    def createEntries(self):
+        raise NotImplementedError('Subclass Responsibility: %r' % (self,))
     def _safeGetIndicesList(self):
-        return self._iterIndices
+        raise NotImplementedError('Subclass Responsibility: %r' % (self,))
 
     _indicesCountCache = None
     _indicesListCache = None
@@ -188,4 +230,30 @@ class MultiDrawElements(DrawBlockBase):
 
         indicesListCache = self._indicesListCache
         self.glMultiDrawElements(self.mode, self._indicesCountCache, self.dataFormat, indicesListCache, len(indicesListCache))
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+class MultiDrawElementList(MultiDrawElementsBase):
+    def createEntries(self):
+        self._entries = list()
+    def _safeGetIndicesList(self):
+        return self._entries
+    def updateEntries(self, entries):
+        self.entries.update(entries)
+
+class MultiDrawElementSet(MultiDrawElementsBase):
+    def createEntries(self):
+        self._entries = set()
+    def _safeGetIndicesList(self):
+        return list(self._entries)
+    def updateEntries(self, entries):
+        self.entries.update(entries)
+
+class MultiDrawElementDict(MultiDrawElementsBase):
+    def createEntries(self):
+        self._entries = dict()
+    def _safeGetIndicesList(self):
+        return self._entries.values()
+    def updateEntries(self, entries):
+        self.entries.extend(entries)
 
