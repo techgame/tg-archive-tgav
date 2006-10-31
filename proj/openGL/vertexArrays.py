@@ -12,7 +12,8 @@
 
 from functools import partial
 
-from numpy import ndarray, array, dtype
+import numpy
+from numpy import ndarray
 
 from TG.openGL.raw import gl
 
@@ -20,34 +21,140 @@ from TG.openGL.raw import gl
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class ArrayBase(ndarray):
-    dataFormat = None
-    dataFormatMap = dict(
-        uint8=gl.GL_UNSIGNED_BYTE,
-        uint16=gl.GL_UNSIGNED_SHORT,
-        uint32=gl.GL_UNSIGNED_INT,
+class NDArrayBase(ndarray):
+    dataFormatMap = {}
+    dataFormatToDTypeMap = {}
+    dataFormatFromDTypeMap = {}
 
-        int8=gl.GL_BYTE,
-        int16=gl.GL_SHORT,
-        int32=gl.GL_INT,
+    def __new__(klass, shape=None, dtype=float, dataFormat=None, buffer=None, offset=0, strides=None, order=None):
+        return ndarray.__new__(klass, shape, dtype, buffer, offset, strides, order)
+    def __init__(self, shape=None, dtype=float, dataFormat=None, buffer=None, offset=0, strides=None, order=None):
+        self._config(dataFormat)
 
-        float32=gl.GL_FLOAT,
-        float64=gl.GL_DOUBLE,
-        )
-
-    def __new__(klass, data=[], dtype=None, copy=False):
-        data = array(data, dtype, copy=copy, order='C', ndmin=1)
-        return data.view(klass)
-
-    def __init__(self, data=[], dtype=None, copy=False):
-        self._config()
-
-    def _config(self):
+    def _config(self, dataFormat=None):
         self._as_parameter_ = self.ctypes._as_parameter_
-        self._inferDataFormat()
+        if dataFormat is not None:
+            self.setDataFormat(dataFormat)
+        elif self.dataFormat is None:
+            self.inferDataFormat()
 
-    def _inferDataFormat(self):
-        self.dataFormat = self.dataFormatMap[self.dtype.name]
+    @classmethod
+    def lookupDTypeFromFormat(klass, dataFormat):
+        if isinstance(dataFormat, str):
+            dataFormat = dataFormat.replace(' ', '')
+            dataFormat = klass.dataFormatMap[dataFormat]
+        dtype = klass.dataFormatToDTypeMap[dataFormat]
+        return dtype, dataFormat
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    @classmethod
+    def fromFormat(klass, shape, dataFormat):
+        dtype, dataFormat = self.lookupDTypeFromFormat(dataFormat)
+        self = klass(shape, dtype, dataFormat=dataFormat)
+        return self
+
+    @classmethod
+    def fromData(klass, data, dtype=None, copy=False):
+        if isinstance(data, klass):
+            dtype2 = data.dtype
+            if (dtype is None):
+                dtype = dtype2
+
+            if (dtype2 == dtype) and (not copy):
+                return data
+            else:
+                return data.astype(dtype)
+
+        elif isinstance(data, ndarray):
+            if dtype is None:
+                intype = data.dtype
+            else:
+                intype = numpy.dtype(dtype)
+
+            self = data.view(klass)
+            self._config()
+            if intype != data.dtype:
+                return self.astype(intype)
+            elif copy: 
+                return self.copy()
+
+        else:
+            arr = numpy.array(data, dtype=dtype, copy=copy)
+            self = klass(arr.shape, arr.dtype, buffer=arr)
+            return self
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    _dataFormat = None
+    def getDataFormat(self):
+        return self._dataFormat 
+    def setDataFormat(self, dataFormat):
+        self.dataFormat = self.dataFormatMap[dataFormat]
+    dataFormat = property(getDataFormat, setDataFormat)
+
+    def inferDataFormat(self, bSet=True):
+        dataFormat = self.dataFormatFromDTypeMap[self.dtype.name]
+        if bSet:
+            self.dataFormat = dataFormat
+        return dataFormat
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+class ArrayBase(NDArrayBase):
+    dataFormat = None
+    dataFormatMap = {
+        'ub': gl.GL_UNSIGNED_BYTE,
+        'ui8': gl.GL_SHORT,
+        'uint8': gl.GL_SHORT,
+        'ubyte': gl.GL_UNSIGNED_BYTE,
+
+        'us': gl.GL_UNSIGNED_SHORT,
+        'ui16': gl.GL_SHORT,
+        'uint16': gl.GL_SHORT,
+        'ushort': gl.GL_UNSIGNED_SHORT,
+
+        'b': gl.GL_BYTE,
+        'i8': gl.GL_SHORT,
+        'int8': gl.GL_SHORT,
+        'byte': gl.GL_BYTE,
+
+        's': gl.GL_SHORT,
+        'i16': gl.GL_SHORT,
+        'int16': gl.GL_SHORT,
+        'short': gl.GL_SHORT,
+
+        'i': gl.GL_INT,
+        'i32': gl.GL_INT,
+        'int': gl.GL_INT,
+        'int32': gl.GL_INT,
+        'integer': gl.GL_INT,
+
+        'f': gl.GL_FLOAT,
+        'f4': gl.GL_FLOAT,
+        'float': gl.GL_FLOAT,
+        'float32': gl.GL_FLOAT,
+
+        'f8': gl.GL_DOUBLE,
+        'float64': gl.GL_DOUBLE,
+        'd': gl.GL_DOUBLE,
+        'double': gl.GL_DOUBLE,
+        }
+
+    dataFormatDTypeMapping = [
+        (numpy.dtype(numpy.uint8), gl.GL_UNSIGNED_BYTE),
+        (numpy.dtype(numpy.uint16), gl.GL_UNSIGNED_SHORT),
+        (numpy.dtype(numpy.uint32), gl.GL_UNSIGNED_INT),
+
+        (numpy.dtype(numpy.int8), gl.GL_BYTE),
+        (numpy.dtype(numpy.int16), gl.GL_SHORT),
+        (numpy.dtype(numpy.int32), gl.GL_INT),
+
+        (numpy.dtype(numpy.float32), gl.GL_FLOAT),
+        (numpy.dtype(numpy.float64), gl.GL_DOUBLE),
+        ]
+    dataFormatFromDTypeMap = dict((k.name, v) for k,v in dataFormatDTypeMapping)
+    dataFormatToDTypeMap = dict((v, k) for k,v in dataFormatDTypeMapping)
 
     def select(self):
         self.enable()
@@ -132,106 +239,4 @@ class EdgeFlagArray(ArrayBase):
     glArrayPointer = staticmethod(gl.glEdgeFlagPointer)
     enable = staticmethod(partial(gl.glEnableClientState, glArrayType))
     disable = staticmethod(partial(gl.glDisableClientState, glArrayType))
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#~ Interleaved Arrays
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-def gldtype(gltypestr):
-    parts = [[i.strip() for i in p.split(':', 1)] for p in gltypestr.split(',')]
-    names = [e[0] for e in parts]
-    formats = [e[1] for e in parts]
-    return dtype(dict(names=names, formats=formats))
-
-class InterleavedArrays(ArrayBase):
-    dataFormat = None
-    dataFormatMap = {
-        gl.GL_V2F: gl.GL_V2F,
-        'V2F': gl.GL_V2F,
-        'v2f': gl.GL_V2F,
-        gl.GL_V3F: gl.GL_V3F,
-        'V3F': gl.GL_V3F,
-        'v3f': gl.GL_V3F,
-        gl.GL_C4UB_V2F: gl.GL_C4UB_V2F,
-        'C4UB_V2F': gl.GL_C4UB_V2F,
-        'c4ub_v2f': gl.GL_C4UB_V2F,
-        gl.GL_C4UB_V3F: gl.GL_C4UB_V3F,
-        'C4UB_V3F': gl.GL_C4UB_V3F,
-        'c4ub_v3f': gl.GL_C4UB_V3F,
-        gl.GL_C3F_V3F: gl.GL_C3F_V3F,
-        'C3F_V3F': gl.GL_C3F_V3F,
-        'c3f_v3f': gl.GL_C3F_V3F,
-        gl.GL_N3F_V3F: gl.GL_N3F_V3F,
-        'N3F_V3F': gl.GL_N3F_V3F,
-        'n3f_v3f': gl.GL_N3F_V3F,
-        gl.GL_C4F_N3F_V3F: gl.GL_C4F_N3F_V3F,
-        'C4F_N3F_V3F': gl.GL_C4F_N3F_V3F,
-        'c4f_n3f_v3f': gl.GL_C4F_N3F_V3F,
-        gl.GL_T2F_V3F: gl.GL_T2F_V3F,
-        'T2F_V3F': gl.GL_T2F_V3F,
-        't2f_v3f': gl.GL_T2F_V3F,
-        gl.GL_T4F_V4F: gl.GL_T4F_V4F,
-        'T4F_V4F': gl.GL_T4F_V4F,
-        't4f_v4f': gl.GL_T4F_V4F,
-        gl.GL_T2F_C4UB_V3F: gl.GL_T2F_C4UB_V3F,
-        'T2F_C4UB_V3F': gl.GL_T2F_C4UB_V3F,
-        't2f_c4ub_v3f': gl.GL_T2F_C4UB_V3F,
-        gl.GL_T2F_C3F_V3F: gl.GL_T2F_C3F_V3F,
-        'T2F_C3F_V3F': gl.GL_T2F_C3F_V3F,
-        't2f_c3f_v3f': gl.GL_T2F_C3F_V3F,
-        gl.GL_T2F_N3F_V3F: gl.GL_T2F_N3F_V3F,
-        'T2F_N3F_V3F': gl.GL_T2F_N3F_V3F,
-        't2f_n3f_v3f': gl.GL_T2F_N3F_V3F,
-        gl.GL_T2F_C4F_N3F_V3F: gl.GL_T2F_C4F_N3F_V3F,
-        'T2F_C4F_N3F_V3F': gl.GL_T2F_C4F_N3F_V3F,
-        't2f_c4f_n3f_v3f': gl.GL_T2F_C4F_N3F_V3F,
-        gl.GL_T4F_C4F_N3F_V4F: gl.GL_T4F_C4F_N3F_V4F,
-        'T4F_C4F_N3F_V4F': gl.GL_T4F_C4F_N3F_V4F,
-        't4f_c4f_n3f_v4f': gl.GL_T4F_C4F_N3F_V4F,
-        }
-    dataFormatToDTypeMap = {
-        gl.GL_V2F: gldtype('v:2f'),
-        gl.GL_V3F: gldtype('v:3f'),
-        gl.GL_C4UB_V2F: gldtype('c:4B, v:2f'),
-        gl.GL_C4UB_V3F: gldtype('c:4B, v:3f'),
-        gl.GL_C3F_V3F: gldtype('c:3f, v:3f'),
-        gl.GL_N3F_V3F: gldtype('n:3f, v:3f'),
-        gl.GL_C4F_N3F_V3F: gldtype('c:4f, n:3f, v:3f'),
-        gl.GL_T2F_V3F: gldtype('t:2f, v:3f'),
-        gl.GL_T4F_V4F: gldtype('t:4f, v:4f'),
-        gl.GL_T2F_C4UB_V3F: gldtype('t:2f, c:4B, v:3f'),
-        gl.GL_T2F_C3F_V3F: gldtype('t:2f, c:3f, v:3f'),
-        gl.GL_T2F_N3F_V3F: gldtype('t:2f, n:3f, v:3f'),
-        gl.GL_T2F_C4F_N3F_V3F: gldtype('t:2f, c:4f, n:3f, v:3f'),
-        gl.GL_T4F_C4F_N3F_V4F: gldtype('t:4f, c:4f, n:3f, v:4f'),
-        }
-
-    glInterleavedArrays = staticmethod(gl.glInterleavedArrays)
-
-    def __new__(klass, data=[], dataFormat=None, dtype=None, copy=False):
-        if dtype is None:
-            dataFormat = klass.dataFormatMap[dataFormat]
-            dtype = klass.dataFormatToDTypeMap[dataFormat]
-
-        data = array(data, dtype, copy=copy, order='C', ndmin=1)
-        return data.view(klass)
-
-    def __init__(self, data=[], dataFormat=None, dtype=None, copy=False):
-        self._config()
-
-    def _inferDataFormat(self):
-        # we don't need to infer it because it is specified at creation time
-        pass
-
-    def enable(self):
-        pass
-
-    def bind(self):
-        self.glInterleavedArrays(self.dataFormat, 0, self)
-
-    def disable(self):
-        pass
-
-    def unbind(self):
-        self.glInterleavedArrays(self.dataFormat, 0, None)
 
