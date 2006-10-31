@@ -12,7 +12,7 @@
 
 from functools import partial
 
-from numpy import ndarray, array
+from numpy import ndarray, array, dtype
 
 from TG.openGL.raw import gl
 
@@ -35,11 +35,11 @@ class ArrayBase(ndarray):
         float64=gl.GL_DOUBLE,
         )
 
-    def __new__(klass, data, dtype=None, copy=False):
+    def __new__(klass, data=[], dtype=None, copy=False):
         data = array(data, dtype, copy=copy, order='C', ndmin=1)
         return data.view(klass)
 
-    def __init__(self, data=None, dtype=None, copy=False):
+    def __init__(self, data=[], dtype=None, copy=False):
         self._config()
 
     def _config(self):
@@ -80,13 +80,13 @@ class VertexArray(ArrayBase):
     enable = staticmethod(partial(gl.glEnableClientState, glArrayType))
     disable = staticmethod(partial(gl.glDisableClientState, glArrayType))
 
-class TexCoordArray(ArrayBase):
+class TexureCoordArray(ArrayBase):
     glArrayType = gl.GL_TEXTURE_COORD_ARRAY
     glArrayPointer = staticmethod(gl.glTexCoordPointer)
     enable = staticmethod(partial(gl.glEnableClientState, glArrayType))
     disable = staticmethod(partial(gl.glDisableClientState, glArrayType))
 
-class MultiTexCoordArray(TexCoordArray):
+class MultiTexureCoordArray(TexureCoordArray):
     glClientActiveTexture = staticmethod(gl.glClientActiveTexture)
     texUnit = gl.GL_TEXTURE0
 
@@ -137,11 +137,91 @@ class EdgeFlagArray(ArrayBase):
 #~ Interleaved Arrays
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+def gldtype(gltypestr):
+    parts = [[i.strip() for i in p.split(':', 1)] for p in gltypestr.split(',')]
+    names = [e[0] for e in parts]
+    formats = [e[1] for e in parts]
+    return dtype(dict(names=names, formats=formats))
+
 class InterleavedArrays(ArrayBase):
     dataFormat = None
-    dataFormatMap = dict()
+    dataFormatMap = {
+        gl.GL_V2F: gl.GL_V2F,
+        'V2F': gl.GL_V2F,
+        'v2f': gl.GL_V2F,
+        gl.GL_V3F: gl.GL_V3F,
+        'V3F': gl.GL_V3F,
+        'v3f': gl.GL_V3F,
+        gl.GL_C4UB_V2F: gl.GL_C4UB_V2F,
+        'C4UB_V2F': gl.GL_C4UB_V2F,
+        'c4ub_v2f': gl.GL_C4UB_V2F,
+        gl.GL_C4UB_V3F: gl.GL_C4UB_V3F,
+        'C4UB_V3F': gl.GL_C4UB_V3F,
+        'c4ub_v3f': gl.GL_C4UB_V3F,
+        gl.GL_C3F_V3F: gl.GL_C3F_V3F,
+        'C3F_V3F': gl.GL_C3F_V3F,
+        'c3f_v3f': gl.GL_C3F_V3F,
+        gl.GL_N3F_V3F: gl.GL_N3F_V3F,
+        'N3F_V3F': gl.GL_N3F_V3F,
+        'n3f_v3f': gl.GL_N3F_V3F,
+        gl.GL_C4F_N3F_V3F: gl.GL_C4F_N3F_V3F,
+        'C4F_N3F_V3F': gl.GL_C4F_N3F_V3F,
+        'c4f_n3f_v3f': gl.GL_C4F_N3F_V3F,
+        gl.GL_T2F_V3F: gl.GL_T2F_V3F,
+        'T2F_V3F': gl.GL_T2F_V3F,
+        't2f_v3f': gl.GL_T2F_V3F,
+        gl.GL_T4F_V4F: gl.GL_T4F_V4F,
+        'T4F_V4F': gl.GL_T4F_V4F,
+        't4f_v4f': gl.GL_T4F_V4F,
+        gl.GL_T2F_C4UB_V3F: gl.GL_T2F_C4UB_V3F,
+        'T2F_C4UB_V3F': gl.GL_T2F_C4UB_V3F,
+        't2f_c4ub_v3f': gl.GL_T2F_C4UB_V3F,
+        gl.GL_T2F_C3F_V3F: gl.GL_T2F_C3F_V3F,
+        'T2F_C3F_V3F': gl.GL_T2F_C3F_V3F,
+        't2f_c3f_v3f': gl.GL_T2F_C3F_V3F,
+        gl.GL_T2F_N3F_V3F: gl.GL_T2F_N3F_V3F,
+        'T2F_N3F_V3F': gl.GL_T2F_N3F_V3F,
+        't2f_n3f_v3f': gl.GL_T2F_N3F_V3F,
+        gl.GL_T2F_C4F_N3F_V3F: gl.GL_T2F_C4F_N3F_V3F,
+        'T2F_C4F_N3F_V3F': gl.GL_T2F_C4F_N3F_V3F,
+        't2f_c4f_n3f_v3f': gl.GL_T2F_C4F_N3F_V3F,
+        gl.GL_T4F_C4F_N3F_V4F: gl.GL_T4F_C4F_N3F_V4F,
+        'T4F_C4F_N3F_V4F': gl.GL_T4F_C4F_N3F_V4F,
+        't4f_c4f_n3f_v4f': gl.GL_T4F_C4F_N3F_V4F,
+        }
+    dataFormatToDTypeMap = {
+        gl.GL_V2F: gldtype('v:2f'),
+        gl.GL_V3F: gldtype('v:3f'),
+        gl.GL_C4UB_V2F: gldtype('c:4B, v:2f'),
+        gl.GL_C4UB_V3F: gldtype('c:4B, v:3f'),
+        gl.GL_C3F_V3F: gldtype('c:3f, v:3f'),
+        gl.GL_N3F_V3F: gldtype('n:3f, v:3f'),
+        gl.GL_C4F_N3F_V3F: gldtype('c:4f, n:3f, v:3f'),
+        gl.GL_T2F_V3F: gldtype('t:2f, v:3f'),
+        gl.GL_T4F_V4F: gldtype('t:4f, v:4f'),
+        gl.GL_T2F_C4UB_V3F: gldtype('t:2f, c:4B, v:3f'),
+        gl.GL_T2F_C3F_V3F: gldtype('t:2f, c:3f, v:3f'),
+        gl.GL_T2F_N3F_V3F: gldtype('t:2f, n:3f, v:3f'),
+        gl.GL_T2F_C4F_N3F_V3F: gldtype('t:2f, c:4f, n:3f, v:3f'),
+        gl.GL_T4F_C4F_N3F_V4F: gldtype('t:4f, c:4f, n:3f, v:4f'),
+        }
 
     glInterleavedArrays = staticmethod(gl.glInterleavedArrays)
+
+    def __new__(klass, data=[], dataFormat=None, dtype=None, copy=False):
+        if dtype is None:
+            dataFormat = klass.dataFormatMap[dataFormat]
+            dtype = klass.dataFormatToDTypeMap[dataFormat]
+
+        data = array(data, dtype, copy=copy, order='C', ndmin=1)
+        return data.view(klass)
+
+    def __init__(self, data=[], dataFormat=None, dtype=None, copy=False):
+        self._config()
+
+    def _inferDataFormat(self):
+        # we don't need to infer it because it is specified at creation time
+        pass
 
     def enable(self):
         pass

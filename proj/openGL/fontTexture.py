@@ -18,6 +18,8 @@ from TG.freetype2.face import FreetypeFace
 
 from TG.openGL.texture import Texture
 from TG.openGL.blockMosaic import BlockMosaicAlg
+from TG.openGL.vertexArray import TexureCoordArray
+
 from TG.openGL.raw import gl, glu, glext
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -40,6 +42,9 @@ class FontTextureBase(Texture):
     dataFormat = gl.GL_ALPHA
     dataType = gl.GL_UNSIGNED_BYTE
     pointSize = (1./64., 1./64.)
+
+    vertexDataFormat = 'f'
+    texCoordDataFormat = 'f'
 
     @classmethod
     def fromFace(klass, ftFace):
@@ -93,8 +98,6 @@ class FontTextureBase(Texture):
 
         data.texClear()
 
-    vertexDataFormat = 'f'
-    texCoordDataFormat = 'f'
     def _genTexCoords(self, glyphLayout, ftFace):
         mapping = {}
         arraySize = (len(glyphLayout), 4, 2)

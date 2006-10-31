@@ -58,7 +58,7 @@ class GLFreetypeFaceBasic(FreetypeFontFace):
 
     def _createTexure(self):
         #working: texture: GL_INTENSITY, texEnv: GL_MODULTE, gl.glBlendFunc: (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        texture = Texture(self.texTarget, self.texFormat, wrap=gl.GL_CLAMP)
+        texture = Texture(self.texTarget, format=self.texFormat, wrap=gl.GL_CLAMP)
         if gl.glGetError(): raise RuntimeError("GL: %s" % (gl.glGetError(),))
 
         if self.bUseMipmaps:

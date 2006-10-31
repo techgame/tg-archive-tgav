@@ -366,8 +366,7 @@ class Texture(object):
     texParams = dict()
 
     def __init__(self, *args, **kwargs):
-        if args or kwargs:
-            self.create(*args, **kwargs)
+        self.create(*args, **kwargs)
 
     def __del__(self):
         try:

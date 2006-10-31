@@ -10,7 +10,16 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+import numpy
+
+from TG.openGL.vertexArray import InterleavedArrays
+
+from TG.openGL.raw import gl
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+class FontGeometryArray(InterleavedArrays):
+    pass
 
