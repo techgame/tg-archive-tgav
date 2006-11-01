@@ -17,7 +17,7 @@ from bisect import bisect_left, bisect_right
 
 from ctypes import byref, c_void_p, c_uint
 
-from TG.freetype2.fontFace import FreetypeFontFace
+from fontFace import FreetypeFontFace
 
 from TG.openGL.texture import Texture
 from TG.openGL.raw import gl, glu, glext
