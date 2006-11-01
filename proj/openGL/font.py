@@ -118,8 +118,8 @@ class Font(object):
         geoEntry = geometry[self._emptyEntry]
         geoEntry['t'] = [(0., 0.)]*4
         geoEntry['v'] = [(0., 0., 0.)]*4
-        advEntry = advance[self._emptyEntry]
-        advEntry = [(0., 0., 0.)]*4
+        #advEntry = advance[self._emptyEntry]
+        #advEntry[:] = [(0., 0., 0.)]*4
 
         #self.glyphToIndexMap = glyphToIndexMap
         self._indexMap = charToIndexMap
@@ -140,19 +140,25 @@ class Font(object):
     def _advanceFrom(self, advance, (ptw, pth)):
         return [(advance[0]*ptw, advance[1]*pth, 0.)]*4
 
-    def layout(self, text):
+    def getGeoAndAdv(self, text):
         text = [self._emptyEntry] + map(ord, text.encode('utf-8'))
         idx = self._indexMap[text]
-        adv = self._advance[idx[:-1]].cumsum(0)
+        adv = self._advance[idx]
         geo = self._geometry[idx[1:]]
-        geo['v'] += adv
         geo.dataFormat = self._geometry.dataFormat
-        return geo
+        return idx, geo, adv
+
+    def layout(self, text):
+        idx, geo, adv = self.getGeoAndAdv(text)
+        geo['v'] += adv[:-1].cumsum(0)
+
+        def textRenderObj(tex=self.texture):
+            tex.select()
+            geo.draw(gl.GL_QUADS)
+            tex.deselect()
+        return geo, textRenderObj
 
     def render(self, text):
-        geo = self.layout(text)
-
-        self.texture.select()
-        geo.draw(gl.GL_QUADS)
-        self.texture.deselect()
+        geo, textRenderObj = self.layout(text)
+        textRenderObj()
 

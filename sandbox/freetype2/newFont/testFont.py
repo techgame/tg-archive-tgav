@@ -28,7 +28,7 @@ from TG.openGL.font import Font
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class RenderSkinModel(RenderSkinModelBase):
-    fps = 1
+    fps = 60
     fonts = {
             'Arial':'/Library/Fonts/Arial',
             'Monaco':'/System/Library/Fonts/Monaco.dfont',
@@ -61,14 +61,27 @@ class RenderSkinModel(RenderSkinModelBase):
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-        glClearColor(1., 1., 1.,1.)
+        #glClearColor(1., 1., 1.,1.)
+        glClearColor(0., 0., 0., 1.)
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
         #self.fontOne = self.loadFont('AndaleMono', 72)
-        self.fontOne = self.loadFont('Zapfino', 72)
-        #self.fontTwo = self.loadFont('Zapfino', 72)
+        self.fontOne = self.loadFont('Monaco', 32)
+        self.fontTwo = self.loadFont('Zapfino', 72)
 
-        geo = self.fontOne.layout("Four")# score, and seven years ago!")
+        if 0:
+            idx, geo, adv = self.fontOne.getGeoAndAdv("ab")# score, and seven years ago!")
+            print
+            print idx
+            print
+            print geo
+            print
+            print adv
+            print
+            print self.fontOne._advance[-1]
+            print self.fontOne._emptyEntry
+            print len(self.fontOne._geometry)
+            print len(self.fontOne._advance)
 
     def loadFont(self, fontKey, fontSize):
         global f
@@ -108,7 +121,7 @@ class RenderSkinModel(RenderSkinModelBase):
         x0 = y0 = 0
         x1, y1 = self.viewPortSize
 
-        if 1:
+        if 0:
             gl.glBegin(gl.GL_QUADS)
             gl.glColor4f(1., 1., 1., 1.)
             gl.glVertex2f(x0, y1)
@@ -121,18 +134,51 @@ class RenderSkinModel(RenderSkinModelBase):
             gl.glEnd()
 
         if 1:
+            a = abs(1. - (renderStart % 2.0)) 
+
+            if 1: gl.glColor4f(1., 1., 1., a)
+            elif 1: gl.glColor4f(0., 0., 0., a)
+
+            geo, fpsRenderText = self.fontOne.layout(self.fpsStr)
+            #print
+            #print geo[:4]
+            def showText(f):
+                #glTranslatef(3., -1., -.01)
+                #if 1: gl.glColor4f(0., 0., 0., 0.3)
+                #fpsRenderText()
+
+                #glTranslatef(-3., 1., +.02)
+
+                #if 1: gl.glColor4f(1., 1., 1., a)
+                #elif 1: gl.glColor4f(0., 0., 0., a)
+                fpsRenderText()
+
             glPushMatrix()
-            glTranslatef(0., 100., .5)
 
-            glTranslatef(3., -1., -.01)
-            if 1: gl.glColor4f(0., 0., 0., 0.3)
-            self.fontOne.render("Four score, and seven years ago!")
+            #print repr(self.fpsStr)
+            if 0:
+                glTranslatef(0., 300., .5)
+                glPushMatrix()
+                glScalef(2,2,2)
+                showText(self.fpsStr)
+                glPopMatrix()
 
-            glTranslatef(-3., 1., +.02)
+            glTranslatef(400, 400, 0)
+            glRotatef(60*(renderStart % 60.), 0, 0, 1)
+            glTranslatef(-400, 0, 0)
+            glPushMatrix()
+            showText(self.fpsStr)
+            glPopMatrix()
 
-            if 1: gl.glColor4f(1., 1., 1., 1.)
-            elif 1: gl.glColor4f(0., 0., 0., 1.0)
-            self.fontOne.render("Four score, and seven years ago!")
+            if 1:
+                glTranslatef(500., 100., .2)
+                glRotatef(60*(renderStart % 60.), 0, 0, 1)
+                glTranslatef(-400, 0, 0)
+                #glPushMatrix()
+                #glScalef(.5,.5,.5)
+                self.fontTwo.render("Larry rocks!")
+                #showText(self.fpsStr)
+                #glPopMatrix()
 
             glPopMatrix()
 
