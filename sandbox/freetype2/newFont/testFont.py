@@ -15,7 +15,7 @@
 import string
 import time
 
-from TG.tgavUtility.renderBase import RenderSkinModelBase
+from renderBase import RenderSkinModelBase
 
 from TG.openGL.raw import gl, glu, glext
 from TG.openGL.raw.gl import *
