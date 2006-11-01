@@ -27,7 +27,6 @@ def gldtype(gltypestr):
     return dtype(dict(names=names, formats=formats))
 
 class InterleavedArrays(ArrayBase):
-    dataFormat = None
     dataFormatMap = {
         'v2f': gl.GL_V2F,
         'v3f': gl.GL_V3F,
@@ -73,7 +72,7 @@ class InterleavedArrays(ArrayBase):
         pass
 
     def bind(self):
-        self.glInterleavedArrays(self.dataFormat, 0, self)
+        self.glInterleavedArrays(self.dataFormat, 0, self.ctypes)
 
     def disable(self):
         pass

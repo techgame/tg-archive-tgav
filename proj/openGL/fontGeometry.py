@@ -12,7 +12,7 @@
 
 import numpy
 
-from TG.openGL.vertexArrays import InterleavedArrays
+from TG.openGL.interleavedArrays import InterleavedArrays
 
 from TG.openGL.raw import gl
 

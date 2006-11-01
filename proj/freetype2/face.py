@@ -13,7 +13,7 @@
 
 from raw import freetype as FT
 import ctypes
-from ctypes import byref, cast, c_void_p
+from ctypes import byref, cast, c_void_p, c_uint
 
 from library import FreetypeLibrary
 from glyph import FreetypeFaceGlyph
@@ -309,6 +309,10 @@ class FreetypeFace(object):
     _ft_getCharIndex = FT.FT_Get_Char_Index
     def getCharIndex(self, char):
         return self._ft_getCharIndex(ord(char))
+    getOrdinalIndex = _ft_getCharIndex
+
+    def iterUniqueCharIndexes(self, chars):
+        return frozenset(self.iterCharIndexes(chars, False))
     def iterCharIndexes(self, chars, bMapping=False):
         if bMapping:
             return ((char, self._ft_getCharIndex(ord(char))) for char in chars)
@@ -349,9 +353,10 @@ class FreetypeFace(object):
         glyphIndexRef = byref(glyphIndex)
 
         charCode = self._ft_getFirstChar(glyphIndexRef)
-        while glyphIndex != 0:
+        while glyphIndex:
             yield unichr(charCode), glyphIndex.value
             charCode = self._ft_getNextChar(charCode, glyphIndexRef)
+    iterAllChars = iterCharCodes
 
     _ft_getNameIndex = FT.FT_Get_Name_Index
     def getNameIndex(self, name):

@@ -14,11 +14,8 @@
 import string
 import numpy
 
-from TG.freetype2.face import FreetypeFace
-
 from TG.openGL.texture import Texture
 from TG.openGL.blockMosaic import BlockMosaicAlg
-from TG.openGL.vertexArray import TexureCoordArray
 
 from TG.openGL.raw import gl, glu, glext
 
@@ -41,31 +38,16 @@ class FontTextureBase(Texture):
             )
     dataFormat = gl.GL_ALPHA
     dataType = gl.GL_UNSIGNED_BYTE
-    pointSize = (1./64., 1./64.)
-
-    vertexDataFormat = 'f'
-    texCoordDataFormat = 'f'
-
-    @classmethod
-    def fromFace(klass, ftFace):
-        self = klass()
-        self.renderFace(ftFace)
-        return self
-
-    @classmethod
-    def fromFilename(klass, filename, size, dpi=None):
-        ftFace = FreetypeFace(filename)
-        ftFace.setSize(size, dpi)
-        return klass.fromFace(ftFace)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def renderFace(self, ftFace, charset=string.printable):
-        size, layout = self._layoutMosaic(charset, ftFace)
+    def renderFace(self, ftFace, iterableGlyphIndexes):
+        size, layout = self._layoutMosaic(iterableGlyphIndexes, ftFace)
         size = self.validSizeForTarget(size)
 
         data = self._blankTexture(size)
-        self._renderMosaic(data, layout, ftFace)
+        texCoordMapping = self._renderMosaic(data, layout, ftFace)
+        return texCoordMapping
 
     def _blankTexture(self, size):
         data = self.data2d(size=size, format=self.dataFormat, dataType=self.dataType)
@@ -73,12 +55,20 @@ class FontTextureBase(Texture):
         data.setImageOn(self)
         return data
 
-    def _layoutMosaic(self, charset, ftFace):
+    def _layoutMosaic(self, iterableGlyphIndexes, ftFace):
         maxSize = self.getMaxTextureSize()
         alg = self.LayoutAlgorithm((maxSize, maxSize))
 
-        for glyphIndex, glyph in ftFace.iterUniqueGlyphs(charset):
-            alg.addBlock(glyph.bitmapSize, key=glyphIndex)
+        # make sure we have the "unknown" glyph
+        glyphIndex = 0
+        size = ftFace.loadGlyph(glyphIndex).bitmapSize
+        alg.addBlock(size, key=glyphIndex)
+
+        # add all the other glyph indexes
+        for glyphIndex in iterableGlyphIndexes:
+            if glyphIndex:
+                size = ftFace.loadGlyph(glyphIndex).bitmapSize
+                alg.addBlock(size, key=glyphIndex)
 
         usedSize, glyphLayout, unplacedGlyphs = alg.layout()
 
@@ -88,67 +78,37 @@ class FontTextureBase(Texture):
         return usedSize, glyphLayout
 
     def _renderMosaic(self, data, glyphLayout, ftFace):
+        mapping = []
         data.newPixelStore(alignment=1, rowLength=0)
 
-        for block in glyphLayout:
-            glyph = ftFace.loadGlyph(block.key)
-            glyph.render()
-            data.texCData(glyph.bitmap.buffer, dict(rowLength=glyph.bitmap.pitch))
-            data.setSubImageOn(self, pos=block.pos, size=block.size)
-
-        data.texClear()
-
-    def _genTexCoords(self, glyphLayout, ftFace):
-        mapping = {}
-        arraySize = (len(glyphLayout), 4, 2)
-        vertexEntrySize = arraySize[1] * arraySize[2]
-
-        verticies = numpy.array(arraySize, self.vertexDataFormat)
-        advance = numpy.array((len(glyphLayout), 2), self.vertexDataFormat)
-        texCoords = numpy.array(arraySize, self.texCoordDataFormat)
-
-        getTexCoordsFor = self._getTexCoordsFor
-        getVerticisFor = self._getVerticiesFor
-
         loadGlyph = ftFace.loadGlyph
-
-        tw, th = self.size
-        ptw, pth = self.pointSize
-        for i, (glyphIndex, block) in enumerate(glyphLayout.iteritems()):
-            mapping[glyphIndex] = i * vertexEntrySize
-            texCoords[i] = getTexCoordsFor(block, tw, th)
+        texCoordsFromPosSize = self.texCoordsFromPosSize
+        totalSize = float(self.size[0]), float(self.size[1])
+        for block in glyphLayout:
+            glyphIndex = block.key; pos = block.pos; size = block.size;
 
             glyph = loadGlyph(glyphIndex)
-            verticies[i] = getVerticisFor(glyph, ptw, pth)
-            advance[i] = getAdvanceFor(glyph, ptw, pth)
+            glyph.render()
 
-    def _getTexCoordsFor(self, block, tw, th):
+            data.texCData(glyph.bitmap.buffer, dict(rowLength=glyph.bitmap.pitch))
+            data.setSubImageOn(self, pos=pos, size=size)
+
+            mapping.append((glyphIndex, texCoordsFromPosSize(pos, size, totalSize)))
+
+        data.texClear()
+        return mapping
+
+    def texCoordsFromPosSize(self, pos, size, totalSize):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
-
-    def _getVerticiesFor(self, glyph, ptw, pth):
-        m = glyph.metrics
-        x0 = (m.horiBearingX) / ptw
-        y0 = (m.horiBearingY - m.height) / pth
-
-        x1 = (m.horiBearingX + m.width) / ptw
-        y1 = (m.horiBearingY) / pth
-
-        return [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
-
-    def _getAdvanceFor(self, glyph, ptw, pth):
-        ax, ay = glyph.advance
-        return (ax/ptw, ay/pth)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class FontTextureRect(FontTextureBase):
     target = glext.GL_TEXTURE_RECTANGLE_ARB
 
-    def _getTexCoordsFor(self, block, tw, th):
-        x0, y0 = block.pos
-        x1 = x0 + block.size[0]
-        y1 = y0 + block.size[1]
-        return [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+    def texCoordsFromPosSize(self, (x0, y0), (w, h), (tw, th)):
+        x1 = x0 + w; y1 = y0 + h
+        return [(x0, y1), (x1, y1), (x1, y0), (x0, y0)]
 
 FontTexture = FontTextureRect
 
@@ -159,10 +119,8 @@ class FontTexture2D(FontTextureBase):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def _getTexCoordsFor(self, block, tw, th):
-        x0, y0 = block.pos
-        x1 = x0 + block.size[0]
-        y1 = y0 + block.size[1]
-        x0 /= tw; y0 /= th; x1 /= tw; y1 /= th;
-        return [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+    def texCoordsFromPosSize(self, (x0, y0), (w, h), (tw, th)):
+        x1 = (x0 + w)/tw; x0 /= tw
+        y1 = (y0 + h)/th; y0 /= th
+        return [(x0, y1), (x1, y1), (x1, y0), (x0, y0)]
 

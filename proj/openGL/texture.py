@@ -434,8 +434,8 @@ class Texture(object):
         return self
 
     def deselect(self):
-        self.unbind()
         self.disable()
+        self.unbind()
         return self
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

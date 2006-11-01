@@ -22,17 +22,20 @@ from TG.openGL.raw import gl
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class NDArrayBase(ndarray):
+    __array_priority__ = 25.0
+
     dataFormatMap = {}
     dataFormatToDTypeMap = {}
     dataFormatFromDTypeMap = {}
 
     def __new__(klass, shape=None, dtype=float, dataFormat=None, buffer=None, offset=0, strides=None, order=None):
+        if dataFormat is not None:
+            dtype, dataFormat = klass.lookupDTypeFromFormat(dataFormat)
         return ndarray.__new__(klass, shape, dtype, buffer, offset, strides, order)
     def __init__(self, shape=None, dtype=float, dataFormat=None, buffer=None, offset=0, strides=None, order=None):
         self._config(dataFormat)
 
     def _config(self, dataFormat=None):
-        self._as_parameter_ = self.ctypes._as_parameter_
         if dataFormat is not None:
             self.setDataFormat(dataFormat)
         elif self.dataFormat is None:
@@ -41,7 +44,7 @@ class NDArrayBase(ndarray):
     @classmethod
     def lookupDTypeFromFormat(klass, dataFormat):
         if isinstance(dataFormat, str):
-            dataFormat = dataFormat.replace(' ', '')
+            dataFormat = dataFormat.replace(' ', '').replace(',', '_')
             dataFormat = klass.dataFormatMap[dataFormat]
         dtype = klass.dataFormatToDTypeMap[dataFormat]
         return dtype, dataFormat
@@ -50,12 +53,12 @@ class NDArrayBase(ndarray):
 
     @classmethod
     def fromFormat(klass, shape, dataFormat):
-        dtype, dataFormat = self.lookupDTypeFromFormat(dataFormat)
+        dtype, dataFormat = klass.lookupDTypeFromFormat(dataFormat)
         self = klass(shape, dtype, dataFormat=dataFormat)
         return self
 
     @classmethod
-    def fromData(klass, data, dtype=None, copy=False):
+    def fromData(klass, data, dtype=None, dataFormat=None, copy=False):
         if isinstance(data, klass):
             dtype2 = data.dtype
             if (dtype is None):
@@ -73,25 +76,27 @@ class NDArrayBase(ndarray):
                 intype = numpy.dtype(dtype)
 
             self = data.view(klass)
-            self._config()
             if intype != data.dtype:
-                return self.astype(intype)
+                self = self.astype(intype)
             elif copy: 
-                return self.copy()
+                self = self.copy()
+            self._config(dataFormat)
+            return self
 
         else:
             arr = numpy.array(data, dtype=dtype, copy=copy)
-            self = klass(arr.shape, arr.dtype, buffer=arr)
+            self = klass(arr.shape, arr.dtype, dataFormat=dataFormat, buffer=arr)
             return self
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    _dataFormat = None
+    dataFormat = None
     def getDataFormat(self):
-        return self._dataFormat 
+        return self.dataFormat 
     def setDataFormat(self, dataFormat):
-        self.dataFormat = self.dataFormatMap[dataFormat]
-    dataFormat = property(getDataFormat, setDataFormat)
+        if isinstance(dataFormat, str):
+            dataFormat = self.dataFormatMap[dataFormat]
+        self.dataFormat = dataFormat
 
     def inferDataFormat(self, bSet=True):
         dataFormat = self.dataFormatFromDTypeMap[self.dtype.name]
@@ -167,7 +172,7 @@ class ArrayBase(NDArrayBase):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
 
     def bind(self):
-        self.glArrayPointer(len(self), self.dataFormat, 0, self)
+        self.glArrayPointer(len(self), self.dataFormat, 0, self.ctypes)
 
     def deselect(self):
         self.unbind()
@@ -179,6 +184,11 @@ class ArrayBase(NDArrayBase):
     def unbind(self):
         self.glArrayPointer(0, self.dataFormat, 0, None)
 
+    glDrawArrays = staticmethod(gl.glDrawArrays)
+    def draw(self, mode):
+        self.select()
+        self.glDrawArrays(mode, 0, len(self.flat))
+        self.deselect()
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class VertexArray(ArrayBase):
