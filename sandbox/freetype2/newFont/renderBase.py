@@ -86,6 +86,12 @@ xmlSkin = XMLSkin("""<?xml version='1.0'?>
             </panel>
         </layout>
         obj.SetClientSize(ctx.model.clientSize)
+        <event>
+            if ctx.model.onQuit():
+                evt.Skip()
+            else:
+                evt.Veto()
+        </event>
     </frame>
 </skin>
 """)
@@ -184,6 +190,10 @@ class RenderSkinModelBase(wxSkinModel):
         ##glFlush () # implicit in SwapBuffers
         glCanvas.SwapBuffers()
     
+    def onQuit(self):
+        self.repaintTimer.Stop()
+        return True
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 

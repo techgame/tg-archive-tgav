@@ -90,6 +90,8 @@ class Font(object):
         texCoordMapping = self.texture.renderFace(face, face.iterUniqueCharIndexes(charset))
         texCoordMapping.sort()
 
+        count = len(texCoordMapping)+1
+
         glyphToIndexMap = dict((glyphIndex, arrIndex) for arrIndex, (glyphIndex, texCoords) in enumerate(texCoordMapping))
 
         lookup=glyphToIndexMap.get
@@ -97,8 +99,8 @@ class Font(object):
         charToIndexMap = numpy.empty(65535, dtype=numpy.uint16)
         for i in xrange(len(charToIndexMap)):
             charToIndexMap[i] = lookup(idxOf(i), 0)
+        charToIndexMap[0] = count-1
 
-        count = len(texCoordMapping)+1
         geometry = fontGeometry.FontGeometryArray.fromFormat((count, 4), dataFormat='t2f,v3f')
         advance = numpy.zeros((count, 4, 3), numpy.float32)
 
@@ -114,12 +116,10 @@ class Font(object):
 
             advEntry[:] = advanceFrom(glyph.advance, pointSize)
 
-        self._emptyEntry = count-1
-        geoEntry = geometry[self._emptyEntry]
+        geoEntry = geometry[-1]
         geoEntry['t'] = [(0., 0.)]*4
         geoEntry['v'] = [(0., 0., 0.)]*4
-        #advEntry = advance[self._emptyEntry]
-        #advEntry[:] = [(0., 0., 0.)]*4
+        advance[-1] = [(0., 0., 0.)]*4
 
         #self.glyphToIndexMap = glyphToIndexMap
         self._indexMap = charToIndexMap
@@ -140,8 +140,10 @@ class Font(object):
     def _advanceFrom(self, advance, (ptw, pth)):
         return [(advance[0]*ptw, advance[1]*pth, 0.)]*4
 
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     def getGeoAndAdv(self, text):
-        text = [self._emptyEntry] + map(ord, text.encode('utf-8'))
+        text = [0] + map(ord, text.encode('utf-8'))
         idx = self._indexMap[text]
         adv = self._advance[idx]
         geo = self._geometry[idx[1:]]
@@ -150,13 +152,14 @@ class Font(object):
 
     def layout(self, text):
         idx, geo, adv = self.getGeoAndAdv(text)
-        geo['v'] += adv[:-1].cumsum(0)
+        advSum = adv.cumsum(0)
+        geo['v'] += advSum[:-1]
 
         def textRenderObj(tex=self.texture):
             tex.select()
             geo.draw(gl.GL_QUADS)
             tex.deselect()
-        return geo, textRenderObj
+        return geo, advSum[-1][-1], textRenderObj
 
     def render(self, text):
         geo, textRenderObj = self.layout(text)

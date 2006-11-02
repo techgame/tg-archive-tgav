@@ -14,6 +14,7 @@
 
 import string
 import time
+import platform
 
 from renderBase import RenderSkinModelBase
 
@@ -65,28 +66,20 @@ class RenderSkinModel(RenderSkinModelBase):
         glClearColor(0., 0., 0., 1.)
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
-        #self.fontOne = self.loadFont('AndaleMono', 72)
-        self.fontOne = self.loadFont('Monaco', 32)
+        self.fontOne = self.loadFont('Arial', 48)
         self.fontTwo = self.loadFont('Zapfino', 72)
+        self.fontThree = self.loadFont('AndaleMono', 18)
 
-        if 0:
-            idx, geo, adv = self.fontOne.getGeoAndAdv("ab")# score, and seven years ago!")
-            print
-            print idx
-            print
-            print geo
-            print
-            print adv
-            print
-            print self.fontOne._advance[-1]
-            print self.fontOne._emptyEntry
-            print len(self.fontOne._geometry)
-            print len(self.fontOne._advance)
+        global fpsGeo, fpsEnd, fpsRenderText, verGeo, verEnd, verRenderText, stuffGeo, stuffEnd, stuffText, openglGeo, openglEnd, openglRocksText
+        verGeo, verEnd, verRenderText = self.fontThree.layout(platform.version())
+        stuffGeo, stuffEnd, stuffText = self.fontTwo.layout(platform.node())
+        openglGeo, openglEnd, openglRocksText = self.fontTwo.layout("OpenGL rocks!")
 
     def loadFont(self, fontKey, fontSize):
         global f
         fontFilename = self.fonts[fontKey]
         f = Font.fromFilename(fontFilename, fontSize)
+        f.setCharset(string.printable)
         f.configure()
         return f
 
@@ -110,6 +103,8 @@ class RenderSkinModel(RenderSkinModelBase):
 
     i = 0
     def renderContent(self, glCanvas, renderStart):
+        global fpsGeo, fpsEnd, fpsRenderText, verGeo, verEnd, verRenderText, stuffGeo, stuffEnd, stuffText, openglGeo, openglEnd, openglRocksText
+
         if self.viewPortSize is None: return
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
@@ -122,6 +117,7 @@ class RenderSkinModel(RenderSkinModelBase):
         x1, y1 = self.viewPortSize
 
         if 0:
+            glTranslatef(0., 0., -1)
             gl.glBegin(gl.GL_QUADS)
             gl.glColor4f(1., 1., 1., 1.)
             gl.glVertex2f(x0, y1)
@@ -132,53 +128,108 @@ class RenderSkinModel(RenderSkinModelBase):
             gl.glColor4f(0.5, 1., 0.5, 1.)
             gl.glVertex2f(x1, y1)
             gl.glEnd()
+            glTranslatef(0., 0., 1)
 
         if 1:
-            a = abs(1. - (renderStart % 2.0)) 
+            s = abs(1. - (renderStart % 2.0))
+            a = 1.0 #+ 0.5*abs(1. - (renderStart % 2.0)) 
 
             if 1: gl.glColor4f(1., 1., 1., a)
             elif 1: gl.glColor4f(0., 0., 0., a)
 
-            geo, fpsRenderText = self.fontOne.layout(self.fpsStr)
-            #print
-            #print geo[:4]
-            def showText(f):
-                #glTranslatef(3., -1., -.01)
+            fpsGeo, fpsEnd, fpsRenderText = self.fontOne.layout(self.fpsStr)
+
+            def centerEnd(end):
+                glTranslatef(0.5*(self.viewPortSize[0]-end[0]), 0, 0)
+            def rightEnd(end):
+                glTranslatef((self.viewPortSize[0]-end[0]), 0, 0)
+
+            def showText(rt):
+                #glTranslatef(3., -1., -.1)
                 #if 1: gl.glColor4f(0., 0., 0., 0.3)
-                #fpsRenderText()
+                #rt()
 
-                #glTranslatef(-3., 1., +.02)
+                #glTranslatef(-3., 1., +.05)
 
-                #if 1: gl.glColor4f(1., 1., 1., a)
-                #elif 1: gl.glColor4f(0., 0., 0., a)
-                fpsRenderText()
+                if 1: gl.glColor4f(1., 1., 1., a)
+                elif 1: gl.glColor4f(0., 0., 0., a)
+                rt()
 
-            glPushMatrix()
+            def nullify(f): 
+                return None
 
-            #print repr(self.fpsStr)
-            if 0:
-                glTranslatef(0., 300., .5)
+            @nullify
+            def showGeoOutline(geo):
+                geov = geo['v']
+                x0, y0, z0 = geov.min(0).min(0)
+                x1, y1, z1 = geov.max(1).max(0)
+
+                glColor4f(0., 0., 1., .5)
+                glBegin(GL_QUADS)
+                glVertex2f(x0, y0)
+                glVertex2f(x1, y0)
+                glVertex2f(x1, y1)
+                glVertex2f(x0, y1)
+                glEnd()
+
+                glTranslatef(0., 0., .01)
+
+            @nullify
+            def showOutline(geo):
                 glPushMatrix()
-                glScalef(2,2,2)
-                showText(self.fpsStr)
+                glTranslatef(0., 0., -.05)
+                if showGeoOutline is not None:
+                    showGeoOutline(geo)
+                glColor4f(0., 1., 0., .5)
+                geo.draw(GL_QUADS)
                 glPopMatrix()
 
-            glTranslatef(400, 400, 0)
-            glRotatef(60*(renderStart % 60.), 0, 0, 1)
-            glTranslatef(-400, 0, 0)
+            @nullify
+            def showBaseline(end):
+                glColor4f(1., 0., 0., .5)
+                glBegin(GL_LINES)
+                glVertex3f(0., 0., 0.)
+                glVertex3f(*end)
+                glEnd()
+
             glPushMatrix()
-            showText(self.fpsStr)
+            glTranslatef(0, self.viewPortSize[1], 0)
+
+            glTranslatef(0, -40, 0)
+            if showOutline is not None:
+                showOutline(fpsGeo)
+            if showBaseline is not None:
+                showBaseline(fpsEnd)
+            showText(fpsRenderText)
+
+            glTranslatef(0, -200, 0)
+            glPushMatrix()
+            centerEnd(stuffEnd)
+            if showOutline is not None:
+                showOutline(stuffGeo)
+            if showBaseline is not None:
+                showBaseline(stuffEnd)
+            showText(stuffText)
             glPopMatrix()
 
-            if 1:
-                glTranslatef(500., 100., .2)
-                glRotatef(60*(renderStart % 60.), 0, 0, 1)
-                glTranslatef(-400, 0, 0)
-                #glPushMatrix()
-                #glScalef(.5,.5,.5)
-                self.fontTwo.render("Larry rocks!")
-                #showText(self.fpsStr)
-                #glPopMatrix()
+            glTranslatef(0, -100, 0)
+            glPushMatrix()
+            #glScalef(2,2,1)
+            rightEnd(verEnd)
+            if showOutline is not None:
+                showOutline(verGeo)
+            if showBaseline is not None:
+                showBaseline(verEnd)
+            showText(verRenderText)
+            glPopMatrix()
+
+            glTranslatef(0, -200, 0)
+            centerEnd(openglEnd)
+            if showOutline is not None:
+                showOutline(openglGeo)
+            if showBaseline is not None:
+                showBaseline(openglEnd)
+            showText(openglRocksText)
 
             glPopMatrix()
 
@@ -189,9 +240,6 @@ class RenderSkinModel(RenderSkinModelBase):
             t0 = 0
             t1 = tex.size[1]
             tex.select()
-
-            #print (x0, y0, x1, y1), (s0, t0, s1, t1)
-            #(x1-x0)/abs(s1-s0)
 
             gl.glBegin(gl.GL_QUADS)
             gl.glColor4f(0., 0., 0., 0.5)

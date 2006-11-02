@@ -189,6 +189,7 @@ class ArrayBase(NDArrayBase):
         self.select()
         self.glDrawArrays(mode, 0, len(self.flat))
         self.deselect()
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class VertexArray(ArrayBase):
