@@ -46,6 +46,9 @@ class RenderSkinModel(RenderSkinModelBase):
             'StoneSans': '/Library/Fonts/Stone Sans ITC TT',
             'AmericanTypewriter': '/Library/Fonts/AmericanTypewriter.dfont',
             'Helvetica': '/System/Library/Fonts/Helvetica.dfont',
+
+            'Letter': '/Users/lking/Library/Fonts/Letter 1882.ttf',
+            'Chaucer': '/Users/lking/Library/Fonts/chaucher.ttf',
             }
 
     def glCheck(self):
@@ -58,28 +61,33 @@ class RenderSkinModel(RenderSkinModelBase):
         glDepthFunc(GL_LEQUAL)
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_COLOR_MATERIAL)
+        
+        #glHint(GL_LINE_SMOOTH_HINT, GL_NICEST)
+        glEnable(GL_MULTISAMPLE)
 
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
         #glClearColor(1., 1., 1.,1.)
         glClearColor(0., 0., 0., 1.)
-        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
-        self.fontOne = self.loadFont('Arial', 48)
-        self.fontTwo = self.loadFont('Zapfino', 72)
+        self.fontOne = self.loadFont('Arial', 24, charset=None)
+        self.fontTwo = self.loadFont('Letter', 72)
         self.fontThree = self.loadFont('AndaleMono', 18)
+        self.fontFour = self.loadFont('Chaucer', 400)
 
-        global fpsGeo, fpsEnd, fpsRenderText, verGeo, verEnd, verRenderText, stuffGeo, stuffEnd, stuffText, openglGeo, openglEnd, openglRocksText
+        global fpsGeo, fpsEnd, fpsRenderText, verGeo, verEnd, verRenderText, stuffGeo, stuffEnd, stuffText, openglGeo, openglEnd, openglRocksText, junkGeo, junkEnd, junkText
         verGeo, verEnd, verRenderText = self.fontThree.layout(platform.version())
         stuffGeo, stuffEnd, stuffText = self.fontTwo.layout(platform.node())
         openglGeo, openglEnd, openglRocksText = self.fontTwo.layout("OpenGL rocks!")
+        junkGeo, junkEnd, junkText = self.fontFour.layout("A")
 
-    def loadFont(self, fontKey, fontSize):
+    def loadFont(self, fontKey, fontSize, charset=string.printable):
         global f
         fontFilename = self.fonts[fontKey]
         f = Font.fromFilename(fontFilename, fontSize)
-        f.setCharset(string.printable)
+        if charset:
+            f.setCharset(charset)
         f.configure()
         return f
 
@@ -103,11 +111,12 @@ class RenderSkinModel(RenderSkinModelBase):
 
     i = 0
     def renderContent(self, glCanvas, renderStart):
-        global fpsGeo, fpsEnd, fpsRenderText, verGeo, verEnd, verRenderText, stuffGeo, stuffEnd, stuffText, openglGeo, openglEnd, openglRocksText
+        global fpsGeo, fpsEnd, fpsRenderText, verGeo, verEnd, verRenderText, stuffGeo, stuffEnd, stuffText, openglGeo, openglEnd, openglRocksText, junkGeo, junkEnd, junkText
 
         if self.viewPortSize is None: return
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
+
 
         gl.glTexEnvf(gl.GL_TEXTURE_ENV, gl.GL_TEXTURE_ENV_MODE, gl.GL_MODULATE)
 
@@ -116,19 +125,20 @@ class RenderSkinModel(RenderSkinModelBase):
         x0 = y0 = 0
         x1, y1 = self.viewPortSize
 
-        if 0:
+        if 1:
             glTranslatef(0., 0., -1)
             gl.glBegin(gl.GL_QUADS)
-            gl.glColor4f(1., 1., 1., 1.)
+            gl.glColor4f(0.15, 0.15, 0.17, 1.)
             gl.glVertex2f(x0, y1)
-            gl.glColor4f(1., 0.5, 0.5, 1.)
+            gl.glColor4f(0., 0., 0., 1.)
             gl.glVertex2f(x0, y0)
-            gl.glColor4f(0.5, 0.5, 1., 1.)
+            gl.glColor4f(0., 0., 0., 1.)
             gl.glVertex2f(x1, y0)
-            gl.glColor4f(0.5, 1., 0.5, 1.)
+            gl.glColor4f(0.15, 0.17, 0.15, 1.)
             gl.glVertex2f(x1, y1)
             gl.glEnd()
             glTranslatef(0., 0., 1)
+
 
         if 1:
             s = abs(1. - (renderStart % 2.0))
@@ -144,7 +154,7 @@ class RenderSkinModel(RenderSkinModelBase):
             def rightEnd(end):
                 glTranslatef((self.viewPortSize[0]-end[0]), 0, 0)
 
-            def showText(rt):
+            def showText(rt, a=a):
                 #glTranslatef(3., -1., -.1)
                 #if 1: gl.glColor4f(0., 0., 0., 0.3)
                 #rt()
@@ -202,7 +212,7 @@ class RenderSkinModel(RenderSkinModelBase):
                 showBaseline(fpsEnd)
             showText(fpsRenderText)
 
-            glTranslatef(0, -200, 0)
+            glTranslatef(0, -100, 0)
             glPushMatrix()
             centerEnd(stuffEnd)
             if showOutline is not None:
@@ -223,13 +233,46 @@ class RenderSkinModel(RenderSkinModelBase):
             showText(verRenderText)
             glPopMatrix()
 
-            glTranslatef(0, -200, 0)
+            glTranslatef(0, -100, 0)
+            glPushMatrix()
             centerEnd(openglEnd)
             if showOutline is not None:
                 showOutline(openglGeo)
             if showBaseline is not None:
                 showBaseline(openglEnd)
             showText(openglRocksText)
+            glPopMatrix()
+
+            glTranslatef(0, -350, 0)
+            glPushMatrix()
+            centerEnd(junkEnd)
+            if showOutline is not None:
+                showOutline(junkGeo)
+            if showBaseline is not None:
+                showBaseline(junkEnd)
+            showText(junkText)
+            glPopMatrix()
+            
+            
+            
+            glTranslatef(0., 0., -1)
+            glPushMatrix()
+            gl.glBegin(gl.GL_POLYGON)
+            gl.glColor4f(1., 0., 0., 1.)
+            gl.glVertex2f(105, 150)
+            gl.glColor4f(0., 1., 0., 1.)
+            gl.glVertex2f(125, 100)
+            gl.glColor4f(0., 0., 1., 1.)
+            gl.glVertex2f(175, 100)
+            gl.glColor4f(1., 1., 0., 1.)
+            gl.glVertex2f(195, 150)
+            gl.glColor4f(0., 1., 1., 1.)
+            gl.glVertex2f(150, 190)
+            gl.glEnd()
+            glPopMatrix()
+            #glTranslatef(0., 0., 1)
+
+            
 
             glPopMatrix()
 
