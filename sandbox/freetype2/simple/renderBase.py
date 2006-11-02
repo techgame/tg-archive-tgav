@@ -14,6 +14,9 @@
 import sys
 import time
 
+from TG.openGL.raw.gl import glGetError
+from TG.openGL.raw.glu import gluErrorString
+
 from TG.skinning.toolkits.wx import wxSkinModel, XMLSkin
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -86,6 +89,12 @@ xmlSkin = XMLSkin("""<?xml version='1.0'?>
             </panel>
         </layout>
         obj.SetClientSize(ctx.model.clientSize)
+        <event>
+            if ctx.model.onQuit():
+                evt.Skip()
+            else:
+                evt.Veto()
+        </event>
     </frame>
 </skin>
 """)
@@ -141,7 +150,9 @@ class RenderSkinModelBase(wxSkinModel):
         fpsStr = self.fpsFormat % (fpsTrue, fpsEffective, timeRender/totalEntries, timeSwap/totalEntries)
         self._printFPS(fpsStr)
 
+    fpsStr = 'Waiting'
     def _printFPS(self, fpsStr):
+        self.fpsStr = fpsStr
         print '\r', fpsStr.ljust(75),
         sys.stdout.flush()
 
@@ -184,6 +195,10 @@ class RenderSkinModelBase(wxSkinModel):
         ##glFlush () # implicit in SwapBuffers
         glCanvas.SwapBuffers()
     
+    def onQuit(self):
+        self.repaintTimer.Stop()
+        return True
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
