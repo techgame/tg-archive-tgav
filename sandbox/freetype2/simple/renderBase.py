@@ -14,6 +14,9 @@
 import sys
 import time
 
+from TG.openGL.raw.gl import glGetError
+from TG.openGL.raw.glu import gluErrorString
+
 from TG.skinning.toolkits.wx import wxSkinModel, XMLSkin
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -147,7 +150,9 @@ class RenderSkinModelBase(wxSkinModel):
         fpsStr = self.fpsFormat % (fpsTrue, fpsEffective, timeRender/totalEntries, timeSwap/totalEntries)
         self._printFPS(fpsStr)
 
+    fpsStr = 'Waiting'
     def _printFPS(self, fpsStr):
+        self.fpsStr = fpsStr
         print '\r', fpsStr.ljust(75),
         sys.stdout.flush()
 

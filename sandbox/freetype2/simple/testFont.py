@@ -48,12 +48,6 @@ class RenderSkinModel(RenderSkinModelBase):
             'Helvetica': '/System/Library/Fonts/Helvetica.dfont',
             }
 
-    def glCheck(self):
-        glErr = glGetError()
-        if glErr:
-            raise Exception("GL Error: 0x%x" % glErr)
-        return True
-
     def renderInit(self, glCanvas, renderStart):
         glDepthFunc(GL_LEQUAL)
         glEnable(GL_DEPTH_TEST)
@@ -109,15 +103,14 @@ class RenderSkinModel(RenderSkinModelBase):
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
-        gl.glTexEnvf(gl.GL_TEXTURE_ENV, gl.GL_TEXTURE_ENV_MODE, gl.GL_MODULATE)
-
         glLoadIdentity()
 
         x0 = y0 = 0
         x1, y1 = self.viewPortSize
 
-        if 0:
+        if 1:
             glTranslatef(0., 0., -1)
+
             gl.glBegin(gl.GL_QUADS)
             gl.glColor4f(1., 1., 1., 1.)
             gl.glVertex2f(x0, y1)
@@ -258,16 +251,6 @@ class RenderSkinModel(RenderSkinModelBase):
             gl.glTexCoord2s(s0, t0)
             gl.glVertex2f(x0, y1)
             gl.glEnd()
-
-    fpsStr = 'Waiting...'
-    def _printFPS(self, fpsStr):
-        self.fpsStr = fpsStr
-
-    def checkError(self):
-        glerr = gl.glGetError()
-        if glerr:
-            raise Exception("GLError: %d (0x%x)" % (glerr, glerr))
-        return True
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Main 

@@ -415,7 +415,7 @@ def gluEndTrim(nurb, _api_=None):
     """
     return _api_(nurb)
     
-@bind(POINTER(GLubyte), [GLenum])
+@bind(c_char_p, [GLenum])
 def gluErrorString(error, _api_=None): 
     """gluErrorString(error)
     
