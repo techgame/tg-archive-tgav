@@ -10,7 +10,7 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from ctypes import pythonapi
+from ctypes import pythonapi, cast, byref, c_void_p
 
 import numpy
 
@@ -70,7 +70,8 @@ class BufferBase(object):
     dtype = numpy.ubyte
     accessByName = accessMap
 
-    def __init__(self, **kw):
+    def __init__(self, usage=None, **kw):
+        self.create(usage)
         self.set(kw)
 
     def create(self, usage=None):
@@ -84,6 +85,7 @@ class BufferBase(object):
             setattr(self, n, v)
 
     usageByName = bufferUsageMap
+    getUsageByName = usageByName.get
     _usage = usageByName[None]
     def getUsage(self):
         return self._usage
@@ -92,6 +94,7 @@ class BufferBase(object):
 
         self._genId()
         self.bind()
+    usage = property(getUsage, setUsage)
 
     def release(self):
         self.unbind()
@@ -120,12 +123,15 @@ class BufferBase(object):
 
     glBufferData = staticmethod(gl.glBufferData)
     def sendData(self, data, usage=None):
-        self.glBufferData(self.target, len(data), data, usage or self.usage)
+        if usage is not None:
+            usage = self.getUsageByName(usage)
+        else: usage = self.usage
+        self.glBufferData(self.target, data.nbytes, data.ctypes, usage)
         self.size = len(data)
 
     glBufferSubData = staticmethod(gl.glBufferData)
     def sendDataAt(self, data, offset):
-        self.glBufferSubData(self.target, offset, len(data), data)
+        self.glBufferSubData(self.target, offset, data.nbytes, data.ctypes)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -162,6 +162,6 @@ class Font(object):
         return geo, advSum[-1][-1], textRenderObj
 
     def render(self, text):
-        geo, textRenderObj = self.layout(text)
+        textRenderObj = self.layout(text)[-1]
         textRenderObj()
 

@@ -49,7 +49,6 @@ class RenderSkinModel(RenderSkinModelBase):
             }
 
     def renderInit(self, glCanvas, renderStart):
-        glDepthFunc(GL_LEQUAL)
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_COLOR_MATERIAL)
 
@@ -108,7 +107,7 @@ class RenderSkinModel(RenderSkinModelBase):
         x0 = y0 = 0
         x1, y1 = self.viewPortSize
 
-        if 1:
+        if 0:
             glTranslatef(0., 0., -1)
 
             gl.glBegin(gl.GL_QUADS)
@@ -149,6 +148,8 @@ class RenderSkinModel(RenderSkinModelBase):
                 rt()
 
             def nullify(f): 
+                if 0: 
+                    return f
                 return None
 
             @nullify
@@ -185,6 +186,7 @@ class RenderSkinModel(RenderSkinModelBase):
                 glVertex3f(*end)
                 glEnd()
 
+            glDepthMask(False)
             glPushMatrix()
             glTranslatef(0, self.viewPortSize[1], 0)
 
@@ -225,6 +227,7 @@ class RenderSkinModel(RenderSkinModelBase):
             showText(openglRocksText)
 
             glPopMatrix()
+            glDepthMask(True)
 
         if 0:
             tex = self.fontOne.texture
