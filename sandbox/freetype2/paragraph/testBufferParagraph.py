@@ -126,7 +126,7 @@ class RenderSkinModel(RenderSkinModelBase):
         f = Font.fromFilename(fontFilename, fontSize)
         if charset is not None:
             f.setCharset(charset)
-        f.configure()
+        f.rebuild()
         return f
 
     viewPortSize = None

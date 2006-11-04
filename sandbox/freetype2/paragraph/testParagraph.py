@@ -60,7 +60,8 @@ class RenderSkinModel(RenderSkinModelBase):
     sampleText = textwrap.wrap(bigSampleText, width=200)
     fontName = 'Zapfino'
     fontSize = 16
-    spacing = 2.0
+    lineHeight = None
+    spacing = 1.0
     fps = 60
     fonts = {
             'Arial':'/Library/Fonts/Arial',
@@ -97,14 +98,16 @@ class RenderSkinModel(RenderSkinModelBase):
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
         self.font = self.loadFont(self.fontName, self.fontSize)
-        self.layoutList = [self.font.layout(line) for line in self.sampleText]
+        self.lineHeight = (self.font.face.lineHeight)/64. * self.spacing
+        if 1:
+            self.layoutList = [self.font.layout(line) for line in self.sampleText]
 
     def loadFont(self, fontKey, fontSize, charset=string.printable):
         fontFilename = self.fonts[fontKey]
         f = Font.fromFilename(fontFilename, fontSize)
         if charset is not None:
             f.setCharset(charset)
-        f.configure()
+        f.rebuild()
         return f
 
     viewPortSize = None
@@ -140,8 +143,10 @@ class RenderSkinModel(RenderSkinModelBase):
         glPushMatrix()
         #glTranslatef(0, 0.5, 0)
         glTranslatef(50, height, 0)
+        if 1:
+            self.layoutList = [self.font.layout(line) for line in self.sampleText]
         for lgeo, lend, lfn in self.layoutList:
-            glTranslatef(0, -self.spacing*self.fontSize, 0)
+            glTranslatef(0, -self.lineHeight, 0)
             glPushMatrix()
             #self.centerEnd(lend)
             #self.showOutline(lgeo)

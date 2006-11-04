@@ -14,6 +14,7 @@
 from itertools import izip
 
 import numpy
+from numpy import ndarray
 
 from TG.freetype2.face import FreetypeFace
 
@@ -57,10 +58,8 @@ class Font(object):
             self._texture = texture
         return texture
     def setTexture(self, texture):
-        if texture is self._texture:
-            return
+        if texture is self._texture: return
         self._texture = texture
-        self._invalidate()
     texture = property(getTexture, setTexture)
 
     def createTexture(self):
@@ -76,30 +75,33 @@ class Font(object):
         if charset is self._charset:
             return
         self._charset = charset
-        self._invalidate()
+    charset = property(getCharset, setCharset)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def _invalidate(self):
-        pass
-
-    def configure(self):
+    def rebuild(self):
         face = self.face
         charset = self.getCharset()
 
-        texCoordMapping = self.texture.renderFace(face, face.iterUniqueCharIndexes(charset))
-        texCoordMapping.sort()
+        glyphIndexSet = face.uniqueCharIndexSet(charset)
+        count = len(glyphIndexSet)+1
 
-        count = len(texCoordMapping)+1
+        texCoordMapping = self.texture.renderFace(face, glyphIndexSet)
+        texCoordMapping.sort()
 
         glyphToIndexMap = dict((glyphIndex, arrIndex) for arrIndex, (glyphIndex, texCoords) in enumerate(texCoordMapping))
 
         lookup=glyphToIndexMap.get
         idxOf=face.getOrdinalIndex
-        charToIndexMap = numpy.empty(65535, dtype=numpy.uint16)
-        for i in xrange(len(charToIndexMap)):
-            charToIndexMap[i] = lookup(idxOf(i), 0)
-        charToIndexMap[0] = count-1
+        if 0:
+            charToIndexMap = numpy.zeros(65535, dtype=numpy.uint16)
+        elif 1:
+            charToIndexMap = {}
+        for i in xrange(65535):
+            iid = idxOf(i)
+            if iid != 0:
+                charToIndexMap[unichr(i)] = lookup(iid, 0)
+        charToIndexMap[u'\0'] = count-1
 
         geometry = fontGeometry.FontGeometryArray.fromFormat((count, 4), dataFormat='t2f,v3f')
         advance = numpy.zeros((count, 4, 3), numpy.float32)
@@ -143,9 +145,14 @@ class Font(object):
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def getGeoAndAdv(self, text):
-        text = [0] + map(ord, text.encode('utf-8'))
-        idx = self._indexMap[text]
+        # prepend a null so we can offset the advance and geometry arrays
+        text = '\0' + text 
+        idx = map(self._indexMap.get, text)
+
+        # get the advance array
         adv = self._advance[idx]
+
+        # get the geometry array
         geo = self._geometry[idx[1:]]
         geo.dataFormat = self._geometry.dataFormat
         return idx, geo, adv

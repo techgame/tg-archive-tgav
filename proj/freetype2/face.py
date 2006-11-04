@@ -175,6 +175,23 @@ class FreetypeFace(object):
         return self._face.size
 
     @property
+    def lineHeight(self):
+        return self._face.size[0].metrics.height
+
+    @property
+    def ascener(self):
+        return self._face.size[0].metrics.ascender
+
+    @property
+    def descender(self):
+        return self._face.size[0].metrics.descender
+
+    @property
+    def linegap(self):
+        m = self._face.size[0].metrics
+        return m.height - m.ascender + m.descender
+
+    @property
     def sizesList(self):
         result = []
         node = self._face.sizes_list.head
@@ -311,7 +328,7 @@ class FreetypeFace(object):
         return self._ft_getCharIndex(ord(char))
     getOrdinalIndex = _ft_getCharIndex
 
-    def iterUniqueCharIndexes(self, chars):
+    def uniqueCharIndexSet(self, chars):
         return frozenset(self.iterCharIndexes(chars, False))
     def iterCharIndexes(self, chars, bMapping=False):
         if bMapping:
