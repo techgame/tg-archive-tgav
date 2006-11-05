@@ -143,7 +143,7 @@ class RenderSkinModel(RenderSkinModelBase):
         glPushMatrix()
         #glTranslatef(0, 0.5, 0)
         glTranslatef(50, height, 0)
-        if 1:
+        if 0:
             self.layoutList = [self.font.layout(line) for line in self.sampleText]
         for lgeo, lend, lfn in self.layoutList:
             glTranslatef(0, -self.lineHeight, 0)

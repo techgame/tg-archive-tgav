@@ -154,7 +154,6 @@ class Font(object):
 
         # get the geometry array
         geo = self._geometry[idx[1:]]
-        geo.dataFormat = self._geometry.dataFormat
         return idx, geo, adv
 
     def layout(self, text):

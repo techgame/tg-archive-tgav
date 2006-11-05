@@ -32,6 +32,7 @@ class NDArrayBase(ndarray):
         if dataFormat is not None:
             dtype, dataFormat = klass.lookupDTypeFromFormat(dataFormat)
         return ndarray.__new__(klass, shape, dtype, buffer, offset, strides, order)
+
     def __init__(self, shape=None, dtype=float, dataFormat=None, buffer=None, offset=0, strides=None, order=None):
         self._config(dataFormat)
 
@@ -40,6 +41,13 @@ class NDArrayBase(ndarray):
             self.setDataFormat(dataFormat)
         elif self.dataFormat is None:
             self.inferDataFormat()
+
+    def __array_finalize__(self, parent):
+        if parent is not None:
+            self._configFromParent(parent)
+
+    def _configFromParent(self, parent):
+        self.setDataFormat(parent.getDataFormat())
 
     @classmethod
     def lookupDTypeFromFormat(klass, dataFormat):
