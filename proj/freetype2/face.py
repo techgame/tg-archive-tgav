@@ -330,8 +330,10 @@ class FreetypeFace(object):
 
     def uniqueCharIndexSet(self, chars):
         return frozenset(self.iterCharIndexes(chars, False))
-    def iterCharIndexes(self, chars, bMapping=False):
-        if bMapping:
+    def iterCharIndexes(self, chars=None, bMapping=False):
+        if not chars:
+            return self.iterAllChars(bMapping)
+        elif bMapping:
             return ((char, self._ft_getCharIndex(ord(char))) for char in chars)
         else:
             return (self._ft_getCharIndex(ord(char)) for char in chars)
@@ -365,15 +367,19 @@ class FreetypeFace(object):
         charCode = self._ft_getNextChar(ord(char), byref(glyphIndex))
         return unichr(charCode), glyphIndex.value
 
-    def iterCharCodes(self):
+    def iterAllChars(self, bMapping=False):
         glyphIndex = c_uint(0)
         glyphIndexRef = byref(glyphIndex)
 
         charCode = self._ft_getFirstChar(glyphIndexRef)
-        while glyphIndex:
-            yield unichr(charCode), glyphIndex.value
-            charCode = self._ft_getNextChar(charCode, glyphIndexRef)
-    iterAllChars = iterCharCodes
+        if bMapping:
+            while glyphIndex:
+                yield unichr(charCode), glyphIndex.value
+                charCode = self._ft_getNextChar(charCode, glyphIndexRef)
+        else:
+            while glyphIndex:
+                yield unichr(charCode)
+                charCode = self._ft_getNextChar(charCode, glyphIndexRef)
 
     _ft_getNameIndex = FT.FT_Get_Name_Index
     def getNameIndex(self, name):

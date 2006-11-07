@@ -171,6 +171,10 @@ class TextureImageBasic(object):
         return self._pointer
     ptr = property(getPointer)
 
+    def clear(self):
+        self.newPixelStore()
+        self.texClear()
+
     _rawData = None
     def texData(self, rawData, pointer, pixelStoreSettings):
         if pixelStoreSettings:
@@ -201,7 +205,7 @@ class TextureImageBasic(object):
         byteCount = self.getSizeInBytes()
         data = (ctypes.c_ubyte*byteCount)()
         self.texCData(data)
-    
+
     def setImageOn(self, texture, level=0, **kw):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
     def setSubImageOn(self, texture, level=0, **kw):
@@ -222,7 +226,11 @@ class TextureImageBasic(object):
         if isinstance(pixelStore, dict):
             self.updatePixelStore(pixelStore)
         self._pixelStore = pixelStore
-    pixelStore = property(getPixelStore, setPixelStore)
+    def delPixelStore(self):
+        if self._pixelStore is not None:
+            del self._pixelStore
+
+    pixelStore = property(getPixelStore, setPixelStore, delPixelStore)
     def newPixelStore(self, *args, **kw):
         pixelStore = PixelStore(*args, **kw)
         self.setPixelStore(pixelStore)
@@ -497,12 +505,27 @@ class Texture(object):
         return klass.TextureImage3DFactory(*args, **kw)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    def blankImage(self, data, level=0, **kw):
+        data.texBlank()
+        data.setImageOn(self, level, **kw)
+        data.texClear()
+        return data
+
+    def blankImage1d(self, *args, **kw):
+        return self.blankImage(self.data1d(*args, **kw))
+    def blankImage2d(self, *args, **kw):
+        return self.blankImage(self.data2d(*args, **kw))
+    def blankImage3d(self, *args, **kw):
+        return self.blankImage(self.data3d(*args, **kw))
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     #~ Tex Image Setting
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def setImage(self, data, level=0, **kw):
         data.setImageOn(self, level, **kw)
-        return self
+        return data
     def setImage1d(self, data, level=0):
         data.select()
         try:
@@ -565,7 +588,7 @@ class Texture(object):
 
     def setCompressedImage(self, data, level=0, **kw):
         data.setCompressedImageOn(self, level, **kw)
-        return self
+        return data
     def setCompressedImage1d(self, data, level=0):
         data.select()
         try:
@@ -598,7 +621,7 @@ class Texture(object):
 
     def setCompressedSubImage(self, data, level=0):
         data.setCompressedSubImageOn(self, level, **kw)
-        return self
+        return data
     def setCompressedSubImage1d(self, data, level=0):
         data.select()
         try:

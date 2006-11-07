@@ -302,8 +302,8 @@ xmlSkin = XMLSkin("""<?xml version='1.0'?>
 
                 channelMovie = c_void_p()
 
-                filePath = os.path.abspath("cercle.mov")
-                print filePath
+                filePath = os.path.abspath("Curious George.m4b")
+                #filePath = os.path.abspath("cercle.mov")
                 #filePath = "/Users/shane/Movies/Testing.mov"
                 #filePath = "/Users/shane/Movies/UnionStation_02.wmv"
                 #filePath = "/Users/shane/Movies/AspyrIntro.mov"

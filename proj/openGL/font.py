@@ -11,15 +11,15 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from itertools import izip
+import itertools
 
-import numpy
-from numpy import ndarray
+from numpy import ndarray, float32
 
 from TG.freetype2.face import FreetypeFace
 
+from TG.openGL import blockMosaic
 from TG.openGL import fontTexture
-from TG.openGL import fontGeometry
+from TG.openGL import interleavedArrays
 
 from TG.openGL.raw import gl
 
@@ -27,108 +27,198 @@ from TG.openGL.raw import gl
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+class FontGeometryArray(interleavedArrays.InterleavedArrays):
+    dataFormat = gl.GL_T2F_V3F
+    @classmethod
+    def fromCount(klass, count):
+        return klass.fromFormat((count, 4), klass.dataFormat)
+
+class FontAdvanceArray(ndarray):
+    @classmethod
+    def fromCount(klass, count, dtype=float32):
+        return klass((count, 4, 3), dtype)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+class ITextLayout(object):
+    def layout(self, text):
+        raise NotImplementedError('Subclass Responsibility: %r' % (self,))
+
+class SimpleTextLayout(ITextLayout):
+    def layout(self, text):
+        pass
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+class TextTranslator(object):
+    font = None
+    _fontCharMap = None
+    _fontAdvance = None
+    _fontGeometry = None
+
+    def __init__(self, text):
+        self.text = text
+
+    @classmethod
+    def subclassFromFont(klass, font):
+        kvars = dict(font=font, _fontCharMap=font.charMap, _fontAdvance=font.advance, _fontGeometry=font.geometry)
+        subklass = type(klass)(klass.__name__+'_T_', (klass,), kvars)
+        return subklass
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    _indexes = None
+    def getIndexes(self):
+        r = self._indexes
+        if r is None: 
+            r = map(self._fontCharMap.get, '\0' + self.text)
+            self._indexes = r
+        return r
+    indexes = property(getIndexes)
+
+    _advance = None
+    def getAdvance(self):
+        r = self._advance
+        if r is None: 
+            r = self._fontAdvance[self.getIndexes()]
+            self._advance = r
+        return r
+    advance = property(getAdvance)
+
+    _geometry = None
+    def getGeometry(self):
+        r = self._geometry
+        if r is None: 
+            r = self._fontGeometry[self.getIndexes()]
+            self._geometry = r
+        return r
+    geometry = property(getGeometry)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 class Font(object):
-    TextureFactory = fontTexture.FontTextureRect
+    LayoutAlgorithm = blockMosaic.BlockMosaicAlg
+    FontTexture = fontTexture.FontTexture
+    FontGeometryArray = FontGeometryArray
+    FontAdvanceArray = FontAdvanceArray
+    TextTranslatorSubclassFromFont = TextTranslator.subclassFromFont
+    TextTranslator = TextTranslator
+
+    texture = None
+
+    charMap = None
+    geometry = None
+    advance = None
 
     pointSize = (1./64., 1./64.)
 
-    def __init__(self, ftFace=None):
-        if ftFace is not None:
-            self.setFace(ftFace)
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def getFace(self):
-        return self._ftFace
-    def setFace(self, ftFace):
-        self._ftFace = ftFace
-    face = property(getFace, setFace)
+    def __init__(self, face, charset=None):
+        if face is not None:
+            self.compile(face, charset)
 
     @classmethod
-    def fromFilename(klass, filename, size, dpi=None):
-        ftFace = FreetypeFace(filename)
-        ftFace.setSize(size, dpi)
-        return klass(ftFace)
+    def fromFilename(klass, filename, size, dpi=None, charset=None):
+        face = FreetypeFace(filename)
+        face.setSize(size, dpi)
+        return klass(face, charset)
 
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def translate(self, text):
+        return self.TextTranslator(text)
+    __call__ = translate
 
-    _texture = None
-    def getTexture(self):
-        texture = self._texture
-        if texture is None:
-            texture = self.createTexture()
-            self._texture = texture
-        return texture
-    def setTexture(self, texture):
-        if texture is self._texture: return
-        self._texture = texture
-    texture = property(getTexture, setTexture)
+    def layout(self, text):
+        xlate = self.translate(text)
+        adv = xlate.advance.cumsum(0)
+        geo = xlate.geometry[1:]
+        geo['v'] += adv[:-1]
+        def lfn(tex=self.texture):
+            tex.select()
+            geo.draw(gl.GL_QUADS)
+            #tex.deselect()
 
-    def createTexture(self):
-        return self.TextureFactory()
+        return geo, adv[-1], lfn
 
-    _charset = None
-    def getCharset(self):
-        result = self._charset
-        if result is None:
-            return u''.join(c for c,i in self.face.iterAllChars())
-        return result
-    def setCharset(self, charset):
-        if charset is self._charset:
-            return
-        self._charset = charset
-    charset = property(getCharset, setCharset)
+    def render(self, text):
+        self.layout(text)[-1]()
 
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def compile(self, face, charset):
+        self.face = face
+        self.lineHeight = face.lineHeight/self.pointSize[1]
 
-    def rebuild(self):
-        face = self.face
-        charset = self.getCharset()
+        charMap = {'\0': 0}
+        self.charMap = charMap
 
-        glyphIndexSet = face.uniqueCharIndexSet(charset)
-        count = len(glyphIndexSet)+1
+        gidxMap = {}
+        aidxCounter = itertools.count(1)
+        for char, gidx in face.iterCharIndexes(charset, True):
+            aidx = aidxCounter.next()
+            charMap.setdefault(char, aidx)
+            gidxMap.setdefault(gidx, aidx)
+        count = aidxCounter.next()
 
-        texCoordMapping = self.texture.renderFace(face, glyphIndexSet)
-        texCoordMapping.sort()
+        # create a texture for the font mosaic, and run the mosaic algorithm
+        mosaic = self._compileTexture(face, gidxMap)
+        self._compileData(face, count, gidxMap, mosaic)
 
-        glyphToIndexMap = dict((glyphIndex, arrIndex) for arrIndex, (glyphIndex, texCoords) in enumerate(texCoordMapping))
+        self.TextTranslator = self.TextTranslatorSubclassFromFont(self)
 
-        lookup=glyphToIndexMap.get
-        idxOf=face.getOrdinalIndex
-        if 0:
-            charToIndexMap = numpy.zeros(65535, dtype=numpy.uint16)
-        elif 1:
-            charToIndexMap = {}
-        for i in xrange(65535):
-            iid = idxOf(i)
-            if iid != 0:
-                charToIndexMap[unichr(i)] = lookup(iid, 0)
-        charToIndexMap[u'\0'] = count-1
+    def _compileTexture(self, face, gidxMap):
+        texture = self.FontTexture()
+        mosaic, mosaicSize = self._compileGlyphMosaic(face, gidxMap, texture.getMaxTextureSize())
+        texture.createMosaic(mosaicSize)
+        self.texture = texture
+        return mosaic
 
-        geometry = fontGeometry.FontGeometryArray.fromFormat((count, 4), dataFormat='t2f,v3f')
-        advance = numpy.zeros((count, 4, 3), numpy.float32)
+    def _compileGlyphMosaic(self, face, gidxMap, maxSize):
+        alg = self.LayoutAlgorithm((maxSize, maxSize))
 
+        mosaic = {}
+        for gidx in gidxMap.iterkeys():
+            size = face.loadGlyph(gidx).bitmapSize
+            mosaic[gidx] = alg.addBlock(size)
+
+        mosaicSize, layout, unplaced = alg.layout()
+
+        if unplaced:
+            raise RuntimeError("Not all characters could be placed in mosaic")
+
+        return mosaic, mosaicSize
+
+    def _compileData(self, face, count, gidxMap, mosaic):
+        # create the result arrays
+        geometry = self.FontGeometryArray.fromCount(count)
+        self.geometry = geometry
+        advance = self.FontAdvanceArray.fromCount(count)
+        self.advance = advance
+
+        # cache some methods
         loadGlyph = face.loadGlyph
-        pointSize = self.pointSize
         verticesFrom = self._verticesFrom
         advanceFrom = self._advanceFrom
-        for geoEntry, advEntry, (glyphIndex, texCoords) in izip(geometry, advance, texCoordMapping):
-            glyph = loadGlyph(glyphIndex)
+        renderGlyph = self.texture.renderGlyph
 
-            geoEntry['t'] = texCoords
+        # cache some variables
+        pointSize = self.pointSize
+
+        # entry 0 is zero widht and has null geometry
+        geometry[0]['t'] = 0.
+        geometry[0]['v'] = 0.
+        advance[0] = 0.
+        # record the geometry and advance for each glyph, and render to the mosaic
+        for gidx, aidx in gidxMap.iteritems():
+            glyph = loadGlyph(gidx)
+
+            geoEntry = geometry[aidx]
             geoEntry['v'] = verticesFrom(glyph.metrics, pointSize)
+            advance[aidx,:] = advanceFrom(glyph.advance, pointSize)
 
-            advEntry[:] = advanceFrom(glyph.advance, pointSize)
-
-        geoEntry = geometry[-1]
-        geoEntry['t'] = [(0., 0.)]*4
-        geoEntry['v'] = [(0., 0., 0.)]*4
-        advance[-1] = [(0., 0., 0.)]*4
-
-        #self.glyphToIndexMap = glyphToIndexMap
-        self._indexMap = charToIndexMap
-        self._geometry = geometry
-        self._advance = advance
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            block = mosaic.get(gidx)
+            if block is None: 
+                geoEntry['t'] = 0.0
+            else: 
+                geoEntry['t'] = renderGlyph(glyph, block.pos, block.size)
 
     def _verticesFrom(self, metrics, (ptw, pth)):
         x0 = (metrics.horiBearingX) * ptw
@@ -141,33 +231,4 @@ class Font(object):
 
     def _advanceFrom(self, advance, (ptw, pth)):
         return [(advance[0]*ptw, advance[1]*pth, 0.)]*4
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    def getGeoAndAdv(self, text):
-        # prepend a null so we can offset the advance and geometry arrays
-        text = '\0' + text 
-        idx = map(self._indexMap.get, text)
-
-        # get the advance array
-        adv = self._advance[idx]
-
-        # get the geometry array
-        geo = self._geometry[idx[1:]]
-        return idx, geo, adv
-
-    def layout(self, text):
-        idx, geo, adv = self.getGeoAndAdv(text)
-        advSum = adv.cumsum(0)
-        geo['v'] += advSum[:-1]
-
-        def textRenderObj(tex=self.texture):
-            tex.select()
-            geo.draw(gl.GL_QUADS)
-            tex.deselect()
-        return geo, advSum[-1][-1], textRenderObj
-
-    def render(self, text):
-        textRenderObj = self.layout(text)[-1]
-        textRenderObj()
 

@@ -109,7 +109,7 @@ class RenderSkinModel(RenderSkinModelBase):
 
     def layout(self, text, font):
         g, e, fn = font.layout(text)
-        #return g, e, fn
+        return g, e, fn
         ab = ArrayBuffer()
         ab.sendData(g)
         def newFn(tex=font.texture):
@@ -123,20 +123,17 @@ class RenderSkinModel(RenderSkinModelBase):
 
     def loadFont(self, fontKey, fontSize, charset=string.printable):
         fontFilename = self.fonts[fontKey]
-        f = Font.fromFilename(fontFilename, fontSize)
-        if charset is not None:
-            f.setCharset(charset)
-        f.rebuild()
+        f = Font.fromFilename(fontFilename, fontSize, charset=charset)
         return f
 
     viewPortSize = None
     def renderResize(self, glCanvas):
-        (l, b) = (0, 0)
-        (w,h) = glCanvas.GetSize()
+        (w, h) = glCanvas.GetSize()
         if not w or not h: return
 
-        #l, b = (10, 10)
-        #w, h = (w-20, h-20)
+        border = 0
+        (l, b), (w, h) = (border, border), (w-2*border, h-2*border)
+
         self.viewPortSize = w, h
         glViewport (l, b, w, h)
 

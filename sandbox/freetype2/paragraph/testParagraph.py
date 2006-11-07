@@ -48,12 +48,6 @@ Ut eu sapien. Phasellus odio mi, consectetuer non, elementum in, feugiat eu, ped
 Donec vulputate enim adipiscing ligula. Nullam semper neque at lacus. Donec feugiat vulputate orci. Vivamus id sapien. Nunc non odio. Vivamus sodales, ipsum a tristique malesuada, sapien lorem pretium orci, at sollicitudin dolor magna vitae ligula. Ut id nulla. Phasellus lacus felis, imperdiet nec, varius sit amet, tristique vestibulum, odio. In volutpat. Sed leo massa, iaculis at, hendrerit sed, rhoncus sit amet, nulla. Sed vitae lorem. Curabitur massa lectus, ultricies non, tempor eget, mattis et, ipsum. Nulla vulputate felis id orci. Donec placerat vulputate dolor. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Sed aliquet, felis a volutpat tempus, leo sapien eleifend velit, quis interdum dui nunc at risus. Donec sit amet orci. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Pellentesque bibendum iaculis tellus. Etiam tempor nibh.
 
 Nam felis lorem, consequat nec, tincidunt at, malesuada molestie, magna. Nulla facilisi. Quisque egestas justo at nisi. Suspendisse a sapien. Nunc eget sem in lorem cursus accumsan. Curabitur at dolor at justo facilisis sagittis. In a mauris. Mauris leo. Vestibulum dictum dapibus lacus. Phasellus sed est. Cras sit amet sapien. Quisque massa eros, malesuada ac, ultricies nec, fringilla at, lorem. Pellentesque lectus diam, nonummy in, adipiscing ut, lacinia eu, purus. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
-
-Nam felis lorem, consequat nec, tincidunt at, malesuada molestie, magna. Nulla facilisi. Quisque egestas justo at nisi. Suspendisse a sapien. Nunc eget sem in lorem cursus accumsan. Curabitur at dolor at justo facilisis sagittis. In a mauris. Mauris leo. Vestibulum dictum dapibus lacus. Phasellus sed est. Cras sit amet sapien. Quisque massa eros, malesuada ac, ultricies nec, fringilla at, lorem. Pellentesque lectus diam, nonummy in, adipiscing ut, lacinia eu, purus. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
-
-Nam felis lorem, consequat nec, tincidunt at, malesuada molestie, magna. Nulla facilisi. Quisque egestas justo at nisi. Suspendisse a sapien. Nunc eget sem in lorem cursus accumsan. Curabitur at dolor at justo facilisis sagittis. In a mauris. Mauris leo. Vestibulum dictum dapibus lacus. Phasellus sed est. Cras sit amet sapien. Quisque massa eros, malesuada ac, ultricies nec, fringilla at, lorem. Pellentesque lectus diam, nonummy in, adipiscing ut, lacinia eu, purus. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
-
-Nam felis lorem, consequat nec, tincidunt at, malesuada molestie, magna. Nulla facilisi. Quisque egestas justo at nisi. Suspendisse a sapien. Nunc eget sem in lorem cursus accumsan. Curabitur at dolor at justo facilisis sagittis. In a mauris. Mauris leo. Vestibulum dictum dapibus lacus. Phasellus sed est. Cras sit amet sapien. Quisque massa eros, malesuada ac, ultricies nec, fringilla at, lorem. Pellentesque lectus diam, nonummy in, adipiscing ut, lacinia eu, purus. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
 '''
 
 class RenderSkinModel(RenderSkinModelBase):
@@ -104,10 +98,7 @@ class RenderSkinModel(RenderSkinModelBase):
 
     def loadFont(self, fontKey, fontSize, charset=string.printable):
         fontFilename = self.fonts[fontKey]
-        f = Font.fromFilename(fontFilename, fontSize)
-        if charset is not None:
-            f.setCharset(charset)
-        f.rebuild()
+        f = Font.fromFilename(fontFilename, fontSize, charset=charset)
         return f
 
     viewPortSize = None
@@ -130,36 +121,44 @@ class RenderSkinModel(RenderSkinModelBase):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    _no_error = True
     def renderContent(self, glCanvas, renderStart):
         if self.viewPortSize is None: return
 
-        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
+        if self._no_error:
+            try:
+                glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
-        glLoadIdentity()
+                glLoadIdentity()
 
-        width, height = self.viewPortSize
-        glDepthMask(False)
+                width, height = self.viewPortSize
+                glDepthMask(False)
 
-        glPushMatrix()
-        #glTranslatef(0, 0.5, 0)
-        glTranslatef(50, height, 0)
-        if 0:
-            self.layoutList = [self.font.layout(line) for line in self.sampleText]
-        for lgeo, lend, lfn in self.layoutList:
-            glTranslatef(0, -self.lineHeight, 0)
-            glPushMatrix()
-            #self.centerEnd(lend)
-            #self.showOutline(lgeo)
-            #self.showBaseline(lend)
-            glColor4f(0., 0., 0., 1.)
-            lfn()
-            glPopMatrix()
-        glPopMatrix()
+                glPushMatrix()
+                #glTranslatef(0, 0.5, 0)
+                glTranslatef(50, height, 0)
+                if 0:
+                    self.layoutList = [self.font.layout(line) for line in self.sampleText]
+                for lgeo, lend, lfn in self.layoutList:
+                    glTranslatef(0, -self.lineHeight, 0)
+                    glPushMatrix()
+                    #self.centerEnd(lend)
+                    #self.showOutline(lgeo)
+                    #self.showBaseline(lend)
+                    glColor4f(0., 0., 0., 1.)
+                    lfn()
+                    glPopMatrix()
+                glPopMatrix()
 
-        glPushMatrix()
-        self.font.render(self.fpsStr)
-        glPopMatrix()
-        glDepthMask(True)
+                glPushMatrix()
+                self.font.render(self.fpsStr)
+                glPopMatrix()
+                glDepthMask(True)
+
+                self._no_error = True
+            except Exception:
+                self._no_error = False
+                raise
 
     def centerEnd(self, end):
         glTranslatef(0.5*(self.viewPortSize[0]-end[0]), 0, 0)
