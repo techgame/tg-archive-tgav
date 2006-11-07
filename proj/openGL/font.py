@@ -52,47 +52,35 @@ class SimpleTextLayout(ITextLayout):
 
 class TextTranslator(object):
     font = None
+    texture = None
     _fontCharMap = None
     _fontAdvance = None
     _fontGeometry = None
 
     def __init__(self, text):
         self.text = text
+        idx = map(self._fontCharMap.get, '\0' + self.text)
+        self.indexes = idx
+        self.advance = self._fontAdvance[idx]
+        self.geometry = self._fontGeometry[idx]
 
     @classmethod
     def subclassFromFont(klass, font):
-        kvars = dict(font=font, _fontCharMap=font.charMap, _fontAdvance=font.advance, _fontGeometry=font.geometry)
+        kvars = dict(font=font, texture=font.texture, _fontCharMap=font.charMap, _fontAdvance=font.advance, _fontGeometry=font.geometry)
         subklass = type(klass)(klass.__name__+'_T_', (klass,), kvars)
         return subklass
 
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def layout(self):
+        adv = self.advance.cumsum(0)
+        geo = self.geometry[1:]
+        geo['v'] += adv[:-1]
+        self.geo = geo
 
-    _indexes = None
-    def getIndexes(self):
-        r = self._indexes
-        if r is None: 
-            r = map(self._fontCharMap.get, '\0' + self.text)
-            self._indexes = r
-        return r
-    indexes = property(getIndexes)
+        return geo, adv[-1], self.render
 
-    _advance = None
-    def getAdvance(self):
-        r = self._advance
-        if r is None: 
-            r = self._fontAdvance[self.getIndexes()]
-            self._advance = r
-        return r
-    advance = property(getAdvance)
-
-    _geometry = None
-    def getGeometry(self):
-        r = self._geometry
-        if r is None: 
-            r = self._fontGeometry[self.getIndexes()]
-            self._geometry = r
-        return r
-    geometry = property(getGeometry)
+    def render(self):
+        self.texture.select()
+        self.geo.draw(gl.GL_QUADS)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -126,22 +114,12 @@ class Font(object):
 
     def translate(self, text):
         return self.TextTranslator(text)
-    __call__ = translate
-
+    
     def layout(self, text):
         xlate = self.translate(text)
-        adv = xlate.advance.cumsum(0)
-        geo = xlate.geometry[1:]
-        geo['v'] += adv[:-1]
-        def lfn(tex=self.texture):
-            tex.select()
-            geo.draw(gl.GL_QUADS)
-            #tex.deselect()
-
-        return geo, adv[-1], lfn
-
+        return xlate.layout()
     def render(self, text):
-        self.layout(text)[-1]()
+        return self.layout(text)[-1]()
 
     def compile(self, face, charset):
         self.face = face
