@@ -109,7 +109,7 @@ class RenderSkinModel(RenderSkinModelBase):
 
     def layout(self, text, font):
         g, e, fn = font.layout(text)
-        return g, e, fn
+
         ab = ArrayBuffer()
         ab.sendData(g)
         def newFn(tex=font.texture):
