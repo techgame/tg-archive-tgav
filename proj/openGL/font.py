@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
 ##~ Copyright (C) 2002-2006  TechGame Networks, LLC.              ##
 ##~                                                               ##
@@ -37,16 +36,6 @@ class FontAdvanceArray(ndarray):
     @classmethod
     def fromCount(klass, count, dtype=float32):
         return klass((count, 4, 3), dtype)
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-class ITextLayout(object):
-    def layout(self, text):
-        raise NotImplementedError('Subclass Responsibility: %r' % (self,))
-
-class SimpleTextLayout(ITextLayout):
-    def layout(self, text):
-        pass
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -89,8 +78,8 @@ class Font(object):
     FontTexture = fontTexture.FontTexture
     FontGeometryArray = FontGeometryArray
     FontAdvanceArray = FontAdvanceArray
-    TextTranslatorSubclassFromFont = TextTranslator.subclassFromFont
-    TextTranslator = TextTranslator
+    #TextTranslatorSubclassFromFont = TextTranslator.subclassFromFont
+    #TextTranslator = TextTranslator
 
     texture = None
 
@@ -113,7 +102,7 @@ class Font(object):
         return klass(face, charset)
 
     def translate(self, text):
-        return self.TextTranslator(text)
+        return map(self.charMap.get, text)
     
     def layout(self, text):
         xlate = self.translate(text)
@@ -125,7 +114,7 @@ class Font(object):
         self.face = face
         self.lineHeight = face.lineHeight/self.pointSize[1]
 
-        charMap = {'\0': 0}
+        charMap = {'\0': 0, '\n': 0, '\r': 0}
         self.charMap = charMap
 
         gidxMap = {}
@@ -140,9 +129,12 @@ class Font(object):
         mosaic = self._compileTexture(face, gidxMap)
         self._compileData(face, count, gidxMap, mosaic)
 
-        self.TextTranslator = self.TextTranslatorSubclassFromFont(self)
+        #self.TextTranslator = self.TextTranslatorSubclassFromFont(self)
 
     def _compileTexture(self, face, gidxMap):
+        if self.FontTexture is None:
+            return {}
+
         texture = self.FontTexture()
         mosaic, mosaicSize = self._compileGlyphMosaic(face, gidxMap, texture.getMaxTextureSize())
         texture.createMosaic(mosaicSize)
@@ -175,7 +167,8 @@ class Font(object):
         loadGlyph = face.loadGlyph
         verticesFrom = self._verticesFrom
         advanceFrom = self._advanceFrom
-        renderGlyph = self.texture.renderGlyph
+        if self.texture is not None:
+            renderGlyph = self.texture.renderGlyph
 
         # cache some variables
         pointSize = self.pointSize
@@ -184,6 +177,7 @@ class Font(object):
         geometry[0]['t'] = 0.
         geometry[0]['v'] = 0.
         advance[0] = 0.
+
         # record the geometry and advance for each glyph, and render to the mosaic
         for gidx, aidx in gidxMap.iteritems():
             glyph = loadGlyph(gidx)
@@ -209,4 +203,5 @@ class Font(object):
 
     def _advanceFrom(self, advance, (ptw, pth)):
         return [(advance[0]*ptw, advance[1]*pth, 0.)]*4
+
 

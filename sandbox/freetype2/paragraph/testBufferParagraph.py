@@ -54,14 +54,6 @@ Donec vulputate enim adipiscing ligula. Nullam semper neque at lacus. Donec feug
 Nam felis lorem, consequat nec, tincidunt at, malesuada molestie, magna. Nulla facilisi. Quisque egestas justo at nisi. Suspendisse a sapien. Nunc eget sem in lorem cursus accumsan. Curabitur at dolor at justo facilisis sagittis. In a mauris. Mauris leo. Vestibulum dictum dapibus lacus. Phasellus sed est. Cras sit amet sapien. Quisque massa eros, malesuada ac, ultricies nec, fringilla at, lorem. Pellentesque lectus diam, nonummy in, adipiscing ut, lacinia eu, purus. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
 '''
 
-@contextmanager
-def matrix():
-    glPushMatrix()
-    try:
-        yield
-    finally:
-        glPopMatrix()
-
 class RenderSkinModel(RenderSkinModelBase):
     #sampleText = textwrap.wrap(bigSampleText, width=200)
     sampleText = bigSampleText
