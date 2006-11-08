@@ -7,6 +7,7 @@ import numpy
 import textwrap
 import re
 from TG.openGL.font import Font
+from TG.openGL.textLayout import TextWrapper, TextObject
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Constants / Variiables / Etc. 
@@ -35,52 +36,6 @@ Nam felis lorem, consequat nec, tincidunt at, malesuada molestie, magna. Nulla f
 '''
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#~ Definitions 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-def iterSubtextIndexes(text, rePattern=re.compile('\s')):
-    return ((m.start(), m.group()) for m in rePattern.finditer(text))
-
-def indexWrapTo(iterWrapIdx, adv, size, axis=0):
-    advSum = adv[:,0,axis].cumsum(0)
-    lineOffset = numpy.zeros_like(advSum[0])
-    i0 = 0
-    iPrev = None
-    for iCurr, subtext in iterWrapIdx:
-        if size < (advSum[iCurr] - lineOffset):
-            yield (i0, iPrev+1)
-            i0 = iPrev+1
-            lineOffset = advSum[iPrev]
-            iPrev = iCurr
-
-        else:
-            iPrev = iCurr
-
-        if subtext == '\n':
-            yield (i0, iCurr+1)
-            i0 = iCurr+1
-            lineOffset = advSum[iCurr]
-            iPrev = iCurr
-
-    iEnd = len(advSum)-1
-    if i0 > iEnd:
-        return
-
-    # make sure the last line (that doesn't end with whitespace) is wrapped properly too
-    if size < (advSum[iEnd] - lineOffset):
-        yield (i0, iPrev+1)
-        i0 = iPrev+1
-        lineOffset = advSum[iPrev]
-        iPrev = iEnd
-    yield (i0, None)
-
-def wrapTo(text, adv, size, axis=0):
-    iterSpaces = iterSubtextIndexes(text)
-    for i0, i1 in indexWrapTo(iterSpaces, adv, size, axis):
-        end = adv[i0:i1,0,axis].cumsum()
-        yield end, text[i0:i1]
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Main 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -88,20 +43,10 @@ if __name__=='__main__':
     # disable loading of texture
     Font.FontTexture = None
 
-    import string
-    arial = Font.fromFilename('/Library/Fonts/Zapfino.dfont', 25, charset=string.printable)
+    arial = Font.fromFilename('/Library/Fonts/Zapfino.dfont', 25)
+    ArialTextObj = TextObject.factoryFor(arial)
 
-    #text = 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Pellentesque quis lacus.Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Curabitur facilisis, ante at adipiscing ullamcorper, libero dolor rutrum felis, nec vehicula turpis diam id lacus. Quisque tincidunt tempus orci. Quisque sit amet sem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Ut hendrerit, tortor quis laoreet feugiat, quam lectus suscipit orci, ornare tristique risus dui fermentum massa. Quisque scelerisque ullamcorper libero. Sed adipiscing sapien eget enim porttitor volutpat. Proin porttitor. Vivamus semper lectus mattis pede. Mauris pretium odio sit amet enim.'
-    text = bigSampleText.strip()
-    textIdx = arial.translate(text)
-    adv = arial.advance[textIdx]
-
-    lines = list(wrapTo(text, adv, 1000))
-    assert text == ''.join(l[1] for l in lines)
-
-    for p, l in lines:
-        if l:
-            print '%10s: %s' % (p[len(l)-1], l.replace('\n', ''))#.encode('string_escape'))
-        else:
-            print 'STRANGE:', repr(l)
+    tobj = ArialTextObj(bigSampleText)
+    for l in tobj.wrap(1000):
+        print l.replace('\n', '')#encode('string_escape')
 

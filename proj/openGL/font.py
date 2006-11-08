@@ -39,47 +39,11 @@ class FontAdvanceArray(ndarray):
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class TextTranslator(object):
-    font = None
-    texture = None
-    _fontCharMap = None
-    _fontAdvance = None
-    _fontGeometry = None
-
-    def __init__(self, text):
-        self.text = text
-        idx = map(self._fontCharMap.get, '\0' + self.text)
-        self.indexes = idx
-        self.advance = self._fontAdvance[idx]
-        self.geometry = self._fontGeometry[idx]
-
-    @classmethod
-    def subclassFromFont(klass, font):
-        kvars = dict(font=font, texture=font.texture, _fontCharMap=font.charMap, _fontAdvance=font.advance, _fontGeometry=font.geometry)
-        subklass = type(klass)(klass.__name__+'_T_', (klass,), kvars)
-        return subklass
-
-    def layout(self):
-        adv = self.advance.cumsum(0)
-        geo = self.geometry[1:]
-        geo['v'] += adv[:-1]
-        self.geo = geo
-
-        return geo, adv[-1], self.render
-
-    def render(self):
-        self.texture.select()
-        self.geo.draw(gl.GL_QUADS)
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 class Font(object):
     LayoutAlgorithm = blockMosaic.BlockMosaicAlg
     FontTexture = fontTexture.FontTexture
     FontGeometryArray = FontGeometryArray
     FontAdvanceArray = FontAdvanceArray
-    #TextTranslatorSubclassFromFont = TextTranslator.subclassFromFont
-    #TextTranslator = TextTranslator
 
     texture = None
 
@@ -104,12 +68,6 @@ class Font(object):
     def translate(self, text):
         return map(self.charMap.get, text)
     
-    def layout(self, text):
-        xlate = self.translate(text)
-        return xlate.layout()
-    def render(self, text):
-        return self.layout(text)[-1]()
-
     def compile(self, face, charset):
         self.face = face
         self.lineHeight = face.lineHeight/self.pointSize[1]
@@ -128,8 +86,6 @@ class Font(object):
         # create a texture for the font mosaic, and run the mosaic algorithm
         mosaic = self._compileTexture(face, gidxMap)
         self._compileData(face, count, gidxMap, mosaic)
-
-        #self.TextTranslator = self.TextTranslatorSubclassFromFont(self)
 
     def _compileTexture(self, face, gidxMap):
         if self.FontTexture is None:
