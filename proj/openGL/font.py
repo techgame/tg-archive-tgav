@@ -35,7 +35,7 @@ class FontGeometryArray(interleavedArrays.InterleavedArrays):
 class FontAdvanceArray(ndarray):
     @classmethod
     def fromCount(klass, count, dtype=float32):
-        return klass((count, 4, 3), dtype)
+        return klass((count, 1, 3), dtype)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -70,7 +70,7 @@ class Font(object):
     
     def compile(self, face, charset):
         self.face = face
-        self.lineHeight = face.lineHeight/self.pointSize[1]
+        self.lineAdvance = [0., -face.lineHeight*self.pointSize[1], 0.]
 
         charMap = {'\0': 0, '\n': 0, '\r': 0}
         self.charMap = charMap
@@ -158,6 +158,6 @@ class Font(object):
         return [(x0, y0, 0.), (x1, y0, 0.), (x1, y1, 0.), (x0, y1, 0.)]
 
     def _advanceFrom(self, advance, (ptw, pth)):
-        return [(advance[0]*ptw, advance[1]*pth, 0.)]*4
+        return [(advance[0]*ptw, advance[1]*pth, 0.)]
 
 

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#!/usr/local/bin/python2.5
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ##~ Copyright (C) 2002-2004  TechGame Networks, LLC.
 ##~ 
@@ -13,7 +11,6 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import string
-import textwrap
 import time
 
 from renderBase import RenderSkinModelBase
@@ -23,6 +20,7 @@ from TG.openGL.raw.gl import *
 from TG.openGL.raw.glu import *
 
 from TG.openGL.font import Font
+from TG.openGL.textLayout import TextObject, TextWrapLayout
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Constants / Variables / Etc. 
@@ -50,12 +48,13 @@ Donec vulputate enim adipiscing ligula. Nullam semper neque at lacus. Donec feug
 Nam felis lorem, consequat nec, tincidunt at, malesuada molestie, magna. Nulla facilisi. Quisque egestas justo at nisi. Suspendisse a sapien. Nunc eget sem in lorem cursus accumsan. Curabitur at dolor at justo facilisis sagittis. In a mauris. Mauris leo. Vestibulum dictum dapibus lacus. Phasellus sed est. Cras sit amet sapien. Quisque massa eros, malesuada ac, ultricies nec, fringilla at, lorem. Pellentesque lectus diam, nonummy in, adipiscing ut, lacinia eu, purus. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
 '''
 
+#bigSampleText = file(__file__, 'r').read()
+
 class RenderSkinModel(RenderSkinModelBase):
-    sampleText = textwrap.wrap(bigSampleText, width=200)
-    fontName = 'Zapfino'
-    fontSize = 16
-    lineHeight = None
-    spacing = 1.0
+    sampleText = bigSampleText
+    #fontName, fontSize = 'AndaleMono', 12
+    fontName, fontSize = 'Zapfino', 16
+    wrapSize = 1000
     fps = 60
     fonts = {
             'Arial':'/Library/Fonts/Arial',
@@ -92,9 +91,10 @@ class RenderSkinModel(RenderSkinModelBase):
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
         self.font = self.loadFont(self.fontName, self.fontSize)
-        self.lineHeight = (self.font.face.lineHeight)/64. * self.spacing
-        if 1:
-            self.layoutList = [self.font.layout(line) for line in self.sampleText]
+        self.tobjContent = TextObject(self.sampleText, self.font)
+        #self.tobjFPS = TextObject('', self.font)
+        self.twl = TextWrapLayout()
+        self.lfnContent = self.twl.layout(self.tobjContent, self.wrapSize)[1]
 
     def loadFont(self, fontKey, fontSize, charset=string.printable):
         fontFilename = self.fonts[fontKey]
@@ -129,30 +129,18 @@ class RenderSkinModel(RenderSkinModelBase):
             try:
                 glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
-                glLoadIdentity()
-
                 width, height = self.viewPortSize
+
+                glLoadIdentity()
+                glTranslatef(0., height, 0.)
+
                 glDepthMask(False)
 
-                glPushMatrix()
-                #glTranslatef(0, 0.5, 0)
-                glTranslatef(50, height, 0)
-                if 0:
-                    self.layoutList = [self.font.layout(line) for line in self.sampleText]
-                for lgeo, lend, lfn in self.layoutList:
-                    glTranslatef(0, -self.lineHeight, 0)
-                    glPushMatrix()
-                    #self.centerEnd(lend)
-                    #self.showOutline(lgeo)
-                    #self.showBaseline(lend)
-                    glColor4f(0., 0., 0., 1.)
-                    lfn()
-                    glPopMatrix()
-                glPopMatrix()
+                glColor3f(0., 0., 0.)
+                self.lfnContent()
 
-                glPushMatrix()
-                self.font.render(self.fpsStr)
-                glPopMatrix()
+                #self.tobjFPS.text = self.fpsStr
+                #self.twl.render(self.tobjFPS)
                 glDepthMask(True)
 
                 self._no_error = True

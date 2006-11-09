@@ -6,8 +6,8 @@ import numpy
 
 import textwrap
 import re
-from TG.openGL.font import Font
-from TG.openGL.textLayout import TextWrapper, TextObject
+from TG.openGL import font
+from TG.openGL import textLayout
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Constants / Variiables / Etc. 
@@ -41,12 +41,31 @@ Nam felis lorem, consequat nec, tincidunt at, malesuada molestie, magna. Nulla f
 
 if __name__=='__main__':
     # disable loading of texture
-    Font.FontTexture = None
+    font.Font.FontTexture = None
 
-    arial = Font.fromFilename('/Library/Fonts/Zapfino.dfont', 25)
-    ArialTextObj = TextObject.factoryFor(arial)
+    arial = font.Font.fromFilename('/Library/Fonts/Arial', 25)
+    FontTextObj = textLayout.TextObject.factoryFor(arial)
 
-    tobj = ArialTextObj(bigSampleText)
-    for l in tobj.wrap(1000):
-        print l.replace('\n', '')#encode('string_escape')
+    #tobj = FontTextObj(bigSampleText)
+    tobj = FontTextObj('test\nshane')
+
+    #twl.layout(tobj, 400)[0]
+    wrapper = textLayout.TextWrapper(100)
+    twl = textLayout.TextWrapLayout(wrapper)
+
+    if 0:
+        idxr = range(len(tobj.text))
+        for sl in wrapper.wrapSlices(tobj):
+            adv = tobj.getAdvance(True)[sl]
+            off = tobj.getOffset(True)[sl]
+
+            print
+            print tobj.text[sl]
+            print idxr[sl]
+            print 'adv:   ', adv[:,:,0].flatten().tolist()
+            print 'offset: ', (off-off[0])[:,:,0].flatten().tolist()
+            print 'left:  ', (tobj.offset[sl] - tobj.advance[0])[:,:,0].tolist()
+
+    geo, lfn = twl.layout(tobj)
+    print geo['v']
 
