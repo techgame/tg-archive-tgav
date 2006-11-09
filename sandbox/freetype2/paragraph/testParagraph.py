@@ -10,6 +10,8 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+from __future__ import with_statement
+
 import string
 import time
 
@@ -21,6 +23,7 @@ from TG.openGL.raw.glu import *
 
 from TG.openGL.font import Font
 from TG.openGL.textLayout import TextObject, TextWrapLayout
+from TG.openGL import glMatrix
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Constants / Variables / Etc. 
@@ -74,12 +77,6 @@ class RenderSkinModel(RenderSkinModelBase):
             'Helvetica': '/System/Library/Fonts/Helvetica.dfont',
             }
 
-    def glCheck(self):
-        glErr = glGetError()
-        if glErr:
-            raise Exception("GL Error: 0x%x" % glErr)
-        return True
-
     def renderInit(self, glCanvas, renderStart):
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_COLOR_MATERIAL)
@@ -91,15 +88,22 @@ class RenderSkinModel(RenderSkinModelBase):
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
         self.font = self.loadFont(self.fontName, self.fontSize)
-        self.tobjContent = TextObject(self.sampleText, self.font)
-        #self.tobjFPS = TextObject('', self.font)
         self.twl = TextWrapLayout()
-        self.lfnContent = self.twl.layout(self.tobjContent, self.wrapSize)[1]
+
+        self.tobjContent = TextObject(self.sampleText, self.font)
+        self.tobjFPS = TextObject(self.fpsStr, self.font)
+
+        self.lfnContent = self.twl.layout(self.tobjContent, self.wrapSize, line=1)[1]
+        self.lfnFps = self.twl.layout(self.tobjFPS, self.wrapSize, line=-0.5)[1]
 
     def loadFont(self, fontKey, fontSize, charset=string.printable):
         fontFilename = self.fonts[fontKey]
         f = Font.fromFilename(fontFilename, fontSize, charset=charset)
         return f
+
+    def _printFPS(self, fpsStr):
+        self.tobjFPS.text = fpsStr
+        self.lfnFps = self.twl.layout(self.tobjFPS, self.wrapSize, line=-0.5)[1]
 
     viewPortSize = None
     def renderResize(self, glCanvas):
@@ -131,16 +135,18 @@ class RenderSkinModel(RenderSkinModelBase):
 
                 width, height = self.viewPortSize
 
-                glLoadIdentity()
-                glTranslatef(0., height, 0.)
-
                 glDepthMask(False)
-
                 glColor3f(0., 0., 0.)
-                self.lfnContent()
 
-                #self.tobjFPS.text = self.fpsStr
-                #self.twl.render(self.tobjFPS)
+                glLoadIdentity()
+
+                with glMatrix():
+                    glTranslatef(50., height, 0.)
+                    self.lfnContent()
+
+                with glMatrix():
+                    self.lfnFps()
+
                 glDepthMask(True)
 
                 self._no_error = True
@@ -148,41 +154,41 @@ class RenderSkinModel(RenderSkinModelBase):
                 self._no_error = False
                 raise
 
-    def centerEnd(self, end):
-        glTranslatef(0.5*(self.viewPortSize[0]-end[0]), 0, 0)
-    def rightEnd(self, end):
-        glTranslatef((self.viewPortSize[0]-end[0]), 0, 0)
+    #def centerEnd(self, end):
+    #    glTranslatef(0.5*(self.viewPortSize[0]-end[0]), 0, 0)
+    #def rightEnd(self, end):
+    #    glTranslatef((self.viewPortSize[0]-end[0]), 0, 0)
 
-    def showGeoOutline(self, geo):
-        geov = geo['v']
-        x0, y0, z0 = geov.min(0).min(0)
-        x1, y1, z1 = geov.max(1).max(0)
+    #def showGeoOutline(self, geo):
+    #    geov = geo['v']
+    #    x0, y0, z0 = geov.min(0).min(0)
+    #    x1, y1, z1 = geov.max(1).max(0)
 
-        glColor4f(0., 0., 1., .5)
-        glBegin(GL_QUADS)
-        glVertex2f(x0, y0)
-        glVertex2f(x1, y0)
-        glVertex2f(x1, y1)
-        glVertex2f(x0, y1)
-        glEnd()
+    #    glColor4f(0., 0., 1., .5)
+    #    glBegin(GL_QUADS)
+    #    glVertex2f(x0, y0)
+    #    glVertex2f(x1, y0)
+    #    glVertex2f(x1, y1)
+    #    glVertex2f(x0, y1)
+    #    glEnd()
 
-        glTranslatef(0., 0., .01)
+    #    glTranslatef(0., 0., .01)
 
-    def showOutline(self, geo):
-        glPushMatrix()
-        glTranslatef(0., 0., -.05)
-        #if self.showGeoOutline is not None:
-        #    self.showGeoOutline(geo)
-        glColor4f(0., 1., 0., .5)
-        geo.draw(GL_QUADS)
-        glPopMatrix()
+    #def showOutline(self, geo):
+    #    glPushMatrix()
+    #    glTranslatef(0., 0., -.05)
+    #    #if self.showGeoOutline is not None:
+    #    #    self.showGeoOutline(geo)
+    #    glColor4f(0., 1., 0., .5)
+    #    geo.draw(GL_QUADS)
+    #    glPopMatrix()
 
-    def showBaseline(self,end):
-        glColor4f(1., 0., 0., .5)
-        glBegin(GL_LINES)
-        glVertex3f(0., 0., 0.)
-        glVertex3f(*end)
-        glEnd()
+    #def showBaseline(self,end):
+    #    glColor4f(1., 0., 0., .5)
+    #    glBegin(GL_LINES)
+    #    glVertex3f(0., 0., 0.)
+    #    glVertex3f(*end)
+    #    glEnd()
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Main 

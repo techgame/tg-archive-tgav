@@ -61,6 +61,15 @@ xmlSkin = XMLSkin("""<?xml version='1.0'?>
             <panel>
                 <layout>
                     <opengl-canvas ctxobj='canvas'>
+                        ctx.model.canvas = obj
+                        <timer ctxobj='model.repaintTimer' > 
+                            refresh = ctx.model.refresh
+                            canvas = ctx.canvas
+                            <event>
+                                refresh(canvas)
+                            </event>
+                        </timer>
+
                         initialize = ctx.model.initialize
                         refresh = ctx.model.refresh
                         resize = ctx.model.resize
@@ -75,15 +84,10 @@ xmlSkin = XMLSkin("""<?xml version='1.0'?>
                         </event>                        
                         <event type="EVT_ERASE_BACKGROUND"/>
 
-                        <timer ctxobj='model.repaintTimer' seconds='1./ctx.model.fps'>
-                            refresh = ctx.model.refresh
-                            canvas = ctx.canvas
-                            <event>
-                                refresh(canvas)
-                            </event>
-                        </timer>
-
                         <event type='EVT_MOUSE_EVENTS' run='ctx.model.onMouse(evt)' />
+                        <!--<event type='EVT_KEY_UP' run='ctx.model.onKeyboard(evt)' />-->
+                        <!--<event type='EVT_KEY_UP' run='ctx.model.onKeyboard(evt)' />-->
+                        <event type='EVT_CHAR' run='ctx.model.onChar(evt)' />
                     </opengl-canvas>
                 </layout>
             </panel>
@@ -159,7 +163,13 @@ class RenderSkinModelBase(wxSkinModel):
     def onMouse(self, evt):
         pass
 
+    def onChar(self, evt):
+        pass
+
     def initialize(self, glCanvas):
+        if self.fps:
+            self.repaintTimer.Start(1000./self.fps)
+        else: self.repaintTimer.Stop()
         self._lastUpdate = self.timestamp()
         glCanvas.SetCurrent()
         self.renderInit(glCanvas, self._lastUpdate)

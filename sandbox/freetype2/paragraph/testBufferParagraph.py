@@ -14,10 +14,7 @@
 
 from __future__ import with_statement
 import string
-import textwrap
 import time
-
-from contextlib import contextmanager
 
 from renderBase import RenderSkinModelBase
 
@@ -26,7 +23,9 @@ from TG.openGL.raw.gl import *
 from TG.openGL.raw.glu import *
 
 from TG.openGL.font import Font
-from TG.openGL.bufferObjects import ArrayBuffer
+from TG.openGL.textLayout import TextObject, TextWrapLayout
+
+from TG.openGL import glMatrix
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Constants / Variables / Etc. 
@@ -54,13 +53,16 @@ Donec vulputate enim adipiscing ligula. Nullam semper neque at lacus. Donec feug
 Nam felis lorem, consequat nec, tincidunt at, malesuada molestie, magna. Nulla facilisi. Quisque egestas justo at nisi. Suspendisse a sapien. Nunc eget sem in lorem cursus accumsan. Curabitur at dolor at justo facilisis sagittis. In a mauris. Mauris leo. Vestibulum dictum dapibus lacus. Phasellus sed est. Cras sit amet sapien. Quisque massa eros, malesuada ac, ultricies nec, fringilla at, lorem. Pellentesque lectus diam, nonummy in, adipiscing ut, lacinia eu, purus. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
 '''
 
+#bigSampleText = file(__file__, 'r').read()
+
 class RenderSkinModel(RenderSkinModelBase):
-    #sampleText = textwrap.wrap(bigSampleText, width=200)
-    sampleText = bigSampleText
-    fontName = 'Zapfino'
-    fontSize = 16
-    spacing = 2.0
-    fps = 60
+    #sampleText = bigSampleText
+    sampleText = "Hello Larry. "#hello gary"
+    fontName, fontSize = 'Zapfino', 16
+    fontName, fontSize = 'AndaleMono', 12
+    fontName, fontSize = 'Papyrus', 30
+    wrapSize = 1000
+    fps = None #60
     fonts = {
             'Arial':'/Library/Fonts/Arial',
             'Monaco':'/System/Library/Fonts/Monaco.dfont',
@@ -79,12 +81,6 @@ class RenderSkinModel(RenderSkinModelBase):
             'Helvetica': '/System/Library/Fonts/Helvetica.dfont',
             }
 
-    def glCheck(self):
-        glErr = glGetError()
-        if glErr:
-            raise Exception("GL Error: 0x%x" % glErr)
-        return True
-
     def renderInit(self, glCanvas, renderStart):
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_COLOR_MATERIAL)
@@ -92,31 +88,60 @@ class RenderSkinModel(RenderSkinModelBase):
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-        glClearColor(1., 1., 1., 1.)
+        glClearColor(0.15, 0.15, 0.25, 1.)
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
-        self.font = self.loadFont(self.fontName, self.fontSize)
-        self.layoutList = [self.layout(self.sampleText, self.font)]
-        #self.layoutList = [self.font.layout(line) for line in self.sampleText]
+        self.refreshFont()
 
-    def layout(self, text, font):
-        g, e, fn = font.layout(text)
+    def refreshFont(self, name=None, size=None):
+        name = name or self.fontName
+        size = size or self.fontSize
+        self.font = self.loadFont(name, size)
 
-        ab = ArrayBuffer()
-        ab.sendData(g)
-        def newFn(tex=font.texture):
-            tex.select()
-            ab.bind()
-            gl.glInterleavedArrays(g.dataFormat, 0, 0)
-            gl.glDrawArrays(gl.GL_QUADS, 0, len(g.flat))
-            ab.unbind()
-            tex.deselect()
-        return g, e, newFn
+        self.twl = TextWrapLayout()
+        self.refreshText()
+
+    def refreshText(self, bRefresh=True):
+        self.tobjContent = TextObject(self.sampleText, self.font)
+        self.tobjFPS = TextObject(self.fpsStr, self.font)
+
+        self.lfnContent = self.twl.layoutBuffer(self.tobjContent, self.wrapSize, line=1)[1]
+        self.lfnFps = self.twl.layout(self.tobjFPS, self.wrapSize, line=-0.5)[1]
+        if bRefresh:
+            self.canvas.Refresh()
 
     def loadFont(self, fontKey, fontSize, charset=string.printable):
         fontFilename = self.fonts[fontKey]
         f = Font.fromFilename(fontFilename, fontSize, charset=charset)
         return f
+
+    def _printFPS(self, fpsStr):
+        self.fpsStr = fpsStr
+        self.tobjFPS.text = fpsStr
+        self.lfnFps = self.twl.layout(self.tobjFPS, self.wrapSize, line=-0.5)[1]
+
+    def onChar(self, evt):
+        ch = unichr(evt.GetUniChar()).replace('\r', '\n')
+
+        if ch in ('-', '_'):
+            self.fontSize = max(4, self.fontSize - 1)
+            print 'dec', self.fontSize
+            self.refreshFont()
+        elif ch in ('+', '='):
+            self.fontSize += 1
+            print 'inc', self.fontSize
+            self.refreshFont()
+        elif ch in ('\x08',):
+            # backspace
+            self.sampleText = self.sampleText[:-1]
+            self.refreshText()
+        elif ch in string.printable:
+            self.sampleText += ch
+            self.refreshText()
+        else:
+            print repr(ch)
+            self.sampleText += ch.encode("unicode_escape")
+            self.refreshText()
 
     viewPortSize = None
     def renderResize(self, glCanvas):
@@ -138,29 +163,35 @@ class RenderSkinModel(RenderSkinModelBase):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    _no_error = True
     def renderContent(self, glCanvas, renderStart):
         if self.viewPortSize is None: return
 
-        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
+        if self._no_error:
+            try:
+                glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
-        glLoadIdentity()
+                width, height = self.viewPortSize
 
-        width, height = self.viewPortSize
-        glDepthMask(False)
+                glDepthMask(False)
+                glColor3f(.9, .9, 1.)
 
-        with matrix():
-            glTranslatef(50, height, 0)
-            for lgeo, lend, lfn in self.layoutList:
-                glTranslatef(0, -self.spacing*self.fontSize, 0)
+                glLoadIdentity()
 
-                with matrix():
-                    glColor4f(0., 0., 0., 1.)
-                    lfn()
+                with glMatrix():
+                    glTranslatef(50., height, 0.)
+                    #glScalef(.5, .5, 1.)
+                    self.lfnContent()
 
-        with matrix():
-            self.font.render(self.fpsStr)
+                with glMatrix():
+                    self.lfnFps()
 
-        glDepthMask(True)
+                glDepthMask(True)
+
+                self._no_error = True
+            except Exception:
+                #self._no_error = False
+                raise
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Main 
