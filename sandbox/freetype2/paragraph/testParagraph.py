@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+#!/usr/local/bin/python2.5
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ##~ Copyright (C) 2002-2004  TechGame Networks, LLC.
 ##~ 
@@ -11,7 +13,6 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 from __future__ import with_statement
-
 import string
 import time
 
@@ -23,6 +24,7 @@ from TG.openGL.raw.glu import *
 
 from TG.openGL.font import Font
 from TG.openGL.textLayout import TextObject, TextWrapLayout
+
 from TG.openGL import glMatrix
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -54,11 +56,13 @@ Nam felis lorem, consequat nec, tincidunt at, malesuada molestie, magna. Nulla f
 #bigSampleText = file(__file__, 'r').read()
 
 class RenderSkinModel(RenderSkinModelBase):
-    sampleText = bigSampleText
-    #fontName, fontSize = 'AndaleMono', 12
+    #sampleText = bigSampleText
+    sampleText = "Hello Larry. "#hello gary"
     fontName, fontSize = 'Zapfino', 16
+    fontName, fontSize = 'AndaleMono', 12
+    fontName, fontSize = 'Papyrus', 30
     wrapSize = 1000
-    fps = 60
+    fps = None #60
     fonts = {
             'Arial':'/Library/Fonts/Arial',
             'Monaco':'/System/Library/Fonts/Monaco.dfont',
@@ -84,17 +88,27 @@ class RenderSkinModel(RenderSkinModelBase):
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-        glClearColor(1., 1., 1., 1.)
+        glClearColor(0.15, 0.15, 0.25, 1.)
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
-        self.font = self.loadFont(self.fontName, self.fontSize)
-        self.twl = TextWrapLayout()
+        self.refreshFont()
 
+    def refreshFont(self, name=None, size=None):
+        name = name or self.fontName
+        size = size or self.fontSize
+        self.font = self.loadFont(name, size)
+
+        self.twl = TextWrapLayout()
+        self.refreshText()
+
+    def refreshText(self, bRefresh=True):
         self.tobjContent = TextObject(self.sampleText, self.font)
         self.tobjFPS = TextObject(self.fpsStr, self.font)
 
-        self.lfnContent = self.twl.layout(self.tobjContent, self.wrapSize, line=1)[1]
+        self.lfnContent = self.twl.layoutBuffer(self.tobjContent, self.wrapSize, line=1)[1]
         self.lfnFps = self.twl.layout(self.tobjFPS, self.wrapSize, line=-0.5)[1]
+        if bRefresh:
+            self.canvas.Refresh()
 
     def loadFont(self, fontKey, fontSize, charset=string.printable):
         fontFilename = self.fonts[fontKey]
@@ -102,17 +116,41 @@ class RenderSkinModel(RenderSkinModelBase):
         return f
 
     def _printFPS(self, fpsStr):
+        self.fpsStr = fpsStr
         self.tobjFPS.text = fpsStr
         self.lfnFps = self.twl.layout(self.tobjFPS, self.wrapSize, line=-0.5)[1]
 
+    def onChar(self, evt):
+        ch = unichr(evt.GetUniChar()).replace('\r', '\n')
+
+        if ch in ('-', '_'):
+            self.fontSize = max(4, self.fontSize - 1)
+            print 'dec', self.fontSize
+            self.refreshFont()
+        elif ch in ('+', '='):
+            self.fontSize += 1
+            print 'inc', self.fontSize
+            self.refreshFont()
+        elif ch in ('\x08',):
+            # backspace
+            self.sampleText = self.sampleText[:-1]
+            self.refreshText()
+        elif ch in string.printable:
+            self.sampleText += ch
+            self.refreshText()
+        else:
+            print repr(ch)
+            self.sampleText += ch.encode("unicode_escape")
+            self.refreshText()
+
     viewPortSize = None
     def renderResize(self, glCanvas):
-        (l, b) = (0, 0)
-        (w,h) = glCanvas.GetSize()
+        (w, h) = glCanvas.GetSize()
         if not w or not h: return
 
-        #l, b = (10, 10)
-        #w, h = (w-20, h-20)
+        border = 0
+        (l, b), (w, h) = (border, border), (w-2*border, h-2*border)
+
         self.viewPortSize = w, h
         glViewport (l, b, w, h)
 
@@ -136,12 +174,13 @@ class RenderSkinModel(RenderSkinModelBase):
                 width, height = self.viewPortSize
 
                 glDepthMask(False)
-                glColor3f(0., 0., 0.)
+                glColor3f(.9, .9, 1.)
 
                 glLoadIdentity()
 
                 with glMatrix():
                     glTranslatef(50., height, 0.)
+                    #glScalef(.5, .5, 1.)
                     self.lfnContent()
 
                 with glMatrix():
@@ -151,44 +190,8 @@ class RenderSkinModel(RenderSkinModelBase):
 
                 self._no_error = True
             except Exception:
-                self._no_error = False
+                #self._no_error = False
                 raise
-
-    #def centerEnd(self, end):
-    #    glTranslatef(0.5*(self.viewPortSize[0]-end[0]), 0, 0)
-    #def rightEnd(self, end):
-    #    glTranslatef((self.viewPortSize[0]-end[0]), 0, 0)
-
-    #def showGeoOutline(self, geo):
-    #    geov = geo['v']
-    #    x0, y0, z0 = geov.min(0).min(0)
-    #    x1, y1, z1 = geov.max(1).max(0)
-
-    #    glColor4f(0., 0., 1., .5)
-    #    glBegin(GL_QUADS)
-    #    glVertex2f(x0, y0)
-    #    glVertex2f(x1, y0)
-    #    glVertex2f(x1, y1)
-    #    glVertex2f(x0, y1)
-    #    glEnd()
-
-    #    glTranslatef(0., 0., .01)
-
-    #def showOutline(self, geo):
-    #    glPushMatrix()
-    #    glTranslatef(0., 0., -.05)
-    #    #if self.showGeoOutline is not None:
-    #    #    self.showGeoOutline(geo)
-    #    glColor4f(0., 1., 0., .5)
-    #    geo.draw(GL_QUADS)
-    #    glPopMatrix()
-
-    #def showBaseline(self,end):
-    #    glColor4f(1., 0., 0., .5)
-    #    glBegin(GL_LINES)
-    #    glVertex3f(0., 0., 0.)
-    #    glVertex3f(*end)
-    #    glEnd()
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Main 
