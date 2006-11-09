@@ -161,6 +161,9 @@ class RenderSkinModel(RenderSkinModelBase):
         glMatrixMode (GL_MODELVIEW)
         glLoadIdentity ()
 
+        self.wrapSize = w / 2. - 50
+        self.refreshText()
+
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     _no_error = True
@@ -179,7 +182,11 @@ class RenderSkinModel(RenderSkinModelBase):
                 glLoadIdentity()
 
                 with glMatrix():
-                    glTranslatef(50., height, 0.)
+                    glTranslatef(25, height, 0.)
+                    #glScalef(.5, .5, 1.)
+                    self.lfnContent()
+                with glMatrix():
+                    glTranslatef(25.5 + int(width/2), .5 + height, 0.)
                     #glScalef(.5, .5, 1.)
                     self.lfnContent()
 

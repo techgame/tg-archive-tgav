@@ -105,7 +105,7 @@ class TextObject(Observable):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class TextWrapper(object):
-    lineWrapSet = set(['\n', '\r'])
+    lineWrapSet = set(['\n'])
     re_wrapPoints = re.compile('\s')
 
     def __init__(self, wrapSize=None, axis=0):
@@ -113,7 +113,7 @@ class TextWrapper(object):
         self.axis = 0
 
     def wrap(self, textObj, wrapSize=None):
-        for sl, sloff in self.wrapSlices(textObj, wrapSize):
+        for sl, width in self.wrapSlices(textObj, wrapSize):
             yield text[sl]
 
     def wrapSlices(self, textObj, wrapSize=None):
@@ -138,14 +138,14 @@ class TextWrapper(object):
             # force a feed if linewrap
             if subtext in lineWrapSet:
                 newLineOffset = offsetAtEnd[iCurr]
-                yield slice(i0, iCurr+1), newLineOffset - lineOffset
+                yield slice(i0, iCurr+1), (newLineOffset - lineOffset)[0]
                 i0 = iCurr+1
                 lineOffset = newLineOffset
                 iPrev = iCurr
 
             elif wrapSize < (offsetAtEnd[iCurr] - lineOffset)[0, self.axis]:
                 newLineOffset = offsetAtEnd[iPrev]
-                yield slice(i0, iPrev+1), newLineOffset - lineOffset
+                yield slice(i0, iPrev+1), (newLineOffset - lineOffset)[0]
                 i0 = iPrev+1
                 lineOffset = newLineOffset
                 iPrev = iCurr
@@ -160,13 +160,13 @@ class TextWrapper(object):
         # make sure the last line is wrapped properly
         if wrapSize < (offsetAtEnd[iEnd] - lineOffset)[0,self.axis]:
             newLineOffset = offsetAtEnd[iPrev]
-            yield slice(i0, iPrev+1), newLineOffset - lineOffset
+            yield slice(i0, iPrev+1), (newLineOffset - lineOffset)[0]
             i0 = iPrev+1
             lineOffset = newLineOffset
             iPrev = iEnd
 
         newLineOffset = offsetAtEnd[-1]
-        yield slice(i0, None), newLineOffset - lineOffset
+        yield slice(i0, None), (newLineOffset - lineOffset)[0]
 
 wrapper = TextWrapper()
 wrap = wrapper.wrap
@@ -181,19 +181,15 @@ class TextWrapLayout(Observable):
         geo = textObj.geometry.copy()
 
         offset = textObj.getOffsetAtStart()
-        advance = textObj.getPostAdvance()
 
         lineAdv = textObj.lineAdvance
-        for sl, sloff in self.textWrapper.wrapSlices(textObj, wrapSize):
+        for sl, width in self.textWrapper.wrapSlices(textObj, wrapSize):
             off = offset[sl]
             if not len(off):
                 line += 1
                 continue
 
             off = off - off[0]
-
-            adv = advance[sl]
-            width = off[-1][0] + adv[-1][0]
 
             if 1: # left
                 width[:] = 0
@@ -202,8 +198,7 @@ class TextWrapLayout(Observable):
             elif 1: # right
                 width[0] = (wrapSize-width[0])
 
-            geo['v'][sl] += (off + ((line*lineAdv) + width)).round()#- off[0])
-
+            geo['v'][sl] += (off + ((line*lineAdv) + width))
             line += 1
         return geo
 
