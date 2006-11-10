@@ -17,8 +17,8 @@ from numpy import ndarray, float32, asarray
 from TG.freetype2.face import FreetypeFace
 
 from TG.openGL import blockMosaic
-from TG.openGL import fontTexture
-from TG.openGL import interleavedArrays
+from TG.openGL.text import fontTexture
+from TG.openGL.data import interleavedArrays
 
 from TG.openGL.raw import gl
 

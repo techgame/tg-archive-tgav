@@ -20,8 +20,8 @@ from TG.openGL.raw import gl, glu, glext
 from TG.openGL.raw.gl import *
 from TG.openGL.raw.glu import *
 
-from TG.openGL import font
-from TG.openGL import textLayout
+from TG.openGL.text import font
+from TG.openGL.text import textLayout
 
 from TG.openGL import glMatrix
 
@@ -75,10 +75,10 @@ class RenderSkinModel(RenderSkinModelBase):
         self.TextObject = font.FontTextData.factoryFor(self.font)
 
         self.lwl = textLayout.TextLayout()
-        #self.lwl.align = 0.5
+        self.lwl.align = 0.5
 
         self.twl = textLayout.TextWrapLayout()
-        #self.twl.align = 0.
+        self.twl.align = 0.
         self.refreshText(False)
 
     def refreshText(self, bRefresh=True):
@@ -114,6 +114,8 @@ class RenderSkinModel(RenderSkinModelBase):
             self.fontSize += 1
             print 'inc', self.fontSize
             self.refreshFont()
+        elif ch in ('*', ):
+            self.animate = not self.animate
         elif ch in ('\x08',):
             # backspace
             self.sampleText = self.sampleText[:-1]
@@ -139,7 +141,7 @@ class RenderSkinModel(RenderSkinModelBase):
 
         glMatrixMode (GL_PROJECTION)
         glLoadIdentity ()
-        gluOrtho2D(0, w, 0, h)
+        glOrtho(0, w, 0, h, -100, 100)
 
         glMatrixMode (GL_MODELVIEW)
         glLoadIdentity ()
@@ -149,15 +151,13 @@ class RenderSkinModel(RenderSkinModelBase):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    animate = False
     _no_error = True
     def renderContent(self, glCanvas, renderStart):
         if self.viewPortSize is None: return
 
-        oscilateTime = 10
+        oscilateTime = 4
         oscilate = abs((renderStart % (2*oscilateTime)) - oscilateTime)/ oscilateTime
-
-        self.lwl.align = oscilate
-        self.lfnFps = self.lwl.layout(self.tobjFPS, wrapSize=self.viewPortSize[0]-10)[-1]
 
         if self._no_error:
             try:
@@ -175,8 +175,10 @@ class RenderSkinModel(RenderSkinModelBase):
                     #glScalef(.5, .5, 1.)
                     self.lfnContent()
                 with glMatrix():
-                    glTranslatef(25.5 + int(width/2), .5 + height, 0.)
-                    #glScalef(.5, .5, 1.)
+                    offset = .5
+                    width = int(width/2)
+                    glTranslatef(offset + width, offset + height, 0.)
+
                     self.lfnContent()
 
                 with glMatrix():

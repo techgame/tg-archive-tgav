@@ -12,9 +12,9 @@
 
 from numpy import array
 
-from TG.openGL import textWrapping
+from TG.openGL.text import textWrapping
+from TG.openGL.data.bufferObjects import ArrayBuffer
 from TG.openGL.raw import gl
-from TG.openGL.bufferObjects import ArrayBuffer
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Text Layout

@@ -20,7 +20,7 @@ import PIL.Image
 
 from TG.common import path
 
-from TG.tgavUtility.renderBase import RenderSkinModelBase
+from renderBase import RenderSkinModelBase
 from TG.openGL import texture
 from TG.openGL.raw import gl, glu
 from TG.openGL.raw.gl import *
@@ -74,12 +74,13 @@ class RenderSkinModel(RenderSkinModelBase):
     def renderContent(self, glCanvas, renderStart):
         if self.viewAspect is None: return
 
-        glClear (GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
+        try:
+            glClear (GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
-        glPushMatrix()
+            glPushMatrix()
 
-        vl, vr, vt, vb = self.viewPortCoords
-        for m in self.imgTexure.select():
+            vl, vr, vt, vb = self.viewPortCoords
+            self.imgTexure.select()
             glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE)
             glBegin(GL_QUADS)
             vl, vr = 0, self.imgTexure.width
@@ -87,7 +88,10 @@ class RenderSkinModel(RenderSkinModelBase):
             self.makeColor(vl, vr, vb, vt, c=(0., 0., 0., 0.))
             glEnd()
 
-        glPopMatrix()
+            glPopMatrix()
+        except Exception:
+            self.repaintTimer.Stop()
+            raise
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -111,14 +115,12 @@ class RenderSkinModel(RenderSkinModelBase):
         imgData = img.tostring()
         assert len(imgData) == (nItemSize*nChannels*width*height)
 
-        imgTex = texture.Texture(texTarget, texFormat or dataFormat,
+        imgTex = texture.Texture(texTarget, format=texFormat or dataFormat,
                wrap=GL_CLAMP, magFilter=GL_LINEAR, minFilter=GL_LINEAR_MIPMAP_LINEAR, genMipmaps=True)
-        self.glCheck()
 
         data = imgTex.data2d(size=img.size, format=dataFormat, dataType=GL_UNSIGNED_BYTE)
         data.texString(imgData)
         data.setImageOn(imgTex)
-        self.glCheck()
 
         #glu.gluBuild2DMipmaps(texTarget, texFormat or dataFormat, width, height, data.format, data.dataType, None)
 
@@ -137,12 +139,6 @@ class RenderSkinModel(RenderSkinModelBase):
         glVertex3f(vl, vb, 0); glTexCoord2s(1, 1);
         glVertex3f(vr, vb, 0); glTexCoord2s(1, 0);
         glVertex3f(vr, vt, 0); glTexCoord2s(0, 0);
-
-    def glCheck(self):
-        glErr = glGetError()
-        if glErr:
-            raise Exception("GL Error: 0x%x" % glErr)
-        return True
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

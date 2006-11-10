@@ -12,7 +12,7 @@
 
 from numpy import dtype
 
-from TG.openGL.vertexArrays import ArrayBase
+from TG.openGL.data.vertexArrays import ArrayBase
 
 from TG.openGL.raw import gl
 

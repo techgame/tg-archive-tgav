@@ -15,7 +15,7 @@ from numpy import ndarray, array, uint32
 
 from TG.openGL.raw import gl
 
-from TG.openGL.drawArrays import DrawBlockBase
+from TG.openGL.data.drawArrays import DrawBlockBase
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
