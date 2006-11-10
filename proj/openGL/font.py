@@ -12,7 +12,7 @@
 
 import itertools
 
-from numpy import ndarray, float32
+from numpy import ndarray, float32, asarray
 
 from TG.freetype2.face import FreetypeFace
 
@@ -67,25 +67,53 @@ class Font(object):
 
     def translate(self, text):
         return map(self.charMap.get, text)
+
+    def kernIndexes(self, idx, default=[0., 0., 0.]):
+        km = self.kerningMap
+        if not km or len(idx) < 2:
+            return None
+        
+        r = asarray([km.get(e, default) for e in zip(idx, idx[1:])], float32)
+        return r.reshape((-1, 1, 3))
     
     def compile(self, face, charset):
         self.face = face
-        self.lineAdvance = [0., -face.lineHeight*self.pointSize[1], 0.]
+        #face.printInfo()
+
+        self.lineAdvance = self.FontAdvanceArray.fromCount(1)
+        self.lineAdvance[0] = [0., -face.lineHeight*self.pointSize[1], 0.]
 
         charMap = {'\0': 0, '\n': 0, '\r': 0}
         self.charMap = charMap
 
+        shane = {}
         gidxMap = {}
         aidxCounter = itertools.count(1)
         for char, gidx in face.iterCharIndexes(charset, True):
             aidx = aidxCounter.next()
             charMap.setdefault(char, aidx)
             gidxMap.setdefault(gidx, aidx)
+            shane[gidx] = char
         count = aidxCounter.next()
 
         # create a texture for the font mosaic, and run the mosaic algorithm
+        self._compileKerningMap(face, gidxMap, shane)
         mosaic = self._compileTexture(face, gidxMap)
         self._compileData(face, count, gidxMap, mosaic)
+
+    def _compileKerningMap(self, face, gidxMap, shane):
+        ptw, pth = self.pointSize
+        kerningMap = {}
+        gi = gidxMap.items()
+        getKerningByIndex = face.getKerningByIndex
+        for l, li in gi:
+            for r, ri in gi:
+                k = getKerningByIndex(l, r)
+                if k[0] or k[1]:
+                    k = [k[0]*ptw, k[1]*pth, 0.]
+                    kerningMap[(li,ri)] = k
+                    print (shane[l], shane[r]), '->', k
+        self.kerningMap = kerningMap
 
     def _compileTexture(self, face, gidxMap):
         if self.FontTexture is None:

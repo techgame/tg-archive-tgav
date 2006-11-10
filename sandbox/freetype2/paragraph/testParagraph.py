@@ -23,7 +23,7 @@ from TG.openGL.raw.gl import *
 from TG.openGL.raw.glu import *
 
 from TG.openGL.font import Font
-from TG.openGL.textLayout import TextObject, TextWrapLayout
+from TG.openGL.textLayout import FontTextData, TextWrapLayout
 
 from TG.openGL import glMatrix
 
@@ -56,11 +56,9 @@ Nam felis lorem, consequat nec, tincidunt at, malesuada molestie, magna. Nulla f
 #bigSampleText = file(__file__, 'r').read()
 
 class RenderSkinModel(RenderSkinModelBase):
-    #sampleText = bigSampleText
-    sampleText = "Hello Larry. "#hello gary"
-    fontName, fontSize = 'Zapfino', 16
-    fontName, fontSize = 'AndaleMono', 12
-    fontName, fontSize = 'Papyrus', 30
+    sampleText = 'Watch Videos' #bigSampleText
+    #fontName, fontSize = 'Zapfino', 16
+    fontName, fontSize = 'TEST', 16
     wrapSize = 1000
     fps = None #60
     fonts = {
@@ -79,6 +77,9 @@ class RenderSkinModel(RenderSkinModelBase):
             'StoneSans': '/Library/Fonts/Stone Sans ITC TT',
             'AmericanTypewriter': '/Library/Fonts/AmericanTypewriter.dfont',
             'Helvetica': '/System/Library/Fonts/Helvetica.dfont',
+
+            'TEST': '/Users/shane/Dev/AL/BookComposite/FRAMDCN.TTF',
+
             }
 
     def renderInit(self, glCanvas, renderStart):
@@ -97,13 +98,14 @@ class RenderSkinModel(RenderSkinModelBase):
         name = name or self.fontName
         size = size or self.fontSize
         self.font = self.loadFont(name, size)
+        self.TextObject = FontTextData.factoryFor(self.font)
 
         self.twl = TextWrapLayout()
         self.refreshText()
 
     def refreshText(self, bRefresh=True):
-        self.tobjContent = TextObject(self.sampleText, self.font)
-        self.tobjFPS = TextObject(self.fpsStr, self.font)
+        self.tobjContent = self.TextObject(self.sampleText)
+        self.tobjFPS = self.TextObject(self.fpsStr)
 
         self.lfnContent = self.twl.layoutBuffer(self.tobjContent, self.wrapSize, line=1)[1]
         self.lfnFps = self.twl.layout(self.tobjFPS, self.wrapSize, line=-0.5)[1]
@@ -161,7 +163,7 @@ class RenderSkinModel(RenderSkinModelBase):
         glMatrixMode (GL_MODELVIEW)
         glLoadIdentity ()
 
-        self.wrapSize = w / 2. - 50
+        self.wrapSize = (w / 2.) - 50
         self.refreshText()
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -183,11 +185,11 @@ class RenderSkinModel(RenderSkinModelBase):
 
                 with glMatrix():
                     glTranslatef(25, height, 0.)
-                    #glScalef(.5, .5, 1.)
+                    glScalef(.5, .5, 1.)
                     self.lfnContent()
                 with glMatrix():
                     glTranslatef(25.5 + int(width/2), .5 + height, 0.)
-                    #glScalef(.5, .5, 1.)
+                    glScalef(.5, .5, 1.)
                     self.lfnContent()
 
                 with glMatrix():

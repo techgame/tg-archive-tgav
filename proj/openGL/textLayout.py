@@ -11,7 +11,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import re
-from numpy import zeros_like, asarray
+from numpy import zeros_like
 
 from TG.observing import Observable
 from TG.openGL.raw import gl
@@ -21,7 +21,7 @@ from TG.openGL.bufferObjects import ArrayBuffer
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class TextObject(Observable):
+class FontTextData(object):
     font = None
     texture = None
 
@@ -36,6 +36,8 @@ class TextObject(Observable):
     def setupFont(self, font):
         self.font = font
         self.texture = font.texture
+        if not isinstance(self, type):
+            self._recache()
     setupClassFont = classmethod(setupFont)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -45,36 +47,48 @@ class TextObject(Observable):
             self.setupFont(font)
         self.text = text
 
-    text = Observable.obproperty('')
-    @text.fset
-    def setText(self, text, _obSet_):
-        _obSet_(text)
+    _text = ""
+    def getText(self):
+        return self._text
+    def setText(self, text):
+        self._text = text
         self._recache()
+    text = property(getText, setText)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def _recache(self):
-        self.srcidx = self.font.translate(self.text)
+        if self.font is not None:
+            self._xidx = self.font.translate(self.text)
+        else:
+            self._xidx = None
         self._advance = None
         self._geometry = None
         self._offset = None
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     _advance = None
     def getAdvance(self, startAtNull=False):
         r = self._advance
         if r is None:
-            r = self.font.advance[[0]+self.srcidx]
+            r = self.font.advance[[0]+self._xidx]
+            k = self.font.kernIndexes(self._xidx)
+            if k is not None:
+                r[1:-1] += k
             self._advance = r
-            self.lineAdvance = asarray(self.font.lineAdvance, dtype=r.dtype)
+            self.lineAdvance = self.font.lineAdvance
 
         if startAtNull: return r
         else: return r[1:]
+    advance = property(getAdvance)
+
     def getPreAdvance(self):
         return self.getAdvance(True)[:-1]
     def getPostAdvance(self):
         return self.getAdvance(False)
 
-    advance = property(getAdvance)
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     _offset = None
     def getOffset(self, startAtNull=False):
@@ -85,22 +99,25 @@ class TextObject(Observable):
 
         if startAtNull: return r
         else: return r[1:]
+    offset = property(getOffset)
 
     def getOffsetAtStart(self):
         return self.getOffset(True)[:-1]
     def getOffsetAtEnd(self):
         return self.getOffset(False)
 
-    offset = property(getOffset)
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     _geometry = None
     def getGeometry(self):
         r = self._geometry
         if r is None:
-            r = self.font.geometry[self.srcidx]
+            r = self.font.geometry[self._xidx]
             self._geometry = r
         return r
     geometry = property(getGeometry)
+
+TextObject = FontTextData
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

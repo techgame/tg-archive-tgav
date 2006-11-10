@@ -46,6 +46,7 @@ class FontTextureBase(Texture):
         texData = self._mosaicData
 
         glyph.render()
+
         texData.texCData(glyph.bitmap.buffer, dict(rowLength=glyph.bitmap.pitch))
         texData.setSubImageOn(self, pos=pos, size=size)
         return self.texCoordsFrom(pos, size)

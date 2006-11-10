@@ -79,6 +79,10 @@ class FreetypeFace(object):
         faceFlags = self.faceFlags
         return [flag for mask, flag in self.faceFlagsMap.iteritems() if faceFlags & mask]
 
+    def hasFlag(self, flag):
+        flag = self.faceFlagsByName.get(flag, flag)
+        return self.faceFlags & flag
+
     faceFlagsMap = {
         FT.FT_FACE_FLAG_SCALABLE: 'scalable',
         FT.FT_FACE_FLAG_FIXED_SIZES: 'fixed_sizes',
@@ -92,7 +96,7 @@ class FreetypeFace(object):
         FT.FT_FACE_FLAG_GLYPH_NAMES: 'glyph_names',
         FT.FT_FACE_FLAG_EXTERNAL_STREAM:'external_stream',
     }
-    #faceFlagsMap.update((v,k) for k,v in faceFlagsMap.iteritems())
+    faceFlagsByName = dict((v,k) for k,v in faceFlagsMap.iteritems())
 
     @property
     def styleFlags(self):
@@ -273,6 +277,10 @@ class FreetypeFace(object):
         if isinstance(right, basestring):
             right = self.getCharIndex(right)
         self._ft_getKerning(left, right, kernMode, byref(aKerning))
+        return (aKerning.x, aKerning.y)
+    def getKerningByIndex(self, leftIndex, rightIndex, kernMode=0):
+        aKerning = FT.FT_Vector()
+        self._ft_getKerning(leftIndex, rightIndex, kernMode, byref(aKerning))
         return (aKerning.x, aKerning.y)
 
     def iterKerning(self, chars, kernMode=0):
