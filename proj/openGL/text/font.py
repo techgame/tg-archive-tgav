@@ -17,33 +17,20 @@ from numpy import ndarray, float32, asarray
 from TG.freetype2.face import FreetypeFace
 
 from TG.openGL import blockMosaic
+from TG.openGL.text import fontData
 from TG.openGL.text import fontTexture
-from TG.openGL.data import interleavedArrays
-
-from TG.openGL.raw import gl
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class FontGeometryArray(interleavedArrays.InterleavedArrays):
-    dataFormat = gl.GL_T2F_V3F
-    @classmethod
-    def fromCount(klass, count):
-        return klass.fromFormat((count, 4), klass.dataFormat)
-
-class FontAdvanceArray(ndarray):
-    @classmethod
-    def fromCount(klass, count, dtype=float32):
-        return klass((count, 1, 3), dtype)
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 class Font(object):
     LayoutAlgorithm = blockMosaic.BlockMosaicAlg
     FontTexture = fontTexture.FontTexture
-    FontGeometryArray = FontGeometryArray
-    FontAdvanceArray = FontAdvanceArray
+    FontGeometryArray = fontData.FontGeometryArray
+    FontAdvanceArray = fontData.FontAdvanceArray
+    FontTextDataFactory = staticmethod(fontData.FontTextData.factoryFor)
+    FontTextData = None
 
     texture = None
 
@@ -64,6 +51,9 @@ class Font(object):
         face = FreetypeFace(filename)
         face.setSize(size, dpi)
         return klass(face, charset)
+
+    def textData(self, text=''):
+        return self.FontTextData(text)
 
     def translate(self, text):
         return map(self.charMap.get, text)
@@ -86,22 +76,21 @@ class Font(object):
         charMap = {'\0': 0, '\n': 0, '\r': 0}
         self.charMap = charMap
 
-        shane = {}
         gidxMap = {}
         aidxCounter = itertools.count(1)
         for char, gidx in face.iterCharIndexes(charset, True):
             aidx = aidxCounter.next()
             charMap.setdefault(char, aidx)
             gidxMap.setdefault(gidx, aidx)
-            shane[gidx] = char
         count = aidxCounter.next()
 
         # create a texture for the font mosaic, and run the mosaic algorithm
-        self._compileKerningMap(face, gidxMap, shane)
+        self._compileKerningMap(face, gidxMap)
         mosaic = self._compileTexture(face, gidxMap)
         self._compileData(face, count, gidxMap, mosaic)
+        self._compileFontTextData()
 
-    def _compileKerningMap(self, face, gidxMap, shane):
+    def _compileKerningMap(self, face, gidxMap):
         ptw, pth = self.pointSize
         kerningMap = {}
         gi = gidxMap.items()
@@ -112,7 +101,6 @@ class Font(object):
                 if k[0] or k[1]:
                     k = [k[0]*ptw, k[1]*pth, 0.]
                     kerningMap[(li,ri)] = k
-                    print (shane[l], shane[r]), '->', k
         self.kerningMap = kerningMap
 
     def _compileTexture(self, face, gidxMap):
@@ -188,107 +176,8 @@ class Font(object):
     def _advanceFrom(self, advance, (ptw, pth)):
         return [(advance[0]*ptw, advance[1]*pth, 0.)]
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-class FontTextData(object):
-    font = None
-    texture = None
-
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    @classmethod
-    def factoryFor(klass, font):
-        subklass = type(klass)(klass.__name__+'_T_', (klass,), {})
-        subklass.setupClassFont(font)
-        return subklass
-
-    def setupFont(self, font):
-        self.font = font
-        self.texture = font.texture
-        if not isinstance(self, type):
-            self._recache()
-    setupClassFont = classmethod(setupFont)
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    def __init__(self, text, font=None):
-        if font is not None:
-            self.setupFont(font)
-        self.text = text
-
-    _text = ""
-    def getText(self):
-        return self._text
-    def setText(self, text):
-        self._text = text
-        self._recache()
-    text = property(getText, setText)
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    def _recache(self):
-        if self.font is not None:
-            self._xidx = self.font.translate(self.text)
-        else:
-            self._xidx = None
-        self._advance = None
-        self._lineAdvance = None
-        self._geometry = None
-        self._offset = None
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    _lineAdvance = None
-    def getLineAdvance(self):
-        r = self._lineAdvance
-        if r is None:
-            r = self.font.lineAdvance
-            self._lineAdvance = r
-        return r
-    lineAdvance = property(getLineAdvance)
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    _advance = None
-    def getAdvance(self):
-        r = self._advance
-        if r is None:
-            r = self.font.advance[[0]+self._xidx]
-            k = self.font.kernIndexes(self._xidx)
-            if k is not None:
-                r[1:-1] += k
-            self._advance = r
-        return r
-
-    def getPreAdvance(self):
-        return self.getAdvance()[:-1]
-    def getPostAdvance(self):
-        return self.getAdvance()[1:]
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    _offset = None
-    def getOffset(self):
-        r = self._offset
-        if r is None:
-            r = self.getAdvance().cumsum(0)
-            self._offset = r
-
-        return r
-
-    def getOffsetAtStart(self):
-        return self.getOffset()[:-1]
-    def getOffsetAtEnd(self):
-        return self.getOffset()[1:]
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    _geometry = None
-    def getGeometry(self):
-        r = self._geometry
-        if r is None:
-            r = self.font.geometry[self._xidx]
-            self._geometry = r
-        return r
-    geometry = property(getGeometry)
+    def _compileFontTextData(self):
+        self.FontTextData = self.FontTextDataFactory(self)
 

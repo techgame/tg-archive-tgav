@@ -33,7 +33,7 @@ class RenderSkinModel(RenderSkinModelBase):
     fontName, fontSize = 'Zapfino', 12
     fontName, fontSize = 'AndaleMono', 12
     wrapSize = 0
-    fps = 60
+    #fps = 60
     fonts = {
             'Arial':'/Library/Fonts/Arial',
             'Monaco':'/System/Library/Fonts/Monaco.dfont',
@@ -72,24 +72,25 @@ class RenderSkinModel(RenderSkinModelBase):
         name = name or self.fontName
         size = size or self.fontSize
         self.font = self.loadFont(name, size)
-        self.TextObject = font.FontTextData.factoryFor(self.font)
 
         self.lwl = textLayout.TextLayout()
         self.lwl.align = 0.5
 
         self.twl = textLayout.TextWrapLayout()
         self.twl.align = 0.
+
+        self.tobjContent = self.font.textData()
+        self.tobjFPS = self.font.textData()
+
         self.refreshText(False)
 
     def refreshText(self, bRefresh=True):
-        self.tobjContent = self.TextObject(self.sampleText)
-        self.tobjFPS = self.TextObject(self.fpsStr)
+        self.tobjContent.text = self.sampleText
+        self.lfnContent = self.twl.layoutBuffer(self.tobjContent, wrapSize=self.wrapSize, line=1)[1]
 
-        if 1:
-            self.lfnContent = self.twl.layoutBuffer(self.tobjContent, wrapSize=self.wrapSize, line=1)[1]
-        else:
-            self.lfnContent = lambda: None
+        self.tobjFPS.text = self.fpsStr
         self.lfnFps = self.lwl.layout(self.tobjFPS, wrapSize=self.viewPortSize[0])[-1]
+
         if bRefresh:
             self.canvas.Refresh()
 
@@ -170,14 +171,15 @@ class RenderSkinModel(RenderSkinModelBase):
 
                 glLoadIdentity()
 
+                columnInset = 25
+                columnWidth = int(width/2)
                 with glMatrix():
-                    glTranslatef(25, height, 0.)
-                    #glScalef(.5, .5, 1.)
+                    glTranslatef(columnInset, height, 0.)
                     self.lfnContent()
+
                 with glMatrix():
                     offset = .5
-                    width = int(width/2)
-                    glTranslatef(offset + width, offset + height, 0.)
+                    glTranslatef(columnInset + offset + columnWidth, offset + height, 0.)
 
                     self.lfnContent()
 
