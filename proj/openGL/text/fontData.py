@@ -21,6 +21,7 @@ from TG.openGL.raw import gl
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class FontGeometryArray(interleavedArrays.InterleavedArrays):
+    drawMode = gl.GL_QUADS
     dataFormat = gl.GL_T2F_V3F
     @classmethod
     def fromCount(klass, count):

@@ -66,7 +66,7 @@ accessMap = {
 class BufferBase(object):
     _as_parameter_ = None # GLenum returned from glGenBuffers
     target = None
-    size = 0
+    nbytes = 0
     dtype = numpy.ubyte
     accessByName = accessMap
 
@@ -127,9 +127,9 @@ class BufferBase(object):
             usage = self.getUsageByName(usage)
         else: usage = self.usage
         self.glBufferData(self.target, data.nbytes, data.ctypes, usage)
-        self.size = len(data)
+        self.nbytes = data.nbytes
 
-    glBufferSubData = staticmethod(gl.glBufferData)
+    glBufferSubData = staticmethod(gl.glBufferSubData)
     def sendDataAt(self, data, offset):
         self.glBufferSubData(self.target, offset, data.nbytes, data.ctypes)
 
@@ -147,9 +147,9 @@ class BufferBase(object):
             ptr = self.glMapBuffer(self.target, access)
 
             if access == gl.GL_READ_ONLY:
-                buf = self._bufferFromMemory(ptr, self.size)
+                buf = self._bufferFromMemory(ptr, self.nbytes)
             else:
-                buf = self._bufferFromReadWriteMemory(ptr, self.size)
+                buf = self._bufferFromReadWriteMemory(ptr, self.nbytes)
 
             result = numpy.frombuffer(buf, dtype or self.dtype)
 

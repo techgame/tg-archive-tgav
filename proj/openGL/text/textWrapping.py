@@ -18,25 +18,25 @@ from numpy import zeros_like
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class BasicTextWrapper(object):
-    def wrapText(self, textData, wrapSize=None):
-        for sl, width in self.wrapSlices(textData, wrapSize):
+    def wrapText(self, textObj, textData):
+        for sl, width in self.wrapSlices(textObj, textData):
             yield text[sl]
 
-    def wrapSlices(self, textData, wrapSize=None):
+    def wrapSlices(self, textObj, textData):
         yield slice(None), textData.getOffset()[-1,0]
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class LineTextWrapper(BasicTextWrapper):
-    def wrapSlices(self, textData, wrapSize=None):
-        iterWrapIdx = self._iterWrapIndexes(textData)
-        return self._wrapSliceIndexes(iterWrapIdx, textData, wrapSize)
+    def wrapSlices(self, textObj, textData):
+        iterWrapIdx = self._iterWrapIndexes(textObj, textData)
+        return self._wrapSliceIndexes(iterWrapIdx, textObj, textData)
 
     re_wrapPoints = re.compile('\n')
-    def _iterWrapIndexes(self, textData):
+    def _iterWrapIndexes(self, textObj, textData):
         return ((m.start(), m.group()) for m in self.re_wrapPoints.finditer(textData.text))
 
-    def _wrapSliceIndexes(self, iterWrapIdx, textData, wrapSize=None):
+    def _wrapSliceIndexes(self, iterWrapIdx, textObj, textData):
         offsetAtEnd = textData.getOffsetAtEnd()
         if not len(offsetAtEnd):
             return
@@ -62,17 +62,14 @@ class FontTextWrapper(LineTextWrapper):
     lineWrapSet = set(['\n'])
     re_wrapPoints = re.compile('\s')
 
-    def __init__(self, wrapSize=None, axis=0):
-        self.wrapSize = wrapSize
-        self.axis = 0
-
-    def _wrapSliceIndexes(self, iterWrapIdx, textData, wrapSize=None):
-        wrapSize = wrapSize or self.wrapSize
-        lineWrapSet = self.lineWrapSet
-
+    def _wrapSliceIndexes(self, iterWrapIdx, textObj, textData):
         offsetAtEnd = textData.getOffsetAtEnd()
         if not len(offsetAtEnd):
             return
+
+        wrapSize = textObj.wrapSize
+        wrapAxis = textObj.wrapAxis
+        lineWrapSet = self.lineWrapSet
 
         lineOffset = zeros_like(offsetAtEnd[0])
         i0 = 0
@@ -86,7 +83,7 @@ class FontTextWrapper(LineTextWrapper):
                 lineOffset = newLineOffset
                 iPrev = iCurr
 
-            elif wrapSize < (offsetAtEnd[iCurr] - lineOffset)[0, self.axis]:
+            elif wrapSize < (offsetAtEnd[iCurr] - lineOffset)[0, wrapAxis]:
                 newLineOffset = offsetAtEnd[iPrev]
                 yield slice(i0, iPrev+1), (newLineOffset - lineOffset)[0]
                 i0 = iPrev+1
@@ -101,7 +98,7 @@ class FontTextWrapper(LineTextWrapper):
             return
 
         # make sure the last line is wrapped properly
-        if wrapSize < (offsetAtEnd[iEnd] - lineOffset)[0,self.axis]:
+        if wrapSize < (offsetAtEnd[iEnd] - lineOffset)[0, wrapAxis]:
             newLineOffset = offsetAtEnd[iPrev]
             yield slice(i0, iPrev+1), (newLineOffset - lineOffset)[0]
             i0 = iPrev+1

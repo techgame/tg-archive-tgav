@@ -21,7 +21,7 @@ from TG.openGL.raw.gl import *
 from TG.openGL.raw.glu import *
 
 from TG.openGL.text import font
-from TG.openGL.text import textLayout
+from TG.openGL.text.textObject import TextObject
 
 from TG.openGL import glMatrix
 
@@ -31,9 +31,10 @@ from TG.openGL import glMatrix
 
 class RenderSkinModel(RenderSkinModelBase):
     fontName, fontSize = 'Zapfino', 12
-    fontName, fontSize = 'AndaleMono', 12
+    fontNameRight, fontSizeRight = 'Papyrus', 16
+    #fontName, fontSize = 'AndaleMono', 12
     wrapSize = 0
-    #fps = 60
+    fps = 60
     fonts = {
             'Arial':'/Library/Fonts/Arial',
             'Monaco':'/System/Library/Fonts/Monaco.dfont',
@@ -66,31 +67,36 @@ class RenderSkinModel(RenderSkinModelBase):
         glClearColor(0.15, 0.15, 0.25, 1.)
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
+        self.contentText = TextObject()
+        #self.contentText.line = 1
+        self.contentText.buffered = True
+        self.contentText.wrapMode('text')
+        self.contentTextRight = TextObject()
+        #self.contentTextRight.line = 1
+        self.contentTextRight.buffered = True
+        self.contentTextRight.wrapMode('text')
+
+        self.fpsText = TextObject()
+        self.fpsText.buffered = True
+
         self.refreshFont()
 
     def refreshFont(self, name=None, size=None):
-        name = name or self.fontName
-        size = size or self.fontSize
-        self.font = self.loadFont(name, size)
+        self.font = self.loadFont(name or self.fontName, size or self.fontSize)
+        self.fontRight = self.loadFont(name or self.fontNameRight, size or self.fontSizeRight)
 
-        self.lwl = textLayout.TextLayout()
-        self.lwl.align = 0.5
+        self.contentText.setFromFont(self.font)
+        self.contentTextRight.setFromFont(self.fontRight)
 
-        self.twl = textLayout.TextWrapLayout()
-        self.twl.align = 0.
-
-        self.tobjContent = self.font.textData()
-        self.tobjFPS = self.font.textData()
+        self.fontFps = self.loadFont('AndaleMono', 16)
+        self.fpsText.setFromFont(self.fontFps)
 
         self.refreshText(False)
 
     def refreshText(self, bRefresh=True):
-        self.tobjContent.text = self.sampleText
-        self.lfnContent = self.twl.layoutBuffer(self.tobjContent, wrapSize=self.wrapSize, line=1)[1]
-
-        self.tobjFPS.text = self.fpsStr
-        self.lfnFps = self.lwl.layout(self.tobjFPS, wrapSize=self.viewPortSize[0])[-1]
-
+        self.contentText.update(self.sampleText)
+        self.contentTextRight.update(self.sampleText)
+        self.fpsText.update(self.fpsStr)
         if bRefresh:
             self.canvas.Refresh()
 
@@ -101,22 +107,27 @@ class RenderSkinModel(RenderSkinModelBase):
 
     def _printFPS(self, fpsStr):
         self.fpsStr = fpsStr
-        self.tobjFPS.text = fpsStr
-        self.lfnFps = self.lwl.layout(self.tobjFPS, wrapSize=self.viewPortSize[0])[-1]
+        self.fpsText.update(fpsStr)
 
     def onChar(self, evt):
         ch = unichr(evt.GetUniChar()).replace('\r', '\n')
 
         if ch in ('-', '_'):
             self.fontSize = max(4, self.fontSize - 1)
+            self.fontSizeRight = max(4, self.fontSizeRight - 1)
             print 'dec', self.fontSize
             self.refreshFont()
         elif ch in ('+', '='):
             self.fontSize += 1
+            self.fontSizeRight += 1
             print 'inc', self.fontSize
             self.refreshFont()
         elif ch in ('*', ):
             self.animate = not self.animate
+        elif ch in ('\x7f',):
+            # delete
+            self.sampleText = ""
+            self.refreshText()
         elif ch in ('\x08',):
             # backspace
             self.sampleText = self.sampleText[:-1]
@@ -148,6 +159,9 @@ class RenderSkinModel(RenderSkinModelBase):
         glLoadIdentity ()
 
         self.wrapSize = ((w / 2.) - 50)
+
+        self.contentText.wrapSize = self.wrapSize
+        self.contentTextRight.wrapSize = self.wrapSize
         self.refreshText()
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -175,17 +189,17 @@ class RenderSkinModel(RenderSkinModelBase):
                 columnWidth = int(width/2)
                 with glMatrix():
                     glTranslatef(columnInset, height, 0.)
-                    self.lfnContent()
+                    self.contentText()
 
                 with glMatrix():
-                    offset = .5
+                    offset = 0 #.5
                     glTranslatef(columnInset + offset + columnWidth, offset + height, 0.)
 
-                    self.lfnContent()
+                    self.contentTextRight()
 
                 with glMatrix():
                     glTranslatef(5, 5, 0)
-                    self.lfnFps()
+                    self.fpsText()
 
                 glDepthMask(True)
 

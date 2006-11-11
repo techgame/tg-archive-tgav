@@ -71,8 +71,11 @@ class InterleavedArrays(ArrayBase):
     def enable(self):
         pass
 
-    def bind(self):
-        self.glInterleavedArrays(self.dataFormat, 0, self.ctypes)
+    def bind(self, vboOffset=None):
+        if vboOffset is None:
+            self.glInterleavedArrays(self.dataFormat, 0, self.ctypes)
+        else:
+            self.glInterleavedArrays(self.dataFormat, 0, vboOffset)
 
     def disable(self):
         pass

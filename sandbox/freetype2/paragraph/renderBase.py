@@ -169,7 +169,9 @@ class RenderSkinModelBase(wxSkinModel):
     def initialize(self, glCanvas):
         if self.fps:
             self.repaintTimer.Start(1000./self.fps)
-        else: self.repaintTimer.Stop()
+        else: 
+            self.repaintTimer.Stop()
+
         self._lastUpdate = self.timestamp()
         glCanvas.SetCurrent()
         self.renderInit(glCanvas, self._lastUpdate)

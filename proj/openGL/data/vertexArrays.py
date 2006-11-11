@@ -115,6 +115,7 @@ class NDArrayBase(ndarray):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class ArrayBase(NDArrayBase):
+    drawMode = gl.GL_POINTS
     dataFormat = None
     dataFormatMap = {
         'ub': gl.GL_UNSIGNED_BYTE,
@@ -169,9 +170,13 @@ class ArrayBase(NDArrayBase):
     dataFormatFromDTypeMap = dict((k.name, v) for k,v in dataFormatDTypeMapping)
     dataFormatToDTypeMap = dict((v, k) for k,v in dataFormatDTypeMapping)
 
-    def select(self):
+    def _configFromParent(self, parent):
+        NDArrayBase._configFromParent(self, parent)
+        self.drawMode = parent.drawMode
+
+    def select(self, vboOffset=None):
         self.enable()
-        self.bind()
+        self.bind(vboOffset)
 
     def enable(self):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
@@ -179,8 +184,11 @@ class ArrayBase(NDArrayBase):
     def glArrayPointer(self, count, dataFormat, stride, ptr):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
 
-    def bind(self):
-        self.glArrayPointer(len(self), self.dataFormat, 0, self.ctypes)
+    def bind(self, vboOffset=None):
+        if vboOffset is None:
+            self.glArrayPointer(len(self), self.dataFormat, 0, self.ctypes)
+        else:
+            self.glArrayPointer(len(self), self.dataFormat, 0, vboOffset)
 
     def deselect(self):
         self.unbind()
@@ -193,9 +201,9 @@ class ArrayBase(NDArrayBase):
         self.glArrayPointer(0, self.dataFormat, 0, None)
 
     glDrawArrays = staticmethod(gl.glDrawArrays)
-    def draw(self, mode):
-        self.select()
-        self.glDrawArrays(mode, 0, len(self.flat))
+    def draw(self, drawMode=None, vboOffset=None):
+        self.select(vboOffset)
+        self.glDrawArrays(drawMode or self.drawMode, 0, self.size)
         self.deselect()
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -218,7 +226,10 @@ class MultiTexureCoordArray(TexureCoordArray):
 
     def bind(self):
         self.glClientActiveTexture(self.texUnit)
-        self.glArrayPointer(len(self), self.dataFormat, 0, self)
+        if vboOffset is None:
+            self.glArrayPointer(len(self), self.dataFormat, 0, self.ctypes)
+        else:
+            self.glArrayPointer(len(self), self.dataFormat, 0, vboOffset)
     def unbind(self):
         self.glClientActiveTexture(self.texUnit)
         self.glArrayPointer(0, self.dataFormat, 0, None)
