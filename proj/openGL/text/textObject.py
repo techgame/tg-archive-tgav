@@ -30,17 +30,20 @@ class TextObject(object):
     wrapAxis = 0
     align = 0
 
-    def __init__(self, textData=None):
-        self.textData = textData
-        self.buffered = self.buffered
+    def __init__(self, **kwattr):
+        self.set(kwattr)
 
-    def setFromFont(self, font):
+    def set(self, val=None, **kwattr):
+        for n,v in (val or kwattr).iteritems():
+            setattr(self, n, v)
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    def getFont(self, font):
+        return self.textData.font
+    def setFont(self, font):
         self.textData = font.textData(self.getText())
-
-    @classmethod
-    def fromFont(klass, font, text=''):
-        textData = font.textData(text)
-        return klass(textData)
+    font = property(getFont, setFont)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -55,7 +58,7 @@ class TextObject(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def wrapMode(self, mode=None):
+    def setWrapMode(self, mode=None):
         if mode == None:
             self.layout = None
             del self.layout
@@ -69,21 +72,32 @@ class TextObject(object):
             raise ValueError("Mode %r was not found" % (mode,))
 
         self.update()
+    wrapMode = property(fset=setWrapMode)
 
-    _buffered = False
+    _buffered = True
     def getBuffered(self):
         return self._buffered
     def setBuffered(self, buffered=True):
         self._buffered = buffered
-        if buffered:
-            display = self.BufferedDisplayFactory()
-        else:
-            display = self.UnbufferedDisplayFactory()
-        self.display = display
-        self.update()
+        self.display = None
     def setUnbuffered(self, unbuffered=True):
         self.setBuffered(not unbuffered)
     buffered = property(getBuffered, setBuffered)
+
+    _display = None
+    def getDisplay(self):
+        display = self._display
+        if display is None:
+            if self.buffered:
+                display = self.BufferedDisplayFactory()
+            else:
+                display = self.UnbufferedDisplayFactory()
+            self._display = display
+            self.update()
+        return display
+    def setDisplay(self, display):
+        self._display = display
+    display = property(getDisplay, setDisplay)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -16,23 +16,22 @@ import time
 
 from renderBase import RenderSkinModelBase
 
+from TG.openGL.text import Font, TextObject
+
+from TG.openGL import glMatrix
+
 from TG.openGL.raw import gl, glu, glext
 from TG.openGL.raw.gl import *
 from TG.openGL.raw.glu import *
-
-from TG.openGL.text import font
-from TG.openGL.text.textObject import TextObject
-
-from TG.openGL import glMatrix
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Constants / Variables / Etc. 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class RenderSkinModel(RenderSkinModelBase):
+    fontNameFps, fontSizeFps = 'AndaleMono', 24
     fontName, fontSize = 'Zapfino', 12
     fontNameRight, fontSizeRight = 'Papyrus', 16
-    #fontName, fontSize = 'AndaleMono', 12
     wrapSize = 0
     fps = 60
     fonts = {
@@ -67,29 +66,16 @@ class RenderSkinModel(RenderSkinModelBase):
         glClearColor(0.15, 0.15, 0.25, 1.)
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
-        self.contentText = TextObject()
-        #self.contentText.line = 1
-        self.contentText.buffered = True
-        self.contentText.wrapMode('text')
-        self.contentTextRight = TextObject()
-        #self.contentTextRight.line = 1
-        self.contentTextRight.buffered = True
-        self.contentTextRight.wrapMode('text')
-
         self.fpsText = TextObject()
-        self.fpsText.buffered = True
+        self.contentText = TextObject(wrapMode='text')
+        self.contentTextRight = TextObject(wrapMode='text')
 
         self.refreshFont()
 
-    def refreshFont(self, name=None, size=None):
-        self.font = self.loadFont(name or self.fontName, size or self.fontSize)
-        self.fontRight = self.loadFont(name or self.fontNameRight, size or self.fontSizeRight)
-
-        self.contentText.setFromFont(self.font)
-        self.contentTextRight.setFromFont(self.fontRight)
-
-        self.fontFps = self.loadFont('AndaleMono', 16)
-        self.fpsText.setFromFont(self.fontFps)
+    def refreshFont(self):
+        self.contentText.font = self.loadFont(self.fontName, self.fontSize)
+        self.contentTextRight.font = self.loadFont(self.fontNameRight, self.fontSizeRight)
+        self.fpsText.font = self.loadFont(self.fontNameFps, self.fontSizeFps)
 
         self.refreshText(False)
 
@@ -102,7 +88,7 @@ class RenderSkinModel(RenderSkinModelBase):
 
     def loadFont(self, fontKey, fontSize, charset=string.printable):
         fontFilename = self.fonts[fontKey]
-        f = font.Font.fromFilename(fontFilename, fontSize, charset=charset)
+        f = Font.fromFilename(fontFilename, fontSize, charset=charset)
         return f
 
     def _printFPS(self, fpsStr):
