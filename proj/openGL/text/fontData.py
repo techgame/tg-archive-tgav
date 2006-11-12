@@ -41,7 +41,7 @@ class FontTextData(object):
     def setupFont(self, font):
         self.font = font
         if not isinstance(self, type):
-            self.recache()
+            self.recompile()
     setupClassFont = classmethod(setupFont)
 
     @classmethod
@@ -66,7 +66,7 @@ class FontTextData(object):
         return self._text
     def setText(self, text):
         self._text = text
-        self.recache()
+        self.recompile()
     text = property(getText, setText)
 
     def getTexture(self):
@@ -75,9 +75,9 @@ class FontTextData(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def recache(self):
+    def recompile(self):
         if self.font is not None:
-            #print 'recache:', repr(self.text[:40])
+            #print 'recompile:', repr(self.text[:40])
             self._xidx = self.font.translate(self.text)
         else:
             self._xidx = None

@@ -89,14 +89,13 @@ class RenderSkinModel(RenderSkinModelBase):
         if bRefresh and self.fps <= 0:
             self.canvas.Refresh()
 
-    def refreshFont(self):
+    def refreshFont(self, bRefresh=True):
         self.contentText.font.size = self.fontSize
-        self.contentText.font.compileIfDirty()
         if self.contentTextRight is not self.contentText:
             self.contentTextRight.font.size = self.fontSizeRight
-            self.contentTextRight.font.compileIfDirty()
 
-        self.refreshText()
+        if bRefresh:
+            self.refreshText(bRefresh)
 
     def loadFont(self, fontKey, fontSize, dpi=None, charset=string.printable):
         fontFilename = self.fonts[fontKey]

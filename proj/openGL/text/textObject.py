@@ -74,6 +74,8 @@ class TextObject(object):
         self.update()
     wrapMode = property(fset=setWrapMode)
 
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     _buffered = True
     def getBuffered(self):
         return self._buffered

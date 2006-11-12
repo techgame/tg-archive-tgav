@@ -133,7 +133,6 @@ class Font(object):
     def compile(self, face, charset):
         self.setFace(face)
         self.setCharset(charset)
-        print 'Compiling:', self
 
         self.lineAdvance = self.FontAdvanceArray.fromCount(1)
         self.lineAdvance[0] = [0., -face.lineHeight*self.pointSize[1], 0.]
@@ -177,10 +176,9 @@ class Font(object):
         if self.FontTexture is None:
             return {}
 
-        texture = self.texture
-        if texture is None:
-            texture = self.FontTexture()
-            self.texture = texture
+        texture = self.FontTexture()
+        self.texture = texture
+
         mosaic, mosaicSize = self._compileGlyphMosaic(face, gidxMap, texture.getMaxTextureSize())
         texture.createMosaic(mosaicSize)
         return mosaic
@@ -214,6 +212,7 @@ class Font(object):
         verticesFrom = self._verticesFrom
         advanceFrom = self._advanceFrom
         if self.texture is not None:
+            self.texture.select()
             renderGlyph = self.texture.renderGlyph
 
         # cache some variables
