@@ -190,6 +190,7 @@ class TextureImageBasic(object):
 
     def texClear(self, pixelStoreSettings=None):
         self.texData(None, None, pixelStoreSettings)
+    texNull = texClear
     def texString(self, strdata, pixelStoreSettings=None):
         self.texData(strdata, strdata, pixelStoreSettings)
     strdata = property(fset=texString)

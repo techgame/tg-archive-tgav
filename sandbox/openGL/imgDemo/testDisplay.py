@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#!/usr/local/bin/python2.5
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ##~ Copyright (C) 2002-2004  TechGame Networks, LLC.
 ##~ 
@@ -14,19 +12,12 @@
 
 import os
 
-#from ctypes import byref, c_void_p
-
-from TG.common import path
-
 from renderBase import RenderSkinModelBase
-from TG.openGL.image import ImageTexture
-from TG.openGL.raw import gl, glu
-from TG.openGL.raw.gl import *
-from TG.openGL.raw.glu import *
-from TG.openGL.raw.glext import GL_TEXTURE_RECTANGLE_ARB
 
-imgNameList = list(path.path('.').files("*.png"))
-imgMap = dict((n.basename(), n) for n in imgNameList)
+from TG.openGL.image import ImageTexture
+
+from TG.openGL.raw import gl
+from TG.openGL.raw.gl import *
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Constants / Variables / Etc. 
@@ -49,7 +40,7 @@ class RenderSkinModel(RenderSkinModelBase):
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
 
-        gluOrtho2D(0, w, 0, h)
+        glOrtho(-w/2, w/2, -h/2, h/2, -10, 10)
 
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
@@ -62,18 +53,44 @@ class RenderSkinModel(RenderSkinModelBase):
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-        if 0: # video black
-            glClearColor(8/255., 8/255., 8/255., 0)
-        else:
-            glClearColor(1, 1, 1, 1)
+        glClearColor(1., 1., 1., 1.)
         glClear(self.clearMask)
 
-        self.img = ImageTexture(imgMap['hotbutton-selected.png'])
+        spacing = 20
+        totalHeight = 0
+        self.imgLogo = ImageTexture('tg-logo.png')
+        self.imgLogo.centerGeometry()
+        totalHeight += self.imgLogo.imageSize[1] + spacing
+
+        self.imgButton = ImageTexture('button.png')
+        self.imgButton.centerGeometry()
+        totalHeight += self.imgButton.imageSize[1] + spacing
+
+        self.imgStar = ImageTexture('starshape.png')
+        self.imgStar.centerGeometry()
+        totalHeight += self.imgStar.imageSize[1] + spacing
+
+        self.totalHeight = totalHeight - spacing
+        self.spacing = spacing
+
+    def showImg(self, img):
+        halfHeight = img.imageSize[1]/2
+        glTranslatef(0., -halfHeight, 0.)
+        img.render()
+        glTranslatef(0., -halfHeight - self.spacing, 0.)
 
     def renderContent(self, glCanvas, renderStart):
         try:
             glClear(self.clearMask)
-            self.img()
+
+            glLoadIdentity()
+
+            glTranslatef(0, self.totalHeight/2., 0)
+
+            showImg = self.showImg
+            showImg(self.imgLogo)
+            showImg(self.imgButton)
+            showImg(self.imgStar)
 
         except Exception:
             self.repaintTimer.Stop()
