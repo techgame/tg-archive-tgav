@@ -204,7 +204,8 @@ class ArrayBase(NDArrayBase):
     def draw(self, drawMode=None, vboOffset=None):
         self.select(vboOffset)
         self.glDrawArrays(drawMode or self.drawMode, 0, self.size)
-        self.deselect()
+    def drawRaw(self, drawMode=None):
+        self.glDrawArrays(drawMode or self.drawMode, 0, self.size)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

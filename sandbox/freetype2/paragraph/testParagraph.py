@@ -56,42 +56,55 @@ class RenderSkinModel(RenderSkinModelBase):
 
             }
 
+    clearMask = GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT
     def renderInit(self, glCanvas, renderStart):
         glEnable(GL_DEPTH_TEST)
-        glEnable(GL_COLOR_MATERIAL)
 
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
+        glColor3ub(0xee, 0xee, 0xff)
         glClearColor(0.15, 0.15, 0.25, 1.)
-        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
+        glClear(self.clearMask)
 
         self.fpsText = TextObject()
-        self.contentText = TextObject(wrapMode='text')
-        self.contentTextRight = TextObject(wrapMode='text')
-
-        self.refreshFont()
-
-    def refreshFont(self):
-        self.contentText.font = self.loadFont(self.fontName, self.fontSize)
-        self.contentTextRight.font = self.loadFont(self.fontNameRight, self.fontSizeRight)
         self.fpsText.font = self.loadFont(self.fontNameFps, self.fontSizeFps)
+
+        self.contentText = TextObject(wrapMode='text')
+        self.contentText.font = self.loadFont(self.fontName, self.fontSize)
+
+        if 1:
+            self.contentTextRight = TextObject(wrapMode='text')
+            self.contentTextRight.font = self.loadFont(self.fontNameRight, self.fontSizeRight)
+        else:
+            self.contentTextRight = self.contentText
 
         self.refreshText(False)
 
     def refreshText(self, bRefresh=True):
         self.contentText.update(self.sampleText)
-        self.contentTextRight.update(self.sampleText)
+        if self.contentTextRight is not self.contentText:
+            self.contentTextRight.update(self.sampleText)
         self.fpsText.update(self.fpsStr)
-        if bRefresh:
+        if bRefresh and self.fps <= 0:
             self.canvas.Refresh()
 
-    def loadFont(self, fontKey, fontSize, charset=string.printable):
+    def refreshFont(self):
+        self.contentText.font.size = self.fontSize
+        self.contentText.font.compileIfDirty()
+        if self.contentTextRight is not self.contentText:
+            self.contentTextRight.font.size = self.fontSizeRight
+            self.contentTextRight.font.compileIfDirty()
+
+        self.refreshText()
+
+    def loadFont(self, fontKey, fontSize, dpi=None, charset=string.printable):
         fontFilename = self.fonts[fontKey]
-        f = Font.fromFilename(fontFilename, fontSize, charset=charset)
+        f = Font.fromFilename(fontFilename, fontSize, dpi=dpi, charset=charset)
         return f
 
     def _printFPS(self, fpsStr):
+        #print fpsStr
         self.fpsStr = fpsStr
         self.fpsText.update(fpsStr)
 
@@ -109,7 +122,7 @@ class RenderSkinModel(RenderSkinModelBase):
             print 'inc', self.fontSize
             self.refreshFont()
         elif ch in ('*', ):
-            self.animate = not self.animate
+            self.setFps(-self.fps)
         elif ch in ('\x7f',):
             # delete
             self.sampleText = ""
@@ -136,6 +149,7 @@ class RenderSkinModel(RenderSkinModelBase):
 
         self.viewPortSize = w, h
         glViewport (l, b, w, h)
+        glClear(self.clearMask)
 
         glMatrixMode (GL_PROJECTION)
         glLoadIdentity ()
@@ -152,47 +166,34 @@ class RenderSkinModel(RenderSkinModelBase):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    animate = False
-    _no_error = True
     def renderContent(self, glCanvas, renderStart):
-        if self.viewPortSize is None: return
-
         oscilateTime = 4
         oscilate = abs((renderStart % (2*oscilateTime)) - oscilateTime)/ oscilateTime
+        glClear(self.clearMask)
 
-        if self._no_error:
-            try:
-                glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
+        width, height = self.viewPortSize
 
-                width, height = self.viewPortSize
+        glDepthMask(False)
 
-                glDepthMask(False)
-                glColor3f(.9, .9, 1.)
+        glLoadIdentity()
 
-                glLoadIdentity()
+        columnInset = 25
+        columnWidth = int(width/2)
 
-                columnInset = 25
-                columnWidth = int(width/2)
-                with glMatrix():
-                    glTranslatef(columnInset, height, 0.)
-                    self.contentText()
+        glTranslatef(columnInset, height, 0.)
+        self.contentText()
 
-                with glMatrix():
-                    offset = 0 #.5
-                    glTranslatef(columnInset + offset + columnWidth, offset + height, 0.)
+        #offset = 0.5
+        offset = 0.0
+        glTranslatef(columnWidth + offset, offset, 0.)
 
-                    self.contentTextRight()
+        self.contentTextRight()
 
-                with glMatrix():
-                    glTranslatef(5, 5, 0)
-                    self.fpsText()
+        glLoadIdentity()
+        glTranslatef(5, 5, 0)
+        self.fpsText()
 
-                glDepthMask(True)
-
-                self._no_error = True
-            except Exception:
-                #self._no_error = False
-                raise
+        glDepthMask(True)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Main 
@@ -220,7 +221,7 @@ Donec vulputate enim adipiscing ligula. Nullam semper neque at lacus. Donec feug
 Nam felis lorem, consequat nec, tincidunt at, malesuada molestie, magna. Nulla facilisi. Quisque egestas justo at nisi. Suspendisse a sapien. Nunc eget sem in lorem cursus accumsan. Curabitur at dolor at justo facilisis sagittis. In a mauris. Mauris leo. Vestibulum dictum dapibus lacus. Phasellus sed est. Cras sit amet sapien. Quisque massa eros, malesuada ac, ultricies nec, fringilla at, lorem. Pellentesque lectus diam, nonummy in, adipiscing ut, lacinia eu, purus. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
 '''
 
-#sampleText = sampleText.split('\n')[0]
+#sampleText = sampleText[:sampleText.find('\n\n', sampleText.find('\n\n')+2)]
 
 #sampleText = file(__file__, 'r').read()
 

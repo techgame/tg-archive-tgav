@@ -29,11 +29,6 @@ class TextDisplay(object):
         self.texture = textData.texture
 
     def render(self):
-        if 0:
-            self.texture.deselect()
-            glColor4f(1., 1., 1., .1)
-            self.geometry.draw()
-            glColor4f(1., 1., 1., 1.)
         self.texture.select()
         self.geometry.draw()
     __call__ = render
@@ -50,6 +45,7 @@ class TextBufferedDisplay(object):
         self.geometry = geometry
         self.texture = textData.texture
 
+        # push the data to the card
         buff = self.buffer 
         if buff is None:
             buff = ArrayBuffer('dynamicDraw')
@@ -63,12 +59,6 @@ class TextBufferedDisplay(object):
     def render(self, glColor4f=gl.glColor4f):
         buf = self.buffer
         buf.bind()
-        if 0:
-            self.texture.deselect()
-            glColor4f(1., 1., 1., .1)
-            self.geometry.draw(vboOffset=0)
-            glColor4f(1., 1., 1., 1.)
-
         self.texture.select()
         self.geometry.draw(vboOffset=0)
         buf.unbind()

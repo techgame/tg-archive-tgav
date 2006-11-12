@@ -51,6 +51,15 @@ class FreetypeFace(object):
             self._ft_done_face()
         self._as_parameter_ = None
 
+    def __repr__(self):
+        klass = self.__class__
+        fmt = '<%s.%: %%s>' % (klass.__module__, klass.__name__,)
+        if not self._as_parameter_:
+            info = '{uninitialized}'
+        else:
+            info = '"%(familyName)s(%(styleName)s):%(lastSize)s"' % self.getInfo()
+        return fmt % (info,)
+
     def __contains__(self, key):
         if isinstance(key, basestring):
             return self.isCharAvailable(key)
@@ -86,7 +95,7 @@ class FreetypeFace(object):
     faceFlagsMap = {
         FT.FT_FACE_FLAG_SCALABLE: 'scalable',
         FT.FT_FACE_FLAG_FIXED_SIZES: 'fixed_sizes',
-        FT.FT_FACE_FLAG_FIXED_WIDTH: 'fixed_width',
+        FT.FT_FACE_FLAG_FIXED_WIDTH: 'fixed_wleadidth',
         FT.FT_FACE_FLAG_SFNT: 'sfnt',
         FT.FT_FACE_FLAG_HORIZONTAL: 'horizontal',
         FT.FT_FACE_FLAG_VERTICAL: 'vertical',
@@ -105,6 +114,15 @@ class FreetypeFace(object):
     @property
     def numGlyphs(self):
         return self._face.num_glyphs
+
+    def getInfo(self):
+        return dict(
+                familyName=self.familyName, 
+                postscriptName=self.postscriptName, 
+                lastSize=self.lastSize,
+                height=self.height / 64., 
+                lineHeight=self.lineHeight / 64., 
+                styleName=self.styleName)
 
     @property
     def familyName(self):
@@ -183,17 +201,12 @@ class FreetypeFace(object):
         return self._face.size[0].metrics.height
 
     @property
-    def ascener(self):
+    def lineAscender(self):
         return self._face.size[0].metrics.ascender
 
     @property
-    def descender(self):
+    def lineDescender(self):
         return self._face.size[0].metrics.descender
-
-    @property
-    def linegap(self):
-        m = self._face.size[0].metrics
-        return m.height - m.ascender + m.descender
 
     @property
     def sizesList(self):
@@ -206,6 +219,7 @@ class FreetypeFace(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    lastSize = "{Not set}"
     def setSize(self, size, dpi=None):
         if dpi is None:
             return self.setPixelSize(size)
@@ -216,18 +230,21 @@ class FreetypeFace(object):
     def setCharSize(self, size, dpi):
         if isinstance(size, tuple): 
             width, height = size
-        else: width, height = size, 0
+        else: width, height = 0, size
         if isinstance(dpi, tuple): 
             wdpi, hdpi = dpi
-        else: wdpi, hdpi = dpi, 0
+        else: wdpi, hdpi = 0, dpi
         self._ft_setCharSize(width, height, wdpi, hdpi)
+        self.lastSize = '%s@%sdpi'%(height, hdpi)
 
     _ft_setPixelSizes = FT.FT_Set_Pixel_Sizes
     def setPixelSize(self, size):
         if isinstance(size, tuple): 
             width, height = size
-        else: width, height = size, 0
+        else: width, height = 0, size
         self._ft_setPixelSizes(width, height)
+        self._lastSize = (width or height, height, None, None)
+        self.lastSize = str(height)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -312,6 +329,7 @@ class FreetypeFace(object):
     _ft_getPostscriptName = FT.FT_Get_Postscript_Name
     def getPostscriptName(self):
         return self._ft_getPostscriptName()
+    postscriptName = property(getPostscriptName)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -403,7 +421,7 @@ class FreetypeFace(object):
         print >> out, '  metrics:'
         print >> out, '    units per em:', face.unitsPerEM/ptDiv
         print >> out, '    ascender:', face.ascender / ptDiv, 'descender:', face.descender / ptDiv, 'height:', face.height / ptDiv
-        print >> out, '    size:', face.size[0].metrics.height/ptDiv
+        print >> out, '    lineAscender:', face.lineAscender / ptDiv, 'lineDescender:', face.lineDescender / ptDiv, 'lineHeight:', face.lineHeight / ptDiv
         print >> out, '    bbox:', [(face.bbox.xMin/ptDiv, face.bbox.xMax/ptDiv), (face.bbox.yMin/ptDiv, face.bbox.yMax/ptDiv)]
         print >> out, '    underline pos:', face.underlinePosition/ptDiv, 'thickness:', face.underlineThickness/ptDiv
         print >> out, '    max advance width:', face.maxAdvanceWidth/ptDiv, 'height:', face.maxAdvanceHeight/ptDiv

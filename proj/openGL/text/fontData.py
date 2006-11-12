@@ -10,6 +10,7 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+import weakref
 from numpy import ndarray, float32, asarray
 
 from TG.openGL.data import interleavedArrays
@@ -36,22 +37,22 @@ class FontAdvanceArray(ndarray):
 
 class FontTextData(object):
     font = None
-    texture = None
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    @classmethod
-    def factoryFor(klass, font):
-        subklass = type(klass)(klass.__name__+'_T_', (klass,), {})
-        subklass.setupClassFont(font)
-        return subklass
 
     def setupFont(self, font):
         self.font = font
-        self.texture = font.texture
         if not isinstance(self, type):
-            self._recache()
+            self.recache()
     setupClassFont = classmethod(setupFont)
+
+    @classmethod
+    def factoryUpdateFor(klass, font):
+        if font is klass.font:
+            klass.setupClassFont(font)
+            return klass
+        else:
+            subklass = type(klass)(klass.__name__+'_T_', (klass,), {})
+            subklass.setupClassFont(font)
+            return subklass
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -65,13 +66,18 @@ class FontTextData(object):
         return self._text
     def setText(self, text):
         self._text = text
-        self._recache()
+        self.recache()
     text = property(getText, setText)
+
+    def getTexture(self):
+        return self.font.texture
+    texture = property(getTexture)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def _recache(self):
+    def recache(self):
         if self.font is not None:
+            #print 'recache:', repr(self.text[:40])
             self._xidx = self.font.translate(self.text)
         else:
             self._xidx = None

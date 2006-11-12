@@ -36,6 +36,7 @@ class FontTextureBase(Texture):
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def createMosaic(self, mosaicSize):
+        self.select()
         size = self.validSizeForTarget(mosaicSize)
         data = self.blankImage2d(size=size, format=self.dataFormat, dataType=self.dataType)
         data.newPixelStore(alignment=1, rowLength=0)

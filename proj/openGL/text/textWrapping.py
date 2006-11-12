@@ -74,24 +74,28 @@ class FontTextWrapper(LineTextWrapper):
         lineOffset = zeros_like(offsetAtEnd[0])
         i0 = 0
         iPrev = 0
+        prevOffsetAtEnd = lineOffset
         for iCurr, subtext in iterWrapIdx:
-            # force a feed if linewrap
-            if subtext in lineWrapSet:
-                newLineOffset = offsetAtEnd[iCurr]
-                yield slice(i0, iCurr+1), (newLineOffset - lineOffset)[0]
-                i0 = iCurr+1
-                lineOffset = newLineOffset
-                iPrev = iCurr
+            currOffsetAtEnd = offsetAtEnd[iCurr]
 
-            elif wrapSize < (offsetAtEnd[iCurr] - lineOffset)[0, wrapAxis]:
-                newLineOffset = offsetAtEnd[iPrev]
+            # check to see if the current word falls off the end
+            if wrapSize < (currOffsetAtEnd - lineOffset)[0, wrapAxis]:
+                # it does, so wrap to the previous wrap point
+                newLineOffset = prevOffsetAtEnd
                 yield slice(i0, iPrev+1), (newLineOffset - lineOffset)[0]
                 i0 = iPrev+1
                 lineOffset = newLineOffset
-                iPrev = iCurr
 
-            else:
-                iPrev = iCurr
+            # check to see if we have a linewrap at the current position
+            if subtext in lineWrapSet:
+                # there is one, so wrap here
+                newLineOffset = currOffsetAtEnd
+                yield slice(i0, iCurr+1), (newLineOffset - lineOffset)[0]
+                i0 = iCurr+1
+                lineOffset = newLineOffset
+
+            iPrev = iCurr
+            prevOffsetAtEnd = currOffsetAtEnd
 
         iEnd = len(offsetAtEnd)-1
         if i0 > iEnd:

@@ -29,46 +29,111 @@ class Font(object):
     FontTexture = fontTexture.FontTexture
     FontGeometryArray = fontData.FontGeometryArray
     FontAdvanceArray = fontData.FontAdvanceArray
-    FontTextDataFactory = staticmethod(fontData.FontTextData.factoryFor)
-    FontTextData = None
+    FontTextData = fontData.FontTextData
 
     texture = None
 
     charMap = None
     geometry = None
     advance = None
+    kerningMap = None
 
     pointSize = (1./64., 1./64.)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def __init__(self, face, charset=None):
-        if face is not None:
-            self.compile(face, charset)
+    def __init__(self, face=None, charset=NotImplemented, compile=True):
+        if charset is not NotImplemented:
+            self.setCharset(charset, False)
+
+        if face:
+            self.setFace(face, compile)
+
+    def __repr__(self):
+        klass = self.__class__
+        fmt = '<%s.%s %%s>' % (klass.__module__, klass.__name__,)
+        info = '"%(familyName)s(%(styleName)s):%(lastSize)s"' % self.face.getInfo()
+        return fmt % (info,)
 
     @classmethod
-    def fromFilename(klass, filename, size, dpi=None, charset=None):
+    def fromFilename(klass, filename, size=None, dpi=None, charset=None):
+        self = klass()
+        self.loadFace(filename, size, dpi, charset)
+        return self
+
+    def loadFace(self, filename, size=None, dpi=None, charset=NotImplemented):
         face = FreetypeFace(filename)
-        face.setSize(size, dpi)
-        return klass(face, charset)
+        if size is not None:
+            face.setSize(size, dpi)
+        self.setFace(face)
+
+        if charset is not NotImplemented:
+            self.setCharset(charset)
+        self._markDirty()
+
+    _face = None
+    def getFace(self):
+        return self._face
+    def setFace(self, face):
+        self._face = face
+        self._markDirty()
+    face = property(getFace, setFace)
+
+    def getSize(self):
+        return self.face.getSize()
+    def setSize(self, size, dpi=None):
+        face = self.face
+        if size is not None:
+            face.setSize(size, dpi)
+        self._markDirty()
+    size = property(getSize, setSize)
+
+    _charset = None
+    def getCharset(self):
+        return self._charset
+    def setCharset(self, charset):
+        self._charset = charset
+        self._markDirty()
+    charset = property(getCharset, setCharset)
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #~ Text translation
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def textData(self, text=''):
+        self.compileIfDirty()
         return self.FontTextData(text)
 
     def translate(self, text):
+        self.compileIfDirty()
         return map(self.charMap.get, text)
 
     def kernIndexes(self, idx, default=[0., 0., 0.]):
         km = self.kerningMap
         if not km or len(idx) < 2:
             return None
+        self.compileIfDirty()
         
         r = asarray([km.get(e, default) for e in zip(idx, idx[1:])], float32)
         return r.reshape((-1, 1, 3))
     
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #~ Font compilation
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    def _markDirty(self, dirty=True):
+        self._dirty = dirty
+
+    def compileIfDirty(self):
+        if self._dirty: self.recompile()
+
+    def recompile(self):
+        return self.compile(self.face, self.charset)
+
     def compile(self, face, charset):
-        self.face = face
-        #face.printInfo()
+        self.setFace(face)
+        self.setCharset(charset)
+        print 'Compiling:', self
 
         self.lineAdvance = self.FontAdvanceArray.fromCount(1)
         self.lineAdvance[0] = [0., -face.lineHeight*self.pointSize[1], 0.]
@@ -90,7 +155,12 @@ class Font(object):
         self._compileData(face, count, gidxMap, mosaic)
         self._compileFontTextData()
 
+        self._dirty = False
+
     def _compileKerningMap(self, face, gidxMap):
+        if not face.hasFlag('kerning'):
+            return
+
         ptw, pth = self.pointSize
         kerningMap = {}
         gi = gidxMap.items()
@@ -107,10 +177,12 @@ class Font(object):
         if self.FontTexture is None:
             return {}
 
-        texture = self.FontTexture()
+        texture = self.texture
+        if texture is None:
+            texture = self.FontTexture()
+            self.texture = texture
         mosaic, mosaicSize = self._compileGlyphMosaic(face, gidxMap, texture.getMaxTextureSize())
         texture.createMosaic(mosaicSize)
-        self.texture = texture
         return mosaic
 
     def _compileGlyphMosaic(self, face, gidxMap, maxSize):
@@ -118,7 +190,9 @@ class Font(object):
 
         mosaic = {}
         for gidx in gidxMap.iterkeys():
-            size = face.loadGlyph(gidx).bitmapSize
+            glyph = face.loadGlyph(gidx)
+            glyph.render()
+            size = glyph.bitmapSize
             mosaic[gidx] = alg.addBlock(size)
 
         mosaicSize, layout, unplaced = alg.layout()
@@ -179,5 +253,5 @@ class Font(object):
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def _compileFontTextData(self):
-        self.FontTextData = self.FontTextDataFactory(self)
+        self.FontTextData = self.FontTextData.factoryUpdateFor(self)
 

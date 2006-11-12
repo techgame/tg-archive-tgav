@@ -39,7 +39,7 @@ class TextObject(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def getFont(self, font):
+    def getFont(self):
         return self.textData.font
     def setFont(self, font):
         self.textData = font.textData(self.getText())
