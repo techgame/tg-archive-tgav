@@ -81,16 +81,19 @@ class ImageTextureBase(Texture):
 
     def recompile(self):
         if self._geo is not None:
-            self._geo = None
+            if self._geo['v'].mean():
+                self.geometry(self._geo)
+            else:
+                self.centerGeometry(self._geo)
 
-    def centerGeometry(self):
-        geo = self.geometry()
-        geo['v'] -= geo['v'].mean(0)
-        self._geo = geo
+    def centerGeometry(self, geo=None):
+        geo = self.geometry(geo)
+        geo['v'] = geo['v'] - geo['v'].mean(0)
 
     _geo = None
     def geometry(self, geo=None):
-        geo = geo or self._geo
+        if geo is None:
+            geo = self._geo
         if geo is None:
             geo = self.GeometryFactory.fromCount(1)
             self._geo = geo
