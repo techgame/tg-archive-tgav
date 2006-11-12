@@ -172,8 +172,6 @@ class RenderSkinModel(RenderSkinModelBase):
 
         width, height = self.viewPortSize
 
-        glDepthMask(False)
-
         glLoadIdentity()
 
         columnInset = 25
@@ -191,8 +189,6 @@ class RenderSkinModel(RenderSkinModelBase):
         glLoadIdentity()
         glTranslatef(5, 5, 0)
         self.fpsText()
-
-        glDepthMask(True)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Main 
