@@ -10,6 +10,7 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+import traceback
 from bisect import bisect_left
 import ctypes
 from ctypes import cast, byref, c_void_p
@@ -229,8 +230,8 @@ class TextureImageBasic(object):
     def delPixelStore(self):
         if self._pixelStore is not None:
             del self._pixelStore
-
     pixelStore = property(getPixelStore, setPixelStore, delPixelStore)
+
     def newPixelStore(self, *args, **kw):
         pixelStore = PixelStore(*args, **kw)
         self.setPixelStore(pixelStore)
@@ -379,8 +380,7 @@ class Texture(object):
     def __del__(self):
         try:
             self.release()
-        except:
-            import traceback
+        except Exception:
             traceback.print_exc()
             raise
 

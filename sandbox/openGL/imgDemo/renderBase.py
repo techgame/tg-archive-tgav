@@ -129,6 +129,7 @@ class RenderSkinModelBase(wxSkinModel):
     _historyKeep = 15
     _historyLen = 0
     def fpsUpdate(self, renderStart, renderEnd, renderFinish):
+
         self.timingLogRender.append(renderEnd - renderStart)
         self.timingLogSwap.append(renderFinish - renderEnd)
 
@@ -166,10 +167,16 @@ class RenderSkinModelBase(wxSkinModel):
     def onChar(self, evt):
         pass
 
-    def initialize(self, glCanvas):
-        if self.fps:
+    def setFps(self, fps):
+        self.fps = fps
+        if self.fps > 0:
             self.repaintTimer.Start(1000./self.fps)
-        else: self.repaintTimer.Stop()
+        else: 
+            self.repaintTimer.Stop()
+
+    def initialize(self, glCanvas):
+        self.setFps(self.fps)
+
         self._lastUpdate = self.timestamp()
         glCanvas.SetCurrent()
         self.renderInit(glCanvas, self._lastUpdate)
