@@ -64,12 +64,16 @@ class TextLayout(object):
         return geo
     
     def iterPlacements(self, textObj, textData):
+        line = textObj.line
+        lineAdv = textData.lineAdvance
+        lineOffset = (line*lineAdv).round()
+
         offset = textData.getOffsetAtStart()
 
         for sl, width in self.wrapSlices(textObj, textData):
             off = offset[sl]
             if len(off):
-                yield sl, width, offset[sl]
+                yield sl, width, offset[sl] + lineOffset
     
     def wrapText(self, textObj, textData):
         return self.wrapper.wrapText(textObj, textData)

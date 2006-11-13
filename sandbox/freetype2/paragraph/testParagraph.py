@@ -67,7 +67,7 @@ class RenderSkinModel(RenderSkinModelBase):
         glClearColor(0.15, 0.15, 0.25, 1.)
         glClear(self.clearMask)
 
-        self.fpsText = TextObject()
+        self.fpsText = TextObject(line=0)
         self.fpsText.font = self.loadFont(self.fontNameFps, self.fontSizeFps)
 
         self.contentText = TextObject(wrapMode='text')

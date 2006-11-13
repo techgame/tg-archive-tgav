@@ -77,8 +77,7 @@ class FontTextData(object):
 
     def recompile(self):
         if self.font is not None:
-            #print 'recompile:', repr(self.text[:40])
-            self._xidx = self.font.translate(self.text)
+            self._xidx = self.font.translate(self.text or '')
         else:
             self._xidx = None
         self._advance = None

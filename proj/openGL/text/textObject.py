@@ -30,8 +30,11 @@ class TextObject(object):
     wrapAxis = 0
     align = 0
 
-    def __init__(self, **kwattr):
+    def __init__(self, text=None, **kwattr):
+        self.text = text
         self.set(kwattr)
+        #if text is not None:
+        #    self.setText(text, True)
 
     def set(self, val=None, **kwattr):
         for n,v in (val or kwattr).iteritems():
@@ -42,6 +45,8 @@ class TextObject(object):
     def getFont(self):
         return self.textData.font
     def setFont(self, font):
+        if self.textData:
+            self.textData.recompile()
         self.textData = font.textData(self.getText())
     font = property(getFont, setFont)
 
@@ -110,12 +115,14 @@ class TextObject(object):
 
         if text is not None:
             self._text = text
-            textData.text = self._text
 
+        textData.text = self.text
         geo = self.layout(self, textData)
         self.display.update(self, textData, geo)
         return True
 
     def __call__(self):
         self.display()
+    def render(self):
+        self.display.render()
 
