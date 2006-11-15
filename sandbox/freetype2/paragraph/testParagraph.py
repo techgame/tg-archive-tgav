@@ -18,7 +18,7 @@ from renderBase import RenderSkinModelBase
 
 from TG.openGL.text import Font, TextObject
 
-from TG.openGL import glMatrix
+from TG.openGL import glBlock, glMatrix
 
 from TG.openGL.raw import gl, glu, glext
 from TG.openGL.raw.gl import *
@@ -30,9 +30,15 @@ from TG.openGL.raw.glu import *
 
 class RenderSkinModel(RenderSkinModelBase):
     fontNameFps, fontSizeFps = 'AndaleMono', 24
-    fontName, fontSize = 'Zapfino', 12
-    fontNameRight, fontSizeRight = 'Papyrus', 16
+    if 1:
+        fontName, fontSize = 'Zapfino', 11
+        fontNameRight, fontSizeRight = 'Papyrus', 16
+    else:
+        fontName, fontSize = 'AndaleMono', 12
+        fontNameRight, fontSizeRight = 'AndaleMono', 12
+
     wrapSize = 0
+    wrapMode = None
     fps = 60
     fonts = {
             'Arial':'/Library/Fonts/Arial',
@@ -63,36 +69,37 @@ class RenderSkinModel(RenderSkinModelBase):
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-        glColor3ub(0xee, 0xee, 0xff)
         glClearColor(0.15, 0.15, 0.25, 1.)
         glClear(self.clearMask)
 
-        self.fpsText = TextObject(line=0)
-        self.fpsText.font = self.loadFont(self.fontNameFps, self.fontSizeFps)
+        if 1:
+            self.fpsText = TextObject(line=0, font=self.loadFont(self.fontNameFps, self.fontSizeFps))
 
-        self.contentText = TextObject(wrapMode='text', align=.5)
-        self.contentText.font = self.loadFont(self.fontName, self.fontSize)
+        self.contentText = TextObject(wrapMode=self.wrapMode, align=0, font=self.loadFont(self.fontName, self.fontSize))
 
         if 1:
-            self.contentTextRight = TextObject(wrapMode='text', align=.5)
-            self.contentTextRight.font = self.loadFont(self.fontNameRight, self.fontSizeRight)
+            self.contentTextRight = TextObject(wrapMode=self.wrapMode, align=0, font=self.loadFont(self.fontNameRight, self.fontSizeRight))
         else:
             self.contentTextRight = self.contentText
+            self.contentTextRight = None
 
         self.refreshText(False)
 
     def refreshText(self, bRefresh=True):
         self.contentText.update(self.sampleText)
-        if self.contentTextRight is not self.contentText:
-            self.contentTextRight.update(self.sampleText)
-        self.fpsText.update(self.fpsStr)
+        if self.contentTextRight is not None:
+            if self.contentTextRight is not self.contentText:
+                self.contentTextRight.update(self.sampleText)
+        if 1:
+            self.fpsText.update(self.fpsStr)
         if bRefresh and self.fps <= 0:
             self.canvas.Refresh()
 
     def refreshFont(self, bRefresh=True):
         self.contentText.font.size = self.fontSize
-        if self.contentTextRight is not self.contentText:
-            self.contentTextRight.font.size = self.fontSizeRight
+        if self.contentTextRight is not None:
+            if self.contentTextRight is not self.contentText:
+                self.contentTextRight.font.size = self.fontSizeRight
 
         if bRefresh:
             self.refreshText(bRefresh)
@@ -105,7 +112,8 @@ class RenderSkinModel(RenderSkinModelBase):
     def _printFPS(self, fpsStr):
         #print fpsStr
         self.fpsStr = fpsStr
-        self.fpsText.update(fpsStr)
+        if 1:
+            self.fpsText.update(fpsStr)
 
     def onChar(self, evt):
         ch = unichr(evt.GetUniChar()).replace('\r', '\n')
@@ -157,10 +165,15 @@ class RenderSkinModel(RenderSkinModelBase):
         glMatrixMode (GL_MODELVIEW)
         glLoadIdentity ()
 
-        self.wrapSize = ((w / 2.) - 50)
+        if self.contentTextRight is not None:
+            self.wrapSize = ((w / 2.) - 50)
+        else:
+            self.wrapSize = (w - 50)
 
-        self.contentText.wrapSize = self.wrapSize
-        self.contentTextRight.wrapSize = self.wrapSize
+        self.contentText.size = (self.wrapSize, h-50)
+        if self.contentTextRight is not None:
+            self.contentTextRight.size = (self.wrapSize, h-50)
+
         self.refreshText()
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -178,23 +191,29 @@ class RenderSkinModel(RenderSkinModelBase):
         columnWidth = int(width/2)
 
         glTranslatef(columnInset, height, 0.)
-        self.contentText()
+        glColor3ub(0xee, 0xee, 0xff)
+        self.contentText.render()
 
         #offset = 0.5
         offset = 0.0
         glTranslatef(columnWidth + offset, offset, 0.)
 
-        self.contentTextRight()
+        if self.contentTextRight is not None:
+            glColor3ub(0xee, 0xee, 0xff)
+            self.contentTextRight.render()
 
-        glLoadIdentity()
-        glTranslatef(5, 5, 0)
-        self.fpsText()
+        if 1:
+            glLoadIdentity()
+            glTranslatef(5, 5, 0)
+
+            glColor3ub(0xee, 0xee, 0xff)
+            self.fpsText.render()
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Main 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-sampleText = '''\
+sampleText = 'text', '''\
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Pellentesque quis lacus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Curabitur facilisis, ante at adipiscing ullamcorper, libero dolor rutrum felis, nec vehicula turpis diam id lacus. Quisque tincidunt tempus orci. Quisque sit amet sem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Ut hendrerit, tortor quis laoreet feugiat, quam lectus suscipit orci, ornare tristique risus dui fermentum massa. Quisque scelerisque ullamcorper libero. Sed adipiscing sapien eget enim porttitor volutpat. Proin porttitor. Vivamus semper lectus mattis pede. Mauris pretium odio sit amet enim.
 
 Nunc at mauris eleifend leo sollicitudin aliquam. Vivamus fermentum ipsum. Integer augue nulla, semper sit amet, viverra in, tempor eget, sapien. Phasellus id ipsum. Maecenas pharetra, risus a imperdiet vestibulum, velit ligula porttitor orci, sit amet pharetra diam erat vitae dolor. Quisque bibendum. Suspendisse dictum. Vivamus at risus. Nam nonummy mauris in tortor. Nunc nisl ante, placerat a, consequat et, mattis vel, magna.
@@ -216,12 +235,14 @@ Donec vulputate enim adipiscing ligula. Nullam semper neque at lacus. Donec feug
 Nam felis lorem, consequat nec, tincidunt at, malesuada molestie, magna. Nulla facilisi. Quisque egestas justo at nisi. Suspendisse a sapien. Nunc eget sem in lorem cursus accumsan. Curabitur at dolor at justo facilisis sagittis. In a mauris. Mauris leo. Vestibulum dictum dapibus lacus. Phasellus sed est. Cras sit amet sapien. Quisque massa eros, malesuada ac, ultricies nec, fringilla at, lorem. Pellentesque lectus diam, nonummy in, adipiscing ut, lacinia eu, purus. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
 '''
 
-#sampleText = sampleText[:sampleText.find('\n\n', sampleText.find('\n\n')+2)]
+#sampleText = 'line', file(__file__, 'Ur').read()
 
-#sampleText = file(__file__, 'r').read()
+trim = None
+if trim is not None:
+    sampleText = '\n'.join(sampleText.split('\n')[-trim:])
 
 if __name__=='__main__':
     m = RenderSkinModel()
-    m.sampleText = sampleText
+    m.wrapMode, m.sampleText = sampleText
     m.skinModel()
 

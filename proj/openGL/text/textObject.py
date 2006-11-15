@@ -12,21 +12,27 @@
 
 from . import textLayout
 from . import textRenderer
+from . import textWrapping
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class TextObject(object):
-    UnbufferedDisplayFactory = textRenderer.TextDisplay
-    BufferedDisplayFactory = textRenderer.TextBufferedDisplay
-
-    display = None
     layout = textLayout.TextLayout()
+
+    WrapModeMap = textWrapping.wrapModeMap
+    wrapper = WrapModeMap[None]
+
+    DisplayFactoryMap = textRenderer.displayFactoryMap
+    DisplayFactory = DisplayFactoryMap[None]
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     textData = None
 
     line = 1
-    wrapSize = 0
+    size = (None, None)
     wrapAxis = 0
     align = 0
 
@@ -62,46 +68,27 @@ class TextObject(object):
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def setWrapMode(self, mode=None):
-        if mode == None:
-            self.layout = None
-            del self.layout
-        elif mode == 'none':
-            self.layout = textLayout.TextLayout()
-        elif mode == 'line':
-            self.layout = textLayout.LineWrapLayout()
-        elif mode == 'text':
-            self.layout = textLayout.TextWrapLayout()
-        else:
-            raise ValueError("Mode %r was not found" % (mode,))
-
+        self.wrapper = self.WrapModeMap[mode]
         self.update()
     wrapMode = property(fset=setWrapMode)
 
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def setDisplayMode(self, mode=None):
+        self.DisplayFactory = self.DisplayFactoryMap[mode]
+    displayMode = property(fset=setWrapMode)
 
-    _buffered = True
-    def getBuffered(self):
-        return self._buffered
-    def setBuffered(self, buffered=True):
-        self._buffered = buffered
-        self.display = None
-    def setUnbuffered(self, unbuffered=True):
-        self.setBuffered(not unbuffered)
-    buffered = property(getBuffered, setBuffered)
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     _display = None
     def getDisplay(self):
         display = self._display
         if display is None:
-            if self.buffered:
-                display = self.BufferedDisplayFactory()
-            else:
-                display = self.UnbufferedDisplayFactory()
+            display = self.DisplayFactory()
             self._display = display
-            self.update()
         return display
-    def setDisplay(self, display):
+    def setDisplay(self, display, doUpdate=False):
         self._display = display
+        if doUpdate:
+            self.update()
     display = property(getDisplay, setDisplay)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -115,12 +102,10 @@ class TextObject(object):
             self._text = text
 
         textData.text = self.text
-        geo = self.layout(self, textData)
+        geo = self.layout.layout(self, textData)
         self.display.update(self, textData, geo)
         return True
 
-    def __call__(self):
-        self.display()
     def render(self):
         self.display.render()
 

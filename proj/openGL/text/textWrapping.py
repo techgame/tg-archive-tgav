@@ -19,97 +19,87 @@ from numpy import zeros_like
 
 class BasicTextWrapper(object):
     def wrapText(self, textObj, textData):
-        for sl, width in self.wrapSlices(textObj, textData):
-            yield text[sl]
+        text = textData.text
+        for textSlice, textOffset in self.wrapSlices(textObj, textData):
+            yield text[textSlice]
 
     def wrapSlices(self, textObj, textData):
-        yield slice(None), textData.getOffset()[-1,0]
+        if not textData: return
+
+        offset = textData.getOffset()
+        for textSlice in self.availTextSlices(textData.text):
+            textOffset = offset[textSlice.start:textSlice.stop+1]
+            yield textSlice, textOffset
+
+    def availTextSlices(self, text):
+        if text: 
+            return [slice(0, len(text))]
+        else:
+            return []
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class LineTextWrapper(BasicTextWrapper):
-    re_wrapPoints = re.compile('\n')
+class RETextWrapper(BasicTextWrapper):
+    re_wrapPoints = re.compile('$|\n')
 
-    def _iterWrapIndexes(self, textObj, textData):
-        return ((m.start(), m.group()) for m in self.re_wrapPoints.finditer(textData.text))
+    def availTextSlices(self, text):
+        if not text: return
 
-    def wrapSlices(self, textObj, textData):
-        iterWrapIdx = self._iterWrapIndexes(textObj, textData)
-
-        offsetAtEnd = textData.getOffsetAtEnd()
-        if not len(offsetAtEnd):
-            return
-
+        iterMatches = self.re_wrapPoints.finditer(text)
         i0 = 0
-        lineOffset = zeros_like(offsetAtEnd[0])
-        for iCurr, subtext in iterWrapIdx:
-            newLineOffset = offsetAtEnd[iCurr]
-            yield slice(i0, iCurr+1), (newLineOffset - lineOffset)[0]
-            i0 = iCurr+1
-            lineOffset = newLineOffset
-    
-        iEnd = len(offsetAtEnd)-1
-        if i0 > iEnd:
-            return
-    
-        newLineOffset = offsetAtEnd[-1]
-        yield slice(i0, None), (newLineOffset - lineOffset)[0]
+        for match in iterMatches:
+            i1 = match.end()
+            yield slice(i0, i1)
+            i0 = i1
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class FontTextWrapper(LineTextWrapper):
-    lineWrapSet = set(['\n'])
-    re_wrapPoints = re.compile('[\s-]')
+class LineTextWrapper(RETextWrapper):
+    pass
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+class TextWrapper(RETextWrapper):
+    lineWraps = '\n'
+    re_wrapPoints = re.compile('[\s-]|$')
 
     def wrapSlices(self, textObj, textData):
-        iterWrapIdx = self._iterWrapIndexes(textObj, textData)
-
-        offsetAtEnd = textData.getOffsetAtEnd()
-        if not len(offsetAtEnd):
-            return
-
-        wrapSize = textObj.wrapSize
         wrapAxis = textObj.wrapAxis
-        lineWrapSet = self.lineWrapSet
+        wrapSize = textObj.size[wrapAxis]
+        if wrapSize <= 0: return
 
-        lineOffset = zeros_like(offsetAtEnd[0])
-        i0 = 0
-        iPrev = 0
-        prevOffsetAtEnd = lineOffset
-        for iCurr, subtext in iterWrapIdx:
-            currOffsetAtEnd = offsetAtEnd[iCurr]
+        text = textData.text
+        if not text: return
+        offset = textData.getOffset()
 
-            # check to see if the current word falls off the end
-            if wrapSize < (currOffsetAtEnd - lineOffset)[0, wrapAxis]:
-                # it does, so wrap to the previous wrap point
-                newLineOffset = prevOffsetAtEnd
-                yield slice(i0, iPrev+1), (newLineOffset - lineOffset)[0]
-                i0 = iPrev+1
-                lineOffset = newLineOffset
+        lineWraps = self.lineWraps
+
+        iLine = 0; offLine = offset[iLine, 0, wrapAxis]
+        iCurr = iLine; offCurr = offLine
+        for textSlice in self.availTextSlices(text):
+            iNext = textSlice.stop
+            offNext = offset[iNext, 0, wrapAxis]
+
+            # check to see if the next wrap slice falls off the end
+            if (wrapSize < (offNext - offLine)):
+                yield (slice(iLine, iCurr), offset[iLine:iCurr+1])
+                iLine = iCurr; offLine = offCurr
 
             # check to see if we have a linewrap at the current position
-            if subtext in lineWrapSet:
-                # there is one, so wrap here
-                newLineOffset = currOffsetAtEnd
-                yield slice(i0, iCurr+1), (newLineOffset - lineOffset)[0]
-                i0 = iCurr+1
-                lineOffset = newLineOffset
+            if text[iNext-1] in lineWraps:
+                yield (slice(iLine, iNext), offset[iLine:iNext+1])
+                iLine = iNext; offLine = offNext
 
-            iPrev = iCurr
-            prevOffsetAtEnd = currOffsetAtEnd
+            iCurr = iNext; offCurr = offNext
 
-        iEnd = len(offsetAtEnd)-1
-        if i0 > iEnd:
-            return
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ Wrap Mode Map
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        # make sure the last line is wrapped properly
-        if wrapSize < (offsetAtEnd[iEnd] - lineOffset)[0, wrapAxis]:
-            newLineOffset = offsetAtEnd[iPrev]
-            yield slice(i0, iPrev+1), (newLineOffset - lineOffset)[0]
-            i0 = iPrev+1
-            lineOffset = newLineOffset
-            iPrev = iEnd
-
-        newLineOffset = offsetAtEnd[-1]
-        yield slice(i0, None), (newLineOffset - lineOffset)[0]
+wrapModeMap = {
+    'basic': BasicTextWrapper(),
+    'line': LineTextWrapper(),
+    'text': TextWrapper(),
+    }
+wrapModeMap[None] = wrapModeMap['basic']
 

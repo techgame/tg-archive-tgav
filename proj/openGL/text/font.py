@@ -134,8 +134,8 @@ class Font(object):
         self.setFace(face)
         self.setCharset(charset)
 
-        self.lineAdvance = self.FontAdvanceArray.fromCount(1)
-        self.lineAdvance[0] = [0., -face.lineHeight*self.pointSize[1], 0.]
+        self.lineAdvance = self.FontAdvanceArray.fromSingle()
+        self.lineAdvance[:] = [0., -face.lineHeight*self.pointSize[1], 0.]
 
         charMap = {'\0': 0, '\n': 0, '\r': 0}
         self.charMap = charMap
@@ -229,7 +229,7 @@ class Font(object):
 
             geoEntry = geometry[aidx]
             geoEntry['v'] = verticesFrom(glyph.metrics, pointSize)
-            advance[aidx,:] = advanceFrom(glyph.advance, pointSize)
+            advance[aidx] = advanceFrom(glyph.advance, pointSize)
 
             block = mosaic.get(gidx)
             if block is None: 
@@ -247,7 +247,7 @@ class Font(object):
         return [(x0, y0, 0.), (x1, y0, 0.), (x1, y1, 0.), (x0, y1, 0.)]
 
     def _advanceFrom(self, advance, (ptw, pth)):
-        return [(advance[0]*ptw, advance[1]*pth, 0.)]
+        return (advance[0]*ptw, advance[1]*pth, 0.)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

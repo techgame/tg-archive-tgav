@@ -71,3 +71,13 @@ class TextBufferedDisplay(object):
         glDepthMask(True)
     __call__ = render
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ Display Mode Map
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+displayFactoryMap = {
+    'unbuffered': TextDisplay,
+    'buffered': TextBufferedDisplay,
+    }
+displayFactoryMap[None] = displayFactoryMap['buffered']
+

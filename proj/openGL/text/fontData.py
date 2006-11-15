@@ -33,6 +33,11 @@ class FontAdvanceArray(ndarray):
     def fromCount(klass, count, dtype=float32):
         return klass((count, 1, 3), dtype)
 
+    @classmethod
+    def fromSingle(klass, dtype=float32):
+        return klass(3, dtype)
+
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class FontTextData(object):
@@ -68,6 +73,9 @@ class FontTextData(object):
         self._text = text
         self.recompile()
     text = property(getText, setText)
+
+    def __nonzero__(self):
+        return bool(self.text)
 
     def getTexture(self):
         return self.font.texture
@@ -109,13 +117,6 @@ class FontTextData(object):
             self._advance = r
         return r
 
-    def getPreAdvance(self):
-        return self.getAdvance()[:-1]
-    def getPostAdvance(self):
-        return self.getAdvance()[1:]
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     _offset = None
     def getOffset(self):
         r = self._offset
@@ -124,11 +125,6 @@ class FontTextData(object):
             self._offset = r
 
         return r
-
-    def getOffsetAtStart(self):
-        return self.getOffset()[:-1]
-    def getOffsetAtEnd(self):
-        return self.getOffset()[1:]
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

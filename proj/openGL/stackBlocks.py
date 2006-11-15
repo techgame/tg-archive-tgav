@@ -70,6 +70,14 @@ def glMatrixMode(mode):
         gl.glMatrixMode(gl.GL_MODEL_VIEW)
 
 @contextmanager
+def glBlock(mode=None):
+    gl.glBegin(mode)
+    try:
+        yield
+    finally:
+        gl.glEnd()
+
+@contextmanager
 def glMatrix(mode=None):
     if mode is not None:
         gl.glMatrixMode(mode)

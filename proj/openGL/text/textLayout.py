@@ -11,71 +11,48 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 from numpy import array
-
-from TG.openGL.text import textWrapping
+from . import textWrapping
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Text Layout
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class TextLayout(object):
-    wrapper = textWrapping.BasicTextWrapper()
-    
     def layout(self, textObj, textData):
+        wrapper = textObj.wrapper
+        align = textObj.align
+        width, height = textObj.size
+
+        line = textObj.line
+        #if width:
+        #    alignOffset = array([align*width, 0., 0.])
+        #else:
+        #    alignOffset = array([0, 0., 0.])
+
+        lineAdvance = textData.lineAdvance
+        if height is not None:
+            height = -height
+
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         geo = textData.geometry
         geov = geo['v']
 
-        align = textObj.align
-        wrapSize = textObj.wrapSize
-        alignOffset = array([align*wrapSize, 0., 0.])
+        wrapSlices = wrapper.wrapSlices(textObj, textData)
 
-        for sl, width, placement in self.iterPlacements(textObj, textData):
-            geov[sl] += placement + (alignOffset - align*width).round()
+        lineOffset = (line*lineAdvance).round()
+        for textSlice, textOffset in wrapSlices:
+            textOffset = textOffset + (lineOffset - textOffset[0])
+            #textOffset[:,0] -= align * textOffset[-1][0]
 
-        return geo
-    __call__ = layout
-    
-    def iterPlacements(self, textObj, textData):
-        line = textObj.line
-        lineAdv = textData.lineAdvance
-        lineOffset = (line*lineAdv).round()
-
-        offset = textData.getOffsetAtStart()
-
-        for sl, width in self.wrapSlices(textObj, textData):
-            off = offset[sl]
-            if len(off):
-                yield sl, width, offset[sl] + lineOffset
-    
-    def wrapText(self, textObj, textData):
-        return self.wrapper.wrapText(textObj, textData)
-
-    def wrapSlices(self, textObj, textData):
-        return self.wrapper.wrapSlices(textObj, textData)
-    
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-class LineWrapLayout(TextLayout):
-    wrapper = textWrapping.LineTextWrapper()
-
-    def __init__(self, wrapper=None):
-        if wrapper is not None:
-            self.wrapper = wrapper
-
-    def iterPlacements(self, textObj, textData):
-        line = textObj.line
-        lineAdv = textData.lineAdvance
-        offset = textData.getOffsetAtStart()
-        for sl, width in self.wrapSlices(textObj, textData):
-            off = offset[sl]
-            if len(off):
-                linePlacement = (line*lineAdv).round() - off[0]
-                yield sl, width, (off + linePlacement)
+            geov[textSlice] += textOffset[:-1]
 
             line += 1
-    
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class TextWrapLayout(LineWrapLayout):
-    wrapper = textWrapping.FontTextWrapper()
+            lineOffset = (line*lineAdvance).round()
+
+            if lineOffset[1] < height: 
+                return geo[:textSlice.stop]
+
+        return geo
 
