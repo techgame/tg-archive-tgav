@@ -19,38 +19,9 @@ from TG.openGL.text import textWrapping
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class TextLayout(object):
-    align = 0
     wrapper = textWrapping.BasicTextWrapper()
     
-    def leftLayout(self, textObj, textData):
-        geo = textData.geometry
-        geov = geo['v']
-
-        for sl, width, placement in self.iterPlacements(textObj, textData):
-            geov[sl] += placement
-
-        return geo
-    __call__ = leftLayout
-
-    def centerLayout(self, textObj, textData):
-        geo = textData.geometry
-        geov = geo['v']
-
-        for sl, width, placement in self.iterPlacements(textObj, textData):
-            geov[sl] += placement + (width*.5).round()
-
-        return geo
-
-    def rightLayout(self, textObj, textData):
-        geo = textData.geometry
-        geov = geo['v']
-
-        for sl, width, placement in self.iterPlacements(textObj, textData):
-            geov[sl] += placement + (width).round()
-
-        return geo
-
-    def alignLayout(self, textObj, textData):
+    def layout(self, textObj, textData):
         geo = textData.geometry
         geov = geo['v']
 
@@ -62,6 +33,7 @@ class TextLayout(object):
             geov[sl] += placement + (alignOffset - align*width).round()
 
         return geo
+    __call__ = layout
     
     def iterPlacements(self, textObj, textData):
         line = textObj.line

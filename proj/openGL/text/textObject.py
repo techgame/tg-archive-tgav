@@ -33,8 +33,6 @@ class TextObject(object):
     def __init__(self, text=None, **kwattr):
         self.text = text
         self.set(kwattr)
-        #if text is not None:
-        #    self.setText(text, True)
 
     def set(self, val=None, **kwattr):
         for n,v in (val or kwattr).iteritems():

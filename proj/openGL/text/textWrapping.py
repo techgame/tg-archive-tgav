@@ -28,15 +28,14 @@ class BasicTextWrapper(object):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class LineTextWrapper(BasicTextWrapper):
-    def wrapSlices(self, textObj, textData):
-        iterWrapIdx = self._iterWrapIndexes(textObj, textData)
-        return self._wrapSliceIndexes(iterWrapIdx, textObj, textData)
-
     re_wrapPoints = re.compile('\n')
+
     def _iterWrapIndexes(self, textObj, textData):
         return ((m.start(), m.group()) for m in self.re_wrapPoints.finditer(textData.text))
 
-    def _wrapSliceIndexes(self, iterWrapIdx, textObj, textData):
+    def wrapSlices(self, textObj, textData):
+        iterWrapIdx = self._iterWrapIndexes(textObj, textData)
+
         offsetAtEnd = textData.getOffsetAtEnd()
         if not len(offsetAtEnd):
             return
@@ -60,9 +59,11 @@ class LineTextWrapper(BasicTextWrapper):
 
 class FontTextWrapper(LineTextWrapper):
     lineWrapSet = set(['\n'])
-    re_wrapPoints = re.compile('\s')
+    re_wrapPoints = re.compile('[\s-]')
 
-    def _wrapSliceIndexes(self, iterWrapIdx, textObj, textData):
+    def wrapSlices(self, textObj, textData):
+        iterWrapIdx = self._iterWrapIndexes(textObj, textData)
+
         offsetAtEnd = textData.getOffsetAtEnd()
         if not len(offsetAtEnd):
             return

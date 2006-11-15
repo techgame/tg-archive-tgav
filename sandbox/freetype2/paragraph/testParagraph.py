@@ -70,11 +70,11 @@ class RenderSkinModel(RenderSkinModelBase):
         self.fpsText = TextObject(line=0)
         self.fpsText.font = self.loadFont(self.fontNameFps, self.fontSizeFps)
 
-        self.contentText = TextObject(wrapMode='text')
+        self.contentText = TextObject(wrapMode='text', align=.5)
         self.contentText.font = self.loadFont(self.fontName, self.fontSize)
 
         if 1:
-            self.contentTextRight = TextObject(wrapMode='text')
+            self.contentTextRight = TextObject(wrapMode='text', align=.5)
             self.contentTextRight.font = self.loadFont(self.fontNameRight, self.fontSizeRight)
         else:
             self.contentTextRight = self.contentText
