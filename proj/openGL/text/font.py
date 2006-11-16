@@ -238,9 +238,9 @@ class Font(object):
 
     def _verticesFrom(self, metrics, (ptw, pth)):
         x0 = (metrics.horiBearingX) * ptw
-        y0 = (metrics.horiBearingY - metrics.height) * pth
+        y0 = (metrics.horiBearingY - metrics.height - 1) * pth
 
-        x1 = (metrics.horiBearingX + metrics.width) * ptw
+        x1 = (metrics.horiBearingX + metrics.width + 1) * ptw
         y1 = (metrics.horiBearingY) * pth
 
         return [(x0, y0, 0.), (x1, y0, 0.), (x1, y1, 0.), (x0, y1, 0.)]
