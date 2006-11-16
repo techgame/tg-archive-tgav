@@ -14,6 +14,7 @@ from numpy import asarray, float32
 
 from PIL import Image
 
+from .color import ColorProperty
 from .raw import gl, glext
 from .texture import Texture
 from .data import interleavedArrays
@@ -134,10 +135,12 @@ class ImageDisplay(object):
 
     def update(self, imageObj, imageTexture, geometry):
         self.texture = imageTexture
+        self.color = imageObj.color
         self.geometry = geometry
 
     def render(self):
         self.texture.select()
+        self.color.select()
         self.geometry.draw()
     __call__ = render
 
@@ -158,6 +161,8 @@ class ImageObject(object):
             setattr(self, n, v)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    color = ColorProperty()
 
     _pos = None
     def getPos(self):

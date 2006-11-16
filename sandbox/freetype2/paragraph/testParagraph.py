@@ -73,12 +73,12 @@ class RenderSkinModel(RenderSkinModelBase):
         glClear(self.clearMask)
 
         if 1:
-            self.fpsText = TextObject(line=0, align=.5, pos=(0,10,0), font=self.loadFont(self.fontNameFps, self.fontSizeFps))
+            self.fpsText = TextObject(line=0, align=.5, pos=(0,10,0), font=self.loadFont(self.fontNameFps, self.fontSizeFps), color=(.8, .1, .6))
 
-        self.contentText = TextObject(wrapMode=self.wrapMode, align=.5, font=self.loadFont(self.fontName, self.fontSize))
+        self.contentText = TextObject(wrapMode=self.wrapMode, align=.5, font=self.loadFont(self.fontName, self.fontSize), color='#bbf')
 
         if 1:
-            self.contentTextRight = TextObject(wrapMode=self.wrapMode, align=1, font=self.loadFont(self.fontNameRight, self.fontSizeRight))
+            self.contentTextRight = TextObject(wrapMode=self.wrapMode, align=1, font=self.loadFont(self.fontNameRight, self.fontSizeRight), color='#fbb')
         else:
             self.contentTextRight = self.contentText
             self.contentTextRight = None
@@ -110,10 +110,8 @@ class RenderSkinModel(RenderSkinModelBase):
         return f
 
     def _printFPS(self, fpsStr):
-        #print fpsStr
         self.fpsStr = fpsStr
-        if 1:
-            self.fpsText.update(fpsStr)
+        self.fpsText.update(fpsStr)
 
     def onChar(self, evt):
         ch = unichr(evt.GetUniChar()).replace('\r', '\n')
@@ -170,7 +168,6 @@ class RenderSkinModel(RenderSkinModelBase):
         else:
             self.wrapSize = (w - 50)
 
-        glColor3ub(0xee, 0xee, 0xff)
         self.fpsText.size = (w, 0, 0)
         self.contentText.pos = (25, 50, 0)
         self.contentText.size = (self.wrapSize, h-50, 0)

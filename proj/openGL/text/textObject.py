@@ -10,9 +10,11 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+from numpy import asarray
 from . import textLayout
 from . import textRenderer
 from . import textWrapping
+from ..color import ColorProperty
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -69,6 +71,8 @@ class TextObject(object):
             self.update(text)
     text = property(getText, setText)
 
+    color = ColorProperty()
+
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def setWrapMode(self, mode=None, doUpdate=False):
@@ -98,7 +102,10 @@ class TextObject(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def update(self, text=None):
+    def update(self, text=None, **kwattr):
+        if kwattr: 
+            self.set(kwattr)
+
         textData = self.textData
         if textData is None:
             return False

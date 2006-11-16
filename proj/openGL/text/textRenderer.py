@@ -25,6 +25,7 @@ class TextDisplay(object):
 
     def update(self, textObj, textData, geometry):
         self.geometry = geometry
+        self.color = textObj.color
         self.texture = textData.texture
 
     glDepthMask = staticmethod(gl.glDepthMask)
@@ -32,6 +33,7 @@ class TextDisplay(object):
         glDepthMask = self.glDepthMask
         glDepthMask(False)
         self.texture.select()
+        self.color.select()
         self.geometry.draw()
         glDepthMask = self.glDepthMask
     __call__ = render
@@ -46,6 +48,7 @@ class TextBufferedDisplay(object):
     buffer = None
     def update(self, textObj, textData, geometry):
         self.geometry = geometry
+        self.color = textObj.color
         self.texture = textData.texture
 
         # push the data to the card
@@ -65,6 +68,7 @@ class TextBufferedDisplay(object):
         buf = self.buffer
         buf.bind()
         self.texture.select()
+        self.color.select()
         self.geometry.draw(vboOffset=0)
         buf.unbind()
         glDepthMask(True)
