@@ -19,39 +19,34 @@ from . import textWrapping
 
 class TextLayout(object):
     def layout(self, textObj, textData):
-        wrapper = textObj.wrapper
         align = textObj.align
-        width, height = textObj.size
+        oneMinusAlign = 1-align
 
-        line = textObj.line
-        #if width:
-        #    alignOffset = array([align*width, 0., 0.])
-        #else:
-        #    alignOffset = array([0, 0., 0.])
+        pos = textData.AdvanceItem(textObj.pos)
+        size = textData.AdvanceItem(textObj.size)
+        size[0] *= align
+        linePos = pos + size
 
-        lineAdvance = textData.lineAdvance
-        if height is not None:
-            height = -height
+        lineAdvance = textData.lineAdvance * textObj.lineSpacing
 
-        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+        # grab the geometry we are laying out
         geo = textData.geometry
         geov = geo['v']
 
-        wrapSlices = wrapper.wrapSlices(textObj, textData)
+        # ask for our slices
+        wrapSlices = textObj.wrapper.wrapSlices(textObj, textData)
 
-        lineOffset = (line*lineAdvance).round()
+        # now layout
+        if textObj.line:
+            linePos -= (textObj.line*lineAdvance)
+
         for textSlice, textOffset in wrapSlices:
-            textOffset = textOffset + (lineOffset - textOffset[0])
-            #textOffset[:,0] -= align * textOffset[-1][0]
+            alignOff = (oneMinusAlign*textOffset[0] + align*textOffset[-1])
+            lineOffset = (linePos - alignOff).round()
+            geov[textSlice] += textOffset[:-1] + lineOffset
 
-            geov[textSlice] += textOffset[:-1]
-
-            line += 1
-
-            lineOffset = (line*lineAdvance).round()
-
-            if lineOffset[1] < height: 
+            linePos -= lineAdvance
+            if (linePos<=pos)[1]:
                 return geo[:textSlice.stop]
 
         return geo

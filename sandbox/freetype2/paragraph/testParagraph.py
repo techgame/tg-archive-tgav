@@ -73,12 +73,12 @@ class RenderSkinModel(RenderSkinModelBase):
         glClear(self.clearMask)
 
         if 1:
-            self.fpsText = TextObject(line=0, font=self.loadFont(self.fontNameFps, self.fontSizeFps))
+            self.fpsText = TextObject(line=0, align=.5, pos=(0,10,0), font=self.loadFont(self.fontNameFps, self.fontSizeFps))
 
-        self.contentText = TextObject(wrapMode=self.wrapMode, align=0, font=self.loadFont(self.fontName, self.fontSize))
+        self.contentText = TextObject(wrapMode=self.wrapMode, align=.5, font=self.loadFont(self.fontName, self.fontSize))
 
         if 1:
-            self.contentTextRight = TextObject(wrapMode=self.wrapMode, align=0, font=self.loadFont(self.fontNameRight, self.fontSizeRight))
+            self.contentTextRight = TextObject(wrapMode=self.wrapMode, align=1, font=self.loadFont(self.fontNameRight, self.fontSizeRight))
         else:
             self.contentTextRight = self.contentText
             self.contentTextRight = None
@@ -170,44 +170,35 @@ class RenderSkinModel(RenderSkinModelBase):
         else:
             self.wrapSize = (w - 50)
 
-        self.contentText.size = (self.wrapSize, h-50)
-        if self.contentTextRight is not None:
-            self.contentTextRight.size = (self.wrapSize, h-50)
+        glColor3ub(0xee, 0xee, 0xff)
+        self.fpsText.size = (w, 0, 0)
+        self.contentText.pos = (25, 50, 0)
+        self.contentText.size = (self.wrapSize, h-50, 0)
 
-        self.refreshText()
+        if self.contentTextRight is not None:
+            self.contentTextRight.pos = (w/2. + 25, 50, 0)
+            self.contentTextRight.size = (self.wrapSize, h-50, 0)
+
+        self.refreshText(False)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def renderContent(self, glCanvas, renderStart):
-        oscilateTime = 4
-        oscilate = abs((renderStart % (2*oscilateTime)) - oscilateTime)/ oscilateTime
+        #oscilateTime = 4
+        #oscilate = abs((renderStart % (2*oscilateTime)) - oscilateTime)/ oscilateTime
         glClear(self.clearMask)
 
-        width, height = self.viewPortSize
-
-        glLoadIdentity()
-
-        columnInset = 25
-        columnWidth = int(width/2)
-
-        glTranslatef(columnInset, height, 0.)
-        glColor3ub(0xee, 0xee, 0xff)
         self.contentText.render()
 
-        #offset = 0.5
-        offset = 0.0
-        glTranslatef(columnWidth + offset, offset, 0.)
-
         if self.contentTextRight is not None:
-            glColor3ub(0xee, 0xee, 0xff)
             self.contentTextRight.render()
 
         if 1:
-            glLoadIdentity()
-            glTranslatef(5, 5, 0)
-
-            glColor3ub(0xee, 0xee, 0xff)
             self.fpsText.render()
+
+        if 0:
+            # test the speed of the layout algorithm
+            self.refreshText(False)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Main 
@@ -239,7 +230,7 @@ Nam felis lorem, consequat nec, tincidunt at, malesuada molestie, magna. Nulla f
 
 trim = None
 if trim is not None:
-    sampleText = '\n'.join(sampleText.split('\n')[-trim:])
+    sampleText = sampleText[0], '\n'.join(sampleText[1].split('\n')[:trim])
 
 if __name__=='__main__':
     m = RenderSkinModel()

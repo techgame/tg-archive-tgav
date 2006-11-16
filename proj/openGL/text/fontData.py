@@ -34,14 +34,17 @@ class FontAdvanceArray(ndarray):
         return klass((count, 1, 3), dtype)
 
     @classmethod
-    def fromSingle(klass, dtype=float32):
-        return klass(3, dtype)
+    def fromItem(klass, item, dtype=float32):
+        self = klass(3, dtype)
+        self[:] = item
+        return self
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class FontTextData(object):
     font = None
+    AdvanceItem = FontAdvanceArray.fromItem
 
     def setupFont(self, font):
         self.font = font

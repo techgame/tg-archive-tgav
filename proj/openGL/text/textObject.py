@@ -31,10 +31,12 @@ class TextObject(object):
 
     textData = None
 
+    pos = (0, 0, 0)
+    size = (0, 0, 0)
+    align = 0.
     line = 1
-    size = (None, None)
+    lineSpacing = 1
     wrapAxis = 0
-    align = 0
 
     def __init__(self, text=None, **kwattr):
         self.text = text

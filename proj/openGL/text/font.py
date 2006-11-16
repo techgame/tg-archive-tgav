@@ -134,8 +134,7 @@ class Font(object):
         self.setFace(face)
         self.setCharset(charset)
 
-        self.lineAdvance = self.FontAdvanceArray.fromSingle()
-        self.lineAdvance[:] = [0., -face.lineHeight*self.pointSize[1], 0.]
+        self.lineAdvance = self.FontAdvanceArray.fromItem((0., face.lineHeight*self.pointSize[1], 0.))
 
         charMap = {'\0': 0, '\n': 0, '\r': 0}
         self.charMap = charMap

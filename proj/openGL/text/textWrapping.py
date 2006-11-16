@@ -92,6 +92,10 @@ class TextWrapper(RETextWrapper):
 
             iCurr = iNext; offCurr = offNext
 
+        iNext = len(text)
+        if iLine < iNext:
+            yield (slice(iLine, iNext), offset[iLine:iNext+1])
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Wrap Mode Map
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
