@@ -46,6 +46,8 @@ class ImageTextureBase(Texture):
     imgModeFormatMap = {
         'RGBA': (gl.GL_RGBA, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE),
         'RGB': (gl.GL_RGB, gl.GL_RGB, gl.GL_UNSIGNED_BYTE),
+        'LA': (gl.GL_LUMINANCE_ALPHA, gl.GL_LUMINANCE_ALPHA, gl.GL_UNSIGNED_BYTE),
+        'L': (gl.GL_LUMINANCE, gl.GL_LUMINANCE, gl.GL_UNSIGNED_BYTE),
         }
 
     def create(self, image, geometry=True, **kwattrs):
@@ -60,14 +62,16 @@ class ImageTextureBase(Texture):
         if geometry:
             self.geometry()
 
-    def loadFilename(self, filename, changeFormat=True):
+    def loadFilename(self, filename, format=True):
         image = Image.open(filename)
-        return self.loadImage(image, changeFormat)
+        return self.loadImage(image, format)
 
-    def loadImage(self, image, changeFormat=True):
-        format, dataFormat, dataType = self.imgModeFormatMap[image.mode]
-        if changeFormat:
-            self.format = format
+    def loadImage(self, image, texFormat=True):
+        impliedFormat, dataFormat, dataType = self.imgModeFormatMap[image.mode]
+        if texFormat is True:
+            self.format = impliedFormat
+        elif texFormat:
+            self.format = texFormat
 
         self.imageSize = image.size
         size = self.validSizeForTarget(image.size)
@@ -79,17 +83,6 @@ class ImageTextureBase(Texture):
         self.recompile()
     imageSize = (0, 0)
 
-    def recompile(self):
-        if self._geo is not None:
-            if self._geo['v'].mean():
-                self.geometry(self._geo)
-            else:
-                self.centerGeometry(self._geo)
-
-    def centerGeometry(self, geo=None):
-        geo = self.geometry(geo)
-        geo['v'] = geo['v'] - geo['v'].mean(0)
-
     _geo = None
     def geometry(self, geo=None):
         if geo is None:
@@ -98,50 +91,62 @@ class ImageTextureBase(Texture):
             geo = self.GeometryFactory.fromCount(1)
             self._geo = geo
 
-        self._setVerticies(geo['v'])
-        self._setTexCoords(geo['t'])
+        self.verticies(geo['v'])
+        self.texCoords(geo['t'])
         return geo
 
-    def _setVerticies(self, geov):
+    def verticies(self, geov):
         iw, ih = self.imageSize
         geov[:] = [[0., 0., 0.],
                    [iw, 0., 0.],
                    [iw, ih, 0.],
                    [0., ih, 0.]]
 
-    def _setTexCoords(self, geot):
+    def texCoords(self, geot):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
-
-    def render(self):
-        self.select()
-        self._geo.draw()
-    __call__ = render
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class ImageTexture2d(ImageTextureBase):
     target = glext.GL_TEXTURE_2D
 
-    def _setTexCoords(self, geot):
+    def texCoords(self, geot):
         w, h = self.size
         iw, ih = self.imageSize
-        iw = float(iw)/w
-        ih = float(ih)/h
-
-        geot[:] = [[0., ih],
-                   [iw, ih],
-                   [iw, 0.],
-                   [0., 0.]]
+        iw = float(iw)/w; ih = float(ih)/h
+        geot[:] = [[0., ih], [iw, ih], [iw, 0.], [0., 0.]]
 
 class ImageTextureRect(ImageTextureBase):
     target = glext.GL_TEXTURE_RECTANGLE_ARB
 
-    def _setTexCoords(self, geot):
+    def texCoords(self, geot):
         iw, ih = self.imageSize
-        geot[:] = [[0., ih],
-                   [iw, ih],
-                   [iw, 0.],
-                   [0., 0.]]
+        geot[:] = [[0., ih], [iw, ih], [iw, 0.], [0., 0.]]
 
 ImageTexture = ImageTextureRect
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ Image
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+class ImageObject(object):
+    def __init__(self, image, texFormat=True):
+        pass
+    def render(self):
+        self.select()
+        self._geo.draw()
+
+class ImageDisplay(object):
+    def __init__(self, *args, **kw):
+        if args or kw:
+            self.update(*args, **kw)
+
+    def update(self, imageObj, imageTexture, geometry):
+        self.geometry = geometry
+        self.texture = imageTexture
+
+    def render(self):
+        self.texture.select()
+        self.geometry.draw()
+    __call__ = render
 
