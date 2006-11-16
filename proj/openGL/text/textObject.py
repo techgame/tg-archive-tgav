@@ -36,11 +36,13 @@ class TextObject(object):
     align = 0.
     line = 1
     lineSpacing = 1
+    crop = True
     wrapAxis = 0
 
     def __init__(self, text=None, **kwattr):
         self.text = text
         self.set(kwattr)
+        self.update()
 
     def set(self, val=None, **kwattr):
         for n,v in (val or kwattr).iteritems():
@@ -69,9 +71,10 @@ class TextObject(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def setWrapMode(self, mode=None):
+    def setWrapMode(self, mode=None, doUpdate=False):
         self.wrapper = self.WrapModeMap[mode]
-        self.update()
+        if doUpdate:
+            self.update()
     wrapMode = property(fset=setWrapMode)
 
     def setDisplayMode(self, mode=None):

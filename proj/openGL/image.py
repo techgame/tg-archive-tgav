@@ -148,10 +148,10 @@ class ImageObject(object):
     DisplayFactory = ImageDisplay
 
     def __init__(self, image=None, format=True, **kwattr):
+        if kwattr: 
+            self.set(kwattr)
         if image is not None:
             self.load(image, format)
-
-        self.set(kwattr)
 
     def set(self, val=None, **kwattr):
         for n,v in (val or kwattr).iteritems():
@@ -167,7 +167,10 @@ class ImageObject(object):
             pos = self._pos
         return pos
     def setPos(self, pos, doUpdate=False):
-        self._pos = asarray(pos, float32)
+        pos = asarray(pos, float32)
+        if pos.shape != (3,):
+            raise ValueError("Position must be a 3 elements long")
+        self._pos = pos
         if doUpdate:
             self.update()
     pos = property(getPos, setPos)
@@ -179,8 +182,11 @@ class ImageObject(object):
             self.setSize((0., 0., 0.))
             size = self._size
         return size
-    def setSize(self, size, doUpdate=True):
-        self._size = asarray(size, float32)
+    def setSize(self, size, doUpdate=False):
+        size = asarray(size, float32)
+        if size.shape != (3,):
+            raise ValueError("Size must be a 3 elements long")
+        self._size = size
         if doUpdate:
             self.update()
     size = property(getSize, setSize)
@@ -192,17 +198,25 @@ class ImageObject(object):
             self.setAlign((0., 0., 0.))
             align = self._align
         return align
-    def setAlign(self, align, doUpdate=True):
+    def setAlign(self, align, doUpdate=False):
         if isinstance(align, (int, long, float)):
             align = (align, align, align)
-        self._align = asarray(align, float32)
+        else:
+            align = asarray(align, float32)
+
+        if align.shape != (3,):
+            raise ValueError("Align must be a single value, or 3 elements long")
+        self._align = align
         if doUpdate:
             self.update()
     align = property(getAlign, setAlign)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def update(self):
+    def update(self, **kwattr):
+        if kwattr: 
+            self.set(kwattr)
+
         image = self.image
         geo = image.geometry()
 
@@ -217,14 +231,20 @@ class ImageObject(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def load(self, *args, **kw):
-        self.image.load(*args, **kw)
+    def load(self, image=None, format=True, **kwattr):
+        self.image.load(image, format)
+        if kwattr: 
+            self.set(kwattr)
         self.update()
-    def loadImage(self, *args, **kw):
-        self.image.loadImage(*args, **kw)
+    def loadImage(self, image=None, format=True, **kwattr):
+        self.image.loadImage(image, format)
+        if kwattr: 
+            self.set(kwattr)
         self.update()
-    def loadFilename(self, *args, **kw):
-        self.image.loadFilename(*args, **kw)
+    def loadFilename(self, image=None, format=True, **kwattr):
+        self.image.loadFilename(image, format)
+        if kwattr: 
+            self.set(kwattr)
         self.update()
 
     _image = None

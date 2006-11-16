@@ -19,6 +19,7 @@ from . import textWrapping
 
 class TextLayout(object):
     def layout(self, textObj, textData):
+        crop = textObj.crop
         align = textObj.align
         oneMinusAlign = 1-align
 
@@ -40,14 +41,20 @@ class TextLayout(object):
         if textObj.line:
             linePos -= (textObj.line*lineAdvance)
 
-        for textSlice, textOffset in wrapSlices:
+        def getOffsetFor(textSlice, textOffset):
             alignOff = (oneMinusAlign*textOffset[0] + align*textOffset[-1])
-            lineOffset = (linePos - alignOff).round()
-            geov[textSlice] += textOffset[:-1] + lineOffset
+            return textOffset[:-1] + (linePos - alignOff).round()
 
-            linePos -= lineAdvance
-            if (linePos<=pos)[1]:
-                return geo[:textSlice.stop]
+        if crop:
+            for textSlice, textOffset in wrapSlices:
+                geov[textSlice] += getOffsetFor(textSlice, textOffset)
+                linePos -= lineAdvance
+                if (linePos<=pos)[1]:
+                    return geo[:textSlice.stop]
+        else:
+            for textSlice, textOffset in wrapSlices:
+                geov[textSlice] += getOffsetFor(textSlice, textOffset)
+                linePos -= lineAdvance
 
         return geo
 
