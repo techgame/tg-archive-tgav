@@ -14,7 +14,7 @@ import os
 
 from renderBase import RenderSkinModelBase
 
-from TG.openGL.image import ImageTexture
+from TG.openGL.image import ImageObject
 
 from TG.openGL.raw import gl
 from TG.openGL.raw.gl import *
@@ -58,26 +58,17 @@ class RenderSkinModel(RenderSkinModelBase):
 
         spacing = 20
         totalHeight = 0
-        self.imgLogo = ImageTexture('tg-logo.png')
-        self.imgLogo.centerGeometry()
-        totalHeight += self.imgLogo.imageSize[1] + spacing
+        self.imgLogo = ImageObject('tg-logo.png', align=(.5, 1.5, .5))
+        totalHeight += self.imgLogo.size[1] + spacing
 
-        self.imgButton = ImageTexture('button.png')
-        self.imgButton.centerGeometry()
-        totalHeight += self.imgButton.imageSize[1] + spacing
+        self.imgButton = ImageObject('button.png', align=(.5, .5, .5))
+        totalHeight += self.imgButton.size[1] + spacing
 
-        self.imgStar = ImageTexture('starshape.png')
-        self.imgStar.centerGeometry()
-        totalHeight += self.imgStar.imageSize[1] + spacing
+        self.imgStar = ImageObject('starshape.png', align=(.5, -.5, .5))
+        totalHeight += self.imgStar.size[1] + spacing
 
         self.totalHeight = totalHeight - spacing
         self.spacing = spacing
-
-    def showImg(self, img):
-        halfHeight = img.imageSize[1]/2
-        glTranslatef(0., -halfHeight, 0.)
-        img.render()
-        glTranslatef(0., -halfHeight - self.spacing, 0.)
 
     def renderContent(self, glCanvas, renderStart):
         try:
@@ -85,12 +76,11 @@ class RenderSkinModel(RenderSkinModelBase):
 
             glLoadIdentity()
 
-            glTranslatef(0, self.totalHeight/2., 0)
-
-            showImg = self.showImg
-            showImg(self.imgLogo)
-            showImg(self.imgButton)
-            showImg(self.imgStar)
+            glDepthMask(False)
+            self.imgLogo.render()
+            self.imgButton.render()
+            self.imgStar.render()
+            glDepthMask(True)
 
         except Exception:
             self.repaintTimer.Stop()

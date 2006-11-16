@@ -20,11 +20,11 @@ from TG.openGL.raw import gl, glext
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class FontTextureBase(Texture):
-    target = None
-    format = gl.GL_ALPHA
 
     texParams = Texture.texParams.copy()
     texParams.update(
+            format=gl.GL_ALPHA,
+
             wrap=gl.GL_CLAMP,
             genMipmaps=True,
             magFilter=gl.GL_LINEAR,
@@ -60,7 +60,8 @@ class FontTextureBase(Texture):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class FontTextureRect(FontTextureBase):
-    target = glext.GL_TEXTURE_RECTANGLE_ARB
+    texParams = FontTextureBase.texParams.copy()
+    texParams.update(target=glext.GL_TEXTURE_RECTANGLE_ARB)
 
     def texCoordsFrom(self, (x0, y0), (w, h)):
         x1 = x0 + w; y1 = y0 + h
@@ -71,7 +72,8 @@ FontTexture = FontTextureRect
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class FontTexture2D(FontTextureBase):
-    target = gl.GL_TEXTURE_2D
+    texParams = FontTextureBase.texParams.copy()
+    texParams.update(target=gl.GL_TEXTURE_2D)
 
     def texCoordsFrom(self, (x0, y0), (w, h)):
         (tw, th) = self.size

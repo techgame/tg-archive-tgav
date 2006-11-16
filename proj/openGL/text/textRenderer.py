@@ -19,7 +19,6 @@ from TG.openGL.raw import gl
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class TextDisplay(object):
-    mode = gl.GL_QUADS
     def __init__(self, *args, **kw):
         if args or kw:
             self.update(*args, **kw)

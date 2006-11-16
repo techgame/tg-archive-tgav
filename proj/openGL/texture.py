@@ -113,8 +113,47 @@ class PixelStore(object):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class TextureImageBasic(object):
-    format = None # GL_COLOR_INDEX,  GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA,  GL_RGB,  GL_BGR  GL_RGBA, GL_BGRA, GL_LUMINANCE, GL_LUMINANCE_ALPHA
-    dataType = None # GL_UNSIGNED_BYTE, GL_BYTE, GL_BITMAP, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_FLOAT, ...
+    formatMap = {
+        'rgb': gl.GL_RGB, 'RGB': gl.GL_RGB,
+        'rgba': gl.GL_RGBA, 'RGBA': gl.GL_RGBA,
+
+        'bgr': gl.GL_BGR, 'BGR': gl.GL_BGR,
+        'bgra': gl.GL_BGRA, 'BGRA': gl.GL_BGRA,
+
+        'ci': gl.GL_COLOR_INDEX, 'color_index': gl.GL_COLOR_INDEX,
+        'si': gl.GL_STENCIL_INDEX, 'stencil_index': gl.GL_STENCIL_INDEX,
+        'dc': gl.GL_DEPTH_COMPONENT, 'depth': gl.GL_DEPTH_COMPONENT, 'depth_component': gl.GL_DEPTH_COMPONENT,
+
+        'r': gl.GL_RED, 'R': gl.GL_RED, 'red': gl.GL_RED,
+        'g': gl.GL_GREEN, 'G': gl.GL_GREEN, 'green': gl.GL_GREEN,
+        'b': gl.GL_BLUE, 'B': gl.GL_BLUE, 'blue': gl.GL_BLUE,
+        'a': gl.GL_ALPHA, 'A': gl.GL_ALPHA, 'alpha': gl.GL_ALPHA,
+
+        'l': gl.GL_LUMINANCE, 'L': gl.GL_LUMINANCE, 'luminance': gl.GL_LUMINANCE,
+        'la': gl.GL_LUMINANCE_ALPHA, 'LA': gl.GL_LUMINANCE_ALPHA, 'luminance_alpha': gl.GL_LUMINANCE_ALPHA,
+    }
+
+    dataTypeMap = {
+        'bitmap': gl.GL_BITMAP,
+
+        'ub': gl.GL_UNSIGNED_BYTE, 'ubyte': gl.GL_UNSIGNED_BYTE, 'B': gl.GL_UNSIGNED_BYTE,
+        'b': gl.GL_BYTE, 'byte': gl.GL_BYTE,
+
+        'us': gl.GL_UNSIGNED_SHORT, 'ushort': gl.GL_UNSIGNED_SHORT, 'S': gl.GL_UNSIGNED_SHORT,
+        's': gl.GL_SHORT, 'short': gl.GL_SHORT,
+
+        'ui': gl.GL_UNSIGNED_INT, 'uint': gl.GL_UNSIGNED_INT, 'I': gl.GL_UNSIGNED_INT,
+        'ul': gl.GL_UNSIGNED_INT, 'ulong': gl.GL_UNSIGNED_INT, 'L': gl.GL_UNSIGNED_INT,
+        'i': gl.GL_INT, 'int': gl.GL_INT, 'l': gl.GL_INT, 'long': gl.GL_INT,
+
+        'f': gl.GL_FLOAT, 'f32': gl.GL_FLOAT, 'float': gl.GL_FLOAT, 'float32': gl.GL_FLOAT,
+
+        'ub332': gl.GL_UNSIGNED_BYTE_3_3_2, 'ub233r': gl.GL_UNSIGNED_BYTE_2_3_3_REV,
+        'us565': gl.GL_UNSIGNED_SHORT_5_6_5, 'us565r': gl.GL_UNSIGNED_SHORT_5_6_5_REV,
+        'us4444': gl.GL_UNSIGNED_SHORT_4_4_4_4, 'us4444r': gl.GL_UNSIGNED_SHORT_4_4_4_4_REV,
+        'us5551': gl.GL_UNSIGNED_SHORT_5_5_5_1, 'us1555r': gl.GL_UNSIGNED_SHORT_1_5_5_5_REV,
+        'ui8888': gl.GL_UNSIGNED_INT_8_8_8_8, 'ui8888r': gl.GL_UNSIGNED_INT_8_8_8_8_REV, 
+        'uiAAA2': gl.GL_UNSIGNED_INT_10_10_10_2, 'ui2AAAr': gl.GL_UNSIGNED_INT_2_10_10_10_REV, }
     border = False
 
     _dataTypeSizeMap = {
@@ -166,6 +205,26 @@ class TextureImageBasic(object):
         for e in self.getSize():
             byteSize *= e + border
         return byteSize
+
+    _dataType = None
+    def getDataType(self):
+        if self._dataType is None:
+            pass #self.setDataType(None)
+        return self._dataType
+    def setDataType(self, dataType):
+        self._dataType = dataType
+    # dataType should be: gl.GL_UNSIGNED_BYTE, gl.GL_BYTE, gl.GL_BITMAP, gl.GL_UNSIGNED_SHORT, gl.GL_SHORT, gl.GL_UNSIGNED_INT, gl.GL_INT, gl.GL_FLOAT, ...
+    dataType = property(getDataType, setDataType)
+
+    _format = None
+    def getFormat(self):
+        return self._format
+    def setFormat(self, format):
+        if isinstance(format, basestring):
+            format = self.formatMap[format]
+        self._format = format
+    # format should be: gl.GL_COLOR_INDEX,  gl.GL_RED, gl.GL_GREEN, gl.GL_BLUE, gl.GL_ALPHA,  gl.GL_RGB,  gl.GL_BGR  gl.GL_RGBA, gl.GL_BGRA, gl.GL_LUMINANCE, gl.GL_LUMINANCE_ALPHA
+    format = property(getFormat, setFormat)
 
     _pointer = None
     def getPointer(self):
@@ -370,10 +429,75 @@ class TextureImage3D(TextureImageBasic):
 
 class Texture(object):
     _as_parameter_ = None # GLenum returned from glGenTextures
-    target = 0 # GL_TEXTURE_1D, GL_TEXTURE_2D, etc.
-    format = None # GL_RGBA, GL_INTENSITY, etc.
-
     texParams = dict()
+    targetMap = {
+        '1d': gl.GL_TEXTURE_1D, '1D': gl.GL_TEXTURE_1D,
+        'proxy-1d': gl.GL_PROXY_TEXTURE_1D, 'proxy-1D': gl.GL_PROXY_TEXTURE_1D,
+        '2d': gl.GL_TEXTURE_2D, '2D': gl.GL_TEXTURE_2D,
+        'proxy-2d': gl.GL_PROXY_TEXTURE_2D, 'proxy-2D': gl.GL_PROXY_TEXTURE_2D,
+        '3d': gl.GL_TEXTURE_3D, '3D': gl.GL_TEXTURE_3D,
+        'proxy-3d': gl.GL_PROXY_TEXTURE_3D, 'proxy-3D': gl.GL_PROXY_TEXTURE_3D,
+
+        'rect': glext.GL_TEXTURE_RECTANGLE_ARB, 'proxy-rect': glext.GL_PROXY_TEXTURE_RECTANGLE_ARB,
+
+        'cube': gl.GL_TEXTURE_CUBE_MAP, 'proxy-cube': gl.GL_PROXY_TEXTURE_CUBE_MAP,
+        'cube+x': gl.GL_TEXTURE_CUBE_MAP_POSITIVE_X, 'cube-x': gl.GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+        'cube+y': gl.GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 'cube-y': gl.GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+        'cube+z': gl.GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 'cube-z': gl.GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+    }
+    formatMap = {
+        1: 1, 2: 2, 3: 3, 4: 4, '1': 1, '2': 2, '3': 3, '4': 4,
+
+        'rgb': gl.GL_RGB, 'RGB': gl.GL_RGB,
+        'r3b3g2': gl.GL_R3_G3_B2, 'R3B3G2': gl.GL_R3_G3_B2,
+        'rbg4': gl.GL_RGB4, 'RBG4': gl.GL_RGB4,
+        'rbg5': gl.GL_RGB4, 'RBG5': gl.GL_RGB4,
+        'rbg8': gl.GL_RGB8, 'RBG8': gl.GL_RGB8,
+        'rbg12': gl.GL_RGB12, 'RBG12': gl.GL_RGB12,
+        'rbg16': gl.GL_RGB16, 'RBG16': gl.GL_RGB16,
+
+        'rgba': gl.GL_RGBA, 'RGBA': gl.GL_RGBA,
+        'rbga2': gl.GL_RGBA2, 'RBGA2': gl.GL_RGBA2,
+        'rbga4': gl.GL_RGBA4, 'RBGA4': gl.GL_RGBA4,
+        'rbga8': gl.GL_RGBA8, 'RBGA8': gl.GL_RGBA8,
+        'rbga12': gl.GL_RGBA12, 'RBGA12': gl.GL_RGBA12,
+        'rbga16': gl.GL_RGBA16, 'RBGA16': gl.GL_RGBA16,
+
+        'rbg5a1': gl.GL_RGB5_A1, 'RBG5A1': gl.GL_RGB5_A1,
+        'rbg10a2': gl.GL_RGB10_A2, 'RBG10A2': gl.GL_RGB10_A2,
+
+        'a': gl.GL_ALPHA, 'A': gl.GL_ALPHA,'alpha': gl.GL_ALPHA,
+        'a4': gl.GL_ALPHA4, 'A4': gl.GL_ALPHA4,
+        'a8': gl.GL_ALPHA8, 'A8': gl.GL_ALPHA8,
+        'a12': gl.GL_ALPHA12, 'A12': gl.GL_ALPHA12,
+        'a16': gl.GL_ALPHA16, 'A16': gl.GL_ALPHA16,
+
+        'l': gl.GL_LUMINANCE, 'L': gl.GL_LUMINANCE, 'luminance': gl.GL_LUMINANCE,
+        'l4': gl.GL_LUMINANCE4, 'L4': gl.GL_LUMINANCE4, 
+        'l8': gl.GL_LUMINANCE8, 'L8': gl.GL_LUMINANCE8, 
+        'l12': gl.GL_LUMINANCE12, 'L12': gl.GL_LUMINANCE12, 
+        'l16': gl.GL_LUMINANCE16, 'L16': gl.GL_LUMINANCE16, 
+
+        'la': gl.GL_LUMINANCE_ALPHA, 'LA': gl.GL_LUMINANCE_ALPHA, 'luminance_alpha': gl.GL_LUMINANCE_ALPHA,
+        'l6a2': gl.GL_LUMINANCE6_ALPHA2, 'L6A2': gl.GL_LUMINANCE6_ALPHA2, 
+        'l12a4': gl.GL_LUMINANCE12_ALPHA4, 'L12A4': gl.GL_LUMINANCE12_ALPHA4, 
+        'la4': gl.GL_LUMINANCE4_ALPHA4, 'LA4': gl.GL_LUMINANCE4_ALPHA4, 'l4a4': gl.GL_LUMINANCE4_ALPHA4, 'L4A4': gl.GL_LUMINANCE4_ALPHA4, 
+        'la8': gl.GL_LUMINANCE8_ALPHA8, 'LA8': gl.GL_LUMINANCE8_ALPHA8, 'l8a8': gl.GL_LUMINANCE8_ALPHA8, 'L8A8': gl.GL_LUMINANCE8_ALPHA8, 
+        'la12': gl.GL_LUMINANCE12_ALPHA12, 'LA12': gl.GL_LUMINANCE12_ALPHA12, 'l12a12': gl.GL_LUMINANCE12_ALPHA12, 'L12A12': gl.GL_LUMINANCE12_ALPHA12, 
+        'la16': gl.GL_LUMINANCE16_ALPHA16, 'LA16': gl.GL_LUMINANCE16_ALPHA16, 'l16a16': gl.GL_LUMINANCE16_ALPHA16, 'L16A16': gl.GL_LUMINANCE16_ALPHA16, 
+
+        'i': gl.GL_INTENSITY, 'I': gl.GL_INTENSITY, 'intensity': gl.GL_INTENSITY,
+        'i4': gl.GL_INTENSITY4, 'I4': gl.GL_INTENSITY4, 'intensity4': gl.GL_INTENSITY4,
+        'i8': gl.GL_INTENSITY8, 'I8': gl.GL_INTENSITY8, 'intensity8': gl.GL_INTENSITY8,
+        'i12': gl.GL_INTENSITY12, 'I12': gl.GL_INTENSITY12, 'intensity12': gl.GL_INTENSITY12,
+        'i16': gl.GL_INTENSITY16, 'I16': gl.GL_INTENSITY16, 'intensity16': gl.GL_INTENSITY16,
+
+        'c-rgb': gl.GL_COMPRESSED_RGB, 'C-RGB': gl.GL_COMPRESSED_RGB, 'compressed_rgb': gl.GL_COMPRESSED_RGB,
+        'c-rgba': gl.GL_COMPRESSED_RGBA, 'C-RGBA': gl.GL_COMPRESSED_RGBA, 'compressed_rgba': gl.GL_COMPRESSED_RGBA,
+        'c-a': gl.GL_COMPRESSED_ALPHA, 'C-A': gl.GL_COMPRESSED_ALPHA, 'compressed_alpha': gl.GL_COMPRESSED_ALPHA,
+        'c-l': gl.GL_COMPRESSED_LUMINANCE, 'C-L': gl.GL_COMPRESSED_LUMINANCE, 'compressed_luminance': gl.GL_COMPRESSED_LUMINANCE,
+        'c-la': gl.GL_COMPRESSED_LUMINANCE_ALPHA, 'C-LA': gl.GL_COMPRESSED_LUMINANCE_ALPHA, 'compressed_luminance_alpha': gl.GL_COMPRESSED_LUMINANCE_ALPHA,
+        'c-i': gl.GL_COMPRESSED_INTENSITY, 'C-I': gl.GL_COMPRESSED_INTENSITY, 'compressed_intensity': gl.GL_COMPRESSED_INTENSITY, } 
 
     def __init__(self, *args, **kwargs):
         self.create(*args, **kwargs)
@@ -389,8 +513,9 @@ class Texture(object):
         if not self._as_parameter_ is None:
             raise Exception("Create has already been called for this instance")
 
-        if target is not None:
-            self.target = target
+        if target is None:
+            target = self.texParams.get('target') or self.target
+        self.target = target
 
         self._genId()
         self.bind()
@@ -446,6 +571,26 @@ class Texture(object):
         self.disable()
         self.unbind()
         return self
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    _target = 0 # gl.GL_TEXTURE_1D, gl.GL_TEXTURE_2D, etc.
+    def getTarget(self):
+        return self._target
+    def setTarget(self, target):
+        if isinstance(target, basestring):
+            target = self.targetMap[target]
+        self._target = target
+    target = property(getTarget, setTarget)
+
+    _format = None # gl.GL_RGBA, gl.GL_INTENSITY, etc.
+    def getFormat(self):
+        return self._format
+    def setFormat(self, format):
+        if isinstance(format, basestring):
+            format = self.formatMap[format]
+        self._format = format
+    format = property(getFormat, setFormat)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -653,11 +798,11 @@ class Texture(object):
     _maxTextureSizeByTarget = {}
 
     _textureTargetToMaxPName = {
-        gl.GL_TEXTURE_1D: gl.GL_MAX_TEXTURE_SIZE,
-        gl.GL_TEXTURE_2D: gl.GL_MAX_TEXTURE_SIZE,
-        gl.GL_TEXTURE_3D: gl.GL_MAX_3D_TEXTURE_SIZE,
-        gl.GL_TEXTURE_CUBE_MAP: gl.GL_MAX_CUBE_MAP_TEXTURE_SIZE,
-        glext.GL_TEXTURE_RECTANGLE_ARB: glext.GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB,
+        gl.GL_TEXTURE_1D: gl.GL_MAX_TEXTURE_SIZE, gl.GL_PROXY_TEXTURE_1D: gl.GL_MAX_TEXTURE_SIZE,
+        gl.GL_TEXTURE_2D: gl.GL_MAX_TEXTURE_SIZE, gl.GL_PROXY_TEXTURE_2D: gl.GL_MAX_TEXTURE_SIZE,
+        gl.GL_TEXTURE_3D: gl.GL_MAX_3D_TEXTURE_SIZE, gl.GL_PROXY_TEXTURE_3D: gl.GL_MAX_3D_TEXTURE_SIZE,
+        gl.GL_TEXTURE_CUBE_MAP: gl.GL_MAX_CUBE_MAP_TEXTURE_SIZE, gl.GL_PROXY_TEXTURE_CUBE_MAP: gl.GL_MAX_CUBE_MAP_TEXTURE_SIZE,
+        glext.GL_TEXTURE_RECTANGLE_ARB: glext.GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB, glext.GL_PROXY_TEXTURE_RECTANGLE_ARB: glext.GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB,
         }
 
     def getMaxTextureSize(self):
