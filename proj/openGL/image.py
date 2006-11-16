@@ -200,7 +200,7 @@ class ImageObject(object):
         return align
     def setAlign(self, align, doUpdate=False):
         if isinstance(align, (int, long, float)):
-            align = (align, align, align)
+            align = asarray((align, align, align), float32)
         else:
             align = asarray(align, float32)
 
