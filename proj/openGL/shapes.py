@@ -91,7 +91,7 @@ class RectGeometryArray(vertexArrays.VertexArray):
 
     @classmethod
     def fromCount(klass, count):
-        return klass.fromFormat((count, 4), klass.dataFormat)
+        return klass.fromFormat((count, 4, 3), klass.dataFormat)
 
     @classmethod
     def fromSingle(klass):

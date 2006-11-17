@@ -83,3 +83,9 @@ class InterleavedArrays(ArrayBase):
     def unbind(self):
         self.glInterleavedArrays(self.dataFormat, 0, None)
 
+    def draw(self, drawMode=None, vboOffset=None):
+        self.select(vboOffset)
+        self.glDrawArrays(drawMode or self.drawMode, 0, self.size)
+    def drawRaw(self, drawMode=None):
+        self.glDrawArrays(drawMode or self.drawMode, 0, self.size)
+

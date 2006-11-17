@@ -203,9 +203,9 @@ class ArrayBase(NDArrayBase):
     glDrawArrays = staticmethod(gl.glDrawArrays)
     def draw(self, drawMode=None, vboOffset=None):
         self.select(vboOffset)
-        self.glDrawArrays(drawMode or self.drawMode, 0, self.size)
+        self.glDrawArrays(drawMode or self.drawMode, 0, self.size/self.shape[-1])
     def drawRaw(self, drawMode=None):
-        self.glDrawArrays(drawMode or self.drawMode, 0, self.size)
+        self.glDrawArrays(drawMode or self.drawMode, 0, self.size/self.shape[-1])
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
