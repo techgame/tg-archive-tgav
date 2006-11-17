@@ -14,10 +14,11 @@ from numpy import asarray, float32
 
 from PIL import Image
 
-from .color import ColorProperty
-from .raw import gl, glext
+from .shapes import PositionalObject
 from .texture import Texture
 from .data import interleavedArrays
+
+from .raw import gl, glext
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -29,7 +30,11 @@ class ImageGeometryArray(interleavedArrays.InterleavedArrays):
 
     @classmethod
     def fromCount(klass, count):
-        return klass.fromFormat(count * 4, klass.dataFormat)
+        return klass.fromFormat((count, 4), klass.dataFormat)
+
+    @classmethod
+    def fromSingle(klass):
+        return klass.fromFormat(4, klass.dataFormat)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -83,19 +88,15 @@ class ImageTextureBase(Texture):
         data.setSubImageOn(self, size=image.size)
     imageSize = (0., 0., 0.)
 
-    _geo = None
     def geometry(self, geo=None):
         if geo is None:
-            geo = self._geo
-        if geo is None:
-            geo = self.GeometryFactory.fromCount(1)
-            self._geo = geo
+            geo = self.GeometryFactory.fromSingle()
 
         geo['v'] = self.verticies()
         geo['t'] = self.texCoords()
         return geo
 
-    def verticies(self, geov=None):
+    def verticies(self):
         iw, ih, id = self.imageSize
         return [[0., 0., id], [iw, 0., id], [iw, ih, id], [0., ih, id]]
 
@@ -128,93 +129,14 @@ ImageTexture = ImageTextureRect
 #~ Image
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class ImageDisplay(object):
-    def __init__(self, *args, **kw):
-        if args or kw:
-            self.update(*args, **kw)
-
-    def update(self, imageObj, imageTexture, geometry):
-        self.texture = imageTexture
-        self.color = imageObj.color
-        self.geometry = geometry
-
-    def render(self):
-        self.texture.select()
-        self.color.select()
-        self.geometry.draw()
-    __call__ = render
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-class ImageObject(object):
+class ImageObject(PositionalObject):
     ImageTextureFactory = ImageTextureRect
-    DisplayFactory = ImageDisplay
 
     def __init__(self, image=None, format=True, **kwattr):
         if kwattr: 
             self.set(kwattr)
         if image is not None:
             self.load(image, format)
-
-    def set(self, val=None, **kwattr):
-        for n,v in (val or kwattr).iteritems():
-            setattr(self, n, v)
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    color = ColorProperty()
-
-    _pos = None
-    def getPos(self):
-        pos = self._pos
-        if pos is None:
-            self.setPos((0., 0., 0.))
-            pos = self._pos
-        return pos
-    def setPos(self, pos, doUpdate=False):
-        pos = asarray(pos, float32)
-        if pos.shape != (3,):
-            raise ValueError("Position must be a 3 elements long")
-        self._pos = pos
-        if doUpdate:
-            self.update()
-    pos = property(getPos, setPos)
-
-    _size = None
-    def getSize(self):
-        size = self._size
-        if size is None:
-            self.setSize((0., 0., 0.))
-            size = self._size
-        return size
-    def setSize(self, size, doUpdate=False):
-        size = asarray(size, float32)
-        if size.shape != (3,):
-            raise ValueError("Size must be a 3 elements long")
-        self._size = size
-        if doUpdate:
-            self.update()
-    size = property(getSize, setSize)
-
-    _align = None
-    def getAlign(self):
-        align = self._align
-        if align is None:
-            self.setAlign((0., 0., 0.))
-            align = self._align
-        return align
-    def setAlign(self, align, doUpdate=False):
-        if isinstance(align, (int, long, float)):
-            align = asarray((align, align, align), float32)
-        else:
-            align = asarray(align, float32)
-
-        if align.shape != (3,):
-            raise ValueError("Align must be a single value, or 3 elements long")
-        self._align = align
-        if doUpdate:
-            self.update()
-    align = property(getAlign, setAlign)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -227,11 +149,14 @@ class ImageObject(object):
 
         size = self.size
         size[:] = image.imageSize
-        off = self.pos - (self.align*self.size)
+        off = self.pos - (self.align*size)
 
-        geo['v'] += off
+        if self.roundValues:
+            geo['v'] += off.round()
+        else:
+            geo['v'] += off
 
-        self.display.update(self, image, geo)
+        self.geometry = geo
         return True
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -270,19 +195,8 @@ class ImageObject(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    _display = None
-    def getDisplay(self):
-        display = self._display
-        if display is None:
-            display = self.DisplayFactory()
-            self._display = display
-        return display
-    def setDisplay(self, display, doUpdate=False):
-        self._display = display
-        if doUpdate:
-            self.update()
-    display = property(getDisplay, setDisplay)
-
     def render(self):
-        self.display.render()
+        self.image.select()
+        self.color.select()
+        self.geometry.draw()
 

@@ -19,8 +19,9 @@ from . import textWrapping
 
 class TextLayout(object):
     def layout(self, textObj, textData):
+        roundValues = textObj.roundValues
         crop = textObj.crop
-        align = textObj.align
+        align = textObj.align[textObj.wrapAxis]
         oneMinusAlign = 1-align
 
         pos = textData.AdvanceItem(textObj.pos)
@@ -41,9 +42,14 @@ class TextLayout(object):
         if textObj.line:
             linePos -= (textObj.line*lineAdvance)
 
-        def getOffsetFor(textSlice, textOffset):
-            alignOff = (oneMinusAlign*textOffset[0] + align*textOffset[-1])
-            return textOffset[:-1] + (linePos - alignOff).round()
+        if roundValues:
+            def getOffsetFor(textSlice, textOffset):
+                alignOff = (oneMinusAlign*textOffset[0] + align*textOffset[-1])
+                return textOffset[:-1] + (linePos - alignOff).round()
+        else:
+            def getOffsetFor(textSlice, textOffset):
+                alignOff = (oneMinusAlign*textOffset[0] + align*textOffset[-1])
+                return textOffset[:-1] + (linePos - alignOff)
 
         if crop:
             for textSlice, textOffset in wrapSlices:

@@ -186,9 +186,9 @@ class ArrayBase(NDArrayBase):
 
     def bind(self, vboOffset=None):
         if vboOffset is None:
-            self.glArrayPointer(len(self), self.dataFormat, 0, self.ctypes)
+            self.glArrayPointer(self.shape[-1], self.dataFormat, 0, self.ctypes)
         else:
-            self.glArrayPointer(len(self), self.dataFormat, 0, vboOffset)
+            self.glArrayPointer(self.shape[-1], self.dataFormat, 0, vboOffset)
 
     def deselect(self):
         self.unbind()
@@ -198,7 +198,7 @@ class ArrayBase(NDArrayBase):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
 
     def unbind(self):
-        self.glArrayPointer(0, self.dataFormat, 0, None)
+        self.glArrayPointer(3, self.dataFormat, 0, None)
 
     glDrawArrays = staticmethod(gl.glDrawArrays)
     def draw(self, drawMode=None, vboOffset=None):
@@ -228,12 +228,12 @@ class MultiTexureCoordArray(TexureCoordArray):
     def bind(self):
         self.glClientActiveTexture(self.texUnit)
         if vboOffset is None:
-            self.glArrayPointer(len(self), self.dataFormat, 0, self.ctypes)
+            self.glArrayPointer(self.shape[-1], self.dataFormat, 0, self.ctypes)
         else:
-            self.glArrayPointer(len(self), self.dataFormat, 0, vboOffset)
+            self.glArrayPointer(self.shape[-1], self.dataFormat, 0, vboOffset)
     def unbind(self):
         self.glClientActiveTexture(self.texUnit)
-        self.glArrayPointer(0, self.dataFormat, 0, None)
+        self.glArrayPointer(3, self.dataFormat, 0, None)
 
 class NormalArray(ArrayBase):
     glArrayType = gl.GL_NORMAL_ARRAY

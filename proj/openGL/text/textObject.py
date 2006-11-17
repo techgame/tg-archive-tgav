@@ -10,17 +10,16 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from numpy import asarray
 from . import textLayout
 from . import textRenderer
 from . import textWrapping
-from ..color import ColorProperty
+from ..shapes import PositionalObject
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class TextObject(object):
+class TextObject(PositionalObject):
     layout = textLayout.TextLayout()
 
     WrapModeMap = textWrapping.wrapModeMap
@@ -33,9 +32,6 @@ class TextObject(object):
 
     textData = None
 
-    pos = (0, 0, 0)
-    size = (0, 0, 0)
-    align = 0.
     line = 1
     lineSpacing = 1
     crop = True
@@ -45,10 +41,6 @@ class TextObject(object):
         self.text = text
         self.set(kwattr)
         self.update()
-
-    def set(self, val=None, **kwattr):
-        for n,v in (val or kwattr).iteritems():
-            setattr(self, n, v)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -70,8 +62,6 @@ class TextObject(object):
         if doUpdate:
             self.update(text)
     text = property(getText, setText)
-
-    color = ColorProperty()
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
