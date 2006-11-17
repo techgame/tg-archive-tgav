@@ -81,7 +81,7 @@ class ColorObject(object):
             if len(value) > 4:
                 # 6 or 8 length hex string
                 value = tuple(int(e, 16)/255. for e in (value[0:2], value[2:4], value[4:6], value[6:]) if e)
-            elif len(value) > 3:
+            elif len(value) > 2:
                 # 3 or 4 length hex string
                 value = tuple(int(e, 16)/15. for e in (value[0:1], value[1:2], value[2:3], value[3:]) if e)
             else:
