@@ -41,14 +41,13 @@ class ImageGeometryArray(interleavedArrays.InterleavedArrays):
 class ImageTextureBase(Texture):
     GeometryFactory = ImageGeometryArray
 
-    texParams = Texture.texParams.copy()
-    texParams.update(
-            wrap=gl.GL_CLAMP_TO_EDGE,
+    texParams = Texture.texParams + [
+            ('wrap', gl.GL_CLAMP_TO_EDGE),
 
-            genMipmaps=True,
-            magFilter=gl.GL_LINEAR,
-            minFilter=gl.GL_LINEAR_MIPMAP_LINEAR,
-            )
+            ('genMipmaps', True),
+            ('magFilter', gl.GL_LINEAR),
+            ('minFilter', gl.GL_LINEAR_MIPMAP_LINEAR),
+            ]
 
     imgModeFormatMap = {
         'RGBA': (gl.GL_RGBA, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE),
@@ -106,8 +105,8 @@ class ImageTextureBase(Texture):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class ImageTexture2d(ImageTextureBase):
-    texParams = ImageTextureBase.texParams.copy()
-    texParams.update(target=gl.GL_TEXTURE_2D)
+    texParams = ImageTextureBase.texParams + [
+                    ('target', gl.GL_TEXTURE_2D), ]
 
     def texCoords(self):
         w, h = self.size
@@ -116,8 +115,8 @@ class ImageTexture2d(ImageTextureBase):
         return [[0., ih], [iw, ih], [iw, 0.], [0., 0.]]
 
 class ImageTextureRect(ImageTextureBase):
-    texParams = ImageTextureBase.texParams.copy()
-    texParams.update(target=glext.GL_TEXTURE_RECTANGLE_ARB)
+    texParams = ImageTextureBase.texParams + [
+                    ('target', glext.GL_TEXTURE_RECTANGLE_ARB), ]
 
     def texCoords(self):
         iw, ih, id = self.imageSize

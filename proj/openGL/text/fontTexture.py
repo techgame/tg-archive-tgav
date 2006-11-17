@@ -21,15 +21,14 @@ from TG.openGL.raw import gl, glext
 
 class FontTextureBase(Texture):
 
-    texParams = Texture.texParams.copy()
-    texParams.update(
-            format=gl.GL_ALPHA,
+    texParams = Texture.texParams + [
+            ('format', gl.GL_ALPHA),
 
-            wrap=gl.GL_CLAMP,
-            genMipmaps=True,
-            magFilter=gl.GL_LINEAR,
-            minFilter=gl.GL_LINEAR_MIPMAP_LINEAR,
-            )
+            ('wrap', gl.GL_CLAMP),
+            ('genMipmaps', True),
+            ('magFilter', gl.GL_LINEAR),
+            ('minFilter', gl.GL_LINEAR_MIPMAP_LINEAR),
+            ]
     dataFormat = gl.GL_ALPHA
     dataType = gl.GL_UNSIGNED_BYTE
 
@@ -60,8 +59,8 @@ class FontTextureBase(Texture):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class FontTextureRect(FontTextureBase):
-    texParams = FontTextureBase.texParams.copy()
-    texParams.update(target=glext.GL_TEXTURE_RECTANGLE_ARB)
+    texParams = FontTextureBase.texParams + [
+                    ('target', glext.GL_TEXTURE_RECTANGLE_ARB), ]
 
     def texCoordsFrom(self, (x0, y0), (w, h)):
         x1 = x0 + w; y1 = y0 + h
@@ -72,8 +71,8 @@ FontTexture = FontTextureRect
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class FontTexture2D(FontTextureBase):
-    texParams = FontTextureBase.texParams.copy()
-    texParams.update(target=gl.GL_TEXTURE_2D)
+    texParams = FontTextureBase.texParams + [
+                    ('target', gl.GL_TEXTURE_2D), ]
 
     def texCoordsFrom(self, (x0, y0), (w, h)):
         (tw, th) = self.size

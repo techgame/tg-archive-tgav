@@ -429,7 +429,7 @@ class TextureImage3D(TextureImageBasic):
 
 class Texture(object):
     _as_parameter_ = None # GLenum returned from glGenTextures
-    texParams = dict()
+    texParams = []
     targetMap = {
         '1d': gl.GL_TEXTURE_1D, '1D': gl.GL_TEXTURE_1D,
         'proxy-1d': gl.GL_PROXY_TEXTURE_1D, 'proxy-1D': gl.GL_PROXY_TEXTURE_1D,
@@ -514,8 +514,10 @@ class Texture(object):
             raise Exception("Create has already been called for this instance")
 
         if target is None:
-            target = self.texParams.get('target') or self.target
-        self.target = target
+            for n,v in self.texParams:
+                if n == 'target':
+                    self.target = v
+                    break
 
         self._genId()
         self.bind()
@@ -523,7 +525,13 @@ class Texture(object):
         self.set(kwargs)
         
     def set(self, val=None, **kwattr):
-        for n,v in (val or kwattr).iteritems():
+        if val:
+            if isinstance(val, dict):
+                val = val.iteritems()
+            else: val = iter(val)
+        else: val = kwattr.iteritems()
+
+        for n,v in val:
             setattr(self, n, v)
 
     def release(self):
