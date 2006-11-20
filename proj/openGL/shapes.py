@@ -112,7 +112,8 @@ class RectObject(PositionalObject):
         if geo is None:
             geo = self.GeometryFactory.fromSingle()
 
-        geo[:] = self.verticies()
+        v = self.verticies()
+        geo['v'] = v
         return geo
 
     def verticies(self):
@@ -127,10 +128,9 @@ class RectObject(PositionalObject):
 
         off = self.pos - (self.align*self.size)
         if self.roundValues:
-            geo += off.round()
+            geo['v'] += off.round()
         else:
-            geo += off
-
+            geo['v'] += off
         self.geometry = geo
         return True
 
