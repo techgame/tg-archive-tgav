@@ -75,21 +75,21 @@ class RenderSkinModel(RenderSkinModelBase):
         if 1:
             self.fpsText = TextObject(line=0, align=.5, pos=(0,10,0), font=self.loadFont(self.fontNameFps, self.fontSizeFps), color=(.8, .1, .6))
 
-        self.contentText = TextObject(wrapMode=self.wrapMode, align=.5, font=self.loadFont(self.fontName, self.fontSize), color='#bbf')
+        self.contentText = TextObject(text=self.sampleText, wrapMode=self.wrapMode, align=.5, font=self.loadFont(self.fontName, self.fontSize), color='#bbf')
 
         if 1:
-            self.contentTextRight = TextObject(wrapMode=self.wrapMode, align=1, font=self.loadFont(self.fontNameRight, self.fontSizeRight), color='#fbb')
+            self.contentTextRight = TextObject(text=self.sampleText, wrapMode=self.wrapMode, align=1, font=self.loadFont(self.fontNameRight, self.fontSizeRight), color='#fbb')
         else:
             self.contentTextRight = self.contentText
             self.contentTextRight = None
 
         self.refreshText(False)
 
-    def refreshText(self, bRefresh=True):
-        self.contentText.update(self.sampleText)
+    def refreshText(self, bRefresh=True, **kw):
+        self.contentText.update(**kw)
         if self.contentTextRight is not None:
             if self.contentTextRight is not self.contentText:
-                self.contentTextRight.update(self.sampleText)
+                self.contentTextRight.update(**kw)
         if 1:
             self.fpsText.update(self.fpsStr)
         if bRefresh and self.fps <= 0:
@@ -131,18 +131,18 @@ class RenderSkinModel(RenderSkinModelBase):
         elif ch in ('\x7f',):
             # delete
             self.sampleText = ""
-            self.refreshText()
+            self.refreshText(text=self.sampleText)
         elif ch in ('\x08',):
             # backspace
             self.sampleText = self.sampleText[:-1]
-            self.refreshText()
+            self.refreshText(text=self.sampleText)
         elif ch in string.printable:
             self.sampleText += ch
-            self.refreshText()
+            self.refreshText(text=self.sampleText)
         else:
             print repr(ch)
             self.sampleText += ch.encode("unicode_escape")
-            self.refreshText()
+            self.refreshText(text=self.sampleText)
 
     viewPortSize = (800, 800)
     def renderResize(self, glCanvas):
