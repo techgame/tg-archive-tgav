@@ -32,7 +32,7 @@ class TextLayout(object):
         lineAdvance = textData.lineAdvance * textObj.lineSpacing
 
         # grab the geometry we are laying out
-        geo = textData.geometry
+        geo = textData.geometry.copy()
         geov = geo['v']
 
         # ask for our slices

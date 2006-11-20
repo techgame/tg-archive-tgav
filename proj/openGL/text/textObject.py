@@ -102,7 +102,6 @@ class TextObject(PositionalObject):
 
         if text is not None:
             self._text = text
-
         textData.text = self.text
         geo = self.layout.layout(self, textData)
         self.display.update(self, textData, geo)
