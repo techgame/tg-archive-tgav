@@ -64,8 +64,8 @@ class PixelStore(object):
     formatAttrs = None # a list of (pname, newValue, origValue)
     pack = False
 
-    def __init__(self, pack=False, **kwattrs):
-        self.create(pack, **kwattrs)
+    def __init__(self, **kwattrs):
+        self.create(**kwattrs)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

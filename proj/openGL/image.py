@@ -40,6 +40,7 @@ class ImageGeometryArray(interleavedArrays.InterleavedArrays):
 
 class ImageTextureBase(Texture):
     GeometryFactory = ImageGeometryArray
+    premultiply = False
 
     texParams = Texture.texParams + [
             ('wrap', gl.GL_CLAMP_TO_EDGE),
@@ -78,6 +79,7 @@ class ImageTextureBase(Texture):
         elif format:
             self.format = format
 
+        image = self._preRenderTexture(image)
         self.imageSize = image.size + (0.,)
         size = self.validSizeForTarget(image.size)
         data = self.data2d(size=size, format=dataFormat, dataType=dataType)
@@ -86,6 +88,20 @@ class ImageTextureBase(Texture):
         data.texString(image.tostring(), dict(alignment=1,))
         data.setSubImageOn(self, size=image.size)
     imageSize = (0., 0., 0.)
+
+    def _preRenderTexture(self, image):
+        if self.premultiply:
+            bands = image.getbands()
+            assert bands[-1] == 'A', bands
+
+            imageData = image.getdata()
+
+            a = imageData.getband(len(bands)-1)
+            
+            for idx in xrange(len(bands)-1):
+                premult = a.chop_multiply(imageData.getband(idx))
+                imageData.putband(premult, idx)
+        return image
 
     def geometry(self, geo=None):
         if geo is None:
@@ -191,6 +207,12 @@ class ImageObject(PositionalObject):
     def createImage(self):
         image = self.ImageTextureFactory()
         self.setImage(image, False)
+
+    def getPremultiply(self):
+        return self.image.premultiply
+    def setPremultiply(self, premultiply):
+        self.image.premultiply = premultiply
+    premultiply = property(getPremultiply, setPremultiply)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
