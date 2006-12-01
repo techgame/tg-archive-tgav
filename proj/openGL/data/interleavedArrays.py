@@ -12,7 +12,7 @@
 
 from numpy import dtype
 
-from TG.openGL.data.vertexArrays import ArrayBase, dtypefmt
+from TG.openGL.data.vertexArrays import FieldProperty, ArrayBase, dtypefmt
 
 from TG.openGL.raw import gl
 
@@ -21,6 +21,8 @@ from TG.openGL.raw import gl
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class InterleavedArrays(ArrayBase):
+    dataFormatDefault = gl.GL_V2F
+    defaultElementShape = ()
     dataFormatMap = {
         'v2f': gl.GL_V2F,
         'v3f': gl.GL_V3F,
@@ -37,8 +39,15 @@ class InterleavedArrays(ArrayBase):
         't2f_c4f_n3f_v3f': gl.GL_T2F_C4F_N3F_V3F,
         't4f_c4f_n3f_v4f': gl.GL_T4F_C4F_N3F_V4F,
         }
-    dataFormatDTypeMapping = [
-        (None, dtypefmt('v:2f')),
+
+    vertex = v = FieldProperty('v')
+    colors = c = FieldProperty('c')
+    normals = n = FieldProperty('n')
+    texcoords = tex = t = FieldProperty('t')
+
+    v0 = FieldProperty((0, 'v'))
+
+    dataFormatToDTypeMap = dict([
         (gl.GL_V2F, dtypefmt('v:2f')),
         (gl.GL_V3F, dtypefmt('v:3f')),
         (gl.GL_C4UB_V2F, dtypefmt('c:4B, v:2f')),
@@ -53,9 +62,7 @@ class InterleavedArrays(ArrayBase):
         (gl.GL_T2F_N3F_V3F, dtypefmt('t:2f, n:3f, v:3f')),
         (gl.GL_T2F_C4F_N3F_V3F, dtypefmt('t:2f, c:4f, n:3f, v:3f')),
         (gl.GL_T4F_C4F_N3F_V4F, dtypefmt('t:4f, c:4f, n:3f, v:4f')),
-        ]
-    dataFormatFromDTypeMap = dict((k.name, v) for v,k in dataFormatDTypeMapping)
-    dataFormatToDTypeMap = dict((v, k) for v,k in dataFormatDTypeMapping)
+        ])
 
     glInterleavedArrays = staticmethod(gl.glInterleavedArrays)
 

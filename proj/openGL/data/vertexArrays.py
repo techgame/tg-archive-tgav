@@ -25,16 +25,27 @@ def dtypefmt(gltypestr):
     names, formats = zip(*[[i.strip() for i in p.split(':', 1)] for p in gltypestr.split(',')])
     return numpy.dtype(dict(names=names, formats=formats))
 
+class FieldProperty(object):
+    def __init__(self, key):
+        self.key = key
+    def __get__(self, obj, klass):
+        if obj is None:
+            return self
+        else: return obj[self.key]
+    def __set__(self, obj, value):
+        obj[self.key] = value
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 class NDArrayBase(ndarray):
     __array_priority__ = 25.0
+    FieldProperty = FieldProperty
 
     dataFormatMap = {}
     dataFormatDefault = None
-    defaultElementShape = (0,)
+    defaultElementShape = ()
 
-    dataFormatDTypeMapping = []
-    dataFormatFromDTypeMap = dict((k.name, v) for v,k in dataFormatDTypeMapping)
-    dataFormatToDTypeMap = dict((v, k) for v,k in dataFormatDTypeMapping)
+    dataFormatToDTypeMap = dict()
 
     def __new__(klass, data=None, dataFormat=None, dtype=None, copy=False):
         return klass.fromData(data, dataFormat=dataFormat, dtype=dtype, copy=copy)
@@ -67,10 +78,12 @@ class NDArrayBase(ndarray):
             shape = shape[:-1] + klass.defaultElementShape
 
         dataFormatToDTypeMap = klass.dataFormatToDTypeMap
-        key = (dataFormat, shape[-1])
-        dtype = dataFormatToDTypeMap.get(key, None)
-        if dtype is not None:
-            return dtype, dataFormat, shape[:-1]
+
+        if shape:
+            key = (dataFormat, shape[-1])
+            dtype = dataFormatToDTypeMap.get(key, None)
+            if dtype is not None:
+                return dtype, dataFormat, shape[:-1]
 
         dtype = dataFormatToDTypeMap.get(dataFormat, None)
         if dtype is not None:
@@ -177,6 +190,15 @@ class NDArrayBase(ndarray):
         self.dataFormat = dataFormat
         return dataFormat
 
+    def set(self, data, at=Ellipsis):
+        if isinstance(data, (tuple, list, ndarray)):
+            idxPart = (at, Ellipsis, slice(len(data)))
+        else:
+            idxPart = (at, Ellipsis)
+        self[idxPart] = data
+        return self[idxPart]
+
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class ArrayBase(NDArrayBase):
@@ -281,7 +303,10 @@ class ArrayBase(NDArrayBase):
 class VertexArray(ArrayBase):
     dataFormatDefault = gl.GL_FLOAT
     defaultElementShape = (3,)
-    dataFormatDTypeMapping = [
+
+    vertex = v = FieldProperty('v')
+
+    dataFormatToDTypeMap = dict([
         ((gl.GL_SHORT, 2), dtypefmt('v:2h')),
         ((gl.GL_SHORT, 3), dtypefmt('v:3h')),
         ((gl.GL_SHORT, 4), dtypefmt('v:4h')),
@@ -297,9 +322,7 @@ class VertexArray(ArrayBase):
         ((gl.GL_DOUBLE, 2), dtypefmt('v:2d')),
         ((gl.GL_DOUBLE, 3), dtypefmt('v:3d')),
         ((gl.GL_DOUBLE, 4), dtypefmt('v:4d')),
-        ]
-    dataFormatFromDTypeMap = dict((k.name, v) for v,k in dataFormatDTypeMapping)
-    dataFormatToDTypeMap = dict((v, k) for v,k in dataFormatDTypeMapping)
+        ])
 
     dataFormatToImmediateFn = dict([
         ((gl.GL_SHORT, 2), gl.glVertex2sv),
@@ -327,7 +350,10 @@ class VertexArray(ArrayBase):
 class TexureCoordArray(ArrayBase):
     dataFormatDefault = gl.GL_FLOAT
     defaultElementShape = (3,)
-    dataFormatDTypeMapping = [
+
+    texcoords = tex = t = FieldProperty('t')
+
+    dataFormatToDTypeMap = dict([
         ((gl.GL_SHORT, 1), dtypefmt('t:1h')),
         ((gl.GL_SHORT, 2), dtypefmt('t:2h')),
         ((gl.GL_SHORT, 3), dtypefmt('t:3h')),
@@ -347,9 +373,7 @@ class TexureCoordArray(ArrayBase):
         ((gl.GL_DOUBLE, 2), dtypefmt('t:2d')),
         ((gl.GL_DOUBLE, 3), dtypefmt('t:3d')),
         ((gl.GL_DOUBLE, 4), dtypefmt('t:4d')),
-        ]
-    dataFormatFromDTypeMap = dict((k.name, v) for v,k in dataFormatDTypeMapping)
-    dataFormatToDTypeMap = dict((v, k) for v,k in dataFormatDTypeMapping)
+        ])
 
     dataFormatToImmediateFn = dict([
         ((gl.GL_SHORT, 1), gl.glTexCoord1sv),
@@ -420,15 +444,16 @@ class MultiTexureCoordArray(TexureCoordArray):
 class NormalArray(ArrayBase):
     dataFormatDefault = gl.GL_FLOAT
     defaultElementShape = (3,)
-    dataFormatDTypeMapping = [
+
+    normals = n = FieldProperty('n')
+
+    dataFormatToDTypeMap = dict([
         ((gl.GL_BYTE, 3), dtypefmt('n:3b')),
         ((gl.GL_SHORT, 3), dtypefmt('n:3h')),
         ((gl.GL_INT, 3), dtypefmt('n:3i')),
         ((gl.GL_FLOAT, 3), dtypefmt('n:3f')),
         ((gl.GL_DOUBLE, 3), dtypefmt('n:3d')),
-        ]
-    dataFormatFromDTypeMap = dict((k.name, v) for v,k in dataFormatDTypeMapping)
-    dataFormatToDTypeMap = dict((v, k) for v,k in dataFormatDTypeMapping)
+        ])
 
     dataFormatToImmediateFn = dict([
         ((gl.GL_BYTE, 3), gl.glNormal3bv),
@@ -446,7 +471,10 @@ class NormalArray(ArrayBase):
 class ColorArray(ArrayBase):
     dataFormatDefault = gl.GL_FLOAT
     defaultElementShape = (4,)
-    dataFormatDTypeMapping = [
+    
+    colors = c = FieldProperty('c')
+
+    dataFormatToDTypeMap = dict([
         ((gl.GL_UNSIGNED_BYTE, 3), dtypefmt('c:3B')),
         ((gl.GL_UNSIGNED_BYTE, 4), dtypefmt('c:4B')),
 
@@ -470,9 +498,7 @@ class ColorArray(ArrayBase):
 
         ((gl.GL_DOUBLE, 3), dtypefmt('c:3d')),
         ((gl.GL_DOUBLE, 4), dtypefmt('c:4d')),
-        ]
-    dataFormatFromDTypeMap = dict((k.name, v) for v,k in dataFormatDTypeMapping)
-    dataFormatToDTypeMap = dict((v, k) for v,k in dataFormatDTypeMapping)
+        ])
 
     dataFormatToImmediateFn = dict([
         ((gl.GL_UNSIGNED_BYTE, 3), gl.glColor3ubv),
@@ -508,7 +534,10 @@ class ColorArray(ArrayBase):
 class SecondaryColorArray(ArrayBase):
     dataFormatDefault = gl.GL_FLOAT
     defaultElementShape = (3,)
-    dataFormatDTypeMapping = [
+
+    secondColor = c2 = FieldProperty('c2')
+
+    dataFormatToDTypeMap = dict([
         ((gl.GL_UNSIGNED_BYTE, 3), dtypefmt('c2:3B')),
         ((gl.GL_UNSIGNED_SHORT, 3), dtypefmt('c2:3H')),
         ((gl.GL_UNSIGNED_INT, 3), dtypefmt('c2:3I')),
@@ -517,9 +546,7 @@ class SecondaryColorArray(ArrayBase):
         ((gl.GL_INT, 3), dtypefmt('c2:3i')),
         ((gl.GL_FLOAT, 3), dtypefmt('c2:3f')),
         ((gl.GL_DOUBLE, 3), dtypefmt('c2:3d')),
-        ]
-    dataFormatFromDTypeMap = dict((k.name, v) for v,k in dataFormatDTypeMapping)
-    dataFormatToDTypeMap = dict((v, k) for v,k in dataFormatDTypeMapping)
+        ])
 
     dataFormatToImmediateFn = dict([
         ((gl.GL_UNSIGNED_BYTE, 3), gl.glSecondaryColor3ubv),
@@ -540,15 +567,16 @@ class SecondaryColorArray(ArrayBase):
 class ColorIndexArray(ArrayBase):
     dataFormatDefault = gl.GL_UNSIGNED_BYTE
     defaultElementShape = (1,)
-    dataFormatDTypeMapping = [
+
+    colorIndex = ci = FieldProperty('ci')
+
+    dataFormatToDTypeMap = dict([
         ((gl.GL_UNSIGNED_BYTE, 1), dtypefmt('ci:1B')),
         ((gl.GL_SHORT, 1), dtypefmt('ci:1h')),
         ((gl.GL_INT, 1), dtypefmt('ci:1i')),
         ((gl.GL_FLOAT, 1), dtypefmt('ci:1f')),
         ((gl.GL_DOUBLE, 1), dtypefmt('ci:1d')),
-        ]
-    dataFormatFromDTypeMap = dict((k.name, v) for v,k in dataFormatDTypeMapping)
-    dataFormatToDTypeMap = dict((v, k) for v,k in dataFormatDTypeMapping)
+        ])
 
     dataFormatToImmediateFn = dict([
         ((gl.GL_UNSIGNED_BYTE, 1), gl.glIndexubv),
@@ -566,12 +594,13 @@ class ColorIndexArray(ArrayBase):
 class FogCoordArray(ArrayBase):
     dataFormatDefault = gl.GL_FLOAT
     defaultElementShape = (1,)
-    dataFormatDTypeMapping = [
+
+    fogcoord = fog = FieldProperty('fog')
+
+    dataFormatToDTypeMap = dict([
         ((gl.GL_FLOAT, 1), dtypefmt('fog:1f')),
         ((gl.GL_DOUBLE, 1), dtypefmt('fog:1d')),
-        ]
-    dataFormatFromDTypeMap = dict((k.name, v) for v,k in dataFormatDTypeMapping)
-    dataFormatToDTypeMap = dict((v, k) for v,k in dataFormatDTypeMapping)
+        ])
 
     dataFormatToImmediateFn = dict([
         ((gl.GL_FLOAT, 1), gl.glFogCoordfv),
@@ -586,11 +615,12 @@ class FogCoordArray(ArrayBase):
 class EdgeFlagArray(ArrayBase):
     dataFormatDefault = gl.GL_UNSIGNED_BYTE
     defaultElementShape = (1,)
-    dataFormatDTypeMapping = [
+
+    edgeflag = edge = FieldProperty('edge')
+
+    dataFormatToDTypeMap = dict([
         ((gl.GL_UNSIGNED_BYTE, 1), dtypefmt('edge:1B')),
-        ]
-    dataFormatFromDTypeMap = dict((k.name, v) for v,k in dataFormatDTypeMapping)
-    dataFormatToDTypeMap = dict((v, k) for v,k in dataFormatDTypeMapping)
+        ])
 
     dataFormatToImmediateFn = dict([
         ((gl.GL_UNSIGNED_BYTE, 1), gl.glEdgeFlagv),
