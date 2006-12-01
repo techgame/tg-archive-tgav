@@ -68,8 +68,10 @@ class ImageTextureBase(Texture):
             self.loadFilename(image, format)
         else:
             self.loadImage(image, format)
+
+    openImage = staticmethod(Image.open)
     def loadFilename(self, filename, format=True):
-        image = Image.open(filename)
+        image = self.openImage(filename)
         return self.loadImage(image, format)
 
     def loadImage(self, image, format=True):
