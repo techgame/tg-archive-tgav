@@ -45,7 +45,7 @@ class ColorObject(object):
         glColorFn = self.glColorFnMap[len(value)]
         value = asarray(value, float32)
         self._value = value
-        self.select = partial(glColorFn, value.ctypes.data_as(glColorFn.api.argtypes[0]))
+        self.select = partial(glColorFn, value.ctypes.data_as(glColorFn.api.argtypes[-1]))
     def delValue(self):
         self.setValue(None)
     value = property(getValue, setValue, delValue)
