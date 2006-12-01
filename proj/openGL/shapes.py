@@ -13,7 +13,7 @@
 from numpy import asarray, float32
 
 from .color import ColorProperty
-from .data import vertexArrays
+from .data.vertexArrays import VertexArray
 from .raw import gl
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -85,20 +85,86 @@ class PositionalObject(object):
 #~ Rectangle Object
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class RectGeometryArray(vertexArrays.VertexArray):
+class RectArray(VertexArray):
     drawMode = gl.GL_QUADS
     dataFormat = gl.GL_FLOAT
 
-    @classmethod
-    def fromCount(klass, count):
-        return klass.fromFormat((count, 4, 3), klass.dataFormat)
+    noFields = True
+    defaultElementShape = (4, 3,)
 
-    @classmethod
-    def fromSingle(klass):
-        return klass.fromFormat((4, 3), klass.dataFormat)
+    def getLeft(self):
+        return self[..., 0, 0]
+    def setLeft(self, value):
+        self[..., 0, 0] = value
+        self[..., 3, 0] = value
+    left = property(getLeft, setLeft)
+
+    def getRight(self):
+        return self[..., 2, 0]
+    def setRight(self, value):
+        self[..., 1, 0] = value
+        self[..., 2, 0] = value
+    right = property(getRight, setRight)
+
+    def getBottom(self):
+        return self[..., 0, 1]
+    def setBottom(self, value):
+        self[..., 0, 1] = value
+        self[..., 1, 1] = value
+    bottom = property(getBottom, setBottom)
+
+    def getTop(self):
+        return self[..., 2, 1]
+    def setTop(self, value):
+        self[..., 2, 1] = value
+        self[..., 3, 1] = value
+    top = property(getTop, setTop)
+
+    def getWidth(self):
+        return self.left - self.right
+    def setWidth(self, width):
+        self.right = self.left + width
+    width = property(getWidth, setWidth)
+    
+    def getHeight(self):
+        return self.top - self.bottom
+    def setHeight(self, height):
+        self.top = self.bottom + height
+    height = property(getHeight, setHeight)
+
+    def getDims(self):
+        return self.ptp(-2)
+    def setDims(self, dims, align=.5):
+        dims = self.newData(dims)
+        self.right = self.left + dims[0]
+        self.top = self.bottom + dims[1]
+    dims = property(getDims, setDims)
+
+    def getCorners(self):
+        return self[..., 0:4:2, :]
+    def setCorners(self, bltr):
+        bltr = self.newData(bltr)
+        self.left = bltr[..., 0, 0]
+        self.bottom = bltr[..., 0, 1]
+        self.right = bltr[..., 1, 0]
+        self.top = bltr[..., 1, 1]
+    corners = property(getCorners, setCorners)
+
+    def getPosDims(self):
+        corners = self.getCorners()
+        return (corners[..., 0, :], (corners[...,1,:] - corners[...,0,:]))
+    def setPosDims(self, pos, dims):
+        items = self.newData([pos, dims])
+        items[1] += items[0]
+        self.setCorners(items)
+    posDims = property(getPosDims, setPosDims)
+
+    def offset(self, pos):
+        self[:] += self.newData(pos)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+RectGeometryArray = RectArray
 class RectObject(PositionalObject):
     GeometryFactory = RectGeometryArray
 

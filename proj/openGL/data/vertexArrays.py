@@ -45,6 +45,7 @@ class NDArrayBase(ndarray):
     dataFormatDefault = None
     defaultElementShape = ()
 
+    noFields = False
     dataFormatToDTypeMap = dict()
 
     def __new__(klass, data=None, dataFormat=None, dtype=None, copy=False):
@@ -62,8 +63,23 @@ class NDArrayBase(ndarray):
 
     dtypefmt = staticmethod(dtypefmt)
 
+    def newItem(self, shape=None):
+        item = self.flat[0:0].copy()
+        if shape is None:
+            shape = self.shape[-1:]
+        item.resize(shape)
+        return item
+    def newData(self, data):
+        shape = numpy.shape(data)[:-1] + self.shape[-1:]
+        item = self.newItem(shape)
+        item.set(data)
+        return item
+
     @classmethod
     def lookupDTypeFromFormat(klass, dtype, dataFormat, shape):
+        if not dataFormat and dtype is not None:
+            dataFormat = numpy.dtype(dtype).name
+
         if isinstance(dataFormat, str):
             dataFormat = dataFormat.replace(' ', '').replace(',', '_')
             dataFormat = klass.dataFormatMap[dataFormat]
@@ -79,14 +95,20 @@ class NDArrayBase(ndarray):
 
         dataFormatToDTypeMap = klass.dataFormatToDTypeMap
 
+        dtype = None
         if shape:
             key = (dataFormat, shape[-1])
             dtype = dataFormatToDTypeMap.get(key, None)
             if dtype is not None:
-                return dtype, dataFormat, shape[:-1]
+                shape = shape[:-1]
 
-        dtype = dataFormatToDTypeMap.get(dataFormat, None)
+        if dtype is None:
+            dtype = dataFormatToDTypeMap.get(dataFormat, None)
+
         if dtype is not None:
+            if klass.noFields and len(dtype.fields)==1:
+                dtype = dtype[0]
+
             return dtype, dataFormat, shape
 
         raise LookupError("Not able to find an appropriate data type from format: %r, shape: %r" % (dataFormat, shape))
@@ -190,13 +212,17 @@ class NDArrayBase(ndarray):
         self.dataFormat = dataFormat
         return dataFormat
 
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    def get(self, at=Ellipsis):
+        return self[at]
     def set(self, data, at=Ellipsis):
         if isinstance(data, (tuple, list, ndarray)):
-            idxPart = (at, Ellipsis, slice(len(data)))
+            idxPart = (Ellipsis, slice(numpy.shape(data)[-1]))
         else:
-            idxPart = (at, Ellipsis)
+            idxPart = (Ellipsis,)
         self[idxPart] = data
-        return self[idxPart]
+        return self
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

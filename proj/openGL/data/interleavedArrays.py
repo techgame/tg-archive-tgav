@@ -45,8 +45,6 @@ class InterleavedArrays(ArrayBase):
     normals = n = FieldProperty('n')
     texcoords = tex = t = FieldProperty('t')
 
-    v0 = FieldProperty((0, 'v'))
-
     dataFormatToDTypeMap = dict([
         (gl.GL_V2F, dtypefmt('v:2f')),
         (gl.GL_V3F, dtypefmt('v:3f')),
