@@ -61,7 +61,9 @@ class NDArrayBase(ndarray):
 
         if isinstance(shape, (int, long, float)):
             shape = (shape,)
-        if not shape or not shape[-1]:
+        if not shape:
+            shape = klass.defaultElementShape
+        elif not shape[-1]:
             shape = shape[:-1] + klass.defaultElementShape
 
         dataFormatToDTypeMap = klass.dataFormatToDTypeMap
