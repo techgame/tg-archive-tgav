@@ -10,9 +10,10 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from numpy import dtype
+import numpy
 
-from TG.openGL.data.vertexArrays import FieldProperty, ArrayBase, dtypefmt
+from TG.openGL.data.glArrayDataType import GLInterleavedArrayDataType
+from TG.openGL.data.vertexArrays import GLArrayBase
 
 from TG.openGL.raw import gl
 
@@ -20,47 +21,26 @@ from TG.openGL.raw import gl
 #~ Interleaved Arrays
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class InterleavedArrays(ArrayBase):
-    dataFormatDefault = gl.GL_V2F
-    defaultElementShape = ()
-    dataFormatMap = {
-        'v2f': gl.GL_V2F,
-        'v3f': gl.GL_V3F,
-        'c4ub_v2f': gl.GL_C4UB_V2F,
-        'c4ub_v3f': gl.GL_C4UB_V3F,
-        'c3f_v3f': gl.GL_C3F_V3F,
-        'n3f_v3f': gl.GL_N3F_V3F,
-        'c4f_n3f_v3f': gl.GL_C4F_N3F_V3F,
-        't2f_v3f': gl.GL_T2F_V3F,
-        't4f_v4f': gl.GL_T4F_V4F,
-        't2f_c4ub_v3f': gl.GL_T2F_C4UB_V3F,
-        't2f_c3f_v3f': gl.GL_T2F_C3F_V3F,
-        't2f_n3f_v3f': gl.GL_T2F_N3F_V3F,
-        't2f_c4f_n3f_v3f': gl.GL_T2F_C4F_N3F_V3F,
-        't4f_c4f_n3f_v4f': gl.GL_T4F_C4F_N3F_V4F,
-        }
+class FieldProperty(object):
+    def __init__(self, fieldName):
+        self.fieldName = fieldName
+    def __get__(self, obj, klass):
+        if obj is None:
+            return self
+        else:
+            return obj[self.fieldName]
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+class InterleavedArrays(GLArrayBase):
+    defaultValue = numpy.array([0], 'f')
+    gldtype = GLInterleavedArrayDataType()
+    gldtype.setDefaultFormat(gl.GL_V3F)
 
     vertex = v = FieldProperty('v')
     colors = c = FieldProperty('c')
     normals = n = FieldProperty('n')
     texcoords = tex = t = FieldProperty('t')
-
-    dataFormatToDTypeMap = dict([
-        (gl.GL_V2F, dtypefmt('v:2f')),
-        (gl.GL_V3F, dtypefmt('v:3f')),
-        (gl.GL_C4UB_V2F, dtypefmt('c:4B, v:2f')),
-        (gl.GL_C4UB_V3F, dtypefmt('c:4B, v:3f')),
-        (gl.GL_C3F_V3F, dtypefmt('c:3f, v:3f')),
-        (gl.GL_N3F_V3F, dtypefmt('n:3f, v:3f')),
-        (gl.GL_C4F_N3F_V3F, dtypefmt('c:4f, n:3f, v:3f')),
-        (gl.GL_T2F_V3F, dtypefmt('t:2f, v:3f')),
-        (gl.GL_T4F_V4F, dtypefmt('t:4f, v:4f')),
-        (gl.GL_T2F_C4UB_V3F, dtypefmt('t:2f, c:4B, v:3f')),
-        (gl.GL_T2F_C3F_V3F, dtypefmt('t:2f, c:3f, v:3f')),
-        (gl.GL_T2F_N3F_V3F, dtypefmt('t:2f, n:3f, v:3f')),
-        (gl.GL_T2F_C4F_N3F_V3F, dtypefmt('t:2f, c:4f, n:3f, v:3f')),
-        (gl.GL_T4F_C4F_N3F_V4F, dtypefmt('t:4f, c:4f, n:3f, v:4f')),
-        ])
 
     glInterleavedArrays = staticmethod(gl.glInterleavedArrays)
 

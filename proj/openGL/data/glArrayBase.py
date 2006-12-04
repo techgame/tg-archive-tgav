@@ -24,7 +24,7 @@ class GLArrayBase(ndarray):
     gltypeid = None
 
     default = object()
-    defaultValue = 0.
+    defaultValue = numpy.array([0], 'B')
 
     def __new__(klass, data=None, dtype=None, shape=(), copy=False, value=default):
         if data is None:
@@ -67,7 +67,8 @@ class GLArrayBase(ndarray):
         if value is not None: 
             if value is klass.default:
                 value = klass.defaultValue
-            self[:] = value
+            value = numpy.asarray(value)
+            self.view(value.dtype)[:] = value
         self.gldtype.configFrom(self)
         return self
 
