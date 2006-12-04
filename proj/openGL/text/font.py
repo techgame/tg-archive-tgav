@@ -27,8 +27,6 @@ from TG.openGL.text import fontTexture
 class Font(object):
     LayoutAlgorithm = blockMosaic.BlockMosaicAlg
     FontTexture = fontTexture.FontTexture
-    FontGeometryArray = fontData.FontGeometryArray
-    FontAdvanceArray = fontData.FontAdvanceArray
     FontTextData = fontData.FontTextData
 
     texture = None
@@ -38,7 +36,7 @@ class Font(object):
     advance = None
     kerningMap = None
 
-    pointSize = (1./64., 1./64.)
+    pointSize = FontTextData.AdvanceArray([1./64., 1./64., 1./64.])
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -134,7 +132,7 @@ class Font(object):
         self.setFace(face)
         self.setCharset(charset)
 
-        self.lineAdvance = self.FontAdvanceArray.fromItem((0., face.lineHeight*self.pointSize[1], 0.))
+        self.lineAdvance = self.pointSize * [0., face.lineHeight, 0.]
 
         charMap = {'\0': 0, '\n': 0, '\r': 0}
         self.charMap = charMap
@@ -159,7 +157,7 @@ class Font(object):
         if not face.hasFlag('kerning'):
             return
 
-        ptw, pth = self.pointSize
+        pointSize = self.pointSize
         kerningMap = {}
         gi = gidxMap.items()
         getKerningByIndex = face.getKerningByIndex
@@ -167,7 +165,7 @@ class Font(object):
             for r, ri in gi:
                 k = getKerningByIndex(l, r)
                 if k[0] or k[1]:
-                    k = [k[0]*ptw, k[1]*pth, 0.]
+                    k = pointSize * [k[0], k[1], 0.]
                     kerningMap[(li,ri)] = k
         self.kerningMap = kerningMap
 
@@ -201,9 +199,9 @@ class Font(object):
 
     def _compileData(self, face, count, gidxMap, mosaic):
         # create the result arrays
-        geometry = self.FontGeometryArray.fromCount(count)
+        geometry = self.FontTextData.GeometryArray(shape=(count, 4, -1), value=None)
         self.geometry = geometry
-        advance = self.FontAdvanceArray.fromCount(count)
+        advance = self.FontTextData.AdvanceArray(shape=(count, 1, -1), value=None)
         self.advance = advance
 
         # cache some methods
@@ -218,35 +216,35 @@ class Font(object):
         pointSize = self.pointSize
 
         # entry 0 is zero widht and has null geometry
-        geometry[0]['t'] = 0.
-        geometry[0]['v'] = 0.
-        advance[0] = 0.
+        geometry.t[0] = 0
+        geometry.v[0] = 0
+        advance[0] = 0
 
         # record the geometry and advance for each glyph, and render to the mosaic
         for gidx, aidx in gidxMap.iteritems():
             glyph = loadGlyph(gidx)
 
             geoEntry = geometry[aidx]
-            geoEntry['v'] = verticesFrom(glyph.metrics, pointSize)
-            advance[aidx] = advanceFrom(glyph.advance, pointSize)
+            geoEntry.v = verticesFrom(glyph.metrics) * pointSize
+            advance[aidx] = advanceFrom(glyph.advance) * pointSize
 
             block = mosaic.get(gidx)
             if block is None: 
-                geoEntry['t'] = 0.0
+                geoEntry.t = 0.0
             else: 
-                geoEntry['t'] = renderGlyph(glyph, block.pos, block.size)
+                geoEntry.t = renderGlyph(glyph, block.pos, block.size)
 
-    def _verticesFrom(self, metrics, (ptw, pth)):
-        x0 = (metrics.horiBearingX) * ptw
-        y0 = (metrics.horiBearingY - metrics.height - 1) * pth
+    def _verticesFrom(self, metrics):
+        x0 = (metrics.horiBearingX)
+        y0 = (metrics.horiBearingY - metrics.height - 1)
 
-        x1 = (metrics.horiBearingX + metrics.width + 1) * ptw
-        y1 = (metrics.horiBearingY) * pth
+        x1 = (metrics.horiBearingX + metrics.width + 1)
+        y1 = (metrics.horiBearingY)
 
         return [(x0, y0, 0.), (x1, y0, 0.), (x1, y1, 0.), (x0, y1, 0.)]
 
-    def _advanceFrom(self, advance, (ptw, pth)):
-        return (advance[0]*ptw, advance[1]*pth, 0.)
+    def _advanceFrom(self, advance):
+        return (advance[0], advance[1], 0.)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

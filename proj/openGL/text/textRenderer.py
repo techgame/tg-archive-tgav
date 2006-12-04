@@ -34,8 +34,12 @@ class TextDisplay(object):
         glDepthMask(False)
         self.texture.select()
         self.color.select()
-        self.geometry.draw()
-        glDepthMask = self.glDepthMask
+
+        geom = self.geometry
+        gl.glInterleavedArrays(geom.gltypeid, 0, geom.ctypes)
+        gl.glDrawArrays(geom.drawMode, 0, geom.size)
+
+        glDepthMask(True)
     __call__ = render
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -69,7 +73,11 @@ class TextBufferedDisplay(object):
         buf.bind()
         self.texture.select()
         self.color.select()
-        self.geometry.draw(vboOffset=0)
+
+        geom = self.geometry
+        gl.glInterleavedArrays(geom.gltypeid, 0, 0)
+        gl.glDrawArrays(geom.drawMode, 0, geom.size)
+
         buf.unbind()
         glDepthMask(True)
     __call__ = render

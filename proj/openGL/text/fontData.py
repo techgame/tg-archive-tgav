@@ -13,7 +13,8 @@
 import weakref
 from numpy import ndarray, float32, asarray
 
-from TG.openGL.data import interleavedArrays
+from TG.openGL.data.vertexArrays import VertexArray
+from TG.openGL.data.interleavedArrays import InterleavedArray
 
 from TG.openGL.raw import gl
 
@@ -21,30 +22,21 @@ from TG.openGL.raw import gl
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class FontGeometryArray(interleavedArrays.InterleavedArrays):
+class FontGeometryArray(InterleavedArray):
     drawMode = gl.GL_QUADS
-    dataFormat = gl.GL_T2F_V3F
-    @classmethod
-    def fromCount(klass, count):
-        return klass.fromFormat((count, 4), klass.dataFormat)
+    gldtype = InterleavedArray.gldtype.copy()
+    gldtype.setDefaultFormat(gl.GL_T2F_V3F)
 
-class FontAdvanceArray(ndarray):
-    @classmethod
-    def fromCount(klass, count, dtype=float32):
-        return klass((count, 1, 3), dtype)
-
-    @classmethod
-    def fromItem(klass, item, dtype=float32):
-        self = klass(3, dtype)
-        self[:] = item
-        return self
-
+class FontAdvanceArray(VertexArray):
+    gldtype = VertexArray.gldtype.copy()
+    gldtype.setDefaultFormat('3f')
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class FontTextData(object):
     font = None
-    AdvanceItem = FontAdvanceArray.fromItem
+    GeometryArray = FontGeometryArray
+    AdvanceArray = FontAdvanceArray
 
     def setupFont(self, font):
         self.font = font

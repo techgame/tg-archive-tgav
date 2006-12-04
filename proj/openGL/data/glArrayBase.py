@@ -33,7 +33,6 @@ class GLArrayBase(ndarray):
         elif isinstance(data, (int, long)):
             # determine if shape is complete before we adjust the shape parameter
             completeShape = (dtype is None) and isinstance(shape, tuple)
-
             # adjust shape
             shape = (data,) + (shape or ())
             self = klass.fromShape(shape, dtype, value, completeShape)

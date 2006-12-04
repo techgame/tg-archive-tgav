@@ -21,11 +21,12 @@ class TextLayout(object):
     def layout(self, textObj, textData):
         roundValues = textObj.roundValues
         crop = textObj.crop
-        align = textObj.align[textObj.wrapAxis]
+        #align = textObj.align[textObj.wrapAxis]
+        align = 0
         oneMinusAlign = 1-align
 
-        pos = textData.AdvanceItem(textObj.pos)
-        size = textData.AdvanceItem(textObj.size)
+        pos = textData.AdvanceArray(textObj.pos).copy()
+        size = textData.AdvanceArray(textObj.size).copy()
         size[0] *= align
         linePos = pos + size
 
@@ -33,7 +34,7 @@ class TextLayout(object):
 
         # grab the geometry we are laying out
         geo = textData.geometry.copy()
-        geov = geo['v']
+        geov = geo.v
 
         # ask for our slices
         wrapSlices = textObj.wrapper.wrapSlices(textObj, textData)

@@ -91,7 +91,7 @@ class RenderSkinModel(RenderSkinModelBase):
             if self.contentTextRight is not self.contentText:
                 self.contentTextRight.update(**kw)
         if 1:
-            self.fpsText.update(self.fpsStr)
+            self.fpsText.update()
         if bRefresh and self.fps <= 0:
             self.canvas.Refresh()
 
@@ -110,7 +110,7 @@ class RenderSkinModel(RenderSkinModelBase):
         return f
 
     def _printFPS(self, fpsStr):
-        self.fpsStr = fpsStr
+        RenderSkinModelBase._printFPS(self, fpsStr)
         self.fpsText.update(fpsStr)
 
     def onChar(self, evt):

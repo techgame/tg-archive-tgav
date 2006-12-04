@@ -29,10 +29,12 @@ class FieldProperty(object):
             return self
         else:
             return obj[self.fieldName]
+    def __set__(self, obj, value):
+        obj[self.fieldName][:] = value
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class InterleavedArrays(GLArrayBase):
+class InterleavedArray(GLArrayBase):
     defaultValue = numpy.array([0], 'f')
     gldtype = GLInterleavedArrayDataType()
     gldtype.setDefaultFormat(gl.GL_V3F)
@@ -41,27 +43,4 @@ class InterleavedArrays(GLArrayBase):
     colors = c = FieldProperty('c')
     normals = n = FieldProperty('n')
     texcoords = tex = t = FieldProperty('t')
-
-    glInterleavedArrays = staticmethod(gl.glInterleavedArrays)
-
-    def enable(self):
-        pass
-
-    def bind(self, vboOffset=None):
-        if vboOffset is None:
-            self.glInterleavedArrays(self.dataFormat, self.strides[-1], self.ctypes)
-        else:
-            self.glInterleavedArrays(self.dataFormat, self.strides[-1], vboOffset)
-
-    def disable(self):
-        pass
-
-    def unbind(self):
-        self.glInterleavedArrays(self.dataFormat, 0, None)
-
-    def draw(self, drawMode=None, vboOffset=None):
-        self.select(vboOffset)
-        self.glDrawArrays(drawMode or self.drawMode, 0, self.size)
-    def drawRaw(self, drawMode=None):
-        self.glDrawArrays(drawMode or self.drawMode, 0, self.size)
 

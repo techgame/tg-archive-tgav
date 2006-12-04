@@ -83,9 +83,8 @@ class GLArrayDataType(object):
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def configFrom(self, array, parent=None):
-        if parent is not None:
-            array.gltypeid = parent.gltypeid 
-        else: array.gltypeid = self.gltypeidForDtype(array.dtype)
+        gltypeid = getattr(parent, 'gltypeid', None)
+        array.gltypeid = gltypeid or self.gltypeidForDtype(array.dtype)
 
     def gltypeidForArray(self, array):
         return self.gltypeidForDtype(array.dtype)
@@ -134,17 +133,18 @@ class GLArrayDataType(object):
 
     def lookupDTypeFrom(self, dtype, shape, completeShape=None):
         if completeShape is None:
-            completeShape = isinstance(shape, tuple) and dtype is None
+            completeShape = (dtype is None) and isinstance(shape, tuple)
+        if completeShape and shape[-1] == -1:
+            completeShape = False
+            shape = shape[:-1]
 
-        print 'lookupDTypeFrom:', (dtype, shape, completeShape)
         if dtype is None:
             dtype = self.defaultFormat
         else:
             dtype = self.dtypefmt(dtype)
             key = (dtype.base.name, shape[-1:])
 
-        if isinstance(shape, (int, long, float)):
-            shape = (shape,)
+        if isinstance(shape, (int, long)): shape = (shape,)
         elif shape is None: shape = ()
 
         if completeShape:
@@ -152,7 +152,6 @@ class GLArrayDataType(object):
             shape = shape[:-1]
         else: key = self._getKeyForDtype(dtype)
 
-        print '   ...', (self.dtypeMap.get(key, '<no entry>'), shape, key)
         dtype = self.dtypeMap[key]
         return dtype, shape
 
