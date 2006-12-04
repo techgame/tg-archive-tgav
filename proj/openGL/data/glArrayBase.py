@@ -26,12 +26,17 @@ class GLArrayBase(ndarray):
     default = object()
     defaultValue = numpy.array([0], 'B')
 
-    def __new__(klass, data=None, dtype=None, shape=(), copy=False, value=default):
+    def __new__(klass, data=None, dtype=None, shape=None, copy=False, value=default):
         if data is None:
-            self = klass.fromShape(shape, dtype, value=value)
-        elif isinstance(data, (int, long, float)):
-            shape = (data,) + shape
-            self = klass.fromShape(shape, dtype, value=value)
+            # default with no args is to use shape a single 1-element
+            self = klass.fromShape(shape or 1, dtype, value)
+        elif isinstance(data, (int, long)):
+            # determine if shape is complete before we adjust the shape parameter
+            completeShape = (dtype is None) and isinstance(shape, tuple)
+
+            # adjust shape
+            shape = (data,) + (shape or ())
+            self = klass.fromShape(shape, dtype, value, completeShape)
         else:
             self = klass.fromData(data, dtype, copy)
         return self
@@ -61,14 +66,15 @@ class GLArrayBase(ndarray):
         return klass.fromShape(shape, dtype, value=1)
 
     @classmethod
-    def fromShape(klass, shape, dtype=None, value=None):
-        dtype, shape = klass.gldtype.lookupDTypeFrom(dtype, shape, False)
+    def fromShape(klass, shape, dtype=None, value=None, completeShape=None):
+        dtype, shape = klass.gldtype.lookupDTypeFrom(dtype, shape, completeShape)
         self = ndarray.__new__(klass, shape, dtype=dtype)
         if value is not None: 
-            if value is klass.default:
-                value = klass.defaultValue
-            value = numpy.asarray(value)
+            if value is not klass.default:
+                value = numpy.asarray(value, klass.defaultValue.dtype)
+            else: value = klass.defaultValue
             self.view(value.dtype)[:] = value
+
         self.gldtype.configFrom(self)
         return self
 

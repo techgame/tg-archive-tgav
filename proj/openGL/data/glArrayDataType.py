@@ -132,7 +132,11 @@ class GLArrayDataType(object):
 
         return klass.dtypeFrom(dtypefmt)
 
-    def lookupDTypeFrom(self, dtype, shape, completeShape=False):
+    def lookupDTypeFrom(self, dtype, shape, completeShape=None):
+        if completeShape is None:
+            completeShape = isinstance(shape, tuple) and dtype is None
+
+        print 'lookupDTypeFrom:', (dtype, shape, completeShape)
         if dtype is None:
             dtype = self.defaultFormat
         else:
@@ -146,9 +150,9 @@ class GLArrayDataType(object):
         if completeShape:
             key = self._getKeyForDtype(dtype, shape[-1:])
             shape = shape[:-1]
-        else: 
-            key = self._getKeyForDtype(dtype, dtype.shape or shape[-1:])
+        else: key = self._getKeyForDtype(dtype)
 
+        print '   ...', (self.dtypeMap.get(key, '<no entry>'), shape, key)
         dtype = self.dtypeMap[key]
         return dtype, shape
 
