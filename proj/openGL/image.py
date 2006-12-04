@@ -16,7 +16,7 @@ from PIL import Image
 
 from .shapes import PositionalObject
 from .texture import Texture
-from .data import interleavedArrays
+from .data.interleavedArrays import InterleavedArray
 
 from .raw import gl, glext
 
@@ -24,17 +24,11 @@ from .raw import gl, glext
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class ImageGeometryArray(interleavedArrays.InterleavedArrays):
+class ImageGeometryArray(InterleavedArray):
     drawMode = gl.GL_QUADS
-    dataFormat = gl.GL_T2F_V3F
 
-    @classmethod
-    def fromCount(klass, count):
-        return klass.fromFormat((count, 4), klass.dataFormat)
-
-    @classmethod
-    def fromSingle(klass):
-        return klass.fromFormat(4, klass.dataFormat)
+    gldtype = InterleavedArray.gldtype.copy()
+    gldtype.setDefaultFormat(gl.GL_T2F_V3F)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -107,10 +101,10 @@ class ImageTextureBase(Texture):
 
     def geometry(self, geo=None):
         if geo is None:
-            geo = self.GeometryFactory.fromSingle()
+            geo = self.GeometryFactory(shape=(1,4,-1), value=None)
 
-        geo['v'] = self.verticies()
-        geo['t'] = self.texCoords()
+        geo.v = self.verticies()
+        geo.t = self.texCoords()
         return geo
 
     def verticies(self):
@@ -221,5 +215,7 @@ class ImageObject(PositionalObject):
     def render(self):
         self.image.select()
         self.color.select()
-        self.geometry.draw()
+        geom = self.geometry
+        gl.glInterleavedArrays(geom.gltypeid, 0, geom.ctypes)
+        gl.glDrawArrays(geom.drawMode, 0, geom.size)
 
