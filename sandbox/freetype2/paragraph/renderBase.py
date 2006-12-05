@@ -14,8 +14,8 @@
 import sys
 import time
 
-from TG.openGL.raw.gl import glGetError
-from TG.openGL.raw.glu import gluErrorString
+from TG.openGL.raw import gl
+from TG.openGL.raw.gl import glFlush
 
 from TG.skinning.toolkits.wx import wxSkinModel, XMLSkin
 
@@ -111,7 +111,7 @@ class RenderSkinModelBase(wxSkinModel):
     xmlSkin = xmlSkin
     clientSize = (800, 800)
     frameTitle = 'GLCanvas'
-    fpsFormat = '%.1f fps (true), %.0f fps (%.5f:%.5f render:swap)'
+    fpsFormat = '%.1f fps (refresh), %.0f fps (render)'
     fps = 60
 
     if sys.platform.startswith('win'):
@@ -121,38 +121,29 @@ class RenderSkinModelBase(wxSkinModel):
 
     def setFrame(self, frame):
         self.frame = frame
-        self.timingLogRender = []
-        self.timingLogSwap = []
-        self.timingLogEnds = []
+        self.timingLog = []
 
     _lastUpdate = 0
-    _historyKeep = 15
+    _historyKeep = 10
     _historyLen = 0
-    def fpsUpdate(self, renderStart, renderEnd, renderFinish):
+    def fpsUpdate(self, renderStart, renderEnd):
+        self.timingLog.append(renderEnd - renderStart)
 
-        self.timingLogRender.append(renderEnd - renderStart)
-        self.timingLogSwap.append(renderFinish - renderEnd)
+        timeDelta = renderEnd - self._lastUpdate
+        if timeDelta >= 1 and len(self.timingLog):
+            newEntries = (len(self.timingLog) - self._historyLen - 1)
+            fpsRefresh = newEntries / timeDelta
+            fpsRender = len(self.timingLog) / sum(self.timingLog, 0.0)
 
-        timeDelta = renderFinish - self._lastUpdate
-        totalEntries = len(self.timingLogRender)
-        if timeDelta >= 1 and totalEntries:
-            newEntries = (totalEntries - self._historyLen)
-            fpsTrue = newEntries / timeDelta
-            timeRender = sum(self.timingLogRender, 0.0)
-            #fpsRender = totalEntries / timeRender
-            timeSwap = sum(self.timingLogSwap, 0.0)
-            #fpsSwap = totalEntries / timeSwap
-            fpsEffective = totalEntries / (timeRender + timeSwap)
+            self._updateFPSInfo(fpsRefresh, fpsRender)
 
-            self._updateFPSInfo(fpsTrue, fpsEffective, timeRender, timeSwap, totalEntries)
+            self.timingLog = self.timingLog[-self._historyKeep:]
+            self._historyLen = len(self.timingLog)
+            self._lastUpdate = renderEnd
+            return True
 
-            self.timingLogRender[:] = self.timingLogRender[-self._historyKeep:]
-            self.timingLogSwap[:] = self.timingLogSwap[-self._historyKeep:]
-            self._historyLen = len(self.timingLogRender)
-            self._lastUpdate = renderFinish
-
-    def _updateFPSInfo(self, fpsTrue, fpsEffective, timeRender, timeSwap, totalEntries):
-        fpsStr = self.fpsFormat % (fpsTrue, fpsEffective, timeRender/totalEntries, timeSwap/totalEntries)
+    def _updateFPSInfo(self, fpsRefresh, fpsRender):
+        fpsStr = self.fpsFormat % (fpsRefresh, fpsRender)
         self._printFPS(fpsStr)
 
     fpsStr = 'Waiting'
@@ -173,6 +164,7 @@ class RenderSkinModelBase(wxSkinModel):
             self.repaintTimer.Start(1000./self.fps)
         else: 
             self.repaintTimer.Stop()
+        del self.timingLog[:]
 
     def initialize(self, glCanvas):
         self.setFps(self.fps)
@@ -194,23 +186,25 @@ class RenderSkinModelBase(wxSkinModel):
         pass
 
     def refresh(self, glCanvas):
-        renderStart = self.timestamp()
-        glCanvas.SetCurrent()
-        self.renderContent(glCanvas, renderStart)
-        renderEnd = self.timestamp()
-        self.renderFinish(glCanvas, renderStart, renderEnd)
-        renderFinish = self.timestamp()
-        self.fpsUpdate(renderStart, renderEnd, renderFinish)
+        self.renderSwap(glCanvas)
+        t0 = self.timestamp()
+        self.renderContent(glCanvas, t0)
+        t1 = self.timestamp()
+        self.renderFinish(glCanvas, t0, t1)
 
-    def renderContent(self, glCanvas, renderStart):
+    def renderSwap(self, glCanvas):
+        glCanvas.SetCurrent()
+        glCanvas.SwapBuffers()
+
+    def renderContent(self, glCanvas, timestamp):
         pass
 
-    def renderFinish(self, glCanvas, renderStart, renderEnd):
+    def renderFinish(self, glCanvas, timestamp, timestampEnd):
         ## Note: Don't use unless absolutely needed:
         ## glFinish () # VERY expensive
 
-        ##glFlush () # implicit in SwapBuffers
-        glCanvas.SwapBuffers()
+        self.fpsUpdate(timestamp, timestampEnd)
+        glFlush()
     
     def onQuit(self):
         self.repaintTimer.Stop()

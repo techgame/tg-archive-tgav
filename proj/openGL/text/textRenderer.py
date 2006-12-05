@@ -28,18 +28,13 @@ class TextDisplay(object):
         self.color = textObj.color
         self.texture = textData.texture
 
-    glDepthMask = staticmethod(gl.glDepthMask)
     def render(self):
-        glDepthMask = self.glDepthMask
-        glDepthMask(False)
         self.texture.select()
         self.color.select()
 
         geom = self.geometry
         gl.glInterleavedArrays(geom.gltypeid, 0, geom.ctypes)
         gl.glDrawArrays(geom.drawMode, 0, geom.size)
-
-        glDepthMask(True)
     __call__ = render
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -65,10 +60,7 @@ class TextBufferedDisplay(object):
         buff.sendData(geometry)
         buff.unbind()
 
-    glDepthMask = staticmethod(gl.glDepthMask)
     def render(self, glColor4f=gl.glColor4f):
-        glDepthMask = self.glDepthMask
-        glDepthMask(False)
         buf = self.buffer
         buf.bind()
         self.texture.select()
@@ -79,7 +71,6 @@ class TextBufferedDisplay(object):
         gl.glDrawArrays(geom.drawMode, 0, geom.size)
 
         buf.unbind()
-        glDepthMask(True)
     __call__ = render
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
