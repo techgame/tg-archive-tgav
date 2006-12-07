@@ -13,13 +13,16 @@
 from contextlib import contextmanager
 
 from TG.openGL.raw import gl
+from TG.openGL.raw.errors import GLError
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def _glPurgeStackMethod(method):
+def _glPurgeStackOf(method):
+    GLError.check()
     try:
+        method = getattr(method, 'api', method)
         while 1:
             method()
             if glGetError() != 0:
@@ -37,7 +40,7 @@ def glName(name):
         gl.glPopName()
 
 def glPurgeNames():
-    _glPurgeStackMethod(gl.glPopName)
+    _glPurgeStackOf(gl.glPopName)
 
 @contextmanager
 def glClientAttribs(mask):
@@ -48,7 +51,7 @@ def glClientAttribs(mask):
         gl.glPopClientAttrib()
 
 def glPurgeClientAttribs():
-    _glPurgeStackMethod(gl.glPopClientAttribs)
+    _glPurgeStackOf(gl.glPopClientAttribs)
 
 @contextmanager
 def glAttribs(mask):
@@ -59,42 +62,28 @@ def glAttribs(mask):
         gl.glPopAttrib()
 
 def glPurgeAttribs():
-    _glPurgeStackMethod(gl.glPopAttribs)
+    _glPurgeStackOf(gl.glPopAttribs)
 
 @contextmanager
-def glMatrixMode(mode):
-    gl.glMatrixMode(mode)
-    try:
-        yield
-    finally:
-        gl.glMatrixMode(gl.GL_MODEL_VIEW)
-
-@contextmanager
-def glBlock(mode=None):
+def glImmediate(mode=None):
     gl.glBegin(mode)
     try:
         yield
     finally:
         gl.glEnd()
+glBlock = glImmediate
 
 @contextmanager
 def glMatrix(mode=None):
     if mode is not None:
         gl.glMatrixMode(mode)
-        try:
-            gl.glPushMatrix()
-        finally:
-            gl.glMatrixMode(gl.GL_MODEL_VIEW)
-
+        gl.glPushMatrix()
         try:
             yield
         finally:
-
             gl.glMatrixMode(mode)
-            try:
-                gl.glPopMatrix()
-            finally:
-                gl.glMatrixMode(gl.GL_MODEL_VIEW)
+            gl.glPopMatrix()
+            gl.glMatrixMode(gl.GL_MODEL_VIEW)
 
     else:
         gl.glPushMatrix()
@@ -104,12 +93,12 @@ def glMatrix(mode=None):
             gl.glPopMatrix()
 
 def glPurgeMatrix(mode=None):
-    if mode is not None:
+    if mode is None:
+        _glPurgeStackOf(gl.glPopMatrix)
+        gl.glLoadIdentity()
+    else:
         gl.glMatrixMode(mode)
-
-    _glPurgeStackMethod(gl.glPopMatrix)
-    gl.glLoadIdentity()
-
-    if mode is not None:
+        _glPurgeStackOf(gl.glPopMatrix)
+        gl.glLoadIdentity()
         gl.glMatrixMode(gl.GL_MODEL_VIEW)
 

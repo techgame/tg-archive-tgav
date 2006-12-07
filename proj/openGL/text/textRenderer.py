@@ -25,12 +25,12 @@ class TextDisplay(object):
 
     def update(self, textObj, textData, geometry):
         self.geometry = geometry
-        self.color = textObj.color
+        #self.color = textObj.color
         self.texture = textData.texture
 
     def render(self):
         self.texture.select()
-        self.color.select()
+        #self.color.select()
 
         geom = self.geometry
         gl.glInterleavedArrays(geom.gltypeid, 0, geom.ctypes)
@@ -47,7 +47,7 @@ class TextBufferedDisplay(object):
     buffer = None
     def update(self, textObj, textData, geometry):
         self.geometry = geometry
-        self.color = textObj.color
+        #self.color = textObj.color
         self.texture = textData.texture
 
         # push the data to the card
@@ -64,7 +64,7 @@ class TextBufferedDisplay(object):
         buf = self.buffer
         buf.bind()
         self.texture.select()
-        self.color.select()
+        #self.color.select()
 
         geom = self.geometry
         gl.glInterleavedArrays(geom.gltypeid, 0, 0)

@@ -163,9 +163,9 @@ class ImageObject(PositionalObject):
         off = self.pos - (self.align*size)
 
         if self.roundValues:
-            geo['v'] += off.round()
+            geo.v += off.round()
         else:
-            geo['v'] += off
+            geo.v += off
 
         self.geometry = geo
         return True

@@ -12,7 +12,6 @@
 
 from numpy import asarray, float32
 
-from .color import ColorProperty
 from .data.vertexArrays import VertexArray
 from .raw import gl
 
@@ -22,7 +21,7 @@ from .raw import gl
 
 class PositionalObject(object):
     roundValues = True
-    color = ColorProperty()
+    color = None
 
     def set(self, val=None, **kwattr):
         for n,v in (val or kwattr).iteritems():

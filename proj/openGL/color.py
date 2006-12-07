@@ -11,7 +11,8 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 from functools import partial 
-from numpy import asarray, float32
+from .data.vertexArrays import ColorArray
+from .data.arrayViews import ColorArrayView
 from raw import gl
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -50,81 +51,84 @@ class ColorObject(object):
         self.setValue(None)
     value = property(getValue, setValue, delValue)
 
-    def convertValue(self, value, dataFormat):
-        if isinstance(value, (long, int)):
-            if dataFormat in ('h', 'hex', 'rgb'):
-                value = (v/255. for v in ((value >> 16) & 0xff, (value >> 8) & 0xff, (value) & 0xff))
-            elif dataFormat in ('ha', 'hexalpha', 'hexa', 'rgba'):
-                value = (v/255. for v in ((value >> 32) & 0xff, (value >> 16) & 0xff, (value >> 8) & 0xff, (value) & 0xff))
-            else: 
-                if value > 255:
-                    raise ValueError("Do not know how to interpret %r as a color with format %r" % (value, dataFormat))
-                if value > 1:
-                    value /= 255.
-                value = (value, value, value)
-
-        elif isinstance(value, float):
-            if dataFormat in ('i', 'I', 'la', 'LA', 'rgba', 'RGBA', 'a', 'A'):
-                value = (value, value, value, value)
-            elif dataFormat in ('l', 'L', 'rgb', 'RGB'):
-                value = (value, value, value)
-            else: 
-                value = (value, value, value)
-
-        elif isinstance(value, basestring):
-            value = value.replace(' ', '')
-            if value.startswith('#'):
-                value = value[1:]
-            elif value.startswith('0x'):
-                value = value[2:]
-
-            if len(value) > 4:
-                # 6 or 8 length hex string
-                value = tuple(int(e, 16)/255. for e in (value[0:2], value[2:4], value[4:6], value[6:]) if e)
-            elif len(value) > 2:
-                # 3 or 4 length hex string
-                value = tuple(int(e, 16)/15. for e in (value[0:1], value[1:2], value[2:3], value[3:]) if e)
-            else:
-                raise ValueError("Do not know how to interpret %r as a color with format %r" % (value, dataFormat))
-
-        return value
-
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class ColorProperty(object):
-    ColorFactory = ColorObject
+class ColorFormats(object):
+    ColorArray = ColorArray
 
-    def __init__(self, *argsColor, **kwColor):
-        self.argsColor = argsColor
-        self.kwColor = kwColor
+    @classmethod
+    def colorFrom(klass, value, components=0):
+        if isinstance(value, (list, tuple)):
+            return klass.colorArrayFrom(value)[:components or None]
 
-    def __get__(self, obj, klass):
-        if obj is None:
-            return self
+        elif isinstance(value, (long, int)):
+            return klass.colorFromInt(value, components)[:components or None]
 
-        try:
-            return obj.__value
-        except AttributeError:
-            return self.create(obj, *self.argsColor, **self.kwColor)
+        elif isinstance(value, float):
+            return klass.colorFromFloat(value, components)[:components or None]
+        
+        elif isinstance(value, basestring):
+            return klass.colorFromHex(value, components)[:components or None]
 
-    def __set__(self, obj, value):
-        try:
-            colorObj = obj.__value
-        except AttributeError:
-            colorObj = self.create(obj, value)
-        else:
-            colorObj.setValue(value)
+        return klass.colorArrayFrom(value)[:components or None]
 
-    def __delete__(self, obj):
-        try:
-            colorObj = obj.__value
-        except AttributeError:
-            pass
-        else:
-            colorObj.delValue()
+    @classmethod
+    def colorFromInt(klass, value, components=0):
+        if components in (-1,0,3):
+            result = ((value >> 16) & 0xff, (value >> 8) & 0xff, (value >> 0) & 0xff)
+        elif components == 4:
+            result = ((value >> 32) & 0xff, (value >> 16) & 0xff, (value >> 8) & 0xff, (value >> 0) & 0xff)
+        else: 
+            raise ValueError("Do not know how to interpret %r as a color with %r components" % (value, components))
 
-    def create(self, obj, *args, **kw):
-        colorObj = self.ColorFactory(*args, **kw)
-        obj.__value = colorObj
-        return colorObj
+        return klass.colorArrayFrom(result, 'B')
+
+    @classmethod
+    def colorFromFloat(klass, value, components=0):
+        result = (value,)*max(1, components)
+        return klass.colorArrayFrom(result, 'f')
+
+    hexFormatMap = {}
+    for n in range(1, 5):
+        hexFormatMap[0, n] = (n, 1)
+        hexFormatMap[n, n] = (n, 1)
+        hexFormatMap[n, 2*n] = (n, 2)
+        hexFormatMap[0, 2*n] = (n, 2)
+
+    @classmethod
+    def colorFromHex(klass, value, components=0, hexFormatMap=hexFormatMap):
+        if value[:1] == '#':
+            value = value[1:]
+        elif value[:1].isdigit() and value[1:2] == '#':
+            components = int(value[0])
+            value = value[2:]
+        else: raise ValueError("Unsure of the color value string format: %r" % (value,))
+
+        value = value.strip().replace(' ', ':')
+        if ':' in value:
+            components = value.count(':') + (not value.endswith(':')) # add one if no trailing : is found
+            value = value.replace(':', '')
+
+        n, f = hexFormatMap[max(0, components), len(value)]
+        if f == 2: 
+            result = tuple(int(e, 16) for e in (value[0:2], value[2:4], value[4:6], value[6:8]) if e)
+        elif f == 1: 
+            result = tuple(int(e+e, 16) for e in (value[0:1], value[1:2], value[2:3], value[3:4]) if e)
+        else: 
+            raise ValueError("Do not know how to interpret %r as a color with %r components" % (value, components))
+
+        return klass.colorArrayFrom(result, 'B')
+    del hexFormatMap
+
+    @classmethod
+    def colorArrayFrom(klass, result, dtype=None):
+        if len(result) == 1:
+            result = result * 4
+        elif len(result) == 2:
+            result = result[:-1] * 3 + result[-1:]
+
+        return klass.ColorArray(result, dtype)
+
+color = ColorFormats.colorFrom
+hexcolor = ColorFormats.colorFromHex
 
