@@ -46,10 +46,12 @@ class GLArrayDataType(object):
 
     kind = None
     glKindId = None
+    glArrayPointer = None
     def setKind(self, kind):
         self.kind = kind
         self.glKindId = glArrayInfo.glKindIdFrom(kind)
         self._glImmediateFnMap = glArrayInfo.glImmediateMapFrom(kind)
+        self.glArrayPointer = glArrayInfo.glArrayPointerFnFrom(kind)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -75,30 +75,51 @@ glInterleavedTypeIdMap = {
     }
 
 glArrayKindInfo = {
-    'interleaved': (None, {}),
+    'interleaved': (None, gl.glInterleavedArrays, {
+        gl.GL_V2F: {'v': gl.glVertex2fv, 't': None, 'n': None, 'c': None},
+        gl.GL_V3F: {'v': gl.glVertex3fv, 't': None, 'n': None, 'c': None},
 
-    'vertex': (gl.GL_VERTEX_ARRAY, {
+        gl.GL_C4UB_V2F: {'v': gl.glVertex2fv, 't': None, 'n': None, 'c': gl.glColor4ubv},
+        gl.GL_C4UB_V3F: {'v': gl.glVertex3fv, 't': None, 'n': None, 'c': gl.glColor4ubv},
+        gl.GL_C3F_V3F: {'v': gl.glVertex3fv, 't': None, 'n': None, 'c': gl.glColor3fv},
+
+        gl.GL_N3F_V3F: {'v': gl.glVertex3fv, 't': None, 'n': gl.glNormal3fv, 'c': None},
+        gl.GL_C4F_N3F_V3F: {'v': gl.glVertex3fv, 't': None, 'n': gl.glNormal3fv, 'c': gl.glColor4fv},
+
+        gl.GL_T2F_V3F: {'v': gl.glVertex3fv, 't': gl.glTexCoord2fv, 'n': None, 'c': None},
+        gl.GL_T4F_V4F: {'v': gl.glVertex4fv, 't': gl.glTexCoord4fv, 'n': None, 'c': None},
+
+        gl.GL_T2F_C4UB_V3F: {'v': gl.glVertex3fv, 't': gl.glTexCoord2fv, 'n': None, 'c': gl.glColor4ubv},
+        gl.GL_T2F_C3F_V3F: {'v': gl.glVertex3fv, 't': gl.glTexCoord2fv, 'n': None, 'c': gl.glColor3fv},
+
+        gl.GL_T2F_N3F_V3F: {'v': gl.glVertex3fv, 't': gl.glTexCoord2fv, 'n': gl.glNormal3fv, 'c': None},
+
+        gl.GL_T2F_C4F_N3F_V3F: {'v': gl.glVertex3fv, 't': gl.glTexCoord2fv, 'n': gl.glNormal3fv, 'c': gl.glColor4fv},
+        gl.GL_T4F_C4F_N3F_V4F: {'v': gl.glVertex4fv, 't': gl.glTexCoord4fv, 'n': gl.glNormal3fv, 'c': gl.glColor4fv},
+        }),
+
+    'vertex': (gl.GL_VERTEX_ARRAY, gl.glVertexPointer, {
         gl.GL_SHORT: {2: gl.glVertex2sv, 3: gl.glVertex3sv, 4: gl.glVertex4sv,},
         gl.GL_INT: {2: gl.glVertex2iv, 3: gl.glVertex3iv, 4: gl.glVertex4iv,},
         gl.GL_FLOAT: {2: gl.glVertex2fv, 3: gl.glVertex3fv, 4: gl.glVertex4fv,},
         gl.GL_DOUBLE: {2: gl.glVertex2dv, 3: gl.glVertex3dv, 4: gl.glVertex4dv,},
         }),
 
-    'texture_coord': (gl.GL_TEXTURE_COORD_ARRAY, {
+    'texture_coord': (gl.GL_TEXTURE_COORD_ARRAY, gl.glTexCoordPointer, {
         gl.GL_SHORT: {1: gl.glTexCoord1sv, 2: gl.glTexCoord2sv, 3: gl.glTexCoord3sv, 4: gl.glTexCoord4sv},
         gl.GL_INT: {1: gl.glTexCoord1iv, 2: gl.glTexCoord2iv, 3: gl.glTexCoord3iv, 4: gl.glTexCoord4iv},
         gl.GL_FLOAT: {1: gl.glTexCoord1fv, 2: gl.glTexCoord2fv, 3: gl.glTexCoord3fv, 4: gl.glTexCoord4fv},
         gl.GL_DOUBLE: {1: gl.glTexCoord1dv, 2: gl.glTexCoord2dv, 3: gl.glTexCoord3dv, 4: gl.glTexCoord4dv},
         }),
 
-    'multi_texture_coord': (gl.GL_TEXTURE_COORD_ARRAY, {
+    'multi_texture_coord': (gl.GL_TEXTURE_COORD_ARRAY, gl.glTexCoordPointer, {
         gl.GL_SHORT: {1: gl.glMultiTexCoord1sv, 2: gl.glMultiTexCoord2sv, 3: gl.glMultiTexCoord3sv, 4: gl.glMultiTexCoord4sv},
         gl.GL_INT: {1: gl.glMultiTexCoord1iv, 2: gl.glMultiTexCoord2iv, 3: gl.glMultiTexCoord3iv, 4: gl.glMultiTexCoord4iv},
         gl.GL_FLOAT: {1: gl.glMultiTexCoord1fv, 2: gl.glMultiTexCoord2fv, 3: gl.glMultiTexCoord3fv, 4: gl.glMultiTexCoord4fv},
         gl.GL_DOUBLE: {1: gl.glMultiTexCoord1dv, 2: gl.glMultiTexCoord2dv, 3: gl.glMultiTexCoord3dv, 4: gl.glMultiTexCoord4dv},
         }),
 
-    'normal': (gl.GL_NORMAL_ARRAY, {
+    'normal': (gl.GL_NORMAL_ARRAY, gl.glNormalPointer, {
         gl.GL_BYTE: {3: gl.glNormal3bv},
         gl.GL_SHORT: {3: gl.glNormal3sv},
         gl.GL_INT: {3: gl.glNormal3iv},
@@ -106,7 +127,7 @@ glArrayKindInfo = {
         gl.GL_DOUBLE: {3: gl.glNormal3dv},
         }),
 
-    'color': (gl.GL_COLOR_ARRAY, {
+    'color': (gl.GL_COLOR_ARRAY, gl.glColorPointer, {
         gl.GL_UNSIGNED_BYTE: {3: gl.glColor3ubv, 4: gl.glColor4ubv},
         gl.GL_UNSIGNED_SHORT: {3: gl.glColor3usv, 4: gl.glColor4usv},
         gl.GL_UNSIGNED_INT: {3: gl.glColor3uiv, 4: gl.glColor4uiv},
@@ -117,7 +138,7 @@ glArrayKindInfo = {
         gl.GL_DOUBLE: {3: gl.glColor3dv, 4: gl.glColor4dv},
         }),
 
-    'secondary_color': (gl.GL_SECONDARY_COLOR_ARRAY, {
+    'secondary_color': (gl.GL_SECONDARY_COLOR_ARRAY, gl.glSecondaryColorPointer, {
         gl.GL_UNSIGNED_BYTE: {3: gl.glSecondaryColor3ubv},
         gl.GL_UNSIGNED_SHORT: {3: gl.glSecondaryColor3usv},
         gl.GL_UNSIGNED_INT: {3: gl.glSecondaryColor3usv},
@@ -128,7 +149,7 @@ glArrayKindInfo = {
         gl.GL_DOUBLE: {3: gl.glSecondaryColor3usv},
         }),
 
-    'color_index': (gl.GL_INDEX_ARRAY, {
+    'color_index': (gl.GL_INDEX_ARRAY, gl.glIndexPointer, {
         gl.GL_UNSIGNED_BYTE: {1: gl.glIndexubv},
         gl.GL_SHORT: {1: gl.glIndexsv},
         gl.GL_INT: {1: gl.glIndexiv},
@@ -136,18 +157,23 @@ glArrayKindInfo = {
         gl.GL_DOUBLE: {1: gl.glIndexdv},
         }),
 
-    'fog_coord': (gl.GL_FOG_COORD_ARRAY, {
+    'fog_coord': (gl.GL_FOG_COORD_ARRAY, gl.glFogCoordPointer, {
         gl.GL_FLOAT: {1: gl.glFogCoordfv},
         gl.GL_DOUBLE: {1: gl.glFogCoorddv},
         }),
 
-    'edge_flag': (gl.GL_EDGE_FLAG_ARRAY, {
+    'edge_flag': (gl.GL_EDGE_FLAG_ARRAY, gl.glEdgeFlagPointer, {
         gl.GL_UNSIGNED_BYTE: {1: gl.glEdgeFlagv},
         }),
     }
 
 def glKindIdFrom(kind):
     return glArrayKindInfo[kind][0]
+def glArrayPointerFnFrom(kind):
+    return glArrayKindInfo[kind][1]
 def glImmediateMapFrom(kind):
     return glArrayKindInfo[kind][-1]
+def glImmediateFnFrom(kind, glTypeId, dims):
+    typeMap = glImmediateMapFrom(kind)[glTypeId]
+    return typeMap[dims]
 

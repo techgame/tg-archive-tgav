@@ -26,7 +26,7 @@ class GLError(Exception):
     def __init__(self, error, callInfo=None):
         self.error = error
         self.errorString = self.gluErrorString(error)
-        Exception.__init__(self, self.fmt % (errorString, error, ))
+        Exception.__init__(self, self.fmt % (self.errorString, self.error, ))
 
     @classmethod
     def check(klass, err=None, doRaise=True):

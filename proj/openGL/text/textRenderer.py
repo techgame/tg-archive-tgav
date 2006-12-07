@@ -61,16 +61,34 @@ class TextBufferedDisplay(object):
         buff.unbind()
 
     def render(self, glColor4f=gl.glColor4f):
-        buf = self.buffer
-        buf.bind()
-        self.texture.select()
-        #self.color.select()
-
         geom = self.geometry
+        if not len(geom): return
+
+        #self.color.select()
+        self.texture.select()
+
+        buff = self.buffer
+        buff.bind()
+
         gl.glInterleavedArrays(geom.glTypeId, 0, 0)
         gl.glDrawArrays(geom.drawMode, 0, geom.size)
 
-        buf.unbind()
+        ## Font rect/outline highlighting code:
+        #if 0:
+        #    self.texture.deselect()
+        #    gl.glDisableClientState(gl.GL_TEXTURE_COORD_ARRAY)
+
+        #    gl.glColor4f(1, .9, .9, .2)
+        #    gl.glDrawArrays(geom.drawMode, 0, geom.size)
+
+        #    gl.glColor4f(1, .4, .4, .4)
+        #    gl.glPolygonMode(gl.GL_FRONT_AND_BACK, gl.GL_LINE)
+        #    gl.glDrawArrays(geom.drawMode, 0, geom.size)
+        #    gl.glPolygonMode(gl.GL_FRONT_AND_BACK, gl.GL_FILL)
+
+        #    gl.glColor4f(1, 1, 1, 1)
+
+        buff.unbind()
     __call__ = render
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -37,6 +37,7 @@ class FieldProperty(object):
 class InterleavedArray(GLArrayBase):
     defaultValue = numpy.array([0], 'f')
     gldtype = GLInterleavedArrayDataType()
+    gldtype.setKind('interleaved')
     gldtype.setDefaultFormat(gl.GL_V3F)
 
     vertex = v = FieldProperty('v')

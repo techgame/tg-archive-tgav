@@ -21,14 +21,15 @@ class TextLayout(object):
     def layout(self, textObj, textData):
         roundValues = textObj.roundValues
         crop = textObj.crop
-        #align = textObj.align[textObj.wrapAxis]
-        align = 0
+        align = textObj.align[textObj.wrapAxis]
         oneMinusAlign = 1-align
 
         pos = textData.AdvanceArray(textObj.pos).copy()
         size = textData.AdvanceArray(textObj.size).copy()
-        size[0] *= align
-        linePos = pos + size
+
+        linePos = size.copy()
+        linePos[0] *= align
+        linePos += pos
 
         lineAdvance = textData.lineAdvance * textObj.lineSpacing
 
@@ -39,28 +40,33 @@ class TextLayout(object):
         # ask for our slices
         wrapSlices = textObj.wrapper.wrapSlices(textObj, textData)
 
-        # now layout
+        # offset by lines (usually 1 or 0)
         if textObj.line:
             linePos -= (textObj.line*lineAdvance)
 
+        # define some methods to handle alignment and offset
         if roundValues:
-            def getOffsetFor(textSlice, textOffset):
+            def getOffsetFor(textOffset):
                 alignOff = (oneMinusAlign*textOffset[0] + align*textOffset[-1])
                 return textOffset[:-1] + (linePos - alignOff).round()
         else:
-            def getOffsetFor(textSlice, textOffset):
+            def getOffsetFor(textOffset):
                 alignOff = (oneMinusAlign*textOffset[0] + align*textOffset[-1])
                 return textOffset[:-1] + (linePos - alignOff)
 
+        lineCount = 0
         if crop:
             for textSlice, textOffset in wrapSlices:
-                geov[textSlice] += getOffsetFor(textSlice, textOffset)
+                lineCount += 1
+                geov[textSlice] += getOffsetFor(textOffset)
                 linePos -= lineAdvance
                 if (linePos<=pos)[1]:
-                    return geo[:textSlice.stop]
+                    geo = geo[:textSlice.stop]
+                    break
         else:
             for textSlice, textOffset in wrapSlices:
-                geov[textSlice] += getOffsetFor(textSlice, textOffset)
+                lineCount += 1
+                geov[textSlice] += getOffsetFor(textOffset)
                 linePos -= lineAdvance
 
         return geo
