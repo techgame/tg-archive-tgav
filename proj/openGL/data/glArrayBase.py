@@ -21,7 +21,7 @@ from .glArrayDataType import GLArrayDataType
 class GLArrayBase(ndarray):
     __array_priority__ = 25.0
     gldtype = GLArrayDataType()
-    gltypeid = None
+    glTypeId = None
 
     useDefault = object()
     default = numpy.array([0], 'B')

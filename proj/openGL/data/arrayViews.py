@@ -64,9 +64,9 @@ class ArrayViewBase(object):
 
     @classmethod
     def glImmediateFor(klass, glarray):
-        gltypeid = glarray.gltypeid
+        glTypeId = glarray.glTypeId
         dim = glarray.shape[-1]
-        return klass.immediateFnMap[gltypeid, dim]
+        return klass.immediateFnMap[glTypeId, dim]
 
     def glImmediate(self):
         raise NotImplementedError('_glImmediate_ should be repopulated from the dataformat and shape of the array')

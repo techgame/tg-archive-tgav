@@ -33,7 +33,7 @@ class TextDisplay(object):
         #self.color.select()
 
         geom = self.geometry
-        gl.glInterleavedArrays(geom.gltypeid, 0, geom.ctypes)
+        gl.glInterleavedArrays(geom.glTypeId, 0, geom.ctypes)
         gl.glDrawArrays(geom.drawMode, 0, geom.size)
     __call__ = render
 
@@ -67,7 +67,7 @@ class TextBufferedDisplay(object):
         #self.color.select()
 
         geom = self.geometry
-        gl.glInterleavedArrays(geom.gltypeid, 0, 0)
+        gl.glInterleavedArrays(geom.glTypeId, 0, 0)
         gl.glDrawArrays(geom.drawMode, 0, geom.size)
 
         buf.unbind()
