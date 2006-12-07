@@ -5,6 +5,7 @@ geoMath
 
 syntax: glob
 Icon?
+*.orig
 \.DS_Store
 *.pyc
 *.pyo
