@@ -12,7 +12,7 @@
 
 import numpy
 from numpy import ndarray
-from .glArrayDataType import GLArrayDataType
+from .glArrayDataType import GLBaseArrayDataType
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -20,7 +20,7 @@ from .glArrayDataType import GLArrayDataType
 
 class GLArrayBase(ndarray):
     __array_priority__ = 25.0
-    gldtype = GLArrayDataType()
+    gldtype = GLBaseArrayDataType()
     glTypeId = None
 
     useDefault = object()
@@ -66,15 +66,14 @@ class GLArrayBase(ndarray):
 
     @classmethod
     def fromShape(klass, shape, dtype=None, value=None, completeShape=None):
-        dtype, shape = klass.gldtype.lookupDTypeFrom(dtype, shape, completeShape)
-        self = ndarray.__new__(klass, shape, dtype=dtype)
+        dtype, shape, order = klass.gldtype.lookupDTypeFrom(dtype, shape, completeShape)
+        self = ndarray.__new__(klass, shape, dtype=dtype, order=order)
         if value is not None: 
             if value is not klass.useDefault:
                 value = numpy.asarray(value, klass.default.dtype)
             else: value = klass.default
             self.view(value.dtype)[:] = value
 
-        #self.gldtype.configFrom(self)
         return self
 
     @classmethod
@@ -87,7 +86,6 @@ class GLArrayBase(ndarray):
                 self = data.astype(dtype)
             else: self = data
 
-            #self.gldtype.configFrom(self)
             return self
 
         elif isinstance(data, ndarray):
@@ -101,7 +99,6 @@ class GLArrayBase(ndarray):
             elif copy: 
                 self = self.copy()
 
-            #self.gldtype.configFrom(self)
             return self
 
         else:
@@ -109,10 +106,9 @@ class GLArrayBase(ndarray):
 
     @classmethod
     def fromDataRaw(klass, data, dtype=None, copy=False):
-        dtype, shape = klass.gldtype.lookupDTypeFrom(dtype, numpy.shape(data), True)
-        self = ndarray.__new__(klass, shape, dtype=dtype)
+        dtype, shape, order = klass.gldtype.lookupDTypeFrom(dtype, numpy.shape(data), True)
+        self = ndarray.__new__(klass, shape, dtype=dtype, order=order)
         self[:] = data
-        #self.gldtype.configFrom(self)
         return self
 
 

@@ -11,17 +11,18 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import numpy
-from . import glArrayInfo 
+from . glArrayInfo import GLDataArrayInfo, GLInterleavedArrayInfo, GLElementArrayInfo, GLElementRangeInfo
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class GLArrayDataType(object):
+class GLBaseArrayDataType(object):
+    _glTypeIdMap = {}
+    arrayOrder = 'C'
+    
     defaultFormat = None
-
-    dtypeMap = {}
-    _glTypeIdMap = glArrayInfo.glTypeIdMap
+    dtypeMap = None
 
     def __init__(self, other=None):
         if other is not None:
@@ -36,22 +37,9 @@ class GLArrayDataType(object):
 
     def copyFrom(self, other):
         self.defaultFormat = other.defaultFormat
-        self.kind = other.kind
-        self.glKindId = other.glKindId
 
         if self.dtypeMap is not other.dtypeMap:
             self.dtypeMap = other.dtypeMap.copy()
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    kind = None
-    glKindId = None
-    glArrayPointer = None
-    def setKind(self, kind):
-        self.kind = kind
-        self.glKindId = glArrayInfo.glKindIdFrom(kind)
-        self._glImmediateFnMap = glArrayInfo.glImmediateMapFrom(kind)
-        self.glArrayPointer = glArrayInfo.glArrayPointerFnFrom(kind)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -91,11 +79,10 @@ class GLArrayDataType(object):
     def gldrawModeFor(self, key):
         return self.gldrawModeMap.get(key, key)
 
-    _glImmediateFnMap = {}
-    def glImmediateFor(self, array):
-        fnByShape = self._glImmediateFnMap.get(array.glTypeId) or {}
-        glImmediate = fnByShape.get(array.shape[-1])
-        return glImmediate
+    def arrayInfoFor(self, kind):
+        raise NotImplementedError('Subclass Responsibility: %r' % (self,))
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @classmethod
     def _getKeyForDtype(klass, dtype, shape=None):
@@ -158,7 +145,7 @@ class GLArrayDataType(object):
         else: key = self._getKeyForDtype(dtype)
 
         dtype = self.dtypeMap[key]
-        return dtype, shape
+        return dtype, shape, self.arrayOrder
 
     @classmethod
     def _glTypeIdToDtypePopulate(klass):
@@ -173,12 +160,42 @@ class GLArrayDataType(object):
             
         klass._glTypeIdToDtype = glTypeIdToDtype
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+class GLArrayDataType(GLBaseArrayDataType):
+    _glTypeIdMap = GLDataArrayInfo.glTypeIdMap
+    arrayInfoFor = GLDataArrayInfo.arrayInfoFor
+
+    defaultFormat = None
+    dtypeMap = {}
 GLArrayDataType._glTypeIdToDtypePopulate()
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class GLInterleavedArrayDataType(GLArrayDataType):
-    _glTypeIdMap = glArrayInfo.glInterleavedTypeIdMap
+class GLInterleavedArrayDataType(GLBaseArrayDataType):
+    _glTypeIdMap = GLInterleavedArrayInfo.glTypeIdMap
+    arrayInfoFor = GLInterleavedArrayInfo.arrayInfoFor
 
+    defaultFormat = None
+    dtypeMap = {}
 GLInterleavedArrayDataType._glTypeIdToDtypePopulate()
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+class GLElementArrayDataType(GLBaseArrayDataType):
+    _glTypeIdMap = GLElementArrayInfo.glTypeIdMap
+    arrayInfoFor = GLElementArrayInfo.arrayInfoFor
+
+    defaultFormat = None
+    dtypeMap = {}
+GLElementArrayDataType._glTypeIdToDtypePopulate()
+
+class GLElementRangeDataType(GLBaseArrayDataType):
+    arrayOrder = 'F'
+    _glTypeIdMap = GLElementRangeInfo.glTypeIdMap
+    arrayInfoFor = GLElementRangeInfo.arrayInfoFor
+
+    defaultFormat = None
+    dtypeMap = {}
+GLElementRangeDataType._glTypeIdToDtypePopulate()
 

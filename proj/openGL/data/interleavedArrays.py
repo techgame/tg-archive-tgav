@@ -12,13 +12,13 @@
 
 import numpy
 
-from TG.openGL.data.glArrayDataType import GLInterleavedArrayDataType
-from TG.openGL.data.vertexArrays import GLArrayBase
+from ..raw import gl
 
-from TG.openGL.raw import gl
+from .glArrayBase import GLArrayBase
+from .glArrayDataType import GLInterleavedArrayDataType
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#~ Interleaved Arrays
+#~ Interleaved Data Array
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class FieldProperty(object):
@@ -37,8 +37,8 @@ class FieldProperty(object):
 class InterleavedArray(GLArrayBase):
     defaultValue = numpy.array([0], 'f')
     gldtype = GLInterleavedArrayDataType()
-    gldtype.setKind('interleaved')
     gldtype.setDefaultFormat(gl.GL_V3F)
+    glinfo = gldtype.arrayInfoFor('interleaved')
 
     vertex = v = FieldProperty('v')
     colors = c = FieldProperty('c')
