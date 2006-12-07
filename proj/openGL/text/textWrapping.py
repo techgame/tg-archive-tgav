@@ -27,11 +27,12 @@ class BasicTextWrapper(object):
         if not textData: return
 
         offset = textData.getOffset()
-        for textSlice in self.availTextSlices(textData.text):
+        for textSlice in self.availTextSlices(textObj, textData):
             textOffset = offset[textSlice.start:textSlice.stop+1]
             yield textSlice, textOffset
 
-    def availTextSlices(self, text):
+    def availTextSlices(self, textObj, textData):
+        text = textData.text
         if text: 
             return [slice(0, len(text))]
         else:
@@ -42,7 +43,8 @@ class BasicTextWrapper(object):
 class RETextWrapper(BasicTextWrapper):
     re_wrapPoints = re.compile('$|\n')
 
-    def availTextSlices(self, text):
+    def availTextSlices(self, textObj, textData):
+        text = textData.text
         if not text: return
 
         iterMatches = self.re_wrapPoints.finditer(text)
@@ -76,7 +78,7 @@ class TextWrapper(RETextWrapper):
 
         iLine = 0; offLine = offset[iLine, 0, wrapAxis]
         iCurr = iLine; offCurr = offLine
-        for textSlice in self.availTextSlices(text):
+        for textSlice in self.availTextSlices(textObj, textData):
             iNext = textSlice.stop
             offNext = offset[iNext, 0, wrapAxis]
 
