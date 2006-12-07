@@ -23,10 +23,10 @@ class GLArrayBase(ndarray):
     gldtype = GLArrayDataType()
     gltypeid = None
 
-    default = object()
-    defaultValue = numpy.array([0], 'B')
+    useDefault = object()
+    default = numpy.array([0], 'B')
 
-    def __new__(klass, data=None, dtype=None, shape=None, copy=False, value=default):
+    def __new__(klass, data=None, dtype=None, shape=None, copy=False, value=useDefault):
         if data is None:
             # default with no args is to use shape a single 1-element
             self = klass.fromShape(shape or 1, dtype, value)
@@ -40,7 +40,7 @@ class GLArrayBase(ndarray):
             self = klass.fromData(data, dtype, copy)
         return self
 
-    def __init__(klass, data=None, dtype=None, shape=(), copy=False, value=default):
+    def __init__(klass, data=None, dtype=None, shape=(), copy=False, value=useDefault):
         pass
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -69,12 +69,12 @@ class GLArrayBase(ndarray):
         dtype, shape = klass.gldtype.lookupDTypeFrom(dtype, shape, completeShape)
         self = ndarray.__new__(klass, shape, dtype=dtype)
         if value is not None: 
-            if value is not klass.default:
-                value = numpy.asarray(value, klass.defaultValue.dtype)
-            else: value = klass.defaultValue
+            if value is not klass.useDefault:
+                value = numpy.asarray(value, klass.default.dtype)
+            else: value = klass.default
             self.view(value.dtype)[:] = value
 
-        self.gldtype.configFrom(self)
+        #self.gldtype.configFrom(self)
         return self
 
     @classmethod
@@ -87,7 +87,7 @@ class GLArrayBase(ndarray):
                 self = data.astype(dtype)
             else: self = data
 
-            self.gldtype.configFrom(self)
+            #self.gldtype.configFrom(self)
             return self
 
         elif isinstance(data, ndarray):
@@ -101,7 +101,7 @@ class GLArrayBase(ndarray):
             elif copy: 
                 self = self.copy()
 
-            self.gldtype.configFrom(self)
+            #self.gldtype.configFrom(self)
             return self
 
         else:
@@ -112,7 +112,7 @@ class GLArrayBase(ndarray):
         dtype, shape = klass.gldtype.lookupDTypeFrom(dtype, numpy.shape(data), True)
         self = ndarray.__new__(klass, shape, dtype=dtype)
         self[:] = data
-        self.gldtype.configFrom(self)
+        #self.gldtype.configFrom(self)
         return self
 
 

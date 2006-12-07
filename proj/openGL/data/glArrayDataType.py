@@ -11,7 +11,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import numpy
-from ..raw import gl
+from . import glArrayInfo 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -21,33 +21,11 @@ class GLArrayDataType(object):
     defaultFormat = None
 
     dtypeMap = {}
-
-    gltypeidMap = {
-        'uint8': gl.GL_UNSIGNED_BYTE,
-        'B': gl.GL_UNSIGNED_BYTE,
-        'int8': gl.GL_BYTE,
-        'b': gl.GL_BYTE,
-        'uint16': gl.GL_UNSIGNED_SHORT,
-        'H': gl.GL_UNSIGNED_SHORT,
-        'int16': gl.GL_SHORT,
-        'h': gl.GL_SHORT,
-        'uint32': gl.GL_UNSIGNED_INT,
-        'I': gl.GL_UNSIGNED_INT,
-        'L': gl.GL_UNSIGNED_INT,
-        'int32': gl.GL_INT,
-        'i': gl.GL_INT,
-        'l': gl.GL_INT,
-        'float32': gl.GL_FLOAT,
-        'f': gl.GL_FLOAT,
-        'float64': gl.GL_DOUBLE,
-        'd': gl.GL_DOUBLE,
-        }
+    _glTypeIdMap = glArrayInfo.glTypeIdMap
 
     def __init__(self, other=None):
         if other is not None:
             self.copyFrom(other)
-        else:
-            self.dtypeMap = self.dtypeMap.copy()
 
     @classmethod
     def new(klass, other=None):
@@ -58,12 +36,25 @@ class GLArrayDataType(object):
 
     def copyFrom(self, other):
         self.defaultFormat = other.defaultFormat
-        self.dtypeMap = other.dtypeMap.copy()
+        self.kind = other.kind
+        self.glKindId = other.glKindId
+
+        if self.dtypeMap is not other.dtypeMap:
+            self.dtypeMap = other.dtypeMap.copy()
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    kind = None
+    glKindId = None
+    def setKind(self, kind):
+        self.kind = kind
+        self.glKindId = glArrayInfo.glKindIdFrom(kind)
+        self._glImmediateFnMap = glArrayInfo.glImmediateMapFrom(kind)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def addFormatGroups(self, dtypesList, entrySizes=(), default=NotImplemented):
-        dtypeMap = self.dtypeMap
+        dtypeMap = self.dtypeMap.copy()
         keyForDtype = self._getKeyForDtype
         for edtype in dtypesList:
             edtype = self.dtypefmt(edtype)
@@ -74,6 +65,7 @@ class GLArrayDataType(object):
                 else: dt = edtype
                 dtypeMap[keyForDtype(dt)] = dt
 
+        self.dtypeMap = dtypeMap
         if default is not NotImplemented:
             self.setDefaultFormat(default)
 
@@ -83,14 +75,25 @@ class GLArrayDataType(object):
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def configFrom(self, array, parent=None):
-        gltypeid = getattr(parent, 'gltypeid', None)
-        array.gltypeid = gltypeid or self.gltypeidForDtype(array.dtype)
+        glTypeId = getattr(parent, 'glTypeId', None)
+        if glTypeId is None:
+            glTypeId = self.glTypeIdForArray(array)
+        array.glTypeId = glTypeId
 
-    def gltypeidForArray(self, array):
-        return self.gltypeidForDtype(array.dtype)
-    def gltypeidForDtype(self, dtype):
+    def glTypeIdForArray(self, array):
+        return self.glTypeIdForDtype(array.dtype)
+    def glTypeIdForDtype(self, dtype):
         key = self._getKeyForDtype(dtype)
-        return self.gltypeidMap[key]
+        return self._glTypeIdMap.get(key, None)
+
+    def gldrawModeFor(self, key):
+        return self.gldrawModeMap.get(key, key)
+
+    _glImmediateFnMap = {}
+    def glImmediateFor(self, array):
+        fnByShape = self._glImmediateFnMap.get(array.glTypeId) or {}
+        glImmediate = fnByShape.get(array.shape[-1])
+        return glImmediate
 
     @classmethod
     def _getKeyForDtype(klass, dtype, shape=None):
@@ -127,7 +130,7 @@ class GLArrayDataType(object):
                 if result is not None:
                     return result
         elif isinstance(dtypefmt, (int, long)):
-            return klass.gltypeidToDtype[dtypefmt]
+            return klass._glTypeIdToDtype[dtypefmt]
 
         return klass.dtypeFrom(dtypefmt)
 
@@ -156,38 +159,24 @@ class GLArrayDataType(object):
         return dtype, shape
 
     @classmethod
-    def gltypeidToDtypePopulate(klass):
-        gltypeidToDtype = {}
+    def _glTypeIdToDtypePopulate(klass):
+        glTypeIdToDtype = {}
         keyForDtype = klass._getKeyForDtype
-        for dtype, gltypeid in klass.gltypeidMap.iteritems():
+        for dtype, glTypeId in klass._glTypeIdMap.iteritems():
             dtype = klass.dtypefmt(dtype)
-            gltypeidToDtype[gltypeid] = dtype
+            glTypeIdToDtype[glTypeId] = dtype
 
             if dtype.kind == 'V':
                 klass.dtypeMap[keyForDtype(dtype)] = dtype
             
-        klass.gltypeidToDtype = gltypeidToDtype
+        klass._glTypeIdToDtype = glTypeIdToDtype
 
-GLArrayDataType.gltypeidToDtypePopulate()
+GLArrayDataType._glTypeIdToDtypePopulate()
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class GLInterleavedArrayDataType(GLArrayDataType):
-    gltypeidMap = {
-        'v:2f': gl.GL_V2F,
-        'v:3f': gl.GL_V3F,
-        'c:4B;v:2f': gl.GL_C4UB_V2F,
-        'c:4B;v:3f': gl.GL_C4UB_V3F,
-        'c:3f;v:3f': gl.GL_C3F_V3F,
-        'n:3f;v:3f': gl.GL_N3F_V3F,
-        'c:4f;n:3f;v:3f': gl.GL_C4F_N3F_V3F,
-        't:2f;v:3f': gl.GL_T2F_V3F,
-        't:4f;v:4f': gl.GL_T4F_V4F,
-        't:2f;c:4B;v:3f': gl.GL_T2F_C4UB_V3F,
-        't:2f;c:3f;v:3f': gl.GL_T2F_C3F_V3F,
-        't:2f;n:3f;v:3f': gl.GL_T2F_N3F_V3F,
-        't:2f;c:4f;n:3f;v:3f': gl.GL_T2F_C4F_N3F_V3F,
-        't:4f;c:4f;n:3f;v:4f': gl.GL_T4F_C4F_N3F_V4F,
-        }
-GLInterleavedArrayDataType.gltypeidToDtypePopulate()
+    _glTypeIdMap = glArrayInfo.glInterleavedTypeIdMap
+
+GLInterleavedArrayDataType._glTypeIdToDtypePopulate()
 

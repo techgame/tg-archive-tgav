@@ -31,58 +31,62 @@ class ArrayBase(GLArrayBase):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class VertexArray(ArrayBase):
-    defaultValue = numpy.array([0], 'f')
+    default = numpy.array([0], 'f')
 
     gldtype = GLArrayBase.gldtype.copy()
-    gldtype.glBufferType = gl.GL_VERTEX_ARRAY
+    gldtype.setKind('vertex')
     gldtype.addFormatGroups('hlifd', (2,3,4), default='3f')
 
 class TexureCoordArray(ArrayBase):
-    defaultValue = numpy.array([0], 'f')
+    default = numpy.array([0], 'f')
 
     gldtype = GLArrayBase.gldtype.copy()
-    gldtype.glBufferType = gl.GL_TEXTURE_COORD_ARRAY
+    gldtype.setKind('texture_coord')
     gldtype.addFormatGroups('hlifd', (1,2,3,4), default='3f')
 
+class MultiTexureCoordArray(TexureCoordArray):
+    gldtype = TexureCoordArray.gldtype.copy()
+    gldtype.setKind('multi_texture_coord')
+
 class NormalArray(ArrayBase):
-    defaultValue = numpy.array([0, 0, 1], 'f')
+    default = numpy.array([0, 0, 1], 'f')
 
     gldtype = GLArrayBase.gldtype.copy()
-    gldtype.glBufferType = gl.GL_NORMAL_ARRAY
+    gldtype.setKind('normal')
     gldtype.addFormatGroups('bhlifd', (3,), default='3f')
 
 class ColorArray(ArrayBase):
-    defaultValue = numpy.array([1., 1., 1., 1.], 'f')
+    default = numpy.array([1., 1., 1., 1.], 'f')
 
     gldtype = GLArrayBase.gldtype.copy()
-    gldtype.glBufferType = gl.GL_COLOR_ARRAY
-    gldtype.addFormatGroups('BHIbhlifd', (3,4), default='4f')
+    gldtype.setKind('color')
+    gldtype.addFormatGroups('BHLIbhlifd', (3,4), default='4f')
 
 class SecondaryColorArray(ArrayBase):
-    defaultValue = numpy.array([1., 1., 1.], 'f')
+    default = numpy.array([1., 1., 1.], 'f')
 
     gldtype = GLArrayBase.gldtype.copy()
-    gldtype.glBufferType = gl.GL_SECONDARY_COLOR_ARRAY
-    gldtype.addFormatGroups('BHIbhlifd', (3,), default='3f')
+    gldtype.setKind('secondary_color')
+    gldtype.addFormatGroups('BHLIbhlifd', (3,), default='3f')
 
 class ColorIndexArray(ArrayBase):
-    defaultValue = numpy.array([0], 'B')
+    default = numpy.array([0], 'B')
 
     gldtype = GLArrayBase.gldtype.copy()
-    gldtype.glBufferType = gl.GL_INDEX_ARRAY
+    gldtype.setKind('color_index')
     gldtype.addFormatGroups('Bhlifd', (1,), default='1B')
 
 class FogCoordArray(ArrayBase):
-    defaultValue = numpy.array([0.], 'f')
+    default = numpy.array([0.], 'f')
 
     gldtype = GLArrayBase.gldtype.copy()
-    gldtype.glBufferType = gl.GL_FOG_COORD_ARRAY
+    gldtype.setKind('fog_coord')
     gldtype.addFormatGroups('fd', (1,), default='1f')
 
 class EdgeFlagArray(ArrayBase):
-    defaultValue = numpy.array([1], 'B')
+    default = numpy.array([1], 'B')
 
     gldtype = GLArrayBase.gldtype.copy()
-    gldtype.glBufferType = gl.GL_EDGE_FLAG_ARRAY
+    gldtype.setKind('edge_flag')
     gldtype.addFormatGroups('B', (1,), default='1B')
 
