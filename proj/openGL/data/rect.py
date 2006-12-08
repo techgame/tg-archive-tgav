@@ -219,12 +219,55 @@ class RectSidesMixin(object):
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class WinRect(RectSidesMixin, RectBasic):
+class Rect(RectSidesMixin, RectBasic):
+    """Default Rect implementation
+    
+    Can be changed from bottom left to top left via _isBottomLeft attribute.
+    GLRect and WRect override bottom and top to optimize for their setting of _isBottomLeft attribute.
+    """
+    _isBottomLeft = True
+
+class GLRect(Rect):
+    """GLRect implementation.
+    
+    Optimised for bottom left configuration"""
+    _isBottomLeft = True
+
+    def getBottom(self): 
+        return self._v0[1]
+    def setBottom(self, bottom):
+        self._v0[1] = bottom
+        self._kvnotify_('set', 'pos')
+    bottom = property(getBottom, setBottom)
+
+    def getTop(self): 
+        return self._v1[1]
+    def setTop(self, top):
+        self._v1[1] = top
+        self._kvnotify_('set', 'size')
+    top = property(getTop, setTop)
+    
+class WRect(Rect):
+    """WRect implementation.
+    
+    Optimised for top left configuration"""
     _isBottomLeft = False
 
-class GLRect(RectSidesMixin, RectBasic):
-    _isBottomLeft = True
-Rect = GLRect
+    def getBottom(self): 
+        return self._v1[1]
+    def setBottom(self, bottom):
+        self._v1[1] = bottom
+        self._kvnotify_('set', 'size')
+    bottom = property(getBottom, setBottom)
 
-__all__ = ['Rect', 'GLRect', 'WinRect']
+    def getTop(self): 
+        return self._v0[1]
+    def setTop(self, top):
+        self._v0[1] = top
+        self._kvnotify_('set', 'pos')
+    top = property(getTop, setTop)
+    
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+__all__ = ['Rect', 'GLRect', 'WRect']
 
