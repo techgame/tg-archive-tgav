@@ -178,14 +178,16 @@ class RenderSkinModel(RenderSkinModelBase):
         self.refreshText(False)
 
         glLoadIdentity()
-        glTranslatef(w/2, h, 0)
+        glTranslatef(w/2, h*3./4, 0)
 
         gl.glEnable(gl.GL_CLIP_PLANE0)
-        self.clipPlanes[0,:] = [1, -4, 0, 0]
+        self.clipPlanes[0,:] = [1, -1, 0, 0]
         gl.glClipPlane(gl.GL_CLIP_PLANE0, self.clipPlanes[0].ctypes.data_as(self.clipPlaneType))
 
-        gl.glEnable(gl.GL_CLIP_PLANE1)
-        self.clipPlanes[1,:] = [-1, -4, 0, 0]
+        glLoadIdentity()
+        glTranslatef(w/2, h*1./3, 0)
+
+        self.clipPlanes[1,:] = [1, 4, 0, 0]
         gl.glClipPlane(gl.GL_CLIP_PLANE1, self.clipPlanes[1].ctypes.data_as(self.clipPlaneType))
 
         glLoadIdentity()
@@ -200,10 +202,14 @@ class RenderSkinModel(RenderSkinModelBase):
         #oscilate = abs((renderStart % (2*oscilateTime)) - oscilateTime)/ oscilateTime
         glClear(self.clearMask)
 
+        gl.glEnable(gl.GL_CLIP_PLANE0)
         self.contentText.render()
+        gl.glDisable(gl.GL_CLIP_PLANE0)
 
         if self.contentTextRight is not None:
+            gl.glEnable(gl.GL_CLIP_PLANE1)
             self.contentTextRight.render()
+            gl.glDisable(gl.GL_CLIP_PLANE1)
 
         if 1:
             self.fpsText.render()
