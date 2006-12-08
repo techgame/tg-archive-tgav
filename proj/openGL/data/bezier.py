@@ -34,8 +34,7 @@ for Mb in [
         array([[ 1, -2,  1], [-2,  2,  0], [ 1,  0,  0]], 'b'),
         array([[-1,  3, -3,  1], [ 3, -6,  3,  0], [-3,  3,  0,  0], [ 1,  0,  0,  0]], 'b'),
         ]:
-
-    Bezier.order[len(Mb)-1] = Bezier(Mb.shape, Mb.dtype, Mb)
+    Bezier.order[len(Mb)-1] = Mb.astype(Bezier)
 
 Bezier.linear = Bezier.order[1]
 Bezier.quadratic = Bezier.order[2]
