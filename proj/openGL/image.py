@@ -26,7 +26,6 @@ from .raw import gl, glext
 
 class ImageGeometryArray(InterleavedArray):
     drawMode = gl.GL_QUADS
-
     gldtype = InterleavedArray.gldtype.copy()
     gldtype.setDefaultFormat(gl.GL_T2F_V3F)
 
@@ -214,8 +213,8 @@ class ImageObject(PositionalObject):
 
     def render(self):
         self.image.select()
-        self.color.select()
+        #self.color.select()
         geom = self.geometry
-        gl.glInterleavedArrays(geom.gltypeid, 0, geom.ctypes)
+        gl.glInterleavedArrays(geom.glTypeId, 0, geom.ctypes)
         gl.glDrawArrays(geom.drawMode, 0, geom.size)
 
