@@ -70,12 +70,24 @@ class GLArrayBase(ndarray):
         self = ndarray.__new__(klass, shape, dtype=dtype, order=order)
         self.gldtype.configFrom(self)
         if value is not None: 
-            if value is not klass.useDefault:
-                value = numpy.asarray(value, klass.default.dtype)
-            else: value = klass.default
-            self.view(value.dtype)[:] = value
+            self.fillFrom(value)
 
         return self
+
+    def fillFrom(self, value=useDefault):
+        value = self._fillValueFrom(value)
+        self.view(value.dtype)[:] = value[:self.shape[-1]]
+
+    def _fillValueFrom(self, value=useDefault):
+        if value is self.useDefault:
+            value = self.default
+        elif isinstance(value, (int, long, float)):
+            value = value * numpy.ones_like(klass.default)
+        else:
+            r = self.default.copy()
+            r[:] = value
+            value = r
+        return value
 
     @classmethod
     def fromData(klass, data, dtype=None, copy=False):
