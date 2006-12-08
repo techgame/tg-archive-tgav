@@ -1,21 +1,20 @@
 syntax: glob
 audioFormats
-glEngine
-geoMath
 
 syntax: glob
 Icon?
-*.orig
 \.DS_Store
+\.svn/
+*.orig
+*~
 *.pyc
 *.pyo
-*~
 .*.swp
 .*.swo
-\.svn/
+
+*.m4b
+*.mov
 
 syntax: regexp
 ^gen/.*/build/.*
-^sandbox/openGL/imgDemo/.*\.png
-^sandbox/misc/*
-^sandbox/quicktime/*
+^sandbox/misc/.*
