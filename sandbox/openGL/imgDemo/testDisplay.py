@@ -12,6 +12,8 @@
 
 import os
 
+import numpy
+
 from renderBase import RenderSkinModelBase
 
 from TG.openGL.image import ImageObject
@@ -46,10 +48,6 @@ class RenderSkinModel(RenderSkinModelBase):
         glLoadIdentity()
 
     def renderInit(self, glCanvas, renderStart):
-        glEnable(GL_DEPTH_TEST)
-        glEnable(GL_COLOR_MATERIAL)
-        glShadeModel(GL_SMOOTH)
-
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
@@ -76,11 +74,9 @@ class RenderSkinModel(RenderSkinModelBase):
 
             glLoadIdentity()
 
-            glDepthMask(False)
             self.imgLogo.render()
             self.imgButton.render()
             self.imgStar.render()
-            glDepthMask(True)
 
         except Exception:
             self.repaintTimer.Stop()
