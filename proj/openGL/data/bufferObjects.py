@@ -192,3 +192,7 @@ class ElementArrayBuffer(BufferBase):
     def isGLElementBuffer(self):
         return True
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+__all__ = [ArrayBuffer.__name__, ElementArrayBuffer.__name__]
+

@@ -10,30 +10,28 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-import numpy
-
-from .glArrayBase import GLArrayBase
-from .glArrayDataType import GLElementArrayDataType, GLElementRangeDataType
+from vertexArrays import *
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#~ Element Arrays
+#~ Synonyms for (implied) single entry
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class ElementArray(GLArrayBase):
-    default = numpy.array([0], 'H')
-
-    gldtype = GLElementArrayDataType()
-    gldtype.addFormatGroups('BHLI', (1,), default='1H')
-    glinfo = gldtype.arrayInfoFor('element_array')
-
-class ElementRange(GLArrayBase):
-    default = numpy.array([0, 0], 'L')
-
-    gldtype = GLElementRangeDataType()
-    gldtype.addFormatGroups('LI', (2,), default='2I')
-    glinfo = gldtype.arrayInfoFor('element_range')
+class Vertex(VertexArray): pass
+class TextureCoord(TextureCoordArray): pass
+class MultiTextureCoord(MultiTextureCoordArray): pass
+class Normal(NormalArray): pass
+class Color(ColorArray): pass
+class SecondaryColor(SecondaryColorArray): pass
+class ColorIndex(ColorIndexArray): pass
+class FogCoord(FogCoordArray): pass
+class EdgeFlag(EdgeFlagArray): pass
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-__all__ = sorted(name for name, value in vars().items() if isinstance(value, type) and issubclass(value, GLArrayBase))
+class Vector(Vertex):
+    pass
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+__all__ = sorted(name for name, value in vars().items() if not name.endswith('Array') and isinstance(value, type) and issubclass(value, GLArrayBase))
 

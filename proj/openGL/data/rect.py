@@ -10,7 +10,7 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-import numpy
+from .singleArrays import Vector
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -31,9 +31,8 @@ def toAspect(size, aspect, grow=False):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class RectBasic(object):
-    _zerov = numpy.array([0., 0., 0.], 'f').copy
-    _v0 = numpy.array([0., 0., 0.], 'f')
-    _size = numpy.array([1., 1., 0.], 'f')
+    _v0 = Vector([0., 0., 0.], 'f')
+    _size = Vector([1., 1., 0.], 'f')
 
     def __init__(self, *args, **kw):
         self.set(*args, **kw)
@@ -102,11 +101,7 @@ class RectBasic(object):
     def getV0(self): 
         return self._v0.copy()
     def setV0(self, v0):
-        z = self._zerov()
-        z[:len(v0)] = v0
-        z[z<0] = 0
-
-        self._v0[:] = z
+        self._v0.set(v0)
         self._kvnotify_('set', 'pos')
         return self
     pos = v0 = property(getV0, setV0)
@@ -114,23 +109,16 @@ class RectBasic(object):
     def getV1(self):
         return self._v0 + self._size
     def setV1(self, v1):
-        z = self._zerov()
-        z[:len(v1)] = v1 - self._v0[:len(v1)]
-        z[z<0] = 0
-
-        self._size[:] = z
-        self._kvnotify_('set', 'size')
-        return self
+        return self.setSize(v1 - self._v0[:len(v1)])
     v1 = property(getV1, setV1)
     
     def getSize(self):
         return self._size.copy()
     def setSize(self, size):
-        z = self._zerov()
-        z[:len(size)] = size
-        z[z<0] = 0
+        selfSize = self._size
+        selfSize.set(size)
+        selfSize[selfSize < 0] = 0
 
-        self._size[:] = z
         self._kvnotify_('set', 'size')
         return self
     size = property(getSize, setSize)
@@ -237,4 +225,6 @@ class WinRect(RectSidesMixin, RectBasic):
 class GLRect(RectSidesMixin, RectBasic):
     _isBottomLeft = True
 Rect = GLRect
+
+__all__ = ['Rect', 'GLRect', 'WinRect']
 

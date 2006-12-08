@@ -24,7 +24,12 @@ class DataArrayBase(GLArrayBase):
 
     def get(self, at=Ellipsis):
         return self[at]
-    def set(self, data, at=Ellipsis):
+    def set(self, data, at=Ellipsis, fill=0):
+        l = numpy.shape(data)[-1]
+        self[at,:l] = data
+        self[at,l:] = fill
+        return self
+    def setPart(self, data, at=Ellipsis):
         l = numpy.shape(data)[-1]
         self[at,:l] = data
         return self
@@ -36,15 +41,15 @@ class VertexArray(DataArrayBase):
     gldtype.addFormatGroups('hlifd', (2,3,4), default='3f')
     glinfo = gldtype.arrayInfoFor('vertex')
 
-class TexureCoordArray(DataArrayBase):
+class TextureCoordArray(DataArrayBase):
     default = numpy.array([0], 'f')
 
     gldtype = GLArrayDataType()
     gldtype.addFormatGroups('hlifd', (1,2,3,4), default='3f')
     glinfo = gldtype.arrayInfoFor('texture_coord')
 
-class MultiTexureCoordArray(TexureCoordArray):
-    gldtype = TexureCoordArray.gldtype.copy()
+class MultiTextureCoordArray(TextureCoordArray):
+    gldtype = TextureCoordArray.gldtype.copy()
     glinfo = gldtype.arrayInfoFor('multi_texture_coord')
 
 class NormalArray(DataArrayBase):
@@ -88,4 +93,8 @@ class EdgeFlagArray(DataArrayBase):
     gldtype = GLArrayDataType()
     gldtype.addFormatGroups('B', (1,), default='1B')
     glinfo = gldtype.arrayInfoFor('edge_flag')
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+__all__ = sorted(name for name, value in vars().items() if isinstance(value, type) and issubclass(value, GLArrayBase))
 

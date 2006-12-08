@@ -12,8 +12,6 @@
 
 import numpy
 
-from ..raw import gl
-
 from .glArrayBase import GLArrayBase
 from .glArrayDataType import GLInterleavedArrayDataType
 
@@ -37,11 +35,15 @@ class FieldProperty(object):
 class InterleavedArray(GLArrayBase):
     defaultValue = numpy.array([0], 'f')
     gldtype = GLInterleavedArrayDataType()
-    gldtype.setDefaultFormat(gl.GL_V3F)
+    gldtype.setDefaultFormat('v:3f')
     glinfo = gldtype.arrayInfoFor('interleaved')
 
     vertex = v = FieldProperty('v')
     colors = c = FieldProperty('c')
     normals = n = FieldProperty('n')
     texcoords = tex = t = FieldProperty('t')
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+__all__ = sorted(name for name, value in vars().items() if isinstance(value, type) and issubclass(value, GLArrayBase))
 
