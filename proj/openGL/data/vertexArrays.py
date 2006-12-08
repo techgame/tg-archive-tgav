@@ -16,11 +16,27 @@ from .glArrayBase import GLArrayBase
 from .glArrayDataType import GLArrayDataType
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ Utility functions
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+def blend(u0, u1, a):
+    amat = numpy.asarray([a, a])
+    amat[0] = 1-amat[0]
+    return numpy.dot(amat.T, [u0, u1])
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Data Arrays
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class DataArrayBase(GLArrayBase):
     gldtype = GLArrayDataType()
+
+    def blend(self, other, alpha, copy=True):
+        r = blend(self, other, alpha)
+        if copy: return r
+
+        self[:] = r
+        return self
 
     def get(self, at=Ellipsis):
         return self[at]
@@ -71,7 +87,6 @@ class DataArrayBase(GLArrayBase):
             self[at, oshape:] = vmax
 
         return self[at]
-
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -248,4 +263,5 @@ class EdgeFlagArray(DataArrayBase):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 __all__ = sorted(name for name, value in vars().items() if isinstance(value, type) and issubclass(value, GLArrayBase))
+__all__.append('blend')
 
