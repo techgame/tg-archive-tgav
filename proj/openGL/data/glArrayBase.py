@@ -68,6 +68,7 @@ class GLArrayBase(ndarray):
     def fromShape(klass, shape, dtype=None, value=None, completeShape=None):
         dtype, shape, order = klass.gldtype.lookupDTypeFrom(dtype, shape, completeShape)
         self = ndarray.__new__(klass, shape, dtype=dtype, order=order)
+        self.gldtype.configFrom(self)
         if value is not None: 
             if value is not klass.useDefault:
                 value = numpy.asarray(value, klass.default.dtype)
@@ -108,6 +109,7 @@ class GLArrayBase(ndarray):
     def fromDataRaw(klass, data, dtype=None, copy=False):
         dtype, shape, order = klass.gldtype.lookupDTypeFrom(dtype, numpy.shape(data), True)
         self = ndarray.__new__(klass, shape, dtype=dtype, order=order)
+        self.gldtype.configFrom(self)
         self[:] = data
         return self
 
