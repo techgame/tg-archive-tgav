@@ -11,9 +11,8 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from TG.openGL.texture import Texture
-
-from TG.openGL.raw import gl, glext
+from ..raw import gl, glext
+from ..data.texture import Texture
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 

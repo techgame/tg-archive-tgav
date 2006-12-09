@@ -16,7 +16,7 @@ import numpy
 
 from renderBase import RenderSkinModelBase
 
-from TG.openGL.image import ImageObject
+from TG.openGL.data.image import ImageObject
 
 from TG.openGL.raw import gl
 from TG.openGL.raw.gl import *

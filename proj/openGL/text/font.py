@@ -16,9 +16,9 @@ from numpy import ndarray, float32, asarray
 
 from TG.freetype2.face import FreetypeFace
 
-from TG.openGL import blockMosaic
-from TG.openGL.text import fontData
-from TG.openGL.text import fontTexture
+from ..data import blockMosaic
+from . import fontData
+from . import fontTexture
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 

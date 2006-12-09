@@ -12,7 +12,7 @@
 
 from bisect import bisect_left
 from ctypes import cast, byref, c_void_p
-from raw import gl, glu, glext
+from ..raw import gl, glu, glext
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 

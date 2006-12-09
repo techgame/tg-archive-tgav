@@ -10,13 +10,10 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-import weakref
-from numpy import ndarray, float32, asarray
+from ..raw import gl
 
-from TG.openGL.data.vertexArrays import VertexArray
-from TG.openGL.data.interleavedArrays import InterleavedArray
-
-from TG.openGL.raw import gl
+from ..data.vertexArrays import VertexArray
+from ..data.interleavedArrays import InterleavedArray
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
