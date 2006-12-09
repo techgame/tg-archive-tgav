@@ -119,19 +119,25 @@ class ImageTexture2d(ImageTextureBase):
     texParams = ImageTextureBase.texParams + [
                     ('target', gl.GL_TEXTURE_2D), ]
 
-    def texCoords(self):
+    def texCoords(self, flip=True):
         w, h = self.size
         iw, ih, id = self.imageSize
         iw = float(iw)/w; ih = float(ih)/h
-        return [[0., ih], [iw, ih], [iw, 0.], [0., 0.]]
+        if flip:
+            return [[0., ih], [iw, ih], [iw, 0.], [0., 0.]]
+        else:
+            return [[0., 0.], [iw, 0.], [iw, ih], [0., ih]]
 
 class ImageTextureRect(ImageTextureBase):
     texParams = ImageTextureBase.texParams + [
                     ('target', glext.GL_TEXTURE_RECTANGLE_ARB), ]
 
-    def texCoords(self):
+    def texCoords(self, flip=True):
         iw, ih, id = self.imageSize
-        return [[0., ih], [iw, ih], [iw, 0.], [0., 0.]]
+        if flip:
+            return [[0., ih], [iw, ih], [iw, 0.], [0., 0.]]
+        else:
+            return [[0., 0.], [iw, 0.], [iw, ih], [0., ih]]
 
 ImageTexture = ImageTextureRect
 
