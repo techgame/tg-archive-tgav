@@ -17,11 +17,3 @@ from elementArrays import *
 
 from rect import *
 
-from bufferObjects import *
-
-from bezier import Bezier, bLinear, bQuadratic, bCubic
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#~ Definitions 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
