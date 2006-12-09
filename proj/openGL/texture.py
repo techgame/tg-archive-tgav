@@ -10,9 +10,7 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-import traceback
 from bisect import bisect_left
-import ctypes
 from ctypes import cast, byref, c_void_p
 from raw import gl, glu, glext
 
@@ -24,20 +22,36 @@ class glTexParamProperty(object):
     _as_parameter_ = None
         
     def __init__(self, propertyEnum):
-        self._as_parameter_ = propertyEnum
+        self._as_parameter_ = gl.GLenum(propertyEnum)
 
-    glGetTexParameteriv = staticmethod(gl.glGetTexParameteriv)
     def __get__(self, obj, klass):
         if obj is None: 
             return self
 
-        cValue = GLint(0)
-        self.glGetTexParameteriv(obj.target, self, byref(cValue))
+        cValue = self.GLParamType()
+        self.glGetTexParameter(obj.target, self, cValue)
         return cValue.value
 
-    glTexParameteri = staticmethod(gl.glTexParameteri)
     def __set__(self, obj, value):
-        self.glTexParameteri(obj.target, self, value)
+        if not isinstance(value, (list, tuple)):
+            value = (value,)
+        cValue = self.GLParamType(*value)
+        self.glSetTexParameter(obj.target, self, cValue)
+
+class glTexParamProperty_i(glTexParamProperty):
+    GLParamType = (gl.GLint*1)
+    glGetTexParameterv = staticmethod(gl.glGetTexParameteriv)
+    glSetTexParameter = staticmethod(gl.glTexParameteriv)
+
+class glTexParamProperty_f(glTexParamProperty):
+    GLParamType = (gl.GLfloat*1)
+    glGetTexParameterv = staticmethod(gl.glGetTexParameteriv)
+    glSetTexParameter = staticmethod(gl.glTexParameteriv)
+
+class glTexParamProperty_4f(glTexParamProperty):
+    GLParamType = (gl.GLfloat*4)
+    glGetTexParameterv = staticmethod(gl.glGetTexParameterfv)
+    glSetTexParameter = staticmethod(gl.glTexParameterfv)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -264,7 +278,7 @@ class TextureImageBasic(object):
         # setup the alignment properly
         ps = self.newPixelStore(alignment=1)
         byteCount = self.getSizeInBytes()
-        data = (ctypes.c_ubyte*byteCount)()
+        data = (gl.GLubyte*byteCount)()
         self.texCData(data)
 
     def setImageOn(self, texture, level=0, **kw):
@@ -503,11 +517,7 @@ class Texture(object):
         self.create(*args, **kwargs)
 
     def __del__(self):
-        try:
-            self.release()
-        except Exception:
-            traceback.print_exc()
-            raise
+        self.release()
 
     def create(self, target=None, **kwargs):
         if not self._as_parameter_ is None:
@@ -602,20 +612,24 @@ class Texture(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    genMipmaps = glTexParamProperty(gl.GL_GENERATE_MIPMAP)
+    genMipmaps = glTexParamProperty_i(gl.GL_GENERATE_MIPMAP)
 
-    wrapS = glTexParamProperty(gl.GL_TEXTURE_WRAP_S)
-    wrapT = glTexParamProperty(gl.GL_TEXTURE_WRAP_T)
-    wrapR = glTexParamProperty(gl.GL_TEXTURE_WRAP_R)
+    wrapS = glTexParamProperty_i(gl.GL_TEXTURE_WRAP_S)
+    wrapT = glTexParamProperty_i(gl.GL_TEXTURE_WRAP_T)
+    wrapR = glTexParamProperty_i(gl.GL_TEXTURE_WRAP_R)
 
     def setWrap(self, wrap):
-        self.wrapS = wrap
-        self.wrapT = wrap
-        self.wrapR = wrap
+        if isinstance(wrap, tuple):
+            wrapS, wrapT, wrapR = wrap
+        else:
+            wrapS = wrapT = wrapR = wrap
+        self.wrapS = wrapS
+        self.wrapT = wrapT
+        self.wrapR = wrapR
     wrap = property(fset=setWrap)
 
-    magFilter = glTexParamProperty(gl.GL_TEXTURE_MAG_FILTER)
-    minFilter = glTexParamProperty(gl.GL_TEXTURE_MIN_FILTER)
+    magFilter = glTexParamProperty_i(gl.GL_TEXTURE_MAG_FILTER)
+    minFilter = glTexParamProperty_i(gl.GL_TEXTURE_MIN_FILTER)
     
     def setFilter(self, filter):
         if isinstance(filter, tuple):
@@ -625,6 +639,22 @@ class Texture(object):
             self.magFilter = filter
             self.minFilter = filter
     filter = property(fset=setFilter)
+
+    baseLevel = glTexParamProperty_i(gl.GL_TEXTURE_BASE_LEVEL)
+    maxLevel = glTexParamProperty_i(gl.GL_TEXTURE_MAX_LEVEL)
+
+    depthMode = glTexParamProperty_i(gl.GL_DEPTH_TEXTURE_MODE)
+
+    compareMode = glTexParamProperty_i(gl.GL_TEXTURE_COMPARE_MODE)
+    compareFunc = glTexParamProperty_i(gl.GL_TEXTURE_COMPARE_FUNC)
+
+    border = glTexParamProperty_4f(gl.GL_TEXTURE_BORDER_COLOR)
+
+    priority = glTexParamProperty_f(gl.GL_TEXTURE_PRIORITY)
+
+    minLOD = glTexParamProperty_f(gl.GL_TEXTURE_MIN_LOD)
+    maxLOD = glTexParamProperty_f(gl.GL_TEXTURE_MIN_LOD)
+    biasLOD = glTexParamProperty_f(gl.GL_TEXTURE_LOD_BIAS)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     #~ Size & Dimensios
@@ -821,7 +851,7 @@ class Texture(object):
         r = klass._maxTextureSizeByTarget.get(target, None)
         if r is None:
             pname = klass._textureTargetToMaxPName[target]
-            i = ctypes.c_int(0)
+            i = gl.GLint(0)
             gl.glGetIntegerv(pname, byref(i))
             r = i.value
             klass._maxTextureSizeByTarget[target] = r

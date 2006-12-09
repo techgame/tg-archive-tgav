@@ -31,7 +31,7 @@ def toAspect(size, aspect, grow=False):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class RectBasic(object):
-    _v0 = Vector([0., 0., 0.], 'f')
+    _pos = Vector([0., 0., 0.], 'f')
     _size = Vector([1., 1., 0.], 'f')
 
     def __init__(self, *args, **kw):
@@ -81,7 +81,7 @@ class RectBasic(object):
         if kw:
             raise Exception("Unexpected arguments: %s" % (kw.keys(),))
 
-        self._v0 = self._v0.copy()
+        self._pos = self._pos.copy()
         self._size = self._size.copy()
 
         if v0 is not None:
@@ -99,17 +99,17 @@ class RectBasic(object):
         """This method is intended to be replaced by a mixin with ObservableObject"""
 
     def getV0(self): 
-        return self._v0.copy()
+        return self._pos.copy()
     def setV0(self, v0):
-        self._v0.set(v0)
+        self._pos.set(v0)
         self._kvnotify_('set', 'pos')
         return self
     pos = v0 = property(getV0, setV0)
 
     def getV1(self):
-        return self._v0 + self._size
+        return self._pos + self._size
     def setV1(self, v1):
-        return self.setSize(v1 - self._v0[:len(v1)])
+        return self.setSize(v1 - self._pos[:len(v1)])
     v1 = property(getV1, setV1)
     
     def getSize(self):
@@ -164,19 +164,19 @@ class RectSidesMixin(object):
     depth = property(getDepth, setDepth)
     
     def getLeft(self): 
-        return self._v0[0]
+        return self._pos[0]
     def setLeft(self, left):
-        self._v0[0] = left
+        self._pos[0] = left
         self._kvnotify_('set', 'pos')
     left = property(getLeft, setLeft)
 
     def getBottom(self): 
         if self._isBottomLeft:
-            return self._v0[1]
+            return self._pos[1]
         else: return self._v1[1]
     def setBottom(self, bottom):
         if self._isBottomLeft:
-            self._v0[1] = bottom
+            self._pos[1] = bottom
             self._kvnotify_('set', 'pos')
         else: 
             self._v1[1] = bottom
@@ -184,9 +184,9 @@ class RectSidesMixin(object):
     bottom = property(getBottom, setBottom)
 
     def getFront(self): 
-        return self._v0[2]
+        return self._pos[2]
     def setFront(self, front):
-        self._v0[2] = front
+        self._pos[2] = front
         self._kvnotify_('set', 'pos')
     front = property(getFront, setFront)
 
@@ -200,13 +200,13 @@ class RectSidesMixin(object):
     def getTop(self): 
         if self._isBottomLeft:
             return self._v1[1]
-        else: return self._v0[1]
+        else: return self._pos[1]
     def setTop(self, top):
         if self._isBottomLeft:
             self._v1[1] = top
             self._kvnotify_('set', 'size')
         else:
-            self._v0[1] = top
+            self._pos[1] = top
             self._kvnotify_('set', 'pos')
     top = property(getTop, setTop)
     
@@ -234,9 +234,9 @@ class GLRect(Rect):
     _isBottomLeft = True
 
     def getBottom(self): 
-        return self._v0[1]
+        return self._pos[1]
     def setBottom(self, bottom):
-        self._v0[1] = bottom
+        self._pos[1] = bottom
         self._kvnotify_('set', 'pos')
     bottom = property(getBottom, setBottom)
 
@@ -261,9 +261,9 @@ class WRect(Rect):
     bottom = property(getBottom, setBottom)
 
     def getTop(self): 
-        return self._v0[1]
+        return self._pos[1]
     def setTop(self, top):
-        self._v0[1] = top
+        self._pos[1] = top
         self._kvnotify_('set', 'pos')
     top = property(getTop, setTop)
     

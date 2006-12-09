@@ -41,13 +41,22 @@ class DataArrayBase(GLArrayBase):
     def get(self, at=Ellipsis):
         return self[at]
     def set(self, data, at=Ellipsis, fill=0):
-        l = numpy.shape(data)[-1]
-        self[at,:l] = data
-        self[at,l:] = fill
+        l = numpy.shape(data)
+        if not l:
+            # fill with data
+            self[at] = data
+        else:
+            l = l[-1]
+            self[at,:l] = data
+            self[at,l:] = fill
         return self
     def setPart(self, data, at=Ellipsis):
-        l = numpy.shape(data)[-1]
-        self[at,:l] = data
+        l = numpy.shape(data)
+        if not l:
+            # fill with data
+            self[at] = data
+        else:
+            self[at,:l] = data
         return self
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

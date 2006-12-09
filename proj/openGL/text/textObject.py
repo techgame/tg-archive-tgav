@@ -10,16 +10,16 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+from ..data.singleArrays import Vector
 from . import textLayout
 from . import textRenderer
 from . import textWrapping
-from ..shapes import PositionalObject
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class TextObject(PositionalObject):
+class TextObject(object):
     layout = textLayout.TextLayout()
 
     WrapModeMap = textWrapping.wrapModeMap
@@ -36,11 +36,35 @@ class TextObject(PositionalObject):
     lineSpacing = 1
     crop = True
     wrapAxis = 0
+    roundValues = True
 
     def __init__(self, text=None, **kwattr):
+        self._pos = self._pos.copy()
+        self._size = self._size.copy()
+        self._align = self._align.copy()
+
         self.text = text
         self.set(kwattr)
         self.update()
+
+    def set(self, val=None, **kwattr):
+        for n,v in (val or kwattr).iteritems():
+            setattr(self, n, v)
+
+    _pos = Vector([0., 0., 0.], 'f')
+    def getPos(self): return self._pos
+    def setPos(self, pos): self._pos.set(pos)
+    pos = property(getPos, setPos)
+
+    _size = Vector([0., 0., 0.], 'f')
+    def getSize(self): return self._size
+    def setSize(self, size): self._size.set(size)
+    size = property(getSize, setSize)
+
+    _align = Vector([0., 0., 0.], 'f')
+    def getAlign(self): return self._align
+    def setAlign(self, align): self._align.set(align)
+    align = property(getAlign, setAlign)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -14,8 +14,8 @@ from numpy import asarray, float32
 
 from PIL import Image
 
-from .shapes import PositionalObject
 from .texture import Texture
+from .data.singleArrays import Vector
 from .data.interleavedArrays import InterleavedArray
 
 from .raw import gl, glext
@@ -139,16 +139,41 @@ ImageTexture = ImageTextureRect
 #~ Image
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class ImageObject(PositionalObject):
+class ImageObject(object):
     ImageTextureFactory = ImageTextureRect
 
+    roundValues = True
+
     def __init__(self, image=None, format=True, **kwattr):
+        self._pos = self._pos.copy()
+        self._size = self._size.copy()
+        self._align = self._align.copy()
+
         if kwattr: 
             self.set(kwattr)
         if image is not None:
             self.load(image, format)
 
+    def set(self, val=None, **kwattr):
+        for n,v in (val or kwattr).iteritems():
+            setattr(self, n, v)
+
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    _pos = Vector([0., 0., 0.], 'f')
+    def getPos(self): return self._pos
+    def setPos(self, pos): self._pos.set(pos)
+    pos = property(getPos, setPos)
+
+    _size = Vector([0., 0., 0.], 'f')
+    def getSize(self): return self._size
+    def setSize(self, size): self._size.set(size)
+    size = property(getSize, setSize)
+
+    _align = Vector([0., 0., 0.], 'f')
+    def getAlign(self): return self._align
+    def setAlign(self, align): self._align.set(align)
+    align = property(getAlign, setAlign)
 
     def update(self, **kwattr):
         if kwattr: 
@@ -161,10 +186,7 @@ class ImageObject(PositionalObject):
         size[:] = image.imageSize
         off = self.pos - (self.align*size)
 
-        if self.roundValues:
-            geo.v += off.round()
-        else:
-            geo.v += off
+        geo.v += (off.round() if self.roundValues else off)
 
         self.geometry = geo
         return True
