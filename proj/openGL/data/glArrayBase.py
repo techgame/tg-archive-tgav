@@ -82,7 +82,7 @@ class GLArrayBase(ndarray):
         if value is self.useDefault:
             value = self.default
         elif isinstance(value, (int, long, float)):
-            value = value * numpy.ones_like(klass.default)
+            value = value * numpy.ones_like(self.default)
         else:
             r = self.default.copy()
             r[:] = value

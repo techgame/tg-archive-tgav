@@ -168,6 +168,13 @@ class GLElementRangeInfo(GLElementArrayInfo):
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+GLDataArrayInfo('vector', gl.GL_VERTEX_ARRAY, gl.glVertexPointer, {
+        gl.GL_SHORT: {1: None, 2: gl.glVertex2sv, 3: gl.glVertex3sv, 4: gl.glVertex4sv,},
+        gl.GL_INT: {1: None, 2: gl.glVertex2iv, 3: gl.glVertex3iv, 4: gl.glVertex4iv,},
+        gl.GL_FLOAT: {1: None, 2: gl.glVertex2fv, 3: gl.glVertex3fv, 4: gl.glVertex4fv,},
+        gl.GL_DOUBLE: {1: None, 2: gl.glVertex2dv, 3: gl.glVertex3dv, 4: gl.glVertex4dv,},
+        })
+
 GLDataArrayInfo('vertex', gl.GL_VERTEX_ARRAY, gl.glVertexPointer, {
         gl.GL_SHORT: {2: gl.glVertex2sv, 3: gl.glVertex3sv, 4: gl.glVertex4sv,},
         gl.GL_INT: {2: gl.glVertex2iv, 3: gl.glVertex3iv, 4: gl.glVertex4iv,},

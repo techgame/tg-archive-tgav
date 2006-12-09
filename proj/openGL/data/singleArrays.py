@@ -17,6 +17,7 @@ from vertexArrays import *
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class Vertex(VertexArray): pass
+class Vector(VectorArray): pass
 class TextureCoord(TextureCoordArray): pass
 class MultiTextureCoord(MultiTextureCoordArray): pass
 class Normal(NormalArray): pass
@@ -25,11 +26,6 @@ class SecondaryColor(SecondaryColorArray): pass
 class ColorIndex(ColorIndexArray): pass
 class FogCoord(FogCoordArray): pass
 class EdgeFlag(EdgeFlagArray): pass
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-class Vector(Vertex):
-    pass
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
