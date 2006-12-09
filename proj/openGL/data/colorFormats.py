@@ -147,17 +147,17 @@ class ColorFormatMixin(object):
     def set(self, data, at=Ellipsis, fill=0):
         if isinstance(data, basestring):
             data = self.fromHex(data).xformAs(self)
-        return GLArrayBase.set(self, data, at, fill=0)
+        return super(ColorFormatMixin, self).set(data, at, fill=0)
     def setPart(self, data, at=Ellipsis):
         if isinstance(data, basestring):
             data = self.fromHex(data).xformAs(self)
-        return GLArrayBase.setPart(self, data, at)
+        return super(ColorFormatMixin, self).setPart(data, at)
     def __setslice__(self, i, j, value):
         if isinstance(value, basestring):
             value = self.fromHex(value).xformAs(self)
-        return GLArrayBase.__setslice__(self, i, j, value)
+        return super(ColorFormatMixin, self).__setslice__(i, j, value)
     def __setitem__(self, index, value):
         if isinstance(value, basestring):
             value = self.fromHex(value).xformAs(self)
-        return GLArrayBase.__setitem__(self, index, value)
+        return super(ColorFormatMixin, self).__setitem__(index, value)
 

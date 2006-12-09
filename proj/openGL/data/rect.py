@@ -55,6 +55,19 @@ class RectBasic(object):
         else: 
             return '%s(%s)' % (name, size)
 
+    def copy(self):
+        r = self.__new__(self.__class__)
+        return r.copyFrom(self)
+        new = self.new()
+        new._pos = self._pos.copy()
+        new._size = self._size.copy()
+        return new
+
+    def copyFrom(self, other):
+        self._pos = other._pos.copy()
+        self._size = other._size.copy()
+        return self
+
     def set(self, *args, **kw):
         if len(args) == 1:
             size, = args
@@ -76,13 +89,14 @@ class RectBasic(object):
             v1 = kw.pop('v1', None)
             size = kw.pop('size', None)
 
+        dtype = kw.pop('dtype', None)
         aspect = kw.pop('aspect', None)
 
         if kw:
             raise Exception("Unexpected arguments: %s" % (kw.keys(),))
 
-        self._pos = self._pos.copy()
-        self._size = self._size.copy()
+        self._pos = self._pos.fromData(self._pos, dtype)
+        self._size = self._size.fromData(self._size, dtype)
 
         if v0 is not None:
             self.v0 = v0
@@ -219,16 +233,16 @@ class RectSidesMixin(object):
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class Rect(RectSidesMixin, RectBasic):
-    """Default Rect implementation
+class FlexRect(RectSidesMixin, RectBasic):
+    """Flexible Rect implementation
     
     Can be changed from bottom left to top left via _isBottomLeft attribute.
     GLRect and WRect override bottom and top to optimize for their setting of _isBottomLeft attribute.
     """
     _isBottomLeft = True
 
-class GLRect(Rect):
-    """GLRect implementation.
+class BRect(FlexRect):
+    """BRect implementation.
     
     Optimised for bottom left configuration"""
     _isBottomLeft = True
@@ -246,9 +260,12 @@ class GLRect(Rect):
         self._v1[1] = top
         self._kvnotify_('set', 'size')
     top = property(getTop, setTop)
+
+Rect = BRect
+GLRect = BRect
     
-class WRect(Rect):
-    """WRect implementation.
+class TRect(FlexRect):
+    """TRect implementation.
     
     Optimised for top left configuration"""
     _isBottomLeft = False
@@ -266,8 +283,9 @@ class WRect(Rect):
         self._pos[1] = top
         self._kvnotify_('set', 'pos')
     top = property(getTop, setTop)
-    
+WRect = TRect
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-__all__ = ['Rect', 'GLRect', 'WRect']
+__all__ = ['Rect', 'FlexRect', 'BRect', 'TRect', 'GLRect', 'WRect']
 
