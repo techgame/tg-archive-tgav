@@ -11,6 +11,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import numpy
+from numpy import ndarray
 from .glArrayBase import GLArrayBase
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -68,42 +69,84 @@ class ColorFormatMixin(object):
         if (r,l) not in _formatXformMap:
             _formatXformMap[(r,l)] = 1./v
 
-    def fillFrom(self, value=GLArrayBase.useDefault):
-        value = self._fillValueFrom(value)
-        self.xformFrom(value)
+    @classmethod
+    def xform(klass, src, dst):
+        if isinstance(dst, (basestring, tuple, numpy.dtype)):
+            dst = klass.fromShape(src.shape[:-1], dst)
+        elif not isinstance(dst, ndarray):
+            raise TypeError("Dst parameter expected to be an ndarray or dtype")
 
-    def xformAs(self, other, at=Ellipsis):
-        if isinstance(other, (basestring, tuple)):
-            other = self.fromShape(self[at].shape[:-1], other, value=None, completeShape=False)
-        elif isinstance(other, numpy.dtype):
-            other = self.fromShape(self[at].shape, other, value=None, completeShape=True)
-        else:
-            other = self.fromShape(other.shape[-1:], other.dtype, value=None, completeShape=True)
+        srcFormatChar = src.dtype.base.char
+        srcEShape = src.shape[-1]
 
-        return other.xformFrom(self, at)
+        dstFormatChar = dst.dtype.base.char
+        dstEShape = dst.shape[-1]
 
-    def xformFrom(self, other, at=Ellipsis):
-        schar = self.dtype.base.char; sshape = self.shape[-1]
-        ochar = other.dtype.base.char; oshape = other.shape[-1]
-        mshape = min(sshape, oshape)
+        minEShape = min(dstEShape, srcEShape)
 
-        scale = self._formatXformMap.get((ochar, schar), 1)
+        scale = klass._formatXformMap.get((srcFormatChar, dstFormatChar), 1)
+
+        tmpDst = dst.view(ndarray)
+        tmpSrc = src.view(ndarray)
         if scale != 1:
-            if self.itemsize > other.itemsize:
-                self[at, :mshape] = other[at, :mshape]
-                self[at, :mshape] *= scale
+            if tmpDst.itemsize > tmpSrc.itemsize:
+                tmpDst[..., :minEShape] = tmpSrc[..., :minEShape]
+                tmpDst[..., :minEShape] *= scale
             else:
-                self[at, :mshape] = scale * other[at, :mshape]
+                tmpDst[..., :minEShape] = scale * tmpSrc[..., :minEShape]
         else:
-            self[at, :mshape] = other[at, :mshape]
+            tmpDst[..., :minEShape] = tmpSrc[..., :minEShape]
 
-        if sshape > oshape:
-            vmax = self._formatXformMap['f', other.dtype.base.char]
-            self[at, oshape:] = vmax
+        if dstEShape > srcEShape:
+            # fill in the last value
+            vmax = klass._formatXformMap['f', srcFormatChar]
+            tmpDst[..., srcEShape:] = vmax
 
-        return self[at]
+        return dst
+
+    def xformAs(self, other):
+        return self.xform(self, other)
+
+    def xformFrom(self, other):
+        return self.xform(other, self)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    @classmethod
+    def _valueFrom(klass, value, edtype):
+        if isinstance(value, ndarray):
+            if value.dtype != edtype[0]:
+                return klass.xform(value, edtype)
+            else:
+                return value
+
+        if isinstance(value, basestring):
+            return klass.fromHex(value, edtype[0], edtype[1])
+
+        if (isinstance(value, (list, tuple)) and value and 
+                (isinstance(value[0], basestring))):
+            return klass.fromHex(value, edtype[0], edtype[1])
+
+        value = super(ColorFormatMixin, klass)._valueFrom(value, edtype)
+
+        #if isinstance(value, ndarray):
+        #    if value.dtype != edtype[0]:
+        #        return klass.xform(value, edtype)
+        return value
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    @classmethod
+    def fromHex(klass, hexData, dtype=None, shape=None):
+        colors = klass.fromHexRaw(hexData)
+
+        if dtype is None and not shape:
+            return colors
+
+        colors = colors.xformAs((dtype, shape))
+        return colors
+
+    #~ raw color transformations ~~~~~~~~~~~~~~~~~~~~~~~~
 
     hexFormatMap = {}
     for n in range(1, 5):
@@ -111,53 +154,56 @@ class ColorFormatMixin(object):
         hexFormatMap[n, n] = (n, 1)
         hexFormatMap[n, 2*n] = (n, 2)
         hexFormatMap[0, 2*n] = (n, 2)
+    hexFormatMap[0, 2] = (1, 2)
+
+    remapNto4 = {
+        1: (lambda r: r*4),
+        2: (lambda r: r[:-1]*3 + r[-1:]),
+        3: (lambda r: r+(0xff,)),
+        4: (lambda r: r),
+        }
+    hexComponentRemap = (lambda r, remapNto4=remapNto4: remapNto4[len(r)](r))
+    del remapNto4
 
     @classmethod
-    def fromHex(klass, value, hexFormatMap=hexFormatMap):
-        if value[:1] == '#':
-            value = value[1:]
-        else: raise ValueError("Unsure of the color value string format: %r" % (value,))
+    def fromHexRaw(klass, hexColorData, hexFormatMap=hexFormatMap, hexComponentRemap=hexComponentRemap):
+        if isinstance(hexColorData, basestring):
+            hexColorData = [hexColorData]
 
-        value = value.strip().replace(' ', ':').replace(',', ':')
-        components = value.count(':') 
-        if components:
-            # add one if no trailing : is found
-            components += (not value.endswith(':')) 
-            value = value.replace(':', '')
-        else: components = 0
+        colorResult = klass.fromShape(len(hexColorData), '4B')
+        for i in xrange(len(colorResult)):
+            value = hexColorData[i]
 
-        n, f = hexFormatMap[components, len(value)]
-        if f == 2: 
-            result = tuple(int(e, 16) for e in (value[0:2], value[2:4], value[4:6], value[6:8]) if e)
-        elif f == 1: 
-            result = tuple(int(e+e, 16) for e in (value[0:1], value[1:2], value[2:3], value[3:4]) if e)
-        else: 
-            raise ValueError("Do not know how to interpret %r as a color with %r components" % (value, components))
+            if value[:1] == '#':
+                value = value[1:]
+            else: raise ValueError("Unsure of the color value string format: %r" % (value,))
 
-        if len(result) == 1:
-            result = result * 4
-        elif len(result) == 2:
-            result = result[:-1] * 3 + result[-1:]
+            value = value.strip().replace(' ', ':').replace(',', ':')
+            components = value.count(':') 
+            if components:
+                # add one if no trailing : is found
+                components += (not value.endswith(':')) 
+                value = value.split(':')
+                totalSize = sum(len(e) for e in value)
+            else: 
+                components = 0
+                totalSize = len(value)
 
-        return klass.fromDataRaw(result, '%dB' % len(result))
+            n, f = hexFormatMap[components, totalSize]
+            if not components:
+                if f == 2: value = (value[0:2], value[2:4], value[4:6], value[6:8])
+                elif f == 1: value = (value[0:1], value[1:2], value[2:3], value[3:4])
+                else: raise ValueError("Do not know how to interpret %r as a color with %r components" % (value, components))
+
+            if f == 2: 
+                result = tuple(int(e, 16) for e in value if e)
+            elif f == 1: 
+                result = tuple(int(e, 16)*17 for e in value if e)
+
+            result = hexComponentRemap(result)
+            colorResult[i] = result
+        return colorResult
+
     del hexFormatMap
-
-    #~ remap some setters to be able to understand hex values
-
-    def set(self, data, at=Ellipsis, fill=0):
-        if isinstance(data, basestring):
-            data = self.fromHex(data).xformAs(self)
-        return super(ColorFormatMixin, self).set(data, at, fill=0)
-    def setPart(self, data, at=Ellipsis):
-        if isinstance(data, basestring):
-            data = self.fromHex(data).xformAs(self)
-        return super(ColorFormatMixin, self).setPart(data, at)
-    def __setslice__(self, i, j, value):
-        if isinstance(value, basestring):
-            value = self.fromHex(value).xformAs(self)
-        return super(ColorFormatMixin, self).__setslice__(i, j, value)
-    def __setitem__(self, index, value):
-        if isinstance(value, basestring):
-            value = self.fromHex(value).xformAs(self)
-        return super(ColorFormatMixin, self).__setitem__(index, value)
+    del hexComponentRemap
 

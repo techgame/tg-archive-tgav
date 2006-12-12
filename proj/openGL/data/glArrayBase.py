@@ -11,7 +11,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import numpy
-from numpy import ndarray
+from numpy import atleast_2d, ndarray
 from .glArrayDataType import GLBaseArrayDataType
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -24,23 +24,22 @@ class GLArrayBase(ndarray):
     glTypeId = None
 
     useDefault = object()
-    default = numpy.array([0], 'B')
+    default = numpy.array(0, 'B')
 
-    def __new__(klass, data=None, dtype=None, shape=None, copy=False, value=useDefault):
-        if data is None:
-            # default with no args is to use shape a single 1-element
-            self = klass.fromShape(shape or 1, dtype, value)
-        elif isinstance(data, (int, long)):
-            # determine if shape is complete before we adjust the shape parameter
-            completeShape = (dtype is None) and isinstance(shape, tuple)
-            # adjust shape
-            shape = (data,) + (shape or ())
-            self = klass.fromShape(shape, dtype, value, completeShape)
+    def __new__(klass, data=None, dtype=None, shape=None, copy=False):
+        if not shape:
+            if data is None or isinstance(data, (int, long)):
+                copy = True
+                if data: 
+                    shape = (data,) + klass.default.shape
+                data = klass.default
+            return klass.fromData(data, dtype, shape, copy)
+        elif data is not None:
+            return klass.fromData(data, dtype, shape, copy)
         else:
-            self = klass.fromData(data, dtype, copy)
-        return self
+            return klass.fromShape(shape, dtype)
 
-    def __init__(klass, data=None, dtype=None, shape=(), copy=False, value=useDefault):
+    def __init__(klass, data=None, dtype=None, shape=None, copy=False):
         pass
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -57,54 +56,29 @@ class GLArrayBase(ndarray):
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @classmethod
-    def fromZeros(klass, shape, dtype=None):
-        return klass.fromShape(shape, dtype, value=0)
-
-    @classmethod
-    def fromOnes(klass, shape, dtype=None):
-        return klass.fromShape(shape, dtype, value=1)
-
-    @classmethod
-    def fromShape(klass, shape, dtype=None, value=None, completeShape=None):
-        dtype, shape, order = klass.gldtype.lookupDTypeFrom(dtype, shape, completeShape)
+    def fromShape(klass, shape, dtype=None):
+        dtype, order = klass.gldtype.lookupDTypeFrom(dtype)
         self = ndarray.__new__(klass, shape, dtype=dtype, order=order)
         self.gldtype.configFrom(self)
-        if value is not None: 
-            self.fillFrom(value)
-
-        return self
-
-    def fillFrom(self, value=useDefault):
-        value = self._fillValueFrom(value)
-        self.view(value.dtype)[:] = value[:self.shape[-1]]
-
-    def _fillValueFrom(self, value=useDefault):
-        if value is self.useDefault:
-            value = self.default
-        elif isinstance(value, (int, long, float)):
-            value = value * numpy.ones_like(self.default)
-        else:
-            r = self.default.copy()
-            r[:] = value
-            value = r
-        return value
+        return atleast_2d(self)
 
     @classmethod
-    def fromData(klass, data, dtype=None, copy=False):
-        if isinstance(data, klass):
+    def fromData(klass, data, dtype=None, shape=None, copy=False):
+        if shape is not None:
+            return klass.fromDataRaw(data, dtype, shape, copy)
+
+        elif isinstance(data, klass):
             dtype2 = data.dtype
             if dtype is None:
-                self = (data if copy else data.copy())
+                self = (data.copy() if copy else data)
             elif copy or dtype2 != dtype:
                 self = data.astype(dtype)
             else: self = data
 
-            return self
+            return atleast_2d(self)
 
         elif isinstance(data, ndarray):
-            if dtype is None:
-                intype = data.dtype
-            else: intype = self.gldtype.dtypefmt(dtype)
+            intype = klass.gldtype.dtypefmt(dtype, data.dtype)
 
             self = data.view(klass)
             if intype != data.dtype:
@@ -112,17 +86,54 @@ class GLArrayBase(ndarray):
             elif copy: 
                 self = self.copy()
 
-            return self
+            return atleast_2d(self)
 
         else:
-            return klass.fromDataRaw(data, dtype, copy)
+            return klass.fromDataRaw(data, dtype, shape, copy)
 
     @classmethod
-    def fromDataRaw(klass, data, dtype=None, copy=False):
-        dtype, shape, order = klass.gldtype.lookupDTypeFrom(dtype, numpy.shape(data), True)
-        self = ndarray.__new__(klass, shape, dtype=dtype, order=order)
+    def fromDataRaw(klass, data, dtype=None, shape=None, copy=False):
+        data = klass._valueFrom(data, (dtype, ()))
+        if (not shape) and isinstance(data, klass):
+            if dtype is None or data.dtype == dtype:
+                return data
+
+        shape = shape or numpy.shape(data)
+        dtype, order = klass.gldtype.lookupDTypeFrom(dtype, shape)
+        if dtype.shape > 0:
+            shape = shape[:-1] or (1,)
+
+        self = ndarray.__new__(klass, shape, dtype, order=order)
         self.gldtype.configFrom(self)
-        self[:] = data
+        self = atleast_2d(self)
+        self.view(ndarray)[..., :] = data
         return self
 
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    def _kvnotify_(self, op, key):
+        """This method is intended to be replaced by a mixin with ObservableObject"""
+
+    def __setslice__(self, i, j, value):
+        value = self._valueFrom(value, self.edtype)
+        ndarray.__setslice__(self, i, j, value)
+        self._kvnotify_('set', (i, j))
+    def __delslice__(self, i, j):
+        ndarray.__delslice__(self, i, j)
+        self._kvnotify_('del', (i, j))
+    def __setitem__(self, index, value):
+        value = self._valueFrom(value, self.edtype)
+        ndarray.__setitem__(self, index, value)
+        self._kvnotify_('set', index)
+    def __delitem__(self, i): 
+        ndarray.__delitem__(self, i)
+        self._kvnotify_('del', i)
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    @classmethod
+    def _valueFrom(klass, value, edtype):
+        if isinstance(value, ndarray):
+            return value
+        return numpy.asarray(value)
 

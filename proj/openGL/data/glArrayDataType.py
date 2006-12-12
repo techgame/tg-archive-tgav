@@ -46,13 +46,13 @@ class GLBaseArrayDataType(object):
     def addFormatGroups(self, dtypesList, entrySizes=(), default=NotImplemented):
         dtypeMap = self.dtypeMap.copy()
         keyForDtype = self._getKeyForDtype
-        for edtype in dtypesList:
-            edtype = self.dtypefmt(edtype)
+        for dtype in dtypesList:
+            dtype = self.dtypefmt(dtype, self.defaultFormat)
 
             for esize in entrySizes:
                 if esize is not None:
-                    dt = numpy.dtype((edtype, esize))
-                else: dt = edtype
+                    dt = numpy.dtype((dtype, esize))
+                else: dt = dtype
                 dtypeMap[keyForDtype(dt)] = dt
 
         self.dtypeMap = dtypeMap
@@ -60,12 +60,13 @@ class GLBaseArrayDataType(object):
             self.setDefaultFormat(default)
 
     def setDefaultFormat(self, format):
-        self.defaultFormat = self.dtypefmt(format)
+        self.defaultFormat = self.dtypefmt(format, self.defaultFormat)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def configFrom(self, array, parent=None):
         array.glTypeId = self.glTypeIdForArray(array)
+        array.edtype = (array.dtype, array.shape[-1:])
 
     def glTypeIdForArray(self, array):
         return self.glTypeIdForDtype(array.dtype)
@@ -83,8 +84,9 @@ class GLBaseArrayDataType(object):
 
     @classmethod
     def _getKeyForDtype(klass, dtype, shape=None):
-        if shape is None:
-            shape = dtype.shape
+        if isinstance(dtype, tuple) and not shape:
+            dtype, shape = dtype
+        shape = dtype.shape or shape
 
         if dtype.kind != 'V':
             if shape and sum(shape)>1:
@@ -106,7 +108,7 @@ class GLBaseArrayDataType(object):
     dtypeFrom = staticmethod(numpy.dtype)
 
     @classmethod
-    def dtypefmt(klass, dtypefmt):
+    def dtypefmt(klass, dtypefmt, defaultFormat):
         if isinstance(dtypefmt, basestring):
             if (':' in dtypefmt):
                 names, formats = zip(*[[i.strip() for i in p.split(':', 1)] for p in dtypefmt.split(';') if p])
@@ -117,39 +119,25 @@ class GLBaseArrayDataType(object):
                     return result
         elif isinstance(dtypefmt, (int, long)):
             return klass._glTypeIdToDtype[dtypefmt]
+        elif dtypefmt is None:
+            return defaultFormat
 
         return klass.dtypeFrom(dtypefmt)
 
-    def lookupDTypeFrom(self, dtype, shape, completeShape=None):
-        if completeShape is None:
-            completeShape = (dtype is None) and isinstance(shape, tuple)
-        if completeShape and shape[-1] == -1:
-            completeShape = False
-            shape = shape[:-1]
-
-        if dtype is None:
-            dtype = self.defaultFormat
-        else:
-            dtype = self.dtypefmt(dtype)
-            key = (dtype.base.name, shape[-1:])
-
-        if isinstance(shape, (int, long)): shape = (shape,)
-        elif shape is None: shape = ()
-
-        if completeShape:
-            key = self._getKeyForDtype(dtype, shape[-1:])
-            shape = shape[:-1]
-        else: key = self._getKeyForDtype(dtype)
-
-        dtype = self.dtypeMap[key]
-        return dtype, shape, self.arrayOrder
+    def lookupDTypeFrom(self, dtypeIn, shapeIn=()):
+        if isinstance(dtypeIn, tuple) and not shapeIn:
+            dtypeIn, shapeIn = dtypeIn
+        dtypeFmt = self.dtypefmt(dtypeIn, self.defaultFormat)
+        key = self._getKeyForDtype(dtypeFmt, shapeIn[-1:])
+        dtypeOut = self.dtypeMap[key]
+        return dtypeOut, self.arrayOrder
 
     @classmethod
     def _glTypeIdToDtypePopulate(klass):
         glTypeIdToDtype = {}
         keyForDtype = klass._getKeyForDtype
         for dtype, glTypeId in klass._glTypeIdMap.iteritems():
-            dtype = klass.dtypefmt(dtype)
+            dtype = klass.dtypefmt(dtype, klass.defaultFormat)
             glTypeIdToDtype[glTypeId] = dtype
 
             if dtype.kind == 'V':
