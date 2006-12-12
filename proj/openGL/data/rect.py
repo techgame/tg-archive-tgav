@@ -69,8 +69,15 @@ class RectBasic(object):
         return self
 
     def set(self, *args, **kw):
+        dtype = None
+        aspect = None
+
         if len(args) == 1:
             size, = args
+            if isinstance(size, RectBasic):
+                pos = size.pos.copy()
+                dtype = pos.dtype
+                size = size.size.copy()
             if len(size) <= 3:
                 v0 = None
             elif len(size) == 4:
@@ -89,14 +96,14 @@ class RectBasic(object):
             v1 = kw.pop('v1', None)
             size = kw.pop('size', None)
 
-        dtype = kw.pop('dtype', None)
-        aspect = kw.pop('aspect', None)
+        dtype = kw.pop('dtype', dtype)
+        aspect = kw.pop('aspect', aspect)
 
         if kw:
             raise Exception("Unexpected arguments: %s" % (kw.keys(),))
 
-        self._pos = self._pos.fromData(self._pos, dtype)
-        self._size = self._size.fromData(self._size, dtype)
+        self._pos = Vector(self._pos, dtype)
+        self._size = Vector(self._size, dtype)
 
         if v0 is not None:
             self.v0 = v0
