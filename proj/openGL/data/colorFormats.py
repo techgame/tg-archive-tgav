@@ -128,10 +128,6 @@ class ColorFormatMixin(object):
             return klass.fromHex(value, edtype[0], edtype[1])
 
         value = super(ColorFormatMixin, klass)._valueFrom(value, edtype)
-
-        #if isinstance(value, ndarray):
-        #    if value.dtype != edtype[0]:
-        #        return klass.xform(value, edtype)
         return value
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -157,7 +153,7 @@ class ColorFormatMixin(object):
     hexFormatMap[0, 2] = (1, 2)
 
     remapNto4 = {
-        1: (lambda r: r*4),
+        1: (lambda r: r*3+(0xff,)),
         2: (lambda r: r[:-1]*3 + r[-1:]),
         3: (lambda r: r+(0xff,)),
         4: (lambda r: r),

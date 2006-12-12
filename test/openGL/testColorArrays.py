@@ -1,4 +1,4 @@
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
 ##~ Copyright (C) 2002-2006  TechGame Networks, LLC.              ##
 ##~                                                               ##
 ##~ This library is free software; you can redistribute it        ##
@@ -26,12 +26,12 @@ class TestColorArrays(unittest.TestCase):
         self.assertEqual(question.tolist(), [answer])
 
     def testCAfromHex1x1(self):
-        self.doCVTestFor("#3", [0x33, 0x33, 0x33, 0x33])
-        self.doCVTestFor("#3:", [0x33, 0x33, 0x33, 0x33])
+        self.doCVTestFor("#3", [0x33, 0x33, 0x33, 0xff])
+        self.doCVTestFor("#3:", [0x33, 0x33, 0x33, 0xff])
 
     def testCAfromHex1x2(self):
-        self.doCVTestFor("#3a", [0x3a, 0x3a, 0x3a, 0x3a])
-        self.doCVTestFor("#3a:", [0x3a, 0x3a, 0x3a, 0x3a])
+        self.doCVTestFor("#3a", [0x3a, 0x3a, 0x3a, 0xff])
+        self.doCVTestFor("#3a:", [0x3a, 0x3a, 0x3a, 0xff])
 
     def testCAfromHex2by1(self):
         self.doCVTestFor("#3:a", [0x33, 0x33, 0x33, 0xaa])
