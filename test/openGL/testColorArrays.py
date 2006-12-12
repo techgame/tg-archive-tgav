@@ -169,6 +169,12 @@ if 1:
 
         def testCAn0(self):
             self.doCVTestFor(None, [[1., 1., 1., 1.]])
+            self.doCVTestFor(0, [])
+            self.doCVTestFor([], [])
+            self.doCVTestFor(ColorArray(shape=(1, 0,-1)), [[]])
+            self.doCVTestFor(ColorArray(shape=(1, 0, 1,-1)), [[]])
+            self.doCVTestFor(ColorArray(shape=(1, 0, 3,-1)), [[]])
+            self.doCVTestFor(ColorArray(shape=(3, 0, 1,-1)), [[], [], []])
 
         def testCAn1(self):
             self.doCVTestFor(1, [[1., 1., 1., 1.]])
@@ -176,41 +182,43 @@ if 1:
             self.doCVTestFor(5, 5*[[1., 1., 1., 1.]])
 
         def testCAdata(self):
-            self.doCVTestFor(ColorArray([1., 2., 3., 4.]), [[1., 2., 3., 4.]])
-            self.doCVTestFor(ColorArray([1., 2., 3., 4.]), [[1., 2., 3., 4.]])
+            self.doCVTestFor([1., 2., 3., 4.], [[1., 2., 3., 4.]])
+            self.doCVTestFor([[1., 2., 3., 4.]], [[1., 2., 3., 4.]])
             self.doCVTestFor(ColorArray([1., 2., 3., 4.]), [[1., 2., 3., 4.]])
 
         def testCAdataAndShape1(self):
-            self.doCVTestFor(ColorArray([1., 2., 3., 4.], shape=(1,-1)), [[1., 2., 3., 4.]])
-            self.doCVTestFor(ColorArray([1., 2., 3., 4.], shape=(1,-1)), [[1., 2., 3., 4.]])
-            self.doCVTestFor(ColorArray([1., 2., 3., 4.], shape=(1,-1)), [[1., 2., 3., 4.]])
+            self.doCVTestFor(ColorArray([1., 2., 3., 4.], shape=(1, 1,-1)), [[[1., 2., 3., 4.]]])
+            self.doCVTestFor(ColorArray([1., 2., 3., 4.], '4B', shape=(1, 1,-1)), [[[1, 2, 3, 4]]])
+            self.doCVTestFor(ColorArray([1., 2., 3., 4.], '4f', shape=(1, 1,-1)), [[[1, 2, 3, 4]]])
+            self.doCVTestFor(ColorArray([1., 2., 3., 4.], '4d', shape=(1, 1,-1)), [[[1., 2., 3., 4.]]])
 
         def testCAdataAndShape5(self):
             self.doCVTestFor(ColorArray([1., 2., 3., 4.], shape=(5,-1)), 5*[[1., 2., 3., 4.]])
-            self.doCVTestFor(ColorArray([1., 2., 3., 4.], shape=(5,-1)), 5*[[1., 2., 3., 4.]])
-            self.doCVTestFor(ColorArray([1., 2., 3., 4.], shape=(5,-1)), 5*[[1., 2., 3., 4.]])
+            self.doCVTestFor(ColorArray([1., 2., 3., 4.], '4B', shape=(5,-1)), 5*[[1., 2., 3., 4.]])
+            self.doCVTestFor(ColorArray([1., 2., 3., 4.], '4f', shape=(5,-1)), 5*[[1., 2., 3., 4.]])
+            self.doCVTestFor(ColorArray([1., 2., 3., 4.], '4d', shape=(5,-1)), 5*[[1., 2., 3., 4.]])
 
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         def testCAshape1(self):
-            self.doCVTestFor(ColorArray(0, shape=(1,-1)), [[0., 0., 0., 0.]])
-            self.doCVTestFor(ColorArray(0L, shape=(1,-1)), [[0., 0., 0., 0.]])
-            self.doCVTestFor(ColorArray(0., shape=(1,-1)), [[0., 0., 0., 0.]])
+            self.doCVTestFor(ColorArray([0], shape=(1,-1)), [[0., 0., 0., 0.]])
+            self.doCVTestFor(ColorArray([0L], shape=(1,-1)), [[0., 0., 0., 0.]])
+            self.doCVTestFor(ColorArray([0.], shape=(1,-1)), [[0., 0., 0., 0.]])
 
         def testCAshape5(self):
-            self.doCVTestFor(ColorArray(0, shape=(5,-1)), 5*[[0., 0., 0., 0.]])
-            self.doCVTestFor(ColorArray(0L, shape=(5,-1)), 5*[[0., 0., 0., 0.]])
-            self.doCVTestFor(ColorArray(0., shape=(5,-1)), 5*[[0., 0., 0., 0.]])
+            self.doCVTestFor(ColorArray([0], shape=(5,-1)), 5*[[0., 0., 0., 0.]])
+            self.doCVTestFor(ColorArray([0L], shape=(5,-1)), 5*[[0., 0., 0., 0.]])
+            self.doCVTestFor(ColorArray([0.], shape=(5,-1)), 5*[[0., 0., 0., 0.]])
 
         def testCAshape5(self):
-            self.doCVTestFor(ColorArray(-2, shape=(5,-1)), 5*[[-2., -2., -2., -2.]])
-            self.doCVTestFor(ColorArray(-4L, shape=(5,-1)), 5*[[-4., -4., -4., -4.]])
-            self.doCVTestFor(ColorArray(-.25, shape=(5,-1)), 5*[[-.25,-.25,-.25,-.25]])
+            self.doCVTestFor(ColorArray([-2], shape=(5,-1)), 5*[[-2., -2., -2., -2.]])
+            self.doCVTestFor(ColorArray([-4L], shape=(5,-1)), 5*[[-4., -4., -4., -4.]])
+            self.doCVTestFor(ColorArray([-.25], shape=(5,-1)), 5*[[-.25,-.25,-.25,-.25]])
 
         def testCAshape5by2(self):
-            self.doCVTestFor(ColorArray(-2, shape=(5, 2,-1)), 5*[2*[[-2., -2., -2., -2.]]])
-            self.doCVTestFor(ColorArray(-4L, shape=(5, 2,-1)), 5*[2*[[-4., -4., -4., -4.]]])
-            self.doCVTestFor(ColorArray(-.25, shape=(5, 2,-1)), 5*[2*[[-.25,-.25,-.25,-.25]]])
+            self.doCVTestFor(ColorArray([-2], shape=(5, 2,-1)), 5*[2*[[-2., -2., -2., -2.]]])
+            self.doCVTestFor(ColorArray([-4L], shape=(5, 2,-1)), 5*[2*[[-4., -4., -4., -4.]]])
+            self.doCVTestFor(ColorArray([-.25], shape=(5, 2,-1)), 5*[2*[[-.25,-.25,-.25,-.25]]])
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Unittest Main 

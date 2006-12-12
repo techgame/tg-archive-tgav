@@ -33,7 +33,7 @@ class GLArrayBase(ndarray):
         if not shape:
             if data is None or isinstance(data, (int, long)):
                 copy = True
-                if data: 
+                if data is not None: 
                     shape = (data,) + klass.default.shape
                 data = klass.default
             return klass.fromData(data, dtype, shape, copy)
@@ -103,9 +103,12 @@ class GLArrayBase(ndarray):
             if dtype is None or data.dtype == dtype:
                 return data
 
-        shape = shape or numpy.shape(data)
+        dataShape = numpy.shape(data)
+        shape = shape or dataShape
+        if shape[-1:] == (-1,):
+            shape = shape[:-1]
         dtype, order = klass.gldtype.lookupDTypeFrom(dtype, shape)
-        if dtype.shape > 0:
+        if dtype.shape == shape[-1:]:
             shape = shape[:-1]
 
         self = ndarray.__new__(klass, shape, dtype, order=order)
