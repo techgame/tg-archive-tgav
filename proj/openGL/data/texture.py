@@ -225,8 +225,6 @@ class TextureImageBasic(object):
 
     _dataType = None
     def getDataType(self):
-        if self._dataType is None:
-            pass #self.setDataType(None)
         return self._dataType
     def setDataType(self, dataType):
         self._dataType = dataType
@@ -333,8 +331,8 @@ class TextureImageBasic(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    _pos = TextureCoord.fromZeros((3,), 'l')
-    _size = TextureCoord.fromZeros((3,), 'l')
+    _pos = TextureCoord([0., 0., 0.], '3l')
+    _size = TextureCoord([0., 0., 0.], '3l')
 
     def getPos(self): return self._pos
     def setPos(self, pos): 
@@ -360,8 +358,8 @@ class TextureImageBasic(object):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class TextureImage1D(TextureImageBasic):
-    _pos = TextureCoord.fromZeros((1,), 'l')
-    _size = TextureCoord.fromZeros((1,), 'l')
+    _pos = TextureCoord([0.], '1l')
+    _size = TextureCoord([0.], '1l')
 
     def setImageOn(self, texture, level=0, **kw):
         texture.setImage1d(self, level, **kw)
@@ -380,8 +378,8 @@ class TextureImage1D(TextureImageBasic):
         return texture
 
 class TextureImage2D(TextureImageBasic):
-    _pos = TextureCoord.fromZeros((2,), 'l')
-    _size = TextureCoord.fromZeros((2,), 'l')
+    _pos = TextureCoord([0., 0.], '2l')
+    _size = TextureCoord([0., 0.], '2l')
 
     def setImageOn(self, texture, level=0, **kw):
         texture.setImage2d(self, level, **kw)
@@ -400,8 +398,8 @@ class TextureImage2D(TextureImageBasic):
         return texture
 
 class TextureImage3D(TextureImageBasic):
-    _pos = TextureCoord.fromZeros((3,), 'l')
-    _size = TextureCoord.fromZeros((3,), 'l')
+    _pos = TextureCoord([0., 0., 0.], '3l')
+    _size = TextureCoord([0., 0., 0.], '3l')
 
     def setImageOn(self, texture, level=0, **kw):
         texture.setImage3d(self, level, **kw)
@@ -642,7 +640,7 @@ class Texture(object):
     #~ Size & Dimensios
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    _size = TextureCoord.fromZeros((3,), 'l')
+    _size = TextureCoord([0., 0., 0.], '3l')
     def getSize(self): return self._size
     def setSize(self, size):
         self._size = self._size.copy()

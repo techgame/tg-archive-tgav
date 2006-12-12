@@ -36,7 +36,7 @@ class Font(object):
     advance = None
     kerningMap = None
 
-    pointSize = FontTextData.AdvanceArray([1./64., 1./64., 1./64.])
+    pointSize = FontTextData.AdvanceArray([1./64., 1./64., 1./64.])[0]
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -199,9 +199,9 @@ class Font(object):
 
     def _compileData(self, face, count, gidxMap, mosaic):
         # create the result arrays
-        geometry = self.FontTextData.GeometryArray(shape=(count, 4, -1), value=None)
+        geometry = self.FontTextData.GeometryArray.fromShape((count, 4, -1))
         self.geometry = geometry
-        advance = self.FontTextData.AdvanceArray(shape=(count, 1, -1), value=None)
+        advance = self.FontTextData.AdvanceArray.fromShape((count, 1, -1))
         self.advance = advance
 
         # cache some methods

@@ -10,22 +10,33 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+from numpy import atleast_1d
 from vertexArrays import *
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Synonyms for (implied) single entry
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class Vertex(VertexArray): pass
-class Vector(VectorArray): pass
-class TextureCoord(TextureCoordArray): pass
-class MultiTextureCoord(MultiTextureCoordArray): pass
-class Normal(NormalArray): pass
-class Color(ColorArray): pass
-class SecondaryColor(SecondaryColorArray): pass
-class ColorIndex(ColorIndexArray): pass
-class FogCoord(FogCoordArray): pass
-class EdgeFlag(EdgeFlagArray): pass
+class Vertex(VertexArray): 
+    _atleast_nd = staticmethod(atleast_1d)
+class Vector(VectorArray):
+    _atleast_nd = staticmethod(atleast_1d)
+class TextureCoord(TextureCoordArray):
+    _atleast_nd = staticmethod(atleast_1d)
+class MultiTextureCoord(MultiTextureCoordArray):
+    _atleast_nd = staticmethod(atleast_1d)
+class Normal(NormalArray):
+    _atleast_nd = staticmethod(atleast_1d)
+class Color(ColorArray):
+    _atleast_nd = staticmethod(atleast_1d)
+class SecondaryColor(SecondaryColorArray):
+    _atleast_nd = staticmethod(atleast_1d)
+class ColorIndex(ColorIndexArray):
+    _atleast_nd = staticmethod(atleast_1d)
+class FogCoord(FogCoordArray):
+    _atleast_nd = staticmethod(atleast_1d)
+class EdgeFlag(EdgeFlagArray):
+    _atleast_nd = staticmethod(atleast_1d)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

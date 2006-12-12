@@ -170,7 +170,7 @@ class ColorFormatMixin(object):
         if isinstance(hexColorData, basestring):
             hexColorData = [hexColorData]
 
-        colorResult = klass.fromShape(len(hexColorData), '4B')
+        colorResult = klass.fromShape((len(hexColorData),-1), '4B')
         for i in xrange(len(colorResult)):
             value = hexColorData[i]
 

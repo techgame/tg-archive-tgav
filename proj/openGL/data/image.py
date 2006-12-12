@@ -100,7 +100,7 @@ class ImageTextureBase(Texture):
 
     def geometry(self, geo=None):
         if geo is None:
-            geo = self.GeometryFactory(shape=(1,4,-1), value=None)
+            geo = self.GeometryFactory.fromShape((1,4,-1))
 
         geo.v = self.verticies()
         geo.t = self.texCoords()

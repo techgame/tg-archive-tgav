@@ -48,7 +48,10 @@ class DataArrayBase(GLArrayBase):
             self[at] = data
         else:
             l = min(l[-1], self.shape[-1])
-            self[at,:l] = data[:l]
+            if isinstance(data, numpy.ndarray):
+                self[at,:l] = data[at, :l]
+            else:
+                self[at,:l] = data[:l]
             self[at,l:] = fill
         return self
     def setPart(self, data, at=Ellipsis):
@@ -58,7 +61,7 @@ class DataArrayBase(GLArrayBase):
             self[at] = data
         else:
             l = min(l[-1], self.shape[-1])
-            self[at,:l] = data
+            self[at,:l] = data[:l]
         return self
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

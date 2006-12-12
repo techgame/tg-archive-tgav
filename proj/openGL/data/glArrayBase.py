@@ -20,8 +20,11 @@ from .glArrayDataType import GLBaseArrayDataType
 
 class GLArrayBase(ndarray):
     __array_priority__ = 25.0
+
     gldtype = GLBaseArrayDataType()
     glTypeId = None
+
+    _atleast_nd = staticmethod(atleast_2d)
 
     useDefault = object()
     default = numpy.array(0, 'B')
@@ -58,9 +61,11 @@ class GLArrayBase(ndarray):
     @classmethod
     def fromShape(klass, shape, dtype=None):
         dtype, order = klass.gldtype.lookupDTypeFrom(dtype)
+        if shape[-1:] == (-1,):
+            shape = shape[:-1]
         self = ndarray.__new__(klass, shape, dtype=dtype, order=order)
         self.gldtype.configFrom(self)
-        return atleast_2d(self)
+        return klass._atleast_nd(self)
 
     @classmethod
     def fromData(klass, data, dtype=None, shape=None, copy=False):
@@ -75,7 +80,7 @@ class GLArrayBase(ndarray):
                 self = data.astype(dtype)
             else: self = data
 
-            return atleast_2d(self)
+            return klass._atleast_nd(self)
 
         elif isinstance(data, ndarray):
             intype = klass.gldtype.dtypefmt(dtype, data.dtype)
@@ -86,7 +91,7 @@ class GLArrayBase(ndarray):
             elif copy: 
                 self = self.copy()
 
-            return atleast_2d(self)
+            return klass._atleast_nd(self)
 
         else:
             return klass.fromDataRaw(data, dtype, shape, copy)
@@ -101,11 +106,11 @@ class GLArrayBase(ndarray):
         shape = shape or numpy.shape(data)
         dtype, order = klass.gldtype.lookupDTypeFrom(dtype, shape)
         if dtype.shape > 0:
-            shape = shape[:-1] or (1,)
+            shape = shape[:-1]
 
         self = ndarray.__new__(klass, shape, dtype, order=order)
         self.gldtype.configFrom(self)
-        self = atleast_2d(self)
+        self = klass._atleast_nd(self)
         self.view(ndarray)[..., :] = data
         return self
 

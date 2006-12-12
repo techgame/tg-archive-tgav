@@ -24,8 +24,8 @@ class TextLayout(object):
         align = textObj.align[textObj.wrapAxis]
         oneMinusAlign = 1-align
 
-        pos = textData.AdvanceArray(textObj.pos).copy()
-        size = textData.AdvanceArray(textObj.size).copy()
+        pos = textObj.pos.copy()
+        size = textObj.size.copy()
 
         linePos = size.copy()
         linePos[0] *= align
