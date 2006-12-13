@@ -220,6 +220,17 @@ if 1:
             self.doCVTestFor(ColorArray([-4L], shape=(5, 2,-1)), 5*[2*[[-4., -4., -4., -4.]]])
             self.doCVTestFor(ColorArray([-.25], shape=(5, 2,-1)), 5*[2*[[-.25,-.25,-.25,-.25]]])
 
+if 1:
+    class TestColorBlend(unittest.TestCase):
+        cpts = ColorArray(['#000', '#fff'], '4B')
+
+        def doCVTestFor(self, rawQuestion, rawAnswer):
+            self.assertEqual(rawQuestion.squeeze().tolist(), rawAnswer.squeeze().tolist())
+        def testBlend0(self):
+            self.doCVTestFor(self.cpts[0].blend(self.cpts[1], 0.), self.cpts[0])
+        def testBlend1(self):
+            self.doCVTestFor(self.cpts[0].blend(self.cpts[1], 1.), self.cpts[1])
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Unittest Main 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

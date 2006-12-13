@@ -11,6 +11,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import numpy
+from numpy import shape, ndarray, dot, asarray, dstack
 
 from .glArrayBase import GLArrayBase
 from .glArrayDataType import GLArrayDataType
@@ -21,9 +22,7 @@ from .colorFormats import ColorFormatMixin
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def blend(u0, u1, a):
-    amat = numpy.asarray([a, a])
-    amat[0] = 1-amat[0]
-    return numpy.dot(amat.T, [u0, u1])
+    return dot(dstack([u0, u1]), asarray([1-a, a]))
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Data Arrays
@@ -34,7 +33,8 @@ class DataArrayBase(GLArrayBase):
 
     def blend(self, other, alpha, copy=True):
         r = blend(self, other, alpha)
-        if copy: return r
+        if copy: 
+            return r.astype(self.dtype)
 
         self[:] = r
         return self
@@ -42,20 +42,20 @@ class DataArrayBase(GLArrayBase):
     def get(self, at=Ellipsis):
         return self[at]
     def set(self, data, at=Ellipsis, fill=0):
-        l = numpy.shape(data)
+        l = shape(data)
         if not l:
             # fill with data
             self[at] = data
         else:
             l = min(l[-1], self.shape[-1])
-            if isinstance(data, numpy.ndarray):
+            if isinstance(data, ndarray):
                 self[at,:l] = data[at, :l]
             else:
                 self[at,:l] = data[:l]
             self[at,l:] = fill
         return self
     def setPart(self, data, at=Ellipsis):
-        l = numpy.shape(data)
+        l = shape(data)
         if not l:
             # fill with data
             self[at] = data
@@ -67,21 +67,21 @@ class DataArrayBase(GLArrayBase):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class VectorArray(DataArrayBase):
-    default = numpy.array([0], 'f')
+    default = asarray([0], 'f')
 
     gldtype = GLArrayDataType()
     gldtype.addFormatGroups('hlifd', (1,2,3,4), default='3f')
     glinfo = gldtype.arrayInfoFor('vector')
 
 class VertexArray(DataArrayBase):
-    default = numpy.array([0], 'f')
+    default = asarray([0], 'f')
 
     gldtype = GLArrayDataType()
     gldtype.addFormatGroups('hlifd', (2,3,4), default='3f')
     glinfo = gldtype.arrayInfoFor('vertex')
 
 class TextureCoordArray(DataArrayBase):
-    default = numpy.array([0], 'f')
+    default = asarray([0], 'f')
 
     gldtype = GLArrayDataType()
     gldtype.addFormatGroups('hlifd', (1,2,3,4), default='3f')
@@ -92,42 +92,42 @@ class MultiTextureCoordArray(TextureCoordArray):
     glinfo = gldtype.arrayInfoFor('multi_texture_coord')
 
 class NormalArray(DataArrayBase):
-    default = numpy.array([0, 0, 1], 'f')
+    default = asarray([0, 0, 1], 'f')
 
     gldtype = GLArrayDataType()
     gldtype.addFormatGroups('bhlifd', (3,), default='3f')
     glinfo = gldtype.arrayInfoFor('normal')
 
 class ColorArray(ColorFormatMixin, DataArrayBase):
-    default = numpy.array([1., 1., 1., 1.], 'f')
+    default = asarray([1., 1., 1., 1.], 'f')
 
     gldtype = GLArrayDataType()
     gldtype.addFormatGroups('BHLIbhlifd', (3,4), default='4f')
     glinfo = gldtype.arrayInfoFor('color')
 
 class SecondaryColorArray(ColorArray):
-    default = numpy.array([1., 1., 1.], 'f')
+    default = asarray([1., 1., 1.], 'f')
 
     gldtype = GLArrayDataType()
     gldtype.addFormatGroups('BHLIbhlifd', (3,), default='3f')
     glinfo = gldtype.arrayInfoFor('secondary_color')
 
 class ColorIndexArray(DataArrayBase):
-    default = numpy.array([0], 'B')
+    default = asarray([0], 'B')
 
     gldtype = GLArrayDataType()
     gldtype.addFormatGroups('Bhlifd', (1,), default='1B')
     glinfo = gldtype.arrayInfoFor('color_index')
 
 class FogCoordArray(DataArrayBase):
-    default = numpy.array([0.], 'f')
+    default = asarray([0.], 'f')
 
     gldtype = GLArrayDataType()
     gldtype.addFormatGroups('fd', (1,), default='1f')
     glinfo = gldtype.arrayInfoFor('fog_coord')
 
 class EdgeFlagArray(DataArrayBase):
-    default = numpy.array([1], 'B')
+    default = asarray([1], 'B')
 
     gldtype = GLArrayDataType()
     gldtype.addFormatGroups('B', (1,), default='1B')
