@@ -12,13 +12,16 @@
 
 import numpy
 from numpy import atleast_2d, ndarray
+
+from .observableData import ObservableData
+
 from .glArrayDataType import GLBaseArrayDataType
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class GLArrayBase(ndarray):
+class GLArrayBase(ndarray, ObservableData):
     __array_priority__ = 25.0
 
     gldtype = GLBaseArrayDataType()
@@ -30,6 +33,7 @@ class GLArrayBase(ndarray):
     default = numpy.array(0, 'B')
 
     def __new__(klass, data=None, dtype=None, shape=None, copy=False):
+        klass._visitOnObservableNew(klass)
         if not shape:
             if data is None or isinstance(data, (int, long)):
                 copy = True
@@ -42,8 +46,8 @@ class GLArrayBase(ndarray):
         else:
             return klass.fromShape(shape, dtype)
 
-    def __init__(klass, data=None, dtype=None, shape=None, copy=False):
-        pass
+    def __init__(self, data=None, dtype=None, shape=None, copy=False):
+        ObservableData.__init__(self)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -119,23 +123,20 @@ class GLArrayBase(ndarray):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def _kvnotify_(self, op, key):
-        """This method is intended to be replaced by a mixin with ObservableObject"""
-
     def __setslice__(self, i, j, value):
         value = self._valueFrom(value, self.edtype)
         ndarray.__setslice__(self, i, j, value)
-        self._kvnotify_('set', (i, j))
+        self._kvnotify_('set', 'slice', (i, j))
     def __delslice__(self, i, j):
         ndarray.__delslice__(self, i, j)
-        self._kvnotify_('del', (i, j))
+        self._kvnotify_('del', 'slice', (i, j))
     def __setitem__(self, index, value):
         value = self._valueFrom(value, self.edtype)
         ndarray.__setitem__(self, index, value)
-        self._kvnotify_('set', index)
+        self._kvnotify_('set', 'index', index)
     def __delitem__(self, i): 
         ndarray.__delitem__(self, i)
-        self._kvnotify_('del', i)
+        self._kvnotify_('del', 'index', i)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
