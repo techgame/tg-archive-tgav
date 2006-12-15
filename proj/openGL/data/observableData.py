@@ -10,12 +10,12 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from TG.observing import ObservableObject
+from TG.observing import ObservableObject, ObservablePropertyFactoryMixin
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class ObservableData(ObservableObject):
+class ObservableData(ObservableObject, ObservablePropertyFactoryMixin):
     pass
 

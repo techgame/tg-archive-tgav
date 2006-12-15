@@ -51,8 +51,8 @@ def toAspect(size, aspect, grow=None):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class Rect(ObservableData):
-    _pos = Vector([0., 0., 0.], 'f')
-    _size = Vector([1., 1., 0.], 'f')
+    _pos = Vector([0, 0, 0], 'f')
+    _size = Vector([1, 1, 0], 'f')
 
     def __init__(self, rect=None, dtype=None):
         ObservableData.__init__(self)
@@ -78,6 +78,17 @@ class Rect(ObservableData):
         else: 
             return '%s(%s)' % (name, size)
 
+    def getDtype(self):
+        dtype = self._size.dtype
+        assert dtype == self._pos.dtype, (dtype, self._pos.dtype)
+        return dtype
+    def setDtype(self, dtype):
+        self._pos = self._pos.astype(dtype)
+        self._size = self._size.astype(dtype)
+        self._kvnotify_('set', 'pos')
+        self._kvnotify_('set', 'size')
+    dtype = property(getDtype, setDtype)
+
     def astype(self, dtype):
         return self.copy(dtype)
 
@@ -89,13 +100,13 @@ class Rect(ObservableData):
         return r.copyFrom(self, dtype)
 
     def copyFrom(self, other, dtype=None):
-        if dtype is not None:
-            self._pos = other._pos.astype(dtype)
-            self._size = other._size.astype(dtype)
-        else:
-            self._pos = other._pos.copy()
-            self._size = other._size.copy()
+        if dtype is None:
+            dtype = self.dtype
+        self._pos = other._pos.astype(dtype)
+        self._size = other._size.astype(dtype)
         return self
+
+    #~ setters and construction methods ~~~~~~~~~~~~~~~~~
 
     def setRect(self, rect, aspect=None, align=None, dtype=None):
         self.copyFrom(rect)
@@ -184,12 +195,12 @@ class Rect(ObservableData):
             self.toAspect(self._size, aspect)
             self._kvnotify_('set', 'size')
             return self
+        else:
+            size = self._size.copy()
+            self.toAspect(self._size, aspect)
+            self._kvnotify_('set', 'size')
 
-        size = self._size.copy()
-        self.toAspect(self._size, aspect)
-        self._kvnotify_('set', 'size')
-
-        return self.alignIn(align, size)
+            return self.alignIn(align, size)
     aspect = property(getAspect, setAspect)
 
     toAspect = staticmethod(toAspect)
@@ -261,5 +272,15 @@ class Rect(ObservableData):
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-__all__ = ['Rect', 'toAspect']
+class Recti(Rect):
+    _pos = Vector([0, 0, 0], 'i')
+    _size = Vector([1, 1, 0], 'i')
+
+class Rectf(Rect):
+    _pos = Vector([0, 0, 0], 'f')
+    _size = Vector([1, 1, 0], 'f')
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+__all__ = ['Rect', 'Recti', 'Rectf', 'toAspect']
 
