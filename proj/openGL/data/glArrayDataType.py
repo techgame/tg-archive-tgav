@@ -35,6 +35,9 @@ class GLBaseArrayDataType(object):
     def copy(self):
         return self.new(self)
 
+    def __copy__(self):
+        return self.copy()
+
     def copyFrom(self, other):
         self.defaultFormat = other.defaultFormat
 

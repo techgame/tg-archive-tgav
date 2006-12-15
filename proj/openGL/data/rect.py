@@ -81,6 +81,9 @@ class Rect(ObservableData):
     def astype(self, dtype):
         return self.copy(dtype)
 
+    def __copy__(self):
+        return self.copy()
+
     def copy(self, dtype=None):
         r = self.__new__(self.__class__)
         return r.copyFrom(self, dtype)
@@ -94,32 +97,30 @@ class Rect(ObservableData):
             self._size = other._size.copy()
         return self
 
-    def setRect(self, rect, aspect=None, dtype=None):
+    def setRect(self, rect, aspect=None, align=None, dtype=None):
         self.copyFrom(rect)
-        self.aspect = aspect
+        self.setAspect(aspect, align)
         return self
-    def fromRect(self, rect, aspect=None, dtype=None):
+    def fromRect(self, rect, aspect=None, align=None, dtype=None):
         self = klass(rect, dtype)
-        self.aspect = aspect
+        self.setAspect(aspect, align)
         return self
 
     @classmethod
-    def fromSize(klass, size, aspect=None, dtype=None):
+    def fromSize(klass, size, aspect=None, align=None, dtype=None):
         self = klass(dtype=dtype)
-        self.size = size
-        self.aspect = aspect
+        self.setSize(size, aspect, align)
         return self
 
     @classmethod
-    def fromPosSize(klass, pos, size, aspect=None, dtype=None):
+    def fromPosSize(klass, pos, size, aspect=None, align=None, dtype=None):
         self = klass(dtype=dtype)
-        self.setPosSize(pos, size, aspect)
+        self.setPosSize(pos, size, aspect, align)
         return self
 
-    def setPosSize(self, pos, size, aspect=None):
+    def setPosSize(self, pos, size, aspect=None, align=None):
         self.pos = pos
-        self.size = size
-        self.aspect = aspect
+        self.setSize(size, aspect, align)
         return self
 
     @classmethod
@@ -142,34 +143,53 @@ class Rect(ObservableData):
         return self
     pos = property(getPos, setPos)
 
+    def centerIn(self, other): 
+        return self.alignIn(.5, other)
+    def alignIn(self, align, other):
+        if isinstance(other, Rect):
+            self.pos = other.pos + align*(other.size-self.size) 
+        else: self.pos += align*(other-self.size) 
+        return self
+
     def getCorner(self):
         return self._pos + self._size
     corner = property(getCorner)
     
     def getSize(self):
         return self._size.copy()
-    def setSize(self, size):
+    def setSize(self, size, aspect=None, align=None):
         selfSize = self._size
         selfSize.set(size)
         selfSize[selfSize < 0] = 0
+
+        if aspect is not None or align is not None:
+            return self.setAspect(aspect, align)
 
         self._kvnotify_('set', 'size')
         return self
     size = property(getSize, setSize)
 
-    def sizeAs(self, aspect, grow=False):
-        return self.toAspect(self._size.copy(), aspect, grow)
+    def sizeAs(self, aspect):
+        return self.toAspect(self._size.copy(), aspect)
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def getAspect(self):
         s = self._size[0:2].astype(float)
         return s[0]/s[1]
-    def setAspect(self, aspect, grow=None):
+    def setAspect(self, aspect, align=None):
         if aspect is None: return self
-        self.toAspect(self._size, aspect, grow)
+
+        if align is None:
+            self.toAspect(self._size, aspect)
+            self._kvnotify_('set', 'size')
+            return self
+
+        size = self._size.copy()
+        self.toAspect(self._size, aspect)
         self._kvnotify_('set', 'size')
-        return self
+
+        return self.alignIn(align, size)
     aspect = property(getAspect, setAspect)
 
     toAspect = staticmethod(toAspect)
