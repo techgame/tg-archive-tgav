@@ -58,6 +58,9 @@ class GLArrayBase(ndarray, ObservableData):
     def _configFromParent(self, parent):
         self.gldtype.configFrom(self, parent)
 
+    def __nonzero__(self):
+        return self.size != 0
+
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     #~ Contruction methods
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
