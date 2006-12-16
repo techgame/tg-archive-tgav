@@ -46,6 +46,7 @@ class GLArrayBase(ndarray, ObservableData):
         else:
             return klass.fromShape(shape, dtype)
 
+    defaultPropKind = 'asType'
     def __init__(self, data=None, dtype=None, shape=None, copy=False):
         ObservableData.__init__(self)
 

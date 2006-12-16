@@ -54,6 +54,7 @@ class Rect(ObservableData):
     _pos = Vector([0, 0, 0], 'f')
     _size = Vector([1, 1, 0], 'f')
 
+    defaultPropKind = 'asType'
     def __init__(self, rect=None, dtype=None):
         ObservableData.__init__(self)
         if rect is None:

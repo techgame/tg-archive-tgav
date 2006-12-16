@@ -15,7 +15,9 @@ from ctypes import cast, byref, c_void_p
 
 from ..raw import gl, glext
 
-from .singleArrays import TextureCoord
+from .observableData import ObservableData
+from .vertexArrays import TextureCoordArray, VertexArray
+from .singleArrays import TextureCoord, Vertex
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -129,7 +131,7 @@ class PixelStore(object):
 #~ Texture Image
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class TextureImageBasic(object):
+class TextureImageBasic(ObservableData):
     formatMap = {
         'rgb': gl.GL_RGB, 'RGB': gl.GL_RGB,
         'rgba': gl.GL_RGBA, 'RGBA': gl.GL_RGBA,
@@ -199,6 +201,8 @@ class TextureImageBasic(object):
         }
 
     def __init__(self, *args, **kwattrs):
+        super(TextureImageBasic, self).__init__()
+
         self.create(*args, **kwattrs)
 
     def create(self, *args, **kwattrs):
@@ -331,20 +335,8 @@ class TextureImageBasic(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    _pos = TextureCoord([0., 0., 0.], '3l')
-    _size = TextureCoord([0., 0., 0.], '3l')
-
-    def getPos(self): return self._pos
-    def setPos(self, pos): 
-        self._pos = self._pos.copy()
-        self._pos.set(pos)
-    pos = property(getPos, setPos)
-
-    def getSize(self): return self._size
-    def setSize(self, size):
-        self._size = self._size.copy()
-        self._size.set(size)
-    size = property(getSize, setSize)
+    pos = TextureCoord.property([0, 0, 0], dtype='3l')
+    size = TextureCoord.property([0, 0, 0], dtype='3l')
 
     def getPosSize(self):
         return (self.pos, self.size)
@@ -358,9 +350,6 @@ class TextureImageBasic(object):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class TextureImage1D(TextureImageBasic):
-    _pos = TextureCoord([0.], '1l')
-    _size = TextureCoord([0.], '1l')
-
     def setImageOn(self, texture, level=0, **kw):
         texture.setImage1d(self, level, **kw)
         return texture
@@ -378,9 +367,6 @@ class TextureImage1D(TextureImageBasic):
         return texture
 
 class TextureImage2D(TextureImageBasic):
-    _pos = TextureCoord([0., 0.], '2l')
-    _size = TextureCoord([0., 0.], '2l')
-
     def setImageOn(self, texture, level=0, **kw):
         texture.setImage2d(self, level, **kw)
         return texture
@@ -398,9 +384,6 @@ class TextureImage2D(TextureImageBasic):
         return texture
 
 class TextureImage3D(TextureImageBasic):
-    _pos = TextureCoord([0., 0., 0.], '3l')
-    _size = TextureCoord([0., 0., 0.], '3l')
-
     def setImageOn(self, texture, level=0, **kw):
         texture.setImage3d(self, level, **kw)
         return texture
@@ -421,7 +404,7 @@ class TextureImage3D(TextureImageBasic):
 #~ Texture object itself
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class Texture(object):
+class Texture(ObservableData):
     _as_parameter_ = None # GLenum returned from glGenTextures
     texParams = []
     targetMap = {
@@ -494,6 +477,7 @@ class Texture(object):
         'c-i': gl.GL_COMPRESSED_INTENSITY, 'C-I': gl.GL_COMPRESSED_INTENSITY, 'compressed_intensity': gl.GL_COMPRESSED_INTENSITY, } 
 
     def __init__(self, *args, **kwargs):
+        super(Texture, self).__init__()
         self.create(*args, **kwargs)
 
     def __del__(self):
@@ -640,12 +624,7 @@ class Texture(object):
     #~ Size & Dimensios
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    _size = TextureCoord([0., 0., 0.], '3l')
-    def getSize(self): return self._size
-    def setSize(self, size):
-        self._size = self._size.copy()
-        self._size.set(size)
-    size = property(getSize, setSize)
+    size = TextureCoord.property([0, 0, 0], dtype='3l')
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     #~ Texture Data
@@ -706,6 +685,7 @@ class Texture(object):
             gl.glTexImage2D(self.target, level, self.format, 
                     size[0], size[1], data.border, 
                     data.format, data.dataType, data.ptr)
+
             self.size = size
         finally:
             data.deselect()
@@ -867,6 +847,27 @@ class Texture(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    _rstNormalizeTargets = {
+        gl.GL_TEXTURE_1D: True,
+        gl.GL_TEXTURE_2D: True,
+        gl.GL_TEXTURE_3D: True,
+        gl.GL_TEXTURE_CUBE_MAP: True,
+
+        glext.GL_TEXTURE_RECTANGLE_ARB: False,
+        }
+
+    def texCoordsFor(self, texCoords, _rstNormalizeTargets=_rstNormalizeTargets):
+        texSize = self.size
+        ndim = (texSize == 0).argmax()
+
+        if _rstNormalizeTargets.get(self.target, True):
+            return (texCoords[..., :ndim]/texSize[:ndim])
+        else:
+            return texCoords[..., :ndim]
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    _powersOfTwo = [1<<s for s in xrange(31)]
     _textureTargetRequiresPowersOfTwo = {
         gl.GL_TEXTURE_1D: True,
         gl.GL_TEXTURE_2D: True,
@@ -888,7 +889,7 @@ class Texture(object):
         if self._textureTargetRequiresPowersOfTwo.get(self.target, False):
             size = [self.nextPowerOf2(s) for s in size]
 
-        rsize = self._size.copy()
+        rsize = self.size.copy()
         rsize.set(size)
         return rsize
 

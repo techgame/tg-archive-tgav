@@ -17,32 +17,35 @@ from vertexArrays import *
 #~ Synonyms for (implied) single entry
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-@classmethod
-def _normalized(klass, result):
-    return atleast_1d(result.squeeze())
+class _SingleMixin(object):
+    __array_priority__ = 20.0
 
-class Vertex(VertexArray): 
-    _normalized = _normalized
-class Vector(VectorArray):
-    _normalized = _normalized
-class TextureCoord(TextureCoordArray):
-    _normalized = _normalized
+    @classmethod
+    def _normalized(klass, result):
+        return atleast_1d(result.squeeze())
+
+class Vertex(_SingleMixin, VertexArray): 
+    pass
+class Vector(_SingleMixin, VectorArray):
+    pass
+class TextureCoord(_SingleMixin, TextureCoordArray):
+    pass
 TexCoord = TextureCoord
-class MultiTextureCoord(MultiTextureCoordArray):
-    _normalized = _normalized
+class MultiTextureCoord(_SingleMixin, MultiTextureCoordArray):
+    pass
 MultiTexCoord = MultiTextureCoord
-class Normal(NormalArray):
-    _normalized = _normalized
-class Color(ColorArray):
-    _normalized = _normalized
-class SecondaryColor(SecondaryColorArray):
-    _normalized = _normalized
-class ColorIndex(ColorIndexArray):
-    _normalized = _normalized
-class FogCoord(FogCoordArray):
-    _normalized = _normalized
-class EdgeFlag(EdgeFlagArray):
-    _normalized = _normalized
+class Normal(_SingleMixin, NormalArray):
+    pass
+class Color(_SingleMixin, ColorArray):
+    pass
+class SecondaryColor(_SingleMixin, SecondaryColorArray):
+    pass
+class ColorIndex(_SingleMixin, ColorIndexArray):
+    pass
+class FogCoord(_SingleMixin, FogCoordArray):
+    pass
+class EdgeFlag(_SingleMixin, EdgeFlagArray):
+    pass
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

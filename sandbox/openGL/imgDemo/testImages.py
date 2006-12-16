@@ -10,16 +10,12 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-import os
-
-import numpy
-
 from renderBase import RenderSkinModelBase
-
-from TG.openGL.data.image import ImageObject
 
 from TG.openGL.raw import gl
 from TG.openGL.raw.gl import *
+
+from imgObject import ImageObject
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Constants / Variables / Etc. 

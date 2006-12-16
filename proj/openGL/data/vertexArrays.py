@@ -29,6 +29,8 @@ def blend(u0, u1, a):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class DataArrayBase(GLArrayBase):
+    __array_priority__ = 25.0
+
     gldtype = GLArrayDataType()
 
     def blend(self, other, alpha, copy=True):
