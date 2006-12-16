@@ -70,67 +70,78 @@ class VectorArray(DataArrayBase):
     default = asarray([0], 'f')
 
     gldtype = GLArrayDataType()
-    gldtype.addFormatGroups('hlifd', (1,2,3,4), default='3f')
+    gldtype.addFormatGroups('hlifd', (1,2,3,4))
+    gldtype.setDefaultFormat('3f')
     glinfo = gldtype.arrayInfoFor('vector')
 
 class VertexArray(DataArrayBase):
     default = asarray([0], 'f')
 
     gldtype = GLArrayDataType()
-    gldtype.addFormatGroups('hlifd', (2,3,4), default='3f')
+    gldtype.addFormatGroups('hlifd', (2,3,4))
+    gldtype.setDefaultFormat('3f')
     glinfo = gldtype.arrayInfoFor('vertex')
 
 class TextureCoordArray(DataArrayBase):
     default = asarray([0], 'f')
 
     gldtype = GLArrayDataType()
-    gldtype.addFormatGroups('hlifd', (1,2,3,4), default='3f')
+    gldtype.addFormatGroups('hlifd', (1,2,3,4))
+    gldtype.setDefaultFormat('3f')
     glinfo = gldtype.arrayInfoFor('texture_coord')
+TexCoordArray = TextureCoordArray
 
 class MultiTextureCoordArray(TextureCoordArray):
     gldtype = TextureCoordArray.gldtype.copy()
     glinfo = gldtype.arrayInfoFor('multi_texture_coord')
+MultiTexCoordArray = MultiTextureCoordArray
 
 class NormalArray(DataArrayBase):
     default = asarray([0, 0, 1], 'f')
 
     gldtype = GLArrayDataType()
-    gldtype.addFormatGroups('bhlifd', (3,), default='3f')
+    gldtype.addFormatGroups('bhlifd', (3,))
+    gldtype.setDefaultFormat('3f')
     glinfo = gldtype.arrayInfoFor('normal')
 
 class ColorArray(ColorFormatMixin, DataArrayBase):
     default = asarray([1., 1., 1., 1.], 'f')
 
     gldtype = GLArrayDataType()
-    gldtype.addFormatGroups('BHLIbhlifd', (3,4), default='4f')
+    gldtype.addFormatGroups('BHLIbhlifd', (3,4))
+    gldtype.setDefaultFormat('4f')
     glinfo = gldtype.arrayInfoFor('color')
 
 class SecondaryColorArray(ColorArray):
     default = asarray([1., 1., 1.], 'f')
 
     gldtype = GLArrayDataType()
-    gldtype.addFormatGroups('BHLIbhlifd', (3,), default='3f')
+    gldtype.addFormatGroups('BHLIbhlifd', (3,))
+    gldtype.setDefaultFormat('3f')
     glinfo = gldtype.arrayInfoFor('secondary_color')
 
 class ColorIndexArray(DataArrayBase):
     default = asarray([0], 'B')
 
     gldtype = GLArrayDataType()
-    gldtype.addFormatGroups('Bhlifd', (1,), default='1B')
+    gldtype.addFormatGroups('Bhlifd', (1,))
+    gldtype.setDefaultFormat('1B')
     glinfo = gldtype.arrayInfoFor('color_index')
 
 class FogCoordArray(DataArrayBase):
     default = asarray([0.], 'f')
 
     gldtype = GLArrayDataType()
-    gldtype.addFormatGroups('fd', (1,), default='1f')
+    gldtype.addFormatGroups('fd', (1,))
+    gldtype.setDefaultFormat('1f')
     glinfo = gldtype.arrayInfoFor('fog_coord')
 
 class EdgeFlagArray(DataArrayBase):
     default = asarray([1], 'B')
 
     gldtype = GLArrayDataType()
-    gldtype.addFormatGroups('B', (1,), default='1B')
+    gldtype.addFormatGroups('B', (1,))
+    gldtype.setDefaultFormat('1B')
     glinfo = gldtype.arrayInfoFor('edge_flag')
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

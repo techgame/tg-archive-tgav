@@ -23,14 +23,16 @@ class ElementArray(GLArrayBase):
     default = numpy.array([0], 'H')
 
     gldtype = GLElementArrayDataType()
-    gldtype.addFormatGroups('BHLI', (1,), default='1H')
+    gldtype.addFormatGroups('BHLI', (1,))
+    gldtype.setDefaultFormat('1H')
     glinfo = gldtype.arrayInfoFor('element_array')
 
 class ElementRange(GLArrayBase):
     default = numpy.array([0, 0], 'L')
 
     gldtype = GLElementRangeDataType()
-    gldtype.addFormatGroups('LI', (2,), default='2I')
+    gldtype.addFormatGroups('LI', (2,))
+    gldtype.setDefaultFormat('2I')
     glinfo = gldtype.arrayInfoFor('element_range')
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

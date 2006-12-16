@@ -198,7 +198,7 @@ class ColorFormatMixin(object):
 
             result = hexComponentRemap(result)
             colorResult[i] = result
-        return colorResult
+        return klass._normalized(colorResult)
 
     del hexFormatMap
     del hexComponentRemap

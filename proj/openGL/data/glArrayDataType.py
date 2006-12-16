@@ -21,7 +21,7 @@ class GLBaseArrayDataType(object):
     _glTypeIdMap = {}
     arrayOrder = 'C'
     
-    defaultFormat = None
+    dtypeDefault = None
     dtypeMap = None
 
     def __init__(self, other=None):
@@ -39,18 +39,18 @@ class GLBaseArrayDataType(object):
         return self.copy()
 
     def copyFrom(self, other):
-        self.defaultFormat = other.defaultFormat
+        self.dtypeDefault = other.dtypeDefault
 
         if self.dtypeMap is not other.dtypeMap:
             self.dtypeMap = other.dtypeMap.copy()
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def addFormatGroups(self, dtypesList, entrySizes=(), default=NotImplemented):
+    def addFormatGroups(self, dtypesList, entrySizes=()):
         dtypeMap = self.dtypeMap.copy()
         keyForDtype = self._getKeyForDtype
         for dtype in dtypesList:
-            dtype = self.dtypefmt(dtype, self.defaultFormat)
+            dtype = self.dtypefmt(dtype, self.dtypeDefault)
 
             for esize in entrySizes:
                 if esize is not None:
@@ -59,11 +59,13 @@ class GLBaseArrayDataType(object):
                 dtypeMap[keyForDtype(dt)] = dt
 
         self.dtypeMap = dtypeMap
-        if default is not NotImplemented:
-            self.setDefaultFormat(default)
 
     def setDefaultFormat(self, format):
-        self.defaultFormat = self.dtypefmt(format, self.defaultFormat)
+        self.dtypeDefault = self.dtypefmt(format, self.dtypeDefault)
+
+        baseKey = self._getKeyForDtype(self.dtypeDefault.base)
+        if baseKey not in self.dtypeMap:
+            self.dtypeMap[baseKey] = self.dtypeDefault
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -100,8 +102,7 @@ class GLBaseArrayDataType(object):
             if shape and sum(shape)>1:
                 assert len(shape) == 1, shape
                 return '%s%s' % (shape[0], dtype.base.char)
-            else: 
-                raise RuntimeError("Unexpected dtype: %r" % (dtype,))
+            else: return dtype.base.char
         else:
             keyForDtype = klass._getKeyForDtype
             return ';'.join(name+':'+keyForDtype(dtype.fields[name][0]) for name in dtype.names)
@@ -111,7 +112,7 @@ class GLBaseArrayDataType(object):
     dtypeFrom = staticmethod(numpy.dtype)
 
     @classmethod
-    def dtypefmt(klass, dtypefmt, defaultFormat):
+    def dtypefmt(klass, dtypefmt, dtypeDefault, shapeIn=()):
         if isinstance(dtypefmt, basestring):
             if (':' in dtypefmt):
                 names, formats = zip(*[[i.strip() for i in p.split(':', 1)] for p in dtypefmt.split(';') if p])
@@ -123,14 +124,19 @@ class GLBaseArrayDataType(object):
         elif isinstance(dtypefmt, (int, long)):
             return klass._glTypeIdToDtype[dtypefmt]
         elif dtypefmt is None:
-            return defaultFormat
+            if shapeIn and shapeIn[0] != -1:
+                return klass.dtypeFrom((dtypeDefault.base, shapeIn))
+            else:
+                return dtypeDefault
 
         return klass.dtypeFrom(dtypefmt)
 
-    def lookupDTypeFrom(self, dtypeIn, shapeIn=()):
+    def lookupDTypeFrom(self, dtypeIn, shapeIn=(), dtypeDefault=None):
         if isinstance(dtypeIn, tuple) and not shapeIn:
             dtypeIn, shapeIn = dtypeIn
-        dtypeFmt = self.dtypefmt(dtypeIn, self.defaultFormat)
+        if dtypeDefault is None:
+            dtypeDefault = self.dtypeDefault
+        dtypeFmt = self.dtypefmt(dtypeIn, dtypeDefault, shapeIn[-1:])
         key = self._getKeyForDtype(dtypeFmt, shapeIn[-1:])
         dtypeOut = self.dtypeMap[key]
         return dtypeOut, self.arrayOrder
@@ -140,7 +146,7 @@ class GLBaseArrayDataType(object):
         glTypeIdToDtype = {}
         keyForDtype = klass._getKeyForDtype
         for dtype, glTypeId in klass._glTypeIdMap.iteritems():
-            dtype = klass.dtypefmt(dtype, klass.defaultFormat)
+            dtype = klass.dtypefmt(dtype, klass.dtypeDefault)
             glTypeIdToDtype[glTypeId] = dtype
 
             if dtype.kind == 'V':
@@ -154,7 +160,7 @@ class GLArrayDataType(GLBaseArrayDataType):
     _glTypeIdMap = GLDataArrayInfo.glTypeIdMap
     arrayInfoFor = GLDataArrayInfo.arrayInfoFor
 
-    defaultFormat = None
+    dtypeDefault = None
     dtypeMap = {}
 GLArrayDataType._glTypeIdToDtypePopulate()
 
@@ -164,7 +170,7 @@ class GLInterleavedArrayDataType(GLBaseArrayDataType):
     _glTypeIdMap = GLInterleavedArrayInfo.glTypeIdMap
     arrayInfoFor = GLInterleavedArrayInfo.arrayInfoFor
 
-    defaultFormat = None
+    dtypeDefault = None
     dtypeMap = {}
 GLInterleavedArrayDataType._glTypeIdToDtypePopulate()
 
@@ -174,7 +180,7 @@ class GLElementArrayDataType(GLBaseArrayDataType):
     _glTypeIdMap = GLElementArrayInfo.glTypeIdMap
     arrayInfoFor = GLElementArrayInfo.arrayInfoFor
 
-    defaultFormat = None
+    dtypeDefault = None
     dtypeMap = {}
 GLElementArrayDataType._glTypeIdToDtypePopulate()
 
@@ -183,7 +189,7 @@ class GLElementRangeDataType(GLBaseArrayDataType):
     _glTypeIdMap = GLElementRangeInfo.glTypeIdMap
     arrayInfoFor = GLElementRangeInfo.arrayInfoFor
 
-    defaultFormat = None
+    dtypeDefault = None
     dtypeMap = {}
 GLElementRangeDataType._glTypeIdToDtypePopulate()
 

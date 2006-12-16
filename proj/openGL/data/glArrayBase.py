@@ -27,18 +27,18 @@ class GLArrayBase(ndarray, ObservableData):
     gldtype = GLBaseArrayDataType()
     glTypeId = None
 
-    _atleast_nd = staticmethod(atleast_2d)
-
     useDefault = object()
-    default = numpy.array(0, 'B')
+    default = numpy.array([0], 'B')
 
     def __new__(klass, data=None, dtype=None, shape=None, copy=False):
         klass._visitOnObservableNew(klass)
         if not shape:
-            if data is None or isinstance(data, (int, long)):
+            if isinstance(data, (int, long)):
                 copy = True
-                if data is not None: 
-                    shape = (data,) + klass.default.shape
+                shape = (data,) + klass.default.shape
+                data = klass.default
+            elif data is None:
+                copy = True
                 data = klass.default
             return klass.fromData(data, dtype, shape, copy)
         elif data is not None:
@@ -72,36 +72,30 @@ class GLArrayBase(ndarray, ObservableData):
             shape = shape[:-1]
         self = ndarray.__new__(klass, shape, dtype=dtype, order=order)
         self.gldtype.configFrom(self)
-        return klass._atleast_nd(self)
+        return self
 
     @classmethod
     def fromData(klass, data, dtype=None, shape=None, copy=False):
         if shape is not None:
             return klass.fromDataRaw(data, dtype, shape, copy)
 
-        elif isinstance(data, klass):
-            dtype2 = data.dtype
-            if dtype is None:
-                self = (data.copy() if copy else data)
-            elif copy or dtype2 != dtype:
-                self = data.astype(dtype)
-            else: self = data
+        if isinstance(data, ndarray):
+            return klass.fromDataArray(data, dtype, copy)
 
-            return klass._atleast_nd(self)
+        return klass.fromDataRaw(data, dtype, shape, copy)
 
-        elif isinstance(data, ndarray):
-            intype = klass.gldtype.dtypefmt(dtype, data.dtype)
+    @classmethod
+    def fromDataArray(klass, data, dtype, copy=False):
+        indtype = klass.gldtype.lookupDTypeFrom(dtype, data.shape, data.dtype)[0]
 
-            self = data.view(klass)
-            if intype != data.dtype:
-                self = self.astype(intype)
-            elif copy: 
-                self = self.copy()
+        if indtype.shape == data.shape[-1:]:
+            indtype = indtype.base
+        result = data.view(klass)
+        
+        if copy or indtype != result.dtype:
+            result = result.astype(indtype)
 
-            return klass._atleast_nd(self)
-
-        else:
-            return klass.fromDataRaw(data, dtype, shape, copy)
+        return klass._normalized(result)
 
     @classmethod
     def fromDataRaw(klass, data, dtype=None, shape=None, copy=False):
@@ -112,15 +106,15 @@ class GLArrayBase(ndarray, ObservableData):
 
         dataShape = numpy.shape(data)
         shape = shape or dataShape
+        dtype, order = klass.gldtype.lookupDTypeFrom(dtype, shape)
         if shape[-1:] == (-1,):
             shape = shape[:-1]
-        dtype, order = klass.gldtype.lookupDTypeFrom(dtype, shape)
-        if dtype.shape == shape[-1:]:
+        elif dtype.shape == shape[-1:]:
             shape = shape[:-1]
 
         self = ndarray.__new__(klass, shape, dtype, order=order)
         self.gldtype.configFrom(self)
-        self = klass._atleast_nd(self)
+        self = klass._normalized(self)
         self.view(ndarray)[..., :] = data
         return self
 
@@ -142,6 +136,10 @@ class GLArrayBase(ndarray, ObservableData):
         self._kvnotify_('del', 'index', i)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    @classmethod
+    def _normalized(klass, result):
+        return atleast_2d(result)
 
     @classmethod
     def _valueFrom(klass, value, edtype):

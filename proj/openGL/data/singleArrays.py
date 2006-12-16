@@ -17,26 +17,32 @@ from vertexArrays import *
 #~ Synonyms for (implied) single entry
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+@classmethod
+def _normalized(klass, result):
+    return atleast_1d(result.squeeze())
+
 class Vertex(VertexArray): 
-    _atleast_nd = staticmethod(atleast_1d)
+    _normalized = _normalized
 class Vector(VectorArray):
-    _atleast_nd = staticmethod(atleast_1d)
+    _normalized = _normalized
 class TextureCoord(TextureCoordArray):
-    _atleast_nd = staticmethod(atleast_1d)
+    _normalized = _normalized
+TexCoord = TextureCoord
 class MultiTextureCoord(MultiTextureCoordArray):
-    _atleast_nd = staticmethod(atleast_1d)
+    _normalized = _normalized
+MultiTexCoord = MultiTextureCoord
 class Normal(NormalArray):
-    _atleast_nd = staticmethod(atleast_1d)
+    _normalized = _normalized
 class Color(ColorArray):
-    _atleast_nd = staticmethod(atleast_1d)
+    _normalized = _normalized
 class SecondaryColor(SecondaryColorArray):
-    _atleast_nd = staticmethod(atleast_1d)
+    _normalized = _normalized
 class ColorIndex(ColorIndexArray):
-    _atleast_nd = staticmethod(atleast_1d)
+    _normalized = _normalized
 class FogCoord(FogCoordArray):
-    _atleast_nd = staticmethod(atleast_1d)
+    _normalized = _normalized
 class EdgeFlag(EdgeFlagArray):
-    _atleast_nd = staticmethod(atleast_1d)
+    _normalized = _normalized
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

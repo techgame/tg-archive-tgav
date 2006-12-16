@@ -13,7 +13,7 @@
 import unittest
 
 from numpy import allclose
-from TG.openGL.data import ColorArray
+from TG.openGL.data import ColorArray, Color
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -21,9 +21,17 @@ from TG.openGL.data import ColorArray
 
 class TestColorArrays(unittest.TestCase):
     def doCVTestFor(self, rawQuestion, rawAnswer):
+        question = Color(rawQuestion)
+        answer = rawAnswer
+        self.assertEqual(question.tolist(), answer)
+
         question = ColorArray(rawQuestion)
         answer = rawAnswer
         self.assertEqual(question.tolist(), [answer])
+
+        question = Color(rawAnswer)
+        answer = rawAnswer
+        self.assertEqual(question.tolist(), answer)
 
     def testCAfromHex1x1(self):
         self.doCVTestFor("#3", [0x33, 0x33, 0x33, 0xff])
