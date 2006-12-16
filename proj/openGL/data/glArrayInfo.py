@@ -100,6 +100,9 @@ class GLBaseArrayInfo(object):
     kind = None
     glKindId = None
 
+    glEnableArray = staticmethod(gl.glEnableClientState)
+    glDisableArray = staticmethod(gl.glDisableClientState)
+
     def __init__(self, kind):
         self.glArrayKindInfo[kind] = self
         self.kind = kind
