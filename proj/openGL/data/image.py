@@ -11,14 +11,10 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 from numpy import asarray, float32
-
 from PIL import Image
 
 from ..raw import gl, glext
-
 from .texture import Texture, TextureCoord, TextureCoordArray, VertexArray
-from .singleArrays import Vector
-from .interleavedArrays import InterleavedArray
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 

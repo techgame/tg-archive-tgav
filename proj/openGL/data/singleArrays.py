@@ -24,6 +24,15 @@ class _SingleMixin(object):
     def _normalized(klass, result):
         return atleast_1d(result.squeeze())
 
+    def get(self, at=Ellipsis):
+        return self[at]
+    def set(self, data, at=Ellipsis, fill=0):
+        l = min(len(data), self.shape[-1])
+        self[at,:l] = data[:l]
+        return self
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 class Vertex(_SingleMixin, VertexArray): 
     pass
 class Vector(_SingleMixin, VectorArray):

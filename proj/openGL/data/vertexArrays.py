@@ -30,6 +30,7 @@ def blend(u0, u1, a):
 
 class DataArrayBase(GLArrayBase):
     __array_priority__ = 25.0
+    _defaultPropKind = 'asarraytype'
 
     gldtype = GLArrayDataType()
 
@@ -39,31 +40,6 @@ class DataArrayBase(GLArrayBase):
             return r.astype(self.dtype)
 
         self[:] = r
-        return self
-
-    def get(self, at=Ellipsis):
-        return self[at]
-    def set(self, data, at=Ellipsis, fill=0):
-        l = shape(data)
-        if not l:
-            # fill with data
-            self[at] = data
-        else:
-            l = min(l[-1], self.shape[-1])
-            if isinstance(data, ndarray):
-                self[at,:l] = data[at, :l]
-            else:
-                self[at,:l] = data[:l]
-            self[at,l:] = fill
-        return self
-    def setPart(self, data, at=Ellipsis):
-        l = shape(data)
-        if not l:
-            # fill with data
-            self[at] = data
-        else:
-            l = min(l[-1], self.shape[-1])
-            self[at,:l] = data[:l]
         return self
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

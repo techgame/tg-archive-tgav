@@ -31,6 +31,11 @@ class GLArrayBase(ndarray, ObservableData):
     default = numpy.array([0], 'B')
 
     def __new__(klass, data=None, dtype=None, shape=None, copy=False):
+        if isinstance(data, klass):
+            # fastpath applying self class to self
+            if not copy and dtype is None and not shape:
+                return data
+
         klass._visitOnObservableNew(klass)
         if not shape:
             if isinstance(data, (int, long)):
@@ -46,7 +51,6 @@ class GLArrayBase(ndarray, ObservableData):
         else:
             return klass.fromShape(shape, dtype)
 
-    defaultPropKind = 'asType'
     def __init__(self, data=None, dtype=None, shape=None, copy=False):
         ObservableData.__init__(self)
 
@@ -124,17 +128,17 @@ class GLArrayBase(ndarray, ObservableData):
     def __setslice__(self, i, j, value):
         value = self._valueFrom(value, self.edtype)
         ndarray.__setslice__(self, i, j, value)
-        self._kvnotify_('set', 'slice', (i, j))
+        self._opnotify_('__setslice__')
     def __delslice__(self, i, j):
         ndarray.__delslice__(self, i, j)
-        self._kvnotify_('del', 'slice', (i, j))
+        self._opnotify_('__delslice__')
     def __setitem__(self, index, value):
         value = self._valueFrom(value, self.edtype)
         ndarray.__setitem__(self, index, value)
-        self._kvnotify_('set', 'index', index)
+        self._opnotify_('__setindex__')
     def __delitem__(self, i): 
         ndarray.__delitem__(self, i)
-        self._kvnotify_('del', 'index', i)
+        self._opnotify_('__delindex__')
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
