@@ -188,6 +188,11 @@ class Rect(ObservableData):
     def sizeAs(self, aspect):
         return self.toAspect(self.size.copy(), aspect)
     
+    def growSize(self, size):
+        self.size.set(max(self.size, size))
+    def shrinkSize(self, size):
+        self.size.set(min(self.size, size))
+
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def getAspect(self):
