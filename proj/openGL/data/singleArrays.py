@@ -10,7 +10,7 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from numpy import atleast_1d
+from numpy import atleast_1d, shape
 from vertexArrays import *
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -27,7 +27,13 @@ class _SingleMixin(object):
     def get(self, at=Ellipsis):
         return self[at]
     def set(self, data, at=Ellipsis, fill=0):
-        l = min(len(data), self.shape[-1])
+        l = shape(data)
+        if not l:
+            # data is a single object, so broadcast set it
+            self[at] = data
+            return self
+
+        l = min(l[-1], self.shape[-1])
         self[at,:l] = data[:l]
         return self
 

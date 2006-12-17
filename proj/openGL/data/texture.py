@@ -223,7 +223,7 @@ class TextureImageBasic(ObservableData):
             byteSize += (alignment - byteSize) % alignment
 
         border = self.border and 2 or 0
-        for e in self.getSize():
+        for e in self.size:
             byteSize *= e + border
         return byteSize
 
@@ -335,16 +335,16 @@ class TextureImageBasic(ObservableData):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    pos = TextureCoord.property([0, 0, 0], dtype='3l')
-    size = TextureCoord.property([0, 0, 0], dtype='3l')
+    pos = TextureCoord.property([0, 0, 0], dtype='3l', propKind='aschained')
+    size = TextureCoord.property([0, 0, 0], dtype='3l', propKind='aschained')
 
     def getPosSize(self):
         return (self.pos, self.size)
     def setPosSize(self, pos, size=None):
         if size is None:
             pos, size = pos
-        self.pos = pos
-        self.size = size
+        self.pos.set(pos)
+        self.size.set(size)
     posSize = property(getPosSize, setPosSize)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -624,7 +624,7 @@ class Texture(ObservableData):
     #~ Size & Dimensios
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    size = TextureCoord.property([0, 0, 0], dtype='3l')
+    size = TextureCoord.property([0, 0, 0], dtype='3l', propKind='aschained')
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     #~ Texture Data
@@ -674,7 +674,7 @@ class Texture(ObservableData):
             gl.glTexImage1D(self.target, level, self.format, 
                     size[0], data.border, 
                     data.format, data.dataType, data.ptr)
-            self.size = size
+            self.size.set(size)
         finally:
             data.deselect()
         return data
@@ -686,7 +686,7 @@ class Texture(ObservableData):
                     size[0], size[1], data.border, 
                     data.format, data.dataType, data.ptr)
 
-            self.size = size
+            self.size.set(size)
         finally:
             data.deselect()
         return data
@@ -697,7 +697,7 @@ class Texture(ObservableData):
             gl.glTexImage3D(self.target, level, self.format, 
                     size[0], size[1], size[2], data.border, 
                     data.format, data.dataType, data.ptr)
-            self.size = size
+            self.size.set(size)
         finally:
             data.deselect()
         return data
@@ -753,7 +753,7 @@ class Texture(ObservableData):
             gl.glCompressedTexImage1D(self.target, level, self.format, 
                     size[0], data.border, 
                     data.format, data.dataType, data.ptr)
-            self.size = size
+            self.size.set(size)
         finally:
             data.deselect()
         return data
@@ -764,7 +764,7 @@ class Texture(ObservableData):
             gl.glCompressedTexImage2D(self.target, level, self.format, 
                     size[0], size[1], data.border, 
                     data.format, data.dataType, data.ptr)
-            self.size = size
+            self.size.set(size)
         finally:
             data.deselect()
         return data
@@ -775,7 +775,7 @@ class Texture(ObservableData):
             gl.glCompressedTexImage3D(self.target, level, self.format, 
                     size[0], size[1], size[2], data.border, 
                     data.format, data.dataType, data.ptr)
-            self.size = size
+            self.size.set(size)
         finally:
             data.deselect()
         return data
@@ -856,19 +856,18 @@ class Texture(ObservableData):
         glext.GL_TEXTURE_RECTANGLE_ARB: False,
         }
 
-    def texCoordsFor(self, texCoords, _rstNormalizeTargets=_rstNormalizeTargets):
+    def texCoordsFor(self, texCoords):
         texSize = self.size
         ndim = (texSize == 0).argmax()
 
-        if _rstNormalizeTargets.get(self.target, True):
+        if self._rstNormalizeTargets.get(self.target, True):
             return (texCoords[..., :ndim]/texSize[:ndim])
         else:
             return texCoords[..., :ndim]
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    _powersOfTwo = [1<<s for s in xrange(31)]
-    _textureTargetRequiresPowersOfTwo = {
+    _targetPowersOfTwo = {
         gl.GL_TEXTURE_1D: True,
         gl.GL_TEXTURE_2D: True,
         gl.GL_TEXTURE_3D: True,
@@ -876,17 +875,18 @@ class Texture(ObservableData):
 
         glext.GL_TEXTURE_RECTANGLE_ARB: False,
         }
-    _powersOfTwo = [1<<s for s in xrange(31)]
 
+    _powersOfTwo = [1<<s for s in xrange(31)]
     @staticmethod
     def idxNextPowerOf2(v, powersOfTwo=_powersOfTwo):
         return bisect_left(powersOfTwo, v)
     @staticmethod
     def nextPowerOf2(v, powersOfTwo=_powersOfTwo):
         return powersOfTwo[bisect_left(powersOfTwo, v)]
+    del _powersOfTwo
 
     def validSizeForTarget(self, size):
-        if self._textureTargetRequiresPowersOfTwo.get(self.target, False):
+        if self._targetPowersOfTwo.get(self.target, False):
             size = [self.nextPowerOf2(s) for s in size]
 
         rsize = self.size.copy()

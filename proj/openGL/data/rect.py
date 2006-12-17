@@ -55,7 +55,6 @@ class Rect(ObservableData):
     pos = Vector.property([0, 0, 0], propKind='aschained')
     size = Vector.property([1, 1, 0], propKind='aschained')
 
-    #_defaultPropKind = 'astype'
     def __init__(self, rect=None, dtype=None):
         ObservableData.__init__(self)
         if rect is None:

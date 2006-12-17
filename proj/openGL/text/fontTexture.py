@@ -12,7 +12,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 from ..raw import gl, glext
-from ..data.texture import Texture
+from ..data.texture import Texture, TextureCoordArray
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -31,6 +31,8 @@ class FontTextureBase(Texture):
     dataFormat = gl.GL_ALPHA
     dataType = gl.GL_UNSIGNED_BYTE
 
+    texCoordScale = TextureCoordArray([[0., 1.], [1., 1.], [1., 0.], [0., 0.]], '2f')
+
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def createMosaic(self, mosaicSize):
@@ -48,35 +50,18 @@ class FontTextureBase(Texture):
 
         texData.texCData(glyph.bitmap.buffer, dict(rowLength=glyph.bitmap.pitch))
         texData.setSubImageOn(self, pos=pos, size=size)
-        return self.texCoordsFrom(pos, size)
 
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    def texCoordsFrom(self, pos, size, totalSize):
-        raise NotImplementedError('Subclass Responsibility: %r' % (self,))
+        texCoords = texData.pos[:2] + (texData.size[:2]*self.texCoordScale)
+        return self.texCoordsFor(texCoords)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class FontTextureRect(FontTextureBase):
-    texParams = FontTextureBase.texParams + [
-                    ('target', glext.GL_TEXTURE_RECTANGLE_ARB), ]
-
-    def texCoordsFrom(self, (x0, y0), (w, h)):
-        x1 = x0 + w; y1 = y0 + h
-        return [(x0, y1), (x1, y1), (x1, y0), (x0, y0)]
-
-FontTexture = FontTextureRect
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    texParams = FontTextureBase.texParams + [('target', glext.GL_TEXTURE_RECTANGLE_ARB)]
 
 class FontTexture2D(FontTextureBase):
-    texParams = FontTextureBase.texParams + [
-                    ('target', gl.GL_TEXTURE_2D), ]
+    texParams = FontTextureBase.texParams + [('target', gl.GL_TEXTURE_2D)]
 
-    def texCoordsFrom(self, (x0, y0), (w, h)):
-        (tw, th) = self.size
-
-        x1 = (x0 + w)/tw; x0 /= tw
-        y1 = (y0 + h)/th; y0 /= th
-        return [(x0, y1), (x1, y1), (x1, y0), (x0, y0)]
+FontTexture = FontTextureRect
+#FontTexture = FontTexture2D
 
