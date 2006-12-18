@@ -13,7 +13,14 @@
 from font import Font
 from textObject import TextObject
 
+import freetypeFontLoader
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+def fromFilename(filename, size=None, **kw):
+    loader = freetypeFontLoader.FreetypeFontLoader(filename, size, **kw)
+    return loader.compile(Font())
+Font.fromFilename = staticmethod(fromFilename)
 

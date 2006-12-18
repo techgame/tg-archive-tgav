@@ -37,11 +37,14 @@ class FontTextureBase(Texture):
 
     def createMosaic(self, mosaicSize):
         self.select()
-        size = self.validSizeForTarget(mosaicSize)
+        size = self.validSizeForTarget(mosaicSize+(0,))
         data = self.blankImage2d(size=size, format=self.dataFormat, dataType=self.dataType)
         data.newPixelStore(alignment=1, rowLength=0)
         self._mosaicData = data
         return data
+
+    def getMaxMosaicSize(self): 
+        return self.getMaxTextureSize()
 
     def renderGlyph(self, glyph, pos, size):
         texData = self._mosaicData

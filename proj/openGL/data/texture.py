@@ -11,6 +11,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 from bisect import bisect_left
+from numpy import asarray
 from ctypes import cast, byref, c_void_p
 
 from ..raw import gl, glext
@@ -857,10 +858,14 @@ class Texture(ObservableData):
         }
 
     def texCoordsFor(self, texCoords):
-        texSize = self.size
+        return self.texCoordsForData(texCoords, self.size, self.target)
+
+    @classmethod
+    def texCoordsForData(klass, texCoords, texSize, target):
+        texSize = asarray(texSize)
         ndim = (texSize == 0).argmax()
 
-        if self._rstNormalizeTargets.get(self.target, True):
+        if klass._rstNormalizeTargets.get(target, True):
             return (texCoords[..., :ndim]/texSize[:ndim])
         else:
             return texCoords[..., :ndim]
@@ -886,10 +891,11 @@ class Texture(ObservableData):
     del _powersOfTwo
 
     def validSizeForTarget(self, size):
-        if self._targetPowersOfTwo.get(self.target, False):
-            size = [self.nextPowerOf2(s) for s in size]
+        return self.validSizeForTargetData(size, self.target)
+    @classmethod
+    def validSizeForTargetData(klass, size, target):
+        if klass._targetPowersOfTwo.get(target, False):
+            size = [klass.nextPowerOf2(s) for s in size]
 
-        rsize = self.size.copy()
-        rsize.set(size)
-        return rsize
+        return TextureCoord(size, copy=True)
 

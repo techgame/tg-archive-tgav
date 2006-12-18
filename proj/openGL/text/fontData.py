@@ -31,32 +31,40 @@ class FontAdvanceArray(VertexArray):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class FontTextData(object):
-    font = None
-    GeometryArray = FontGeometryArray
-    AdvanceArray = FontAdvanceArray
+    FontGeometryArray = FontGeometryArray
+    FontAdvanceArray = FontAdvanceArray
 
-    def setupFont(self, font):
-        self.font = font
-        if not isinstance(self, type):
+    def __init__(self, text, font=None):
+        if font is not None:
+            self.setFont(font)
+        self.text = text
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    _font = None
+    def getFont(self):
+        return self._font
+    def setFont(self, font):
+        if isinstance(self, type):
+            self._font = font
+        else:
+            self._font = font
             self.recompile()
-    setupClassFont = classmethod(setupFont)
+    font = property(getFont, setFont)
+
+    setClassFont = classmethod(setFont)
 
     @classmethod
     def factoryUpdateFor(klass, font):
         if font is klass.font:
-            klass.setupClassFont(font)
+            klass.setClassFont(font)
             return klass
         else:
             subklass = type(klass)(klass.__name__+'_T_', (klass,), {})
-            subklass.setupClassFont(font)
+            subklass.setClassFont(font)
             return subklass
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    def __init__(self, text, font=None):
-        if font is not None:
-            self.setupFont(font)
-        self.text = text
 
     _text = ""
     def getText(self):
@@ -68,47 +76,47 @@ class FontTextData(object):
     text = property(getText, setText)
 
     def __nonzero__(self):
-        return bool(self.text)
-
-    def getTexture(self):
-        return self.font.texture
-    texture = property(getTexture)
+        return bool(self._text)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def recompile(self):
-        if self.font is not None:
-            self._xidx = self.font.translate(self.text or '')
-        else:
-            self._xidx = None
-        self._advance = None
-        self._lineAdvance = None
+        if self._font is not None:
+            self._xidx = self._font.translate(self._text or '')
         self._geometry = None
+        self._advance = None
         self._offset = None
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    _lineAdvance = None
-    def getLineAdvance(self):
-        r = self._lineAdvance
-        if r is None:
-            r = self.font.lineAdvance
-            self._lineAdvance = r
-        return r
-    lineAdvance = property(getLineAdvance)
+    def getTexture(self):
+        return self._font.texture
+    texture = property(getTexture)
 
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    _geometry = None
+    def getGeometry(self):
+        r = self._geometry
+        if r is None:
+            r = self._font.geometry[self._xidx]
+            self._geometry = r
+        return r
+    geometry = property(getGeometry)
+
+    def getLineAdvance(self):
+        return self._font.lineAdvance
+    lineAdvance = property(getLineAdvance)
 
     _advance = None
     def getAdvance(self):
         r = self._advance
         if r is None:
-            r = self.font.advance[[0]+self._xidx]
-            k = self.font.kernIndexes(self._xidx)
+            r = self._font.advance[[0]+self._xidx]
+            k = self._font.kernIndexes(self._xidx)
             if k is not None:
                 r[1:-1] += k
             self._advance = r
         return r
+    advance = property(getAdvance)
 
     _offset = None
     def getOffset(self):
@@ -116,17 +124,6 @@ class FontTextData(object):
         if r is None:
             r = self.getAdvance().cumsum(0)
             self._offset = r
-
         return r
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    _geometry = None
-    def getGeometry(self):
-        r = self._geometry
-        if r is None:
-            r = self.font.geometry[self._xidx]
-            self._geometry = r
-        return r
-    geometry = property(getGeometry)
+    offset = property(getOffset)
 
