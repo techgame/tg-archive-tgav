@@ -338,8 +338,15 @@ class TextureImageBasic(ObservableData):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    pos = TextureCoord.property([0, 0, 0], dtype='3l', propKind='aschained')
-    size = TextureCoord.property([0, 0, 0], dtype='3l', propKind='aschained')
+    _pos = TextureCoord.property([0, 0, 0], dtype='3l')
+    def getPos(self): return self._pos
+    def setPos(self, pos): self._pos.set(pos)
+    pos = property(getPos, setPos)
+
+    _size = TextureCoord.property([0, 0, 0], dtype='3l')
+    def getSize(self): return self._size
+    def setSize(self, size): self._size.set(size)
+    size = property(getSize, setSize)
 
     def getPosSize(self):
         return (self.pos, self.size)
@@ -627,7 +634,10 @@ class Texture(ObservableData):
     #~ Size & Dimensios
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    size = TextureCoord.property([0, 0, 0], dtype='3l', propKind='aschained')
+    _size = TextureCoord.property([0, 0, 0], dtype='3l')
+    def getSize(self): return self._size
+    def setSize(self, size): self._size.set(size)
+    size = property(getSize, setSize)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     #~ Texture Data

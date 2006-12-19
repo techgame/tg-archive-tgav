@@ -52,8 +52,8 @@ def toAspect(size, aspect, grow=None):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class Rect(ObservableData):
-    pos = Vector.property([0, 0, 0], propKind='aschained')
-    size = Vector.property([1, 1, 0], propKind='aschained')
+    pos = Vector.property([0, 0, 0], propKind='aschainedarray')
+    size = Vector.property([0, 0, 0], propKind='aschainedarray')
 
     def __init__(self, rect=None, dtype=None):
         ObservableData.__init__(self)
@@ -230,6 +230,13 @@ class Rect(ObservableData):
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    def posAt(self, align):
+        return self.pos + align*self.size
+    at = posAt
+    def setPosAt(self, align, value):
+        self.pos.set(value - align*self.size)
+        return self.pos
+
     def getLeft(self): return self.pos[0]
     def setLeft(self, left): self.pos[0] = left
     left = property(getLeft, setLeft)
@@ -259,12 +266,12 @@ class Rect(ObservableData):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class Recti(Rect):
-    pos = Vector.property([0, 0, 0], dtype='i', propKind='aschained')
-    size = Vector.property([1, 1, 0], dtype='i', propKind='aschained')
+    pos = Vector.property([0, 0, 0], dtype='i', propKind='aschainedarray')
+    size = Vector.property([0, 0, 0], dtype='i', propKind='aschainedarray')
 
 class Rectf(Rect):
-    pos = Vector.property([0, 0, 0], dtype='f', propKind='aschained')
-    size = Vector.property([1, 1, 0], dtype='f', propKind='aschained')
+    pos = Vector.property([0, 0, 0], dtype='f', propKind='aschainedarray')
+    size = Vector.property([0, 0, 0], dtype='f', propKind='aschainedarray')
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

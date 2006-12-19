@@ -75,8 +75,11 @@ class ImageTextureBase(Texture):
         elif format:
             self.format = format
 
+        self.select()
         size = self.validSizeForTarget(image.size+(0,))
         data = self.data2d(size=size, format=dataFormat, dataType=dataType)
+        assert data.pos.max() == 0, data.pos
+        assert (data.size == size).all(), data.size
         data.setImageOn(self)
 
         data.texString(image.tostring(), dict(alignment=1,))

@@ -28,6 +28,19 @@ def blend(u0, u1, a):
 #~ Data Arrays
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+class AtIndexProperty(object):
+    def __init__(self, idx):
+        self.idx = idx
+    def __get__(self, obj, klass):
+        if obj is None:
+            return self
+        else:
+            return obj[..., self.idx]
+    def __set__(self, obj, value):
+        obj[..., self.idx] = value
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 class DataArrayBase(GLArrayBase):
     __array_priority__ = 25.0
     _defaultPropKind = 'asarraytype'
@@ -52,6 +65,10 @@ class VectorArray(DataArrayBase):
     gldtype.setDefaultFormat('3f')
     glinfo = gldtype.arrayInfoFor('vector')
 
+    x = AtIndexProperty(0)
+    y = AtIndexProperty(1)
+    z = AtIndexProperty(2)
+
 class VertexArray(DataArrayBase):
     default = asarray([0], 'f')
 
@@ -60,6 +77,10 @@ class VertexArray(DataArrayBase):
     gldtype.setDefaultFormat('3f')
     glinfo = gldtype.arrayInfoFor('vertex')
 
+    x = AtIndexProperty(0)
+    y = AtIndexProperty(1)
+    z = AtIndexProperty(2)
+
 class TextureCoordArray(DataArrayBase):
     default = asarray([0], 'f')
 
@@ -67,6 +88,10 @@ class TextureCoordArray(DataArrayBase):
     gldtype.addFormatGroups('hlifd', (1,2,3,4))
     gldtype.setDefaultFormat('3f')
     glinfo = gldtype.arrayInfoFor('texture_coord')
+
+    r = AtIndexProperty(0)
+    s = AtIndexProperty(1)
+    t = AtIndexProperty(2)
 TexCoordArray = TextureCoordArray
 
 class MultiTextureCoordArray(TextureCoordArray):
@@ -90,6 +115,11 @@ class ColorArray(ColorFormatMixin, DataArrayBase):
     gldtype.setDefaultFormat('4f')
     glinfo = gldtype.arrayInfoFor('color')
 
+    r = AtIndexProperty(0)
+    g = AtIndexProperty(1)
+    b = AtIndexProperty(2)
+    a = AtIndexProperty(3)
+
 class SecondaryColorArray(ColorArray):
     default = asarray([1., 1., 1.], 'f')
 
@@ -97,6 +127,10 @@ class SecondaryColorArray(ColorArray):
     gldtype.addFormatGroups('BHLIbhlifd', (3,))
     gldtype.setDefaultFormat('3f')
     glinfo = gldtype.arrayInfoFor('secondary_color')
+
+    r = AtIndexProperty(0)
+    g = AtIndexProperty(1)
+    b = AtIndexProperty(2)
 
 class ColorIndexArray(DataArrayBase):
     default = asarray([0], 'B')

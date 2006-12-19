@@ -11,17 +11,22 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 from weakref import proxy as wrproxy
-from TG.observing import ObservableObject, ObservablePropertyFactoryMixin
-from TG.observing.observable import ObservableProperty, AsFactoryPropAccessFctr
+from TG.observing import ObservableObject
+from TG.observing.observableProperty import ObservableProperty, ObservablePropertyFactoryMixin, AsFactoryPropAccessFctr
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class AsChainedFactoryPropAccessFctr(AsFactoryPropAccessFctr):
-    def fdel(self):
-        self.fset([])
+class AsArrayTypePropAccessFctr(AsFactoryPropAccessFctr):
+    @classmethod
+    def defaultAsValue(klass):
+        if klass.factory is not None:
+            return klass.factory(klass.default, copy=True)
+        else: 
+            return klass.default.copy()
 
+class AsChainedFactoryPropAccessFctr(AsArrayTypePropAccessFctr):
     def fset(self, value):
         if isinstance(value, (list, tuple, basestring)):
             if self.fget().set(value):
@@ -36,12 +41,13 @@ class AsChainedFactoryPropAccessFctr(AsFactoryPropAccessFctr):
         newValue._pub_.addChain(self.obj, self.name)
         return newValue
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 class ObservableDataProperty(ObservableProperty):
     PropAccessFactoryMap = ObservableProperty.PropAccessFactoryMap.copy()
     PropAccessFactoryMap.update(
-        asarraytype=AsFactoryPropAccessFctr,
-
-        aschained=AsChainedFactoryPropAccessFctr,
+        asarraytype=AsArrayTypePropAccessFctr,
+        aschainedarray=AsChainedFactoryPropAccessFctr,
         )
 
 class ObservableData(ObservableObject, ObservablePropertyFactoryMixin):
