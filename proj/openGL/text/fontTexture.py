@@ -66,5 +66,4 @@ class FontTexture2D(FontTextureBase):
     texParams = FontTextureBase.texParams + [('target', gl.GL_TEXTURE_2D)]
 
 FontTexture = FontTextureRect
-#FontTexture = FontTexture2D
 

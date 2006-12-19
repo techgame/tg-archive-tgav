@@ -48,7 +48,9 @@ class FreetypeFontLoader(object):
     def setFace(self, face):
         if isinstance(face, basestring):
             face = FreetypeFace(face)
-        self._face = face
+        if face is not self._face:
+            self._face = face
+            del self.font
     face = property(getFace, setFace)
 
     def getSize(self):
@@ -57,14 +59,32 @@ class FreetypeFontLoader(object):
         face = self.face
         if size is not None:
             face.setSize(size, dpi)
+            del self.font
     size = property(getSize, setSize)
 
     _charset = None
     def getCharset(self):
         return self._charset
     def setCharset(self, charset):
+        if charset == self._charset:
+            return
         self._charset = charset
+        del self.font
+        
     charset = property(getCharset, setCharset)
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    _font = None
+    def getFont(self):
+        if self._font is None:
+            self.setFont(self.compile())
+        return self._font
+    def setFont(self, font):
+        self._font = font
+    def delFont(self):
+        self._font = None
+    font = property(getFont, setFont, delFont)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     #~ Font compilation
@@ -78,7 +98,7 @@ class FreetypeFontLoader(object):
     @classmethod
     def compileFontOnto(klass, fontResult, face, charset):
         if fontResult is None:
-            fontResult = self.FontFactory()
+            fontResult = klass.FontFactory()
 
         fontResult._onLoaderStart()
         count, gidxMap = klass._compileCharMap(fontResult, face, charset)

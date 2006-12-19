@@ -224,8 +224,10 @@ class TextureImageBasic(ObservableData):
             byteSize += (alignment - byteSize) % alignment
 
         border = self.border and 2 or 0
+
         for e in self.size:
-            byteSize *= e + border
+            if e > 1:
+                byteSize *= e + border
         return byteSize
 
     _dataType = None
