@@ -16,13 +16,15 @@ import time
 
 from renderBase import RenderSkinModelBase
 
-from TG.openGL.text import Font, TextObject
+from TG.openGL.text import Font
 
 from TG.openGL import glBlock, glMatrix
 
 from TG.openGL.raw import gl, glu, glext
 from TG.openGL.raw.gl import *
 from TG.openGL.raw.glu import *
+
+from textObject import TextObject
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Constants / Variables / Etc. 

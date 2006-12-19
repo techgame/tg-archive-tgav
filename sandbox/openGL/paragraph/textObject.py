@@ -12,10 +12,9 @@
 
 from TG.observing import ObservableObject
 
-from ..data import Vector, Rectf
-from . import textLayout
-from . import textRenderer
-from . import textWrapping
+from TG.openGL.data import Vector, Rectf
+from TG.openGL.text import textLayout, textWrapping
+import textRenderer
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
