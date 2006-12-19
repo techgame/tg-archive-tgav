@@ -75,7 +75,7 @@ class ImageTextureBase(Texture):
         elif format:
             self.format = format
 
-        size = self.validSizeForTarget(image.size)
+        size = self.validSizeForTarget(image.size+(0,))
         data = self.data2d(size=size, format=dataFormat, dataType=dataType)
         data.setImageOn(self)
 

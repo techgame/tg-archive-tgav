@@ -18,14 +18,14 @@ from . import textWrapping
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class TextLayout(object):
-    def layout(self, textObj, textData):
+    def layout(self, textObj, textData, wrapper):
         roundValues = textObj.roundValues
         crop = textObj.crop
         align = textObj.align[textObj.wrapAxis]
         oneMinusAlign = 1-align
 
-        pos = textObj.pos.copy()
-        size = textObj.size.copy()
+        pos = textObj.box.pos.copy()
+        size = textObj.box.size.copy()
 
         linePos = size.copy()
         linePos[0] *= align
@@ -38,7 +38,7 @@ class TextLayout(object):
         geov = geo.v
 
         # ask for our slices
-        wrapSlices = textObj.wrapper.wrapSlices(textObj, textData)
+        wrapSlices = wrapper.wrapSlices(textObj, textData)
 
         # offset by lines (usually 1 or 0)
         if textObj.line:

@@ -66,7 +66,7 @@ class TextWrapper(RETextWrapper):
 
     def wrapSlices(self, textObj, textData):
         wrapAxis = textObj.wrapAxis
-        wrapSize = textObj.size[wrapAxis]
+        wrapSize = textObj.box.size[wrapAxis]
         if wrapSize <= 0: return
 
         text = textData.text

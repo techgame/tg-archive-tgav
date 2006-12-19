@@ -19,8 +19,11 @@ import freetypeFontLoader
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def fromFilename(filename, size=None, **kw):
-    loader = freetypeFontLoader.FreetypeFontLoader(filename, size, **kw)
+def fromFace(face, size=None, **kw):
+    loader = freetypeFontLoader.FreetypeFontLoader(face, size, **kw)
     return loader.compile(Font())
+fromFilename = fromFace
+
+Font.fromFace = staticmethod(fromFace)
 Font.fromFilename = staticmethod(fromFilename)
 

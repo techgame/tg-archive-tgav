@@ -39,7 +39,7 @@ class Font(object):
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def textData(self, text=''):
-        return self.textData(text)
+        raise RuntimeError("Font has not been loaded")
 
     def translate(self, text):
         return map(self.charMap.get, text)
