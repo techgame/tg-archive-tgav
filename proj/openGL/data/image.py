@@ -97,6 +97,14 @@ class ImageTextureBase(Texture):
         result = self.texCoordsFor(result)
         return result
 
+    def texCoordsForRect(self, rect, components=2, key='flip'):
+        return self.texCoordsForPosSize(rect.pos, rect.size, components, key)
+    def texCoordsForPosSize(self, pos, size, components=2, key='flip'):
+        scale = self.texCoordScale[components, key]
+        result = size[:components]*scale + pos[:components]
+        result = self.texCoordsFor(result)
+        return result
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class ImageTexture2d(ImageTextureBase):
