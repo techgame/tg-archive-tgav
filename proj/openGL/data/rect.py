@@ -55,7 +55,7 @@ class Rect(ObservableData):
     pos = Vector.property([0, 0, 0], propKind='aschainedarray')
     size = Vector.property([0, 0, 0], propKind='aschainedarray')
 
-    def __init__(self, rect=None, dtype=None):
+    def __init__(self, rect=None, dtype=None, copy=True):
         ObservableData.__init__(self)
         if rect is None:
             rect = self
@@ -78,19 +78,6 @@ class Rect(ObservableData):
             return '%s(%s, %s)' % (name, pos, size)
         else: 
             return '%s(%s)' % (name, size)
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    #@pos.fset
-    #def _onSetPos(self, value, _paSet_):
-    #    print 'onSetPos:', repr(value), _paSet_
-    #    _paSet_(value)
-    #    #_paSet_.fget().set(value)
-    #@size.fset
-    #def _onSetSize(self, value, _paSet_):
-    #    print 'onSetSize:', repr(value), _paSet_
-    #    _paSet_(value)
-    #    #_paSet_.fget().set(value)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -191,6 +178,25 @@ class Rect(ObservableData):
         self.size.set(max(self.size, size))
     def shrinkSize(self, size):
         self.size.set(min(self.size, size))
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    def union(self, rectItems):
+        if isinstance(rectItems, Rect):
+            rectItems = [rectItems]
+        else: rectItems = list(rectItems)
+
+        if rectItems:
+            pos = numpy.vstack(r.pos for r in rectItems).min(0)
+            corner = numpy.vstack(r.corner for r in rectItems).max(0)
+            self.setCorners(pos, corner)
+        return self
+
+    @classmethod
+    def fromUnion(klass, rectItems):
+        self = klass.fromSize(0)
+        self.union(rectItems)
+        return self
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
