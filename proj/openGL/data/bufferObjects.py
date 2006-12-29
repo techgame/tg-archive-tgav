@@ -133,6 +133,7 @@ class BufferBase(object):
         else: usage = self.usage
         self.glBufferData(self.target, data.nbytes, data.ctypes, usage)
         self.nbytes = data.nbytes
+        return (0, self.nbytes)
 
     def allocate(self, count, usage=None, dtype=None):
         if usage is not None:
@@ -143,10 +144,12 @@ class BufferBase(object):
         nbytes = count*dtype().itemsize
         self.glBufferData(self.target, nbytes, None, usage)
         self.nbytes = nbytes
+        return (0, nbytes)
 
     glBufferSubData = staticmethod(gl.glBufferSubData)
     def sendDataAt(self, data, offset=0):
         self.glBufferSubData(self.target, offset, data.nbytes, data.ctypes)
+        return (offset, offset + data.nbytes)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
