@@ -17,7 +17,6 @@ import time
 from renderBase import RenderSkinModelBase
 
 from TG.openGL import glBlock, glMatrix
-
 from TG.openGL.raw import gl, glu, glext
 from TG.openGL.raw.gl import *
 from TG.openGL.raw.glu import *
@@ -39,6 +38,7 @@ class RenderSkinModel(RenderSkinModelBase):
         (l, b), (w, h) = (border, border), (w-2*border, h-2*border)
 
         glViewport (l, b, w, h)
+        glClear(self.clearMask)
 
         glMatrixMode (GL_PROJECTION)
         glLoadIdentity ()
@@ -47,14 +47,10 @@ class RenderSkinModel(RenderSkinModelBase):
         glMatrixMode (GL_MODELVIEW)
         glLoadIdentity ()
 
-        glEnable(GL_TEXTURE_2D)
-        glEnable(glext.GL_TEXTURE_RECTANGLE_ARB)
-        glDisable(GL_TEXTURE_2D)
-
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def renderContent(self, glCanvas, renderStart):
-        glClear(self.clearMask)
+        pass
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Main 

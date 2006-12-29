@@ -57,11 +57,16 @@ accessMap = {
     gl.GL_READ_WRITE: gl.GL_READ_WRITE,
     'rw': gl.GL_READ_WRITE,
     'readWrite': gl.GL_READ_WRITE,
+    'readwrite': gl.GL_READ_WRITE,
+    'read_write': gl.GL_READ_WRITE,
     }
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+class GLBufferException(Exception):
+    pass
 
 class BufferBase(object):
     _as_parameter_ = None # GLenum returned from glGenBuffers
@@ -74,18 +79,25 @@ class BufferBase(object):
         self.create(usage)
         self.set(kw)
 
-    def create(self, usage=None):
-        if not self._as_parameter_ is None:
-            raise Exception("Create has already been called for this instance")
-
-        self.setUsage(usage)
+    def isGLBuffer(self):
+        return True
 
     def set(self, val=None, **kwattr):
         for n,v in (val or kwattr).iteritems():
             setattr(self, n, v)
 
+    def create(self, usage=None):
+        if not self._as_parameter_ is None:
+            raise GLBufferException("Create has already been called for this instance")
+
+        self.setUsage(usage)
+        self.bind()
+
+    def release(self):
+        self.unbind()
+        self._delId()
+
     usageByName = bufferUsageMap
-    getUsageByName = usageByName.get
     _usage = usageByName[None]
     def getUsage(self):
         return self._usage
@@ -93,12 +105,7 @@ class BufferBase(object):
         self._usage = self.usageByName[usage or self.usage]
 
         self._genId()
-        self.bind()
     usage = property(getUsage, setUsage)
-
-    def release(self):
-        self.unbind()
-        self._delId()
 
     glGenBuffers = staticmethod(gl.glGenBuffers)
     def _genId(self):
@@ -116,21 +123,29 @@ class BufferBase(object):
     glBindBuffer = staticmethod(gl.glBindBuffer)
     def bind(self):
         self.glBindBuffer(self.target, self)
-    select = bind
     def unbind(self):
         self.glBindBuffer(self.target, 0)
-    deselect = unbind
 
     glBufferData = staticmethod(gl.glBufferData)
     def sendData(self, data, usage=None):
         if usage is not None:
-            usage = self.getUsageByName(usage)
+            usage = self.usageByName[usage]
         else: usage = self.usage
         self.glBufferData(self.target, data.nbytes, data.ctypes, usage)
         self.nbytes = data.nbytes
 
+    def allocate(self, count, usage=None, dtype=None):
+        if usage is not None:
+            usage = self.usageByName[usage]
+        else: usage = self.usage
+        if dtype is None:
+            dtype = self.dtype
+        nbytes = count*dtype().itemsize
+        self.glBufferData(self.target, nbytes, None, usage)
+        self.nbytes = nbytes
+
     glBufferSubData = staticmethod(gl.glBufferSubData)
-    def sendDataAt(self, data, offset):
+    def sendDataAt(self, data, offset=0):
         self.glBufferSubData(self.target, offset, data.nbytes, data.ctypes)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -159,7 +174,7 @@ class BufferBase(object):
 
         else:
             if self._map_access not in (access, gl.GL_READ_WRITE,):
-                raise Exception("Multiple MapBuffer access mismatch.  Origional: %s Request: %s" % (self._map_access, access))
+                raise GLBufferException("Multiple MapBuffer access mismatch.  Origional: %s Request: %s" % (self._map_access, access))
 
             self._map_count += 1
 
@@ -174,9 +189,6 @@ class BufferBase(object):
         if self._map_count <= 0:
             self.glUnmapBuffer(self.target)
             self._map_count = 0
-
-    def isGLBuffer(self):
-        return True
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
