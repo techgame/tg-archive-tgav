@@ -59,9 +59,10 @@ class GLArrayBase(ndarray, ObservableData):
     def __array_finalize__(self, parent):
         if parent is not None:
             self._configFromParent(parent)
+        self.gldtype.configFrom(self, parent)
 
     def _configFromParent(self, parent):
-        self.gldtype.configFrom(self, parent)
+        pass
 
     def __nonzero__(self):
         return self.size != 0

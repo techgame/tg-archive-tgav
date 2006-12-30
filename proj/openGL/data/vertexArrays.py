@@ -61,7 +61,7 @@ class VectorArray(DataArrayBase):
     default = asarray([0], 'f')
 
     gldtype = GLArrayDataType()
-    gldtype.addFormatGroups('hlifd', (1,2,3,4))
+    gldtype.addFormatGroups('bhlifd', (1,2,3,4))
     gldtype.setDefaultFormat('3f')
     glinfo = gldtype.arrayInfoFor('vector')
 
