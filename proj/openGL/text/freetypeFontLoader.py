@@ -211,7 +211,7 @@ class FreetypeFontLoader(object):
         fontResult.mosaicImage = mosaicImage
         fontResult.geometry = geometry
         fontResult.advance = advance
-        fontResult.lineAdvance = (fontResult.pointSize * [0., face.lineHeight, 0.])
+        fontResult.lineAdvance = (fontResult.pointSize[:2] * [0., face.lineHeight])
 
     @classmethod
     def _verticesFrom(klass, metrics):

@@ -18,7 +18,7 @@ from vertexArrays import *
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class _SingleMixin(object):
-    __array_priority__ = 20.0
+    __array_priority__ = 15.0
 
     @classmethod
     def _normalized(klass, result):
@@ -36,6 +36,9 @@ class _SingleMixin(object):
         l = min(l[-1], self.shape[-1])
         self[at,:l] = data[:l]
         return self
+
+    def setPropValue(self, value):
+        return self.set(value)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -64,5 +67,9 @@ class EdgeFlag(_SingleMixin, EdgeFlagArray):
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-__all__ = sorted(name for name, value in vars().items() if not name.endswith('Array') and isinstance(value, type) and issubclass(value, GLArrayBase))
+__all__ = [
+    'Vertex', 'Vector',
+    'TexCoord', 'TextureCoord', 'MultiTextureCoord', 'MultiTexCoord',
+    'Normal', 'Color', 'SecondaryColor', 'ColorIndex', 'FogCoord',
+    'EdgeFlag', ]
 

@@ -13,15 +13,14 @@
 import numpy
 from numpy import atleast_2d, ndarray
 
-from .observableData import ObservableData
-
+from .glDataProperty import GLDataProperty, asDataProperty
 from .glArrayDataType import GLBaseArrayDataType
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class GLArrayBase(ndarray, ObservableData):
+class GLArrayBase(ndarray):
     __array_priority__ = 25.0
 
     gldtype = GLBaseArrayDataType()
@@ -36,7 +35,6 @@ class GLArrayBase(ndarray, ObservableData):
             if not copy and dtype is None and not shape:
                 return data
 
-        klass._visitOnObservableNew(klass)
         if not shape:
             if isinstance(data, (int, long)):
                 copy = True
@@ -52,7 +50,7 @@ class GLArrayBase(ndarray, ObservableData):
             return klass.fromShape(shape, dtype)
 
     def __init__(self, data=None, dtype=None, shape=None, copy=False):
-        ObservableData.__init__(self)
+        pass
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -126,23 +124,6 @@ class GLArrayBase(ndarray, ObservableData):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def __setslice__(self, i, j, value):
-        value = self._valueFrom(value, self.edtype)
-        ndarray.__setslice__(self, i, j, value)
-        self._opnotify_('__setslice__')
-    def __delslice__(self, i, j):
-        ndarray.__delslice__(self, i, j)
-        self._opnotify_('__delslice__')
-    def __setitem__(self, index, value):
-        value = self._valueFrom(value, self.edtype)
-        ndarray.__setitem__(self, index, value)
-        self._opnotify_('__setindex__')
-    def __delitem__(self, i): 
-        ndarray.__delitem__(self, i)
-        self._opnotify_('__delindex__')
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     @classmethod
     def _normalized(klass, result):
         return atleast_2d(result)
@@ -152,4 +133,14 @@ class GLArrayBase(ndarray, ObservableData):
         if isinstance(value, ndarray):
             return value
         return numpy.asarray(value)
+
+    def setPropValue(self, value):
+        self[:] = value
+        return self
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    PropertyFactory = GLDataProperty
+    property = classmethod(asDataProperty)
+    asProperty = asDataProperty
 

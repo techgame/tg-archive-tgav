@@ -16,7 +16,6 @@ from ctypes import cast, byref, c_void_p
 
 from ..raw import gl, glext
 
-from .observableData import ObservableData
 from .vertexArrays import TextureCoordArray, VertexArray
 from .singleArrays import TextureCoord, Vertex
 
@@ -132,7 +131,7 @@ class PixelStore(object):
 #~ Texture Image
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class TextureImageBasic(ObservableData):
+class TextureImageBasic(object):
     formatMap = {
         'rgb': gl.GL_RGB, 'RGB': gl.GL_RGB,
         'rgba': gl.GL_RGBA, 'RGBA': gl.GL_RGBA,
@@ -338,15 +337,8 @@ class TextureImageBasic(ObservableData):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    _pos = TextureCoord.property([0, 0, 0], dtype='3l')
-    def getPos(self): return self._pos
-    def setPos(self, pos): self._pos.set(pos)
-    pos = property(getPos, setPos)
-
-    _size = TextureCoord.property([0, 0, 0], dtype='3l')
-    def getSize(self): return self._size
-    def setSize(self, size): self._size.set(size)
-    size = property(getSize, setSize)
+    pos = TextureCoord.property([0, 0, 0], dtype='3l')
+    size = TextureCoord.property([0, 0, 0], dtype='3l')
 
     def getPosSize(self):
         return (self.pos, self.size)
@@ -414,7 +406,7 @@ class TextureImage3D(TextureImageBasic):
 #~ Texture object itself
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class Texture(ObservableData):
+class Texture(object):
     _as_parameter_ = None # GLenum returned from glGenTextures
     texParams = []
     targetMap = {
@@ -634,10 +626,7 @@ class Texture(ObservableData):
     #~ Size & Dimensios
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    _size = TextureCoord.property([0, 0, 0], dtype='3l')
-    def getSize(self): return self._size
-    def setSize(self, size): self._size.set(size)
-    size = property(getSize, setSize)
+    size = TextureCoord.property([0, 0, 0], dtype='3l')
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     #~ Texture Data
@@ -893,7 +882,7 @@ class Texture(ObservableData):
         glext.GL_TEXTURE_RECTANGLE_ARB: False,
         }
 
-    _powersOfTwo = [1<<s for s in xrange(31)]
+    _powersOfTwo = [0] + [1<<s for s in xrange(31)]
     @staticmethod
     def idxNextPowerOf2(v, powersOfTwo=_powersOfTwo):
         return bisect_left(powersOfTwo, v)

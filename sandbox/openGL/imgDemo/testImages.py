@@ -50,19 +50,9 @@ class RenderSkinModel(RenderSkinModelBase):
         glClearColor(1., 1., 1., 1.)
         glClear(self.clearMask)
 
-        spacing = 20
-        totalHeight = 0
         self.imgLogo = ImageObject('tg-logo.png', align=(.5, 1.5, .5))
-        totalHeight += self.imgLogo.size[1] + spacing
-
         self.imgButton = ImageObject('button.png', align=(.5, .5, .5))
-        totalHeight += self.imgButton.size[1] + spacing
-
         self.imgStar = ImageObject('starshape.png', align=(.5, -.5, .5))
-        totalHeight += self.imgStar.size[1] + spacing
-
-        self.totalHeight = totalHeight - spacing
-        self.spacing = spacing
 
     def renderContent(self, glCanvas, renderStart):
         try:

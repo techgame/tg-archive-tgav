@@ -19,6 +19,15 @@ from .glArrayBase import GLArrayBase
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class ColorFormatMixin(object):
+    def __setslice__(self, i, j, value):
+        value = self._valueFrom(value, self.edtype)
+        ndarray.__setslice__(self, i, j, value)
+    def __setitem__(self, index, value):
+        value = self._valueFrom(value, self.edtype)
+        ndarray.__setitem__(self, index, value)
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     _formatXformMap = {
         ('f', 'f'): 1., ('d', 'd'): 1.,
         ('f', 'd'): 1., ('d', 'f'): 1.,

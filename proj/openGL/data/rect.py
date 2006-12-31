@@ -13,8 +13,8 @@
 import numpy
 from numpy import asarray
 
-from .observableData import ObservableData
-from .singleArrays import Vertex as Vector
+from .glDataProperty import GLDataProperty, asDataProperty
+from .singleArrays import Vector
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -51,45 +51,74 @@ def toAspect(size, aspect, grow=None):
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class Rect(ObservableData):
-    pos = Vector.property([0, 0, 0], propKind='aschainedarray')
-    size = Vector.property([0, 0, 0], propKind='aschainedarray')
+class Rect(object):
+    _dtype = Vector.gldtype.dtypeMap['2f']
 
     def __init__(self, rect=None, dtype=None, copy=True):
-        ObservableData.__init__(self)
+        if dtype is not None:
+            self._dtype = dtype
+
         if rect is None:
-            rect = self
-        self.copyFrom(rect, dtype)
+            self.pos = [0, 0]
+            self.size = [0, 0]
+
+        elif isinstance(rect, Rect):
+            if copy:
+                self.copyFrom(rect, dtype)
+            else:
+                self._pos = rect.pos
+                self._size = rect.size
+
+        else:
+            self.pos, self.size = rect
+
+    @classmethod
+    def new(klass, dtype=None):
+        self = klass.__new__(klass)
+        if dtype is not None:
+            self._dtype = dtype
+        return self
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    def _vec_(self, p): 
+        return Vector(p, self._dtype, copy=False)
+
+    _pos = None
+    def getPos(self):
+        return self._pos
+    def setPos(self, pos):
+        self._pos = self._vec_(pos)
+    pos = property(getPos, setPos)
+
+    _size = None
+    def getSize(self):
+        return self._size
+    def setSize(self, size):
+        self._size = self._vec_(size)
+    size = property(getSize, setSize)
+
+    def getDtype(self):
+        return self._dtype
+    def setDtype(self, dtype):
+        dtype = dtype
+        self._pos = self._pos.astype(dtype)
+        self._size = self._size.astype(dtype)
+        self._dtype = dtype
+    dtype = property(getDtype, setDtype)
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def __repr__(self):
         name = self.__class__.__name__
-        pos = self.pos
-        if pos.any(): 
-            pos = self.pos.tolist()
-            if not pos[-1]: 
-                pos = pos[:-1]
-        else: pos = None
-
+        pos = self.pos.tolist()
         size = self.size.tolist()
-        if not size[-1]: 
-            size = size[:-1]
-
-        if pos: 
-            return '%s(%s, %s)' % (name, pos, size)
-        else: 
-            return '%s(%s)' % (name, size)
+        return '%s(%s, %s)' % (name, pos, size)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def tolist(self):
         return [self.pos.tolist(), self.size.tolist()]
-
-    def getDtype(self):
-        return self.size.dtype
-    def setDtype(self, dtype):
-        self.pos = self.pos.astype(dtype)
-        self.size = self.size.astype(dtype)
-    dtype = property(getDtype, setDtype)
 
     def astype(self, dtype):
         return self.copy(dtype)
@@ -98,22 +127,21 @@ class Rect(ObservableData):
         return self.copy()
 
     def copy(self, dtype=None):
-        r = self.__new__(self.__class__)
-        return r.copyFrom(self, dtype)
+        return self.new().copyFrom(self, dtype)
 
     def copyFrom(self, other, dtype=None):
-        if dtype is None:
-            dtype = self.dtype
+        self._pos = other.pos.copy()
+        self._size = other.size.copy()
 
-        self.pos = other.pos.astype(dtype)
-        self.size = other.size.astype(dtype)
+        if dtype is not None:
+            self.dtype = dtype
         return self
 
     #~ setters and construction methods ~~~~~~~~~~~~~~~~~
 
     def setRect(self, rect, aspect=None, align=None, dtype=None):
-        self.pos.set(rect.pos)
-        self.size.set(rect.size)
+        self._pos[:] = rect.pos
+        self._size[:] = rect.size
         self.setAspect(aspect, align)
         return self
     def fromRect(self, rect, aspect=None, align=None, dtype=None):
@@ -123,97 +151,105 @@ class Rect(ObservableData):
 
     @classmethod
     def fromSize(klass, size, aspect=None, align=None, dtype=None):
-        self = klass(dtype=dtype)
+        self = klass(None, dtype)
         self.setSize(size, aspect, align)
         return self
 
     @classmethod
     def fromPosSize(klass, pos, size, aspect=None, align=None, dtype=None):
-        self = klass(dtype=dtype)
+        self = klass(None, dtype)
         self.setPosSize(pos, size, aspect, align)
         return self
 
     def setPosSize(self, pos, size, aspect=None, align=None):
-        self.pos.set(pos)
+        self._pos[:] = pos
         self.setSize(size, aspect, align)
         return self
 
     @classmethod
     def fromCorners(klass, p0, p1, dtype=None):
-        self = klass(dtype=dtype)
+        self = klass(None, dtype)
         self.setCorners(p0, p1)
         return self
 
     def setCorners(self, p0, p1):
-        pv = asarray([p0, p1], self.pos.dtype)
-        pos = pv.min(0)
-        size = pv.max(0) - pos
-        return self.setPosSize(pos, size)
+        pv = asarray([p0, p1], self.dtype)
+        p0 = pv.min(0); p1 = pv.max(0)
+        return self.setPosSize(p0, p1-p0)
 
     def centerIn(self, other): 
         return self.alignIn(.5, other)
     def alignIn(self, align, other):
         if isinstance(other, Rect):
-            self.pos.set(other.pos + align*(other.size-self.size))
+            self._pos[:] = other.pos + align*(other.size-self._size)
         else: 
-            self.pos.set(self.pos + align*(other-self.size))
+            self._pos[:] += align*(other-self._size)
         return self
 
     def getCorner(self):
-        return self.pos + self.size
+        return self._pos + self._size
     corner = property(getCorner)
     
     def setSize(self, size, aspect=None, align=None):
-        self.size.set(numpy.abs(size))
-
-        if aspect is not None or align is not None:
+        self._size[:] = size
+        if aspect is not None: 
             return self.setAspect(aspect, align)
-
         return self
-
     def sizeAs(self, aspect):
-        return self.toAspect(self.size.copy(), aspect)
+        return self.toAspect(self._size.copy(), aspect)
     
     def growSize(self, size):
-        self.size.set(max(self.size, size))
+        self._size[:] = max(self._size, size)
     def shrinkSize(self, size):
-        self.size.set(min(self.size, size))
+        self._size[:] = min(self._size, size)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def union(self, rectItems):
-        if isinstance(rectItems, Rect):
-            rectItems = [rectItems]
-        else: rectItems = list(rectItems)
+    @classmethod
+    def unionPosSize(klass, *args):
+        rectItems = []
+        for a in args:
+            if isinstance(a, Rect):
+                rectItems.append(a)
+            else: rectItems.extend(a)
 
         if rectItems:
-            pos = numpy.vstack(r.pos for r in rectItems).min(0)
-            corner = numpy.vstack(r.corner for r in rectItems).max(0)
-            self.setCorners(pos, corner)
+            pos = numpy.min((r.pos for r in rectItems), 0)
+            corner = numpy.max((r.corner for r in rectItems), 0)
+            return (pos, corner)
+
+    def union(self, rectItems):
+        p0p1 = self.unionCorners(self, rectItems)
+        if p0p1 is not None:
+            p0, p1 = p0p1
+            self.setPosSize(p0, p1-p0)
         return self
 
     @classmethod
     def fromUnion(klass, rectItems):
-        self = klass.fromSize(0)
-        self.union(rectItems)
-        return self
+        p0p1 = klass.unionCorners(rectItems)
+        if p0p1 is not None:
+            p0, p1 = p0p1
+            return klass.fromPosSize(p0, p1-p0)
+
+        return klass()
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def getAspect(self):
-        s = self.size[0:2].astype(float)
+        s = self._size[0:2].astype(float)
         return s[0]/s[1]
     def setAspect(self, aspect, align=None):
-        if aspect is None: return self
+        if aspect is None: 
+            return self
 
         if align is None:
-            self.toAspect(self.size, aspect)
+            self.toAspect(self._size, aspect)
             return self
-        else:
-            size = self.size.copy()
-            self.toAspect(self.size, aspect)
 
-            return self.alignIn(align, size)
+        size = self._size.copy()
+        self.toAspect(self._size, aspect)
+        return self.alignIn(align, size)
     aspect = property(getAspect, setAspect)
 
     toAspect = staticmethod(toAspect)
@@ -222,62 +258,72 @@ class Rect(ObservableData):
     #~ Named accessors
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def getWidth(self): return self.size[0]
-    def setWidth(self, width): self.size[0] = max(0, width)
+    def posAt(self, align):
+        return self._pos + align*self._size
+    at = posAt
+    __getitem__ = posAt
+
+    def setPosAt(self, align, value):
+        self._pos[:] = (value - align*self._size)
+        return self._pos
+    __setitem__ = setPosAt
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    def getWidth(self): return self._size[0]
+    def setWidth(self, width): self._size[0] = max(0, width)
     width = property(getWidth, setWidth)
 
-    def getHeight(self): return self.size[1]
-    def setHeight(self, height): self.size[1] = max(0, height)
+    def getHeight(self): return self._size[1]
+    def setHeight(self, height): self._size[1] = max(0, height)
     height = property(getHeight, setHeight)
 
-    def getDepth(self): return self.size[2]
-    def setDepth(self, depth): self.size[2] = max(0, depth)
-    depth = property(getDepth, setDepth)
-    
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def posAt(self, align):
-        return self.pos + align*self.size
-    at = posAt
-    def setPosAt(self, align, value):
-        self.pos.set(value - align*self.size)
-        return self.pos
-
-    def getLeft(self): return self.pos[0]
-    def setLeft(self, left): self.pos[0] = left
+    def getLeft(self): return self._pos[0]
+    def setLeft(self, left): self._pos[0] = left
     left = property(getLeft, setLeft)
 
-    def getBottom(self): return self.pos[1]
-    def setBottom(self, bottom): self.pos[1] = bottom
+    def getBottom(self): return self._pos[1]
+    def setBottom(self, bottom): self._pos[1] = bottom
     bottom = property(getBottom, setBottom)
-
-    def getFront(self): return self.pos[2]
-    def setFront(self, front): self.pos[2] = front
-    front = property(getFront, setFront)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def getRight(self): return self.pos[0] + self.size[0]
-    def setRight(self, right): self.pos[0] = right - self.size[0]
+    def getRight(self): return self._pos[0] + self._size[0]
+    def setRight(self, right): self._pos[0] = right - self._size[0]
     right = property(getRight, setRight)
 
-    def getTop(self): return self.pos[1] + self.size[1]
-    def setTop(self, top): self.pos[1] = top - self.size[1]
+    def getTop(self): return self._pos[1] + self._size[1]
+    def setTop(self, top): self._pos[1] = top - self._size[1]
     top = property(getTop, setTop)
     
-    def getBack(self): return self.pos[2] + self.size[2]
-    def setBack(self, back): self.pos[2] = back - self.size[2]
-    back = property(getBack, setBack)
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    PropertyFactory = GLDataProperty
+    property = classmethod(asDataProperty)
+    asProperty = asDataProperty
+
+    def setPropValue(self, rect):
+        if rect is None:
+            self.pos[:] = 0
+            self.size[:] = 0
+            return self
+
+        elif isinstance(rect, Rect):
+            return rect
+
+        else:
+            self.pos[:], self.size[:] = rect
+            return self
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class Recti(Rect):
-    pos = Vector.property([0, 0, 0], dtype='i', propKind='aschainedarray')
-    size = Vector.property([0, 0, 0], dtype='i', propKind='aschainedarray')
+    _dtype = Vector.gldtype.dtypeMap['2i']
 
 class Rectf(Rect):
-    pos = Vector.property([0, 0, 0], dtype='f', propKind='aschainedarray')
-    size = Vector.property([0, 0, 0], dtype='f', propKind='aschainedarray')
+    _dtype = Vector.gldtype.dtypeMap['2f']
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

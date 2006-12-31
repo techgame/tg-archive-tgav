@@ -30,6 +30,7 @@ class ImageObject(ObservableObject):
     roundValues = True
 
     def __init__(self, image=None, format=True, **kwattr):
+        self.imageTex = self.ImageTexture()
         if kwattr: 
             self.set(kwattr)
         if image is not None:
@@ -41,11 +42,10 @@ class ImageObject(ObservableObject):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    color = Color.property()
-    pos = Vector.property()
-    size = Vector.property()
-    align = Vector.property()
-    imageTex = ImageTexture.property()
+    color = Color.property('#f')
+    pos = Vector.property([0,0,0])
+    size = Vector.property([0,0,0])
+    align = Vector.property([.5, .5, 0])
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

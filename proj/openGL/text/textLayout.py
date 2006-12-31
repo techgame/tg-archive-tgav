@@ -10,7 +10,7 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from numpy import array
+from numpy import array, zeros
 from . import textWrapping
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -24,14 +24,14 @@ class TextLayout(object):
         align = textObj.align[textObj.wrapAxis]
         oneMinusAlign = 1-align
 
-        pos = textObj.box.pos.copy()
-        size = textObj.box.size.copy()
+        pos = textObj.box.pos
+        size = textObj.box.size
 
-        linePos = size.copy()
-        linePos[0] *= align
-        linePos += pos
+        linePos = zeros(3, 'f')
+        linePos[:2] = size*(align, 1) + pos
 
-        lineAdvance = textData.lineAdvance * textObj.lineSpacing
+        lineAdvance = zeros(3, 'f')
+        lineAdvance[:2] = textData.lineAdvance * textObj.lineSpacing
 
         # grab the geometry we are laying out
         geo = textData.geometry.copy()
@@ -60,7 +60,7 @@ class TextLayout(object):
                 lineCount += 1
                 geov[textSlice] += getOffsetFor(textOffset)
                 linePos -= lineAdvance
-                if (linePos<=pos)[1]:
+                if (linePos[1]<=pos[1]):
                     geo = geo[:textSlice.stop]
                     break
         else:

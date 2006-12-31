@@ -60,8 +60,6 @@ class RenderSkinModel(RenderSkinModelBase):
             'AmericanTypewriter': '/Library/Fonts/AmericanTypewriter.dfont',
             'Helvetica': '/System/Library/Fonts/Helvetica.dfont',
 
-            'TEST': '/Users/shane/Dev/AL/BookComposite/FRAMDCN.TTF',
-
             }
 
     clearMask = GL_COLOR_BUFFER_BIT

@@ -58,10 +58,14 @@ class DataArrayBase(GLArrayBase):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class VectorArray(DataArrayBase):
+    # Set Array Priority less than other GLArrays so this type
+    # will easily covert when multiplied by another GLArray type
+    __array_priority__ = 20.0 
+
     default = asarray([0], 'f')
 
     gldtype = GLArrayDataType()
-    gldtype.addFormatGroups('bhlifd', (1,2,3,4))
+    gldtype.addFormatGroups('BHLIbhlifd', (1,2,3,4))
     gldtype.setDefaultFormat('3f')
     glinfo = gldtype.arrayInfoFor('vector')
 
