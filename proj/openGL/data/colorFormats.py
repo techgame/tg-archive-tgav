@@ -19,6 +19,10 @@ from .glArrayBase import GLArrayBase
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class ColorFormatMixin(object):
+    @property
+    def edtype(self):
+        return (self.dtype, self.shape[-1:])
+
     def __setslice__(self, i, j, value):
         value = self._valueFrom(value, self.edtype)
         ndarray.__setslice__(self, i, j, value)
@@ -136,8 +140,9 @@ class ColorFormatMixin(object):
                 (isinstance(value[0], basestring))):
             return klass.fromHex(value, edtype[0], edtype[1])
 
-        value = super(ColorFormatMixin, klass)._valueFrom(value, edtype)
-        return value
+        if isinstance(value, ndarray):
+            return value
+        return numpy.asarray(value)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

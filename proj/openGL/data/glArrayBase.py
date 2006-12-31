@@ -54,16 +54,19 @@ class GLArrayBase(ndarray):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def __array_finalize__(self, parent):
-        if parent is not None:
-            self._configFromParent(parent)
-        self.gldtype.configFrom(self, parent)
-
-    def _configFromParent(self, parent):
-        pass
-
     def __nonzero__(self):
         return self.size != 0
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    _glTypeId = None
+    @property
+    def glTypeId(self):
+        r = self._glTypeId
+        if r is None:
+            r = self.gldtype.glTypeIdForArray(self)
+            self._glTypeId = r 
+        return r
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     #~ Contruction methods
@@ -75,7 +78,6 @@ class GLArrayBase(ndarray):
         if shape[-1:] == (-1,):
             shape = shape[:-1]
         self = ndarray.__new__(klass, shape, dtype=dtype, order=order)
-        self.gldtype.configFrom(self)
         return self
 
     @classmethod
@@ -117,7 +119,6 @@ class GLArrayBase(ndarray):
             shape = shape[:-1]
 
         self = ndarray.__new__(klass, shape, dtype, order=order)
-        self.gldtype.configFrom(self)
         self = klass._normalized(self)
         self.view(ndarray)[..., :] = data
         return self

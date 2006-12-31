@@ -24,7 +24,7 @@ class TestRect(unittest.TestCase):
     Rect = data.Rect
 
     def doVTest(self, rawQuestion, rawAnswer):
-        if rawQuestion.dtype[-1:] not in ('f', 'd'):
+        if rawQuestion.dtype.base.char not in ('f', 'd'):
             rawAnswer = [map(int, ra) for ra in rawAnswer]
 
         self.failUnless(allclose(rawQuestion.pos, rawAnswer[0]), (rawQuestion.pos.tolist(), rawAnswer[0]))

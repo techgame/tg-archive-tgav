@@ -10,6 +10,8 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+from functools import partial
+
 from TG.openGL.data.bufferObjects import ArrayBuffer
 
 from TG.openGL.raw import gl
@@ -28,13 +30,15 @@ class TextDisplay(object):
         #self.color = textObj.color
         self.texture = textData.texture
 
+        self.glInterleavedArrays = partial(gl.glInterleavedArrays, geom.glTypeId, 0, geom.ctypes)
+        self.glDrawArrays = partial(gl.glDrawArrays, geom.drawMode, 0, geom.size)
+
     def render(self):
         self.texture.select()
         #self.color.select()
 
-        geom = self.geometry
-        gl.glInterleavedArrays(geom.glTypeId, 0, geom.ctypes)
-        gl.glDrawArrays(geom.drawMode, 0, geom.size)
+        self.glInterleavedArrays()
+        self.glDrawArrays()
     __call__ = render
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -60,18 +64,18 @@ class TextBufferedDisplay(object):
         buff.sendData(geometry)
         buff.unbind()
 
-    def render(self, glColor4f=gl.glColor4f):
-        geom = self.geometry
-        if not len(geom): return
+        self.glInterleavedArrays = partial(gl.glInterleavedArrays, geometry.glTypeId, 0, 0)
+        self.glDrawArrays = partial(gl.glDrawArrays, geometry.drawMode, 0, geometry.size)
 
+    def render(self, glColor4f=gl.glColor4f):
         #self.color.select()
         self.texture.select()
 
         buff = self.buffer
         buff.bind()
 
-        gl.glInterleavedArrays(geom.glTypeId, 0, 0)
-        gl.glDrawArrays(geom.drawMode, 0, geom.size)
+        self.glInterleavedArrays()
+        self.glDrawArrays()
 
         ## Font rect/outline highlighting code:
         #if 0:

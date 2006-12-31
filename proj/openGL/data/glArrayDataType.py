@@ -69,10 +69,6 @@ class GLBaseArrayDataType(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def configFrom(self, array, parent=None):
-        array.glTypeId = self.glTypeIdForArray(array)
-        array.edtype = (array.dtype, array.shape[-1:])
-
     def glTypeIdForArray(self, array):
         return self.glTypeIdForDtype(array.dtype)
     def glTypeIdForDtype(self, dtype):

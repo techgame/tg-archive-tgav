@@ -56,7 +56,7 @@ class Rect(object):
 
     def __init__(self, rect=None, dtype=None, copy=True):
         if dtype is not None:
-            self._dtype = dtype
+            self._dtype = numpy.dtype(dtype)
 
         if rect is None:
             self.pos = [0, 0]
@@ -76,7 +76,7 @@ class Rect(object):
     def new(klass, dtype=None):
         self = klass.__new__(klass)
         if dtype is not None:
-            self._dtype = dtype
+            self._dtype = numpy.dtype(dtype)
         return self
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -101,7 +101,7 @@ class Rect(object):
     def getDtype(self):
         return self._dtype
     def setDtype(self, dtype):
-        dtype = dtype
+        dtype = numpy.dtype(dtype)
         self._pos = self._pos.astype(dtype)
         self._size = self._size.astype(dtype)
         self._dtype = dtype

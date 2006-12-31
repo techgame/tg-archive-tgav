@@ -45,7 +45,7 @@ class GLDataProperty(object):
         if newValue is not propValue:
             self.__rawset__(obj, newValue)
 
-    __del__ = __rawdel__
+    __delete__ = __rawdel__
 
     _name = None
     def getNameIn(self, klass):
