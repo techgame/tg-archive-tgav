@@ -10,7 +10,7 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from ..data import Rect, Vector
+from ..data import Vector
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Layouts
@@ -21,7 +21,7 @@ class LayoutBase(object):
     outside = Vector.property([0,0], '2f')
     inside = Vector.property([0,0], '2f')
 
-    def layout(self, cells, box, isTrial=False):
+    def layout(self, cells, boxPos, boxSize, isTrial=False):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

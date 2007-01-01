@@ -13,7 +13,7 @@
 from itertools import izip
 
 import numpy
-from numpy import empty_like, empty, ndindex
+from numpy import zeros_like, zeros, empty_like, empty, ndindex
 
 from ..data import Rect, Vector
 from .basicLayout import LayoutBase
@@ -27,7 +27,9 @@ class AxisLayout(LayoutBase):
 
     def layout(self, cells, box, isTrial=False):
         if not cells:
-            return Rect((box.pos, box.size*0))
+            return box.pos.copy(), 0*box.size
+
+        box = box.copy()
 
         # determin visible cells
         visCells = self.cellsVisible(cells)
@@ -40,8 +42,8 @@ class AxisLayout(LayoutBase):
             iCellBoxes = self.iterCellBoxes(visCells, box, axisSizes, isTrial)
 
             # let cells lay themselves out in their boxes
-            for (cpos, csize), c in izip(iCellBoxes, iCells):
-                c.layoutIn(cpos, csize)
+            for cbox, c in izip(iCellBoxes, iCells):
+                c.layoutIn(cbox)
 
             # hide cells that have no box
             for c in iCells:
@@ -53,6 +55,9 @@ class AxisLayout(LayoutBase):
         # determin minsize
         axis = self.axis
         weights, axisSizes = self.cellsStats(cells)
+
+        minNonAxisSize = (1-axis)*(axisSizes.max() + 2*self.outside)
+        box.size[:] = numpy.max([box.size, minNonAxisSize], 0)
         weights *= axis
         axisSizes *= axis
 
@@ -108,13 +113,17 @@ class AxisLayout(LayoutBase):
     def iterCellBoxes(self, cells, box, axisSizes, isTrial=False):
         axis = self.axis
         outside = self.outside
-        nonAxisSize = (1-axis)*(box.size - outside)
+        nonAxisSize = (1-axis)*(box.size - 2*outside)
         pos = box.pos + outside
         axisBorders = axis*self.inside
 
+        cellBox = Rect()
+
         # let each cell know it's new pos and size
         for asize in axisSizes:
-            yield pos, asize + nonAxisSize
+            cellBox.pos[:] = pos
+            cellBox.size[:] = asize + nonAxisSize
+            yield cellBox
 
             pos += asize + axisBorders
         pos -= axisBorders
@@ -122,34 +131,36 @@ class AxisLayout(LayoutBase):
     def layoutBox(self, visCells, box, axisSizes, isTrial=False):
         axis = self.axis
 
-        lPos = box.pos
-        # non-axis size
-        lSize = (1-axis)*box.size
+        lbox = box.copy()
+        lsize = lbox.size
         # plus borders along axis
-        lSize += axis*(2*self.outside + (len(axisSizes)-1)*self.inside)
+        lsize += axis*(2*self.outside + (len(axisSizes)-1)*self.inside)
         # plus axis size
-        lSize += axisSizes.sum(0)
-        return Rect((lPos, lSize))
+        lsize += axisSizes.sum(0)
+        return lbox
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def cellsStats(self, cells):
+    def cellsStats(self, cells, default=zeros((2,), 'f')):
         minSizes = empty((len(cells), 2), 'f')
         weights = empty((len(cells), 2), 'f')
 
         # grab cell info into minSize and weights arrays
         idxWalk = ndindex(weights.shape[:-1])
         for c, idx in izip(cells, idxWalk):
-            weights[idx] = (getattr(c, 'weight', 0) or 0)
-            minSizes[idx] = (getattr(c, 'minSize', 0) or 0)
+            weights[idx] = (getattr(c, 'weight', None) or default)
+            minSizes[idx] = (getattr(c, 'minSize', None) or default)
 
         return (weights, minSizes)
 
-    def cellsAdjustedSize(self, cells, axisSizes, isTrial=False):
+    def cellsAdjustedSize(self, cells, axisSizes, isTrial=False, default=zeros((2,), 'f')):
         adjSizes = empty_like(axisSizes)
         axis = self.axis
         for c, axSize, adSize in zip(cells, axisSizes, adjSizes):
-            adSize[:] = axSize - c.adjustAxisSize(axSize, axis, isTrial)
+            adjustAxisSize = getattr(c, 'adjustAxisSize', None)
+            if adjustAxisSize is not None:
+                adSize[:] = axSize - adjustAxisSize(axSize, axis, isTrial)
+            else: adSize[:] = default
         return adjSizes
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

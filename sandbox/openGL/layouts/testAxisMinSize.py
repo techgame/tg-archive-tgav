@@ -20,7 +20,7 @@ from TG.openGL.layouts.axisLayout import *
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-box = Rect.fromPosSize((0,0), (1000, 1000))
+box = Rect()
 
 def runAxisLayout():
     cells = [
@@ -46,47 +46,9 @@ def runAxisLayout():
             print
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-def runAxisTimiing(n=100):
-    cells = [
-        Cell(0, 200),
-        MaxSizeCell(1, 200, 300),
-        Cell(1, 200),
-        ]
-
-    vl = VLayout()
-
-    if 1:
-        vl.inside.set(10)
-        vl.outside.set((50, 50, 0))
-
-    box.size *= 5
-    cells *= 10
-    cn = max(1, len(cells)*n)
-
-    if 1:
-        s = time.time()
-        for p in xrange(n):
-            vl.layout(cells, box, False)
-        dt = time.time() - s
-        print '%r time: %5s cn/s: %5s pass/s: %5s' % ((n,cn), dt, cn/dt, n/dt)
-
-    if 1:
-        s = time.time()
-        for p in xrange(n):
-            vl.layout(cells, box, True)
-        dt = time.time() - s
-        print '%r time: %5s cn/s: %5s pass/s: %5s' % ((n,cn), dt, cn/dt, n/dt)
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Main 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 if __name__=='__main__':
-    if 1:
-        runAxisLayout()
-
-    # timing analysis
-    if 1:
-        runAxisTimiing()
+    runAxisLayout()
 

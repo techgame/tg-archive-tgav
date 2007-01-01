@@ -21,22 +21,31 @@ from ..data import Rect, Vector
 
 class BasicCell(object):
     visible = True
+
+    layoutVisible = False # set to true of false in layout methods
     box = Rect.property()
 
-    def adjustAxisSize(self, axisSize, axis, isTrial=False):
-        # axisSize must not be modified... use copies!
-        return axisSize
+    def __init__(self):
+        pass
 
-    def layoutIn(self, pos, size):
-        # pos and size must not modified... use copies!
+    # Note: You can provide this function if you want to adjust the size
+    # alloted to your cell.  If not present, some algorithms run faster
+    ##def adjustAxisSize(self, axisSize, axis, isTrial=False):
+    ##    # axisSize parameter must not be modified... use copies!
+    ##    return axisSize
+
+    def layoutIn(self, lbox):
         box = self.box
-        ceil(pos, box.pos)
-        floor(size, box.size)
+        self.layoutVisible = True
+
+        # lbox.pos and lbox.size parameters must not modified... use copies!
+        ceil(lbox.pos, box.pos)
+        floor(lbox.size, box.size)
 
         self.onLayout(self, box)
 
     def layoutHide(self):
-        self.box = None
+        self.layoutVisible = False
 
     def onLayout(self, cell, box): pass
 
@@ -46,9 +55,10 @@ class Cell(BasicCell):
     weight = Vector.property([0,0], '2f')
     minSize = Vector.property([0,0], '2f')
 
-    def __init__(self, weight=0, min=None):
-        self.weight[:] = weight
-
+    def __init__(self, weight=None, min=None):
+        BasicCell.__init__(self)
+        if weight is not None:
+            self.weight[:] = weight
         if min is not None:
             self.minSize[:] = min
 
@@ -57,12 +67,13 @@ class Cell(BasicCell):
 class MaxSizeCell(Cell):
     maxSize = Vector.property([0,0], '2f')
 
-    def __init__(self, weight=0, min=None, max=None):
+    def __init__(self, weight=None, min=None, max=None):
         Cell.__init__(self, weight, min)
         if max is not None:
             self.maxSize[:] = max
 
     def adjustAxisSize(self, axisSize, axis, isTrial=False):
+        # axisSize parameter must not be modified... use copies!
         maxSize = self.maxSize
         idx = (maxSize > 0) & (maxSize < axisSize)
         if idx.any():

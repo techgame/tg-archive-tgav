@@ -14,7 +14,7 @@ import time
 
 from TG.openGL.data.rect import Rect
 from TG.openGL.layouts.cells import *
-from TG.openGL.layouts.axisLayout import *
+from TG.openGL.layouts.absLayout import *
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -22,14 +22,14 @@ from TG.openGL.layouts.axisLayout import *
 
 box = Rect.fromPosSize((0,0), (1000, 1000))
 
-def runAxisLayout():
+def runAbsLayout():
     cells = [
         Cell(0, 200),
         MaxSizeCell(1, 200, 300),
         Cell(1, 200),
         ]
 
-    vl = VLayout()
+    vl = AbsLayout()
 
     if 1:
         vl.inside.set(10)
@@ -47,14 +47,14 @@ def runAxisLayout():
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def runAxisTimiing(n=100):
+def runAbsTimiing(n=100):
     cells = [
         Cell(0, 200),
         MaxSizeCell(1, 200, 300),
         Cell(1, 200),
         ]
 
-    vl = VLayout()
+    vl = AbsLayout()
 
     if 1:
         vl.inside.set(10)
@@ -84,9 +84,9 @@ def runAxisTimiing(n=100):
 
 if __name__=='__main__':
     if 1:
-        runAxisLayout()
+        runAbsLayout()
 
     # timing analysis
     if 1:
-        runAxisTimiing()
+        runAbsTimiing()
 

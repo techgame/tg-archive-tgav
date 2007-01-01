@@ -13,7 +13,7 @@
 from itertools import izip
 
 import numpy
-from numpy import empty_like, empty, ndindex
+from numpy import zeros_like, zeros, empty_like, empty, ndindex
 
 from ..data import Rect, Vector
 from .basicLayout import LayoutBase
@@ -34,7 +34,9 @@ class GridLayout(LayoutBase):
 
     def layout(self, cells, box, isTrial=False):
         if not cells:
-            return box.fromPosSize(box.pos, 0)
+            return box.pos.copy(), 0*box.size
+
+        box = box.copy()
 
         # determin visible cells
         visCells = self.cellsVisible(cells)
@@ -47,8 +49,8 @@ class GridLayout(LayoutBase):
             iCellBoxes = self.iterCellBoxes(visCells, box, rowSizes, colSizes, isTrial)
 
             # let cells lay themselves out in their boxes
-            for (cpos, csize), c in izip(iCellBoxes, iCells):
-                c.layoutIn(cpos, csize)
+            for cbox, c in izip(iCellBoxes, iCells):
+                c.layoutIn(cbox)
 
             # hide cells that have no box
             for c in iCells:
@@ -58,12 +60,14 @@ class GridLayout(LayoutBase):
         
     def layoutBox(self, visCells, box, rowSizes, colSizes, isTrial=False):
         nRows = self.nRows; nCols = self.nCols
-        lPos = box.pos
+
+        lbox = box.copy()
+        lsize = lbox.size
         # row and col sizes
-        lSize = rowSizes.sum(0) + colSizes.sum(0)
+        lsize = rowSizes.sum(0) + colSizes.sum(0)
         # plus borders along axis
-        lSize += 2*self.outside + (nCols-1, nRows-1)*self.inside
-        return box.fromPosSize(lPos, lSize)
+        lsize += 2*self.outside + (nCols-1, nRows-1)*self.inside
+        return lbox
 
     def iterCellBoxes(self, cells, box, rowSizes, colSizes, isTrial=False):
         posStart = box.pos + box.size*self._vaxis
@@ -72,8 +76,9 @@ class GridLayout(LayoutBase):
         advCol = self._haxis*self.inside
         advRow = self._vaxis*self.inside
 
+        cellBox = Rect()
         posRow = posStart
-        posCol = empty_like(posRow)
+        posCol = cellBox.pos
         for row in rowSizes:
             # adv down by row
             posRow -= row
@@ -81,7 +86,8 @@ class GridLayout(LayoutBase):
             posCol[:] = posRow
             for col in colSizes:
                 # yield cell box
-                yield posCol, row + col
+                cellBox.size[:] = row + col
+                yield cellBox
 
                 # adv right by col + inside border
                 posCol += col + advCol
@@ -96,8 +102,11 @@ class GridLayout(LayoutBase):
         # figure out how much room the borders take
         borders = 2*self.outside + (nCols-1, nRows-1)*self.inside
 
+        gridMinSize = borders
+        box.size[:] = numpy.max([box.size, gridMinSize], 0)
+
         # figure out what our starting size minus borders is
-        availSize = box.size - borders 
+        availSize = box.size - gridMinSize 
         cellSize = (availSize / (nCols, nRows))
 
         # repeat rowSize nRows times
@@ -127,11 +136,11 @@ class FlexGridLayout(GridLayout):
         # figure out how much room the borders take
         borders = 2*self.outside + (nCols-1, nRows-1)*self.inside
 
-        # figure out what our starting size minus borders is
-        availSize = box.size - borders 
+        gridMinSize = borders + rowSizes.sum(0) + colSizes.sum(0)
+        box.size[:] = numpy.max([box.size, gridMinSize], 0)
 
-        # subtract the already allocated minsize
-        availSize -= rowSizes.sum(0) + colSizes.sum(0)
+        # figure out what our starting size minus borders is
+        availSize = box.size - gridMinSize
 
         if (availSize > 0).any():
             if (availSize*vaxis > 0).any():
@@ -158,7 +167,7 @@ class FlexGridLayout(GridLayout):
 
         return rowSizes, colSizes
 
-    def cellsStats(self, cells):
+    def cellsStats(self, cells, default=zeros((2,), 'f')):
         nRows = self.nRows; nCols = self.nCols
         minSizes = empty((nRows, nCols, 2), 'f')
         weights = empty((nRows, nCols, 2), 'f')
@@ -166,8 +175,8 @@ class FlexGridLayout(GridLayout):
         # grab cell info into minSize and weights arrays
         idxWalk = ndindex(weights.shape[:-1])
         for c, idx in izip(cells, idxWalk):
-            weights[idx] = (getattr(c, 'weight', 0) or 0)
-            minSizes[idx] = (getattr(c, 'minSize', 0) or 0)
+            weights[idx] = (getattr(c, 'weight', None) or default)
+            minSizes[idx] = (getattr(c, 'minSize', None) or default)
 
         return weights, minSizes
 

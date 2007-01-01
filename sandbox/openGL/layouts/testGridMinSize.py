@@ -20,7 +20,7 @@ from TG.openGL.layouts.gridLayout import *
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-box = Rect.fromPosSize((0,0), (1000, 1000))
+box = Rect()
 
 def runGridLayout(nRows=2, nCols=4, excess=4):
     gl = GridLayout(nRows, nCols)
@@ -41,36 +41,6 @@ def runGridLayout(nRows=2, nCols=4, excess=4):
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def runGridTiming(n=100):
-    box = Rect.fromPosSize((0,0), (1000, 1000))
-    box.size *= (5, 2)
-
-    nRows, nCols = 10, 8
-    excess = 0
-
-    gl = GridLayout(nRows, nCols)
-    cells = [Cell((i%2, (i//4)%2), (100, 100)) for i in xrange(nRows*nCols+excess)]
-
-    cn = max(1, len(cells)*n)
-
-    if 1:
-        gl.inside.set(10)
-        gl.outside.set((50, 50, 0))
-
-    if 1:
-        s = time.time()
-        for p in xrange(n):
-            gl.layout(cells, box, False)
-        dt = time.time() - s
-        print '%r time: %5s cn/s: %5s pass/s: %5s' % ((n, nRows, nCols, cn), dt, cn/dt, n/dt)
-
-    if 1:
-        s = time.time()
-        for p in xrange(n):
-            gl.layout(cells, box, True)
-        dt = time.time() - s
-        print '%r time: %5s cn/s: %5s pass/s: %5s' % ((n, nRows, nCols, cn), dt, cn/dt, n/dt)
-
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Main 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -78,8 +48,4 @@ def runGridTiming(n=100):
 if __name__=='__main__':
     if 1:
         runGridLayout()
-
-    # timing analysis
-    if 1:
-        runGridTiming()
 

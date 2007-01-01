@@ -14,7 +14,7 @@ import time
 
 from TG.openGL.data.rect import Rect
 from TG.openGL.layouts.cells import *
-from TG.openGL.layouts.axisLayout import *
+from TG.openGL.layouts.gridLayout import *
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -22,61 +22,55 @@ from TG.openGL.layouts.axisLayout import *
 
 box = Rect.fromPosSize((0,0), (1000, 1000))
 
-def runAxisLayout():
-    cells = [
-        Cell(0, 200),
-        MaxSizeCell(1, 200, 300),
-        Cell(1, 200),
-        ]
-
-    vl = VLayout()
+def runGridLayout(nRows=2, nCols=4, excess=4):
+    gl = FlexGridLayout(nRows, nCols)
+    #cells = [Cell((i%2, (i//4)%2), (100, 100)) for i in xrange(nRows*nCols+excess)]
+    cells = [Cell() for i in xrange(nRows*nCols+excess)]
 
     if 1:
-        vl.inside.set(10)
-        vl.outside.set((50, 50, 0))
+        gl.inside.set(10)
+        gl.outside.set((50, 50, 0))
 
-    if 1:
-        for p in xrange(2):
-            lb = vl.layout(cells, box, not p%2)
-            print
-            print 'box:', box
-            print '  layout:', lb
-            for i, c in enumerate(cells):
-                print '    cell %s:' % i, c.box
-            print
+    for p in xrange(2):
+        lb = gl.layout(cells, box, not p%2)
+        print
+        print 'box:', box
+        print '  layout:', lb
+        for i, c in enumerate(cells):
+            print '    cell %s:' % i, c.box
+        print
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def runAxisTimiing(n=100):
-    cells = [
-        Cell(0, 200),
-        MaxSizeCell(1, 200, 300),
-        Cell(1, 200),
-        ]
+def runGridTiming(n=100):
+    box = Rect.fromPosSize((0,0), (1000, 1000))
+    box.size *= (5, 2)
 
-    vl = VLayout()
+    nRows, nCols = 10, 8
+    excess = 0
 
-    if 1:
-        vl.inside.set(10)
-        vl.outside.set((50, 50, 0))
+    gl = FlexGridLayout(nRows, nCols)
+    cells = [Cell((i%2, (i//4)%2), (100, 100)) for i in xrange(nRows*nCols+excess)]
 
-    box.size *= 5
-    cells *= 10
     cn = max(1, len(cells)*n)
 
     if 1:
-        s = time.time()
-        for p in xrange(n):
-            vl.layout(cells, box, False)
-        dt = time.time() - s
-        print '%r time: %5s cn/s: %5s pass/s: %5s' % ((n,cn), dt, cn/dt, n/dt)
+        gl.inside.set(10)
+        gl.outside.set((50, 50, 0))
 
     if 1:
         s = time.time()
         for p in xrange(n):
-            vl.layout(cells, box, True)
+            gl.layout(cells, box, False)
         dt = time.time() - s
-        print '%r time: %5s cn/s: %5s pass/s: %5s' % ((n,cn), dt, cn/dt, n/dt)
+        print '%r time: %5s cn/s: %5s pass/s: %5s' % ((n, nRows, nCols, cn), dt, cn/dt, n/dt)
+
+    if 1:
+        s = time.time()
+        for p in xrange(n):
+            gl.layout(cells, box, True)
+        dt = time.time() - s
+        print '%r time: %5s cn/s: %5s pass/s: %5s' % ((n, nRows, nCols, cn), dt, cn/dt, n/dt)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Main 
@@ -84,9 +78,9 @@ def runAxisTimiing(n=100):
 
 if __name__=='__main__':
     if 1:
-        runAxisLayout()
+        runGridLayout()
 
     # timing analysis
     if 1:
-        runAxisTimiing()
+        runGridTiming()
 

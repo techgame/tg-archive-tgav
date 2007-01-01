@@ -24,9 +24,8 @@ class AbsLayout(LayoutBase):
         visCells = self.cellsVisible(cells)
 
         if not isTrial:
-            pos = box.pos; size = box.size
             for c in cells:
-                c.layoutIn(pos. size)
+                c.layoutIn(box)
 
         return box.copy()
 
