@@ -55,7 +55,7 @@ MultiTexCoord = MultiTextureCoord
 class Normal(_SingleMixin, NormalArray):
     pass
 class Color(_SingleMixin, ColorArray):
-    pass
+    setPropValue = ColorArray.setPropValue
 class SecondaryColor(_SingleMixin, SecondaryColorArray):
     pass
 class ColorIndex(_SingleMixin, ColorIndexArray):

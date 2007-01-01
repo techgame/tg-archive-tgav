@@ -18,8 +18,8 @@ class GLDataProperty(object):
     def __init__(self, value):
         self.value = value
 
-    def __rawget__(self, obj):
-        return getattr(obj, self.getNameIn(obj), None)
+    def __rawget__(self, obj, default=None):
+        return getattr(obj, self.getNameIn(obj), default)
     def __rawset__(self, obj, value):
         setattr(obj, self.getNameIn(obj), value)
     def __rawdel__(self, obj):
@@ -29,7 +29,7 @@ class GLDataProperty(object):
         if obj is None:
             return self
 
-        value = self.__rawget__(obj)
+        value = self.__rawget__(obj, None)
         if value is None:
             value = self.__setinit__(obj)
         return value
@@ -42,8 +42,7 @@ class GLDataProperty(object):
     def __set__(self, obj, value):
         propValue = self.__get__(obj, obj.__class__)
         newValue = propValue.setPropValue(value)
-        if newValue is not propValue:
-            self.__rawset__(obj, newValue)
+        self.__rawset__(obj, newValue)
 
     __delete__ = __rawdel__
 
@@ -59,8 +58,9 @@ class GLDataProperty(object):
         for host in klass.__mro__:
             for n, v in host.__dict__.iteritems():
                 if v is self:
-                    self._name = '_gldp_' + n
-                    return n
+                    name = '_gldp_' + n
+                    self._name = name
+                    return name
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

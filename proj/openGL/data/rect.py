@@ -144,7 +144,9 @@ class Rect(object):
         self._size[:] = rect.size
         self.setAspect(aspect, align)
         return self
-    def fromRect(self, rect, aspect=None, align=None, dtype=None):
+
+    @classmethod
+    def fromRect(klass, rect, aspect=None, align=None, dtype=None):
         self = klass(rect, dtype)
         self.setAspect(aspect, align)
         return self

@@ -30,6 +30,14 @@ class ColorFormatMixin(object):
         value = self._valueFrom(value, self.edtype)
         ndarray.__setitem__(self, index, value)
 
+    def setPropValue(self, value):
+        value = self._valueFrom(value, self.edtype)
+        if not self or (value.shape[-1] > self.shape[-1]):
+            return value
+
+        self[:] = value
+        return self
+
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     _formatXformMap = {
