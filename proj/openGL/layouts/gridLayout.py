@@ -50,7 +50,7 @@ class GridLayout(LayoutBase):
 
             # let cells lay themselves out in their boxes
             for cbox, c in izip(iCellBoxes, iCells):
-                c.layoutIn(cbox)
+                c.layoutInBox(cbox)
 
             # hide cells that have no box
             for c in iCells:
@@ -116,6 +116,7 @@ class GridLayout(LayoutBase):
         colSizes = empty((nCols, 2), 'f')
         colSizes[:] = (cellSize*haxis)
         return rowSizes, colSizes
+GridLayout.register('grid')
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -179,4 +180,6 @@ class FlexGridLayout(GridLayout):
             minSizes[idx] = (getattr(c, 'minSize', None) or default)
 
         return weights, minSizes
+
+FlexGridLayout.register('flexgrid', 'fgrid')
 

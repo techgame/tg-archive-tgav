@@ -10,29 +10,13 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from ..data import Vector
+from .cellLayout import LayoutCell
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#~ Layouts
+#~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class LayoutBase(object):
-    outside = Vector.property([0,0], '2f')
-    inside = Vector.property([0,0], '2f')
-
-    def layout(self, cells, boxPos, boxSize, isTrial=False):
-        raise NotImplementedError('Subclass Responsibility: %r' % (self,))
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    def cellsVisible(self, cells):
-        return [c for c in cells if getattr(c, 'visible', 1)]
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    FactoryMap = {}
-    @classmethod
-    def register(klass, *aliases):
-        for alias in aliases:
-            klass.FactoryMap[alias] = klass
+class LayoutGroup(LayoutCell):
+    pass
+LayoutGroup.register('layoutgroup', 'group')
 

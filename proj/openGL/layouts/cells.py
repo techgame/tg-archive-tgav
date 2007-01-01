@@ -34,7 +34,7 @@ class BasicCell(object):
     ##    # axisSize parameter must not be modified... use copies!
     ##    return axisSize
 
-    def layoutIn(self, lbox):
+    def layoutInBox(self, lbox):
         box = self.box
         self.layoutVisible = True
 
@@ -47,7 +47,30 @@ class BasicCell(object):
     def layoutHide(self):
         self.layoutVisible = False
 
-    def onLayout(self, cell, box): pass
+    def onLayout(self, cell, box): 
+        if self.evtList:
+            for e in self.evtList:
+                e(cell, box)
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    evtList = ()
+    def evtAdd(self, fn):
+        if self.evtList == ():
+            self.evtList = [fn]
+        else:
+            self.evtList.append(fn)
+        fn.cell = self
+        return fn
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    FactoryMap = {}
+    @classmethod
+    def register(klass, *aliases):
+        for alias in aliases:
+            klass.FactoryMap[alias] = klass
+BasicCell.register('basic')
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -61,6 +84,7 @@ class Cell(BasicCell):
             self.weight[:] = weight
         if min is not None:
             self.minSize[:] = min
+BasicCell.register('cell')
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -80,4 +104,5 @@ class MaxSizeCell(Cell):
             axisSize = axisSize.copy()
             axisSize[idx] = maxSize
         return axisSize
+BasicCell.register('maxsize', 'maxsizecell')
 

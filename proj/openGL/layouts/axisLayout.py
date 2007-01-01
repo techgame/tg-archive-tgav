@@ -23,6 +23,7 @@ from .basicLayout import LayoutBase
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class AxisLayout(LayoutBase):
+    _nAdjustTries = 3
     axis = Vector.property([0,0], '2b')
 
     def layout(self, cells, box, isTrial=False):
@@ -43,7 +44,7 @@ class AxisLayout(LayoutBase):
 
             # let cells lay themselves out in their boxes
             for cbox, c in izip(iCellBoxes, iCells):
-                c.layoutIn(cbox)
+                c.layoutInBox(cbox)
 
             # hide cells that have no box
             for c in iCells:
@@ -162,11 +163,19 @@ class AxisLayout(LayoutBase):
                 adSize[:] = axSize - adjustAxisSize(axSize, axis, isTrial)
             else: adSize[:] = default
         return adjSizes
+AxisLayout.register('axis')
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class HLayout(AxisLayout):
+class HorizontalLayout(AxisLayout):
     axis = Vector.property([1,0], '2b')
-class VLayout(AxisLayout):
+HorizontalLayout.register('horizontal', 'horiz', 'h')
+HorizLayout = HLayout = HorizontalLayout
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+class VerticalLayout(AxisLayout):
     axis = Vector.property([0,1], '2b')
+VerticalLayout.register('vertical', 'vert', 'v')
+VertLayout = VLayout = VerticalLayout
 

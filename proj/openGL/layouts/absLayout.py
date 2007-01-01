@@ -25,7 +25,8 @@ class AbsLayout(LayoutBase):
 
         if not isTrial:
             for c in cells:
-                c.layoutIn(box)
+                c.layoutInBox(box)
 
         return box.copy()
+AbsLayout.register('abs', 'absolute')
 
