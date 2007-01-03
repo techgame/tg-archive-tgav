@@ -10,13 +10,13 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from basicLayout import LayoutBase
+from basicLayout import BaseLayoutStrategy
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Simplest of all layouts... just tell each cell to "deal with it"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class AbsLayout(LayoutBase):
+class AbsLayoutStrategy(BaseLayoutStrategy):
     """AbsLayout just lets each cell know it should lay itself out"""
 
     def layout(self, cells, box, isTrial=False):
@@ -28,5 +28,5 @@ class AbsLayout(LayoutBase):
                 c.layoutInBox(box)
 
         return box.copy()
-AbsLayout.register('abs', 'absolute')
+AbsLayoutStrategy.register('abs', 'absolute')
 

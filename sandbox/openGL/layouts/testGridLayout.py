@@ -23,7 +23,7 @@ from TG.openGL.layouts.gridLayout import *
 box = Rect.fromPosSize((0,0), (1000, 1000))
 
 def runGridLayout(nRows=2, nCols=4, excess=4):
-    gl = GridLayout(nRows, nCols)
+    gl = GridLayoutStrategy(nRows, nCols)
     cells = [Cell((i%2, (i//4)%2), (100, 100)) for i in xrange(nRows*nCols+excess)]
 
     if 1:
@@ -48,7 +48,7 @@ def runGridTiming(n=100):
     nRows, nCols = 10, 8
     excess = 0
 
-    gl = GridLayout(nRows, nCols)
+    gl = GridLayoutStrategy(nRows, nCols)
     cells = [Cell((i%2, (i//4)%2), (100, 100)) for i in xrange(nRows*nCols+excess)]
 
     cn = max(1, len(cells)*n)

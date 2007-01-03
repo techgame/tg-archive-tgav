@@ -42,26 +42,13 @@ class BasicCell(object):
         ceil(lbox.pos, box.pos)
         floor(lbox.size, box.size)
 
-        self.onLayout(self, box)
+        self.onlayout(self, box)
 
     def layoutHide(self):
         self.layoutVisible = False
 
-    def onLayout(self, cell, box): 
-        if self.evtList:
-            for e in self.evtList:
-                e(cell, box)
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    evtList = ()
-    def evtAdd(self, fn):
-        if self.evtList == ():
-            self.evtList = [fn]
-        else:
-            self.evtList.append(fn)
-        fn.cell = self
-        return fn
+    def onlayout(self, cell, box):
+        pass
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

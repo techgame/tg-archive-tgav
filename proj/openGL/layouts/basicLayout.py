@@ -16,7 +16,7 @@ from ..data import Vector
 #~ Layouts
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class LayoutBase(object):
+class BaseLayoutStrategy(object):
     outside = Vector.property([0,0], '2f')
     inside = Vector.property([0,0], '2f')
 

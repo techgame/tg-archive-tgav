@@ -29,7 +29,7 @@ def runAxisLayout():
         Cell(1, 200),
         ]
 
-    vl = VLayout()
+    vl = VerticalLayoutStrategy()
 
     if 1:
         vl.inside.set(10)

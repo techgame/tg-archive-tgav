@@ -16,13 +16,13 @@ import numpy
 from numpy import zeros_like, zeros, empty_like, empty, ndindex
 
 from ..data import Rect, Vector
-from .basicLayout import LayoutBase
+from .basicLayout import BaseLayoutStrategy
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Axis Layouts
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class AxisLayout(LayoutBase):
+class AxisLayoutStrategy(BaseLayoutStrategy):
     _nAdjustTries = 3
     axis = Vector.property([0,0], '2b')
 
@@ -163,19 +163,17 @@ class AxisLayout(LayoutBase):
                 adSize[:] = axSize - adjustAxisSize(axSize, axis, isTrial)
             else: adSize[:] = default
         return adjSizes
-AxisLayout.register('axis')
+AxisLayoutStrategy.register('axis')
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class HorizontalLayout(AxisLayout):
+class HorizontalLayoutStrategy(AxisLayoutStrategy):
     axis = Vector.property([1,0], '2b')
-HorizontalLayout.register('horizontal', 'horiz', 'h')
-HorizLayout = HLayout = HorizontalLayout
+HorizontalLayoutStrategy.register('horizontal', 'horiz', 'h')
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class VerticalLayout(AxisLayout):
+class VerticalLayoutStrategy(AxisLayoutStrategy):
     axis = Vector.property([0,1], '2b')
-VerticalLayout.register('vertical', 'vert', 'v')
-VertLayout = VLayout = VerticalLayout
+VerticalLayoutStrategy.register('vertical', 'vert', 'v')
 

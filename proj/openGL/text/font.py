@@ -48,7 +48,6 @@ class Font(object):
         km = self.kerningMap
         if not km or len(idx) < 2:
             return None
-        self.compileIfDirty()
         
         r = asarray([km.get(e, default) for e in zip(idx, idx[1:])], float32)
         return r.reshape((-1, 1, 3))

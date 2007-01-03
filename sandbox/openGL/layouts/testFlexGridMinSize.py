@@ -14,7 +14,7 @@ import time
 
 from TG.openGL.data.rect import Rect
 from TG.openGL.layouts.cells import *
-from TG.openGL.layouts.gridLayout import *
+from TG.openGL.layouts.flexGridLayout import *
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -23,7 +23,7 @@ from TG.openGL.layouts.gridLayout import *
 box = Rect()
 
 def runGridLayout(nRows=2, nCols=4, excess=4):
-    gl = FlexGridLayout(nRows, nCols)
+    gl = FlexGridLayoutStrategy(nRows, nCols)
     cells = [Cell((i%2, (i//4)%2), (200, 200)) for i in xrange(nRows*nCols+excess)]
 
     if 1:

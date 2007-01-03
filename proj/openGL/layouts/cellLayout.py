@@ -13,11 +13,7 @@
 from ..data import Vector, Rect
 
 from .cells import BasicCell
-from .basicLayout import LayoutBase
-
-from .absLayout import AbsLayout
-from .axisLayout import AxisLayout, HorizontalLayout, VerticalLayout
-from .gridLayout import GridLayout, FlexGridLayout
+from .basicLayout import BaseLayoutStrategy
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -26,22 +22,36 @@ from .gridLayout import GridLayout, FlexGridLayout
 class LayoutCell(BasicCell):
     layoutBox = Rect.property()
 
-    def __init__(self, layoutAlg='abs'):
+    def __init__(self, strategy='abs'):
         self.children = []
-        self.layoutAlg = layoutAlg
+        self.strategy = strategy
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     cellFactoryMap = BasicCell.FactoryMap
 
-    def addCell(self, cell='cell'):
+    def addCell(self, cell='cell', *args, **kw):
         if isinstance(cell, basestring):
-            cell = self.cellFactoryMap[cell]()
+            cellFactory = self.cellFactoryMap[cell]
+            cell = cellFactory(*args, **kw)
+
         self.children.append(cell)
         return cell
     add = addCell
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    def __call__(self, *args, **kw):
+        if args or kw:
+            return self.layoutInBox(*args, **kw)
+        else:
+            return self.layout()
+
+    def layout(self):
+        box = self.box
+        self.layoutBox = self.strategy.layout(self.children, box, False)
+        self.onlayout(self, box)
+        return self.layoutBox
 
     def layoutInBox(self, box):
         self.box.copyFrom(box)
@@ -55,32 +65,19 @@ class LayoutCell(BasicCell):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    layoutAlgFactoryMap = LayoutBase.FactoryMap
+    layoutStrategyMap = BaseLayoutStrategy.FactoryMap
 
-    _layoutAlg = None
-    def getLayoutAlg(self):
-        return self._layoutAlg
-    def setLayoutAlg(self, layoutAlg):
-        if isinstance(layoutAlg, basestring):
-            layoutAlg = self.layoutAlgFactoryMap[layoutAlg]()
+    _strategy = None
+    def getStrategy(self):
+        return self._strategy
+    def setStrategy(self, strategy):
+        if isinstance(strategy, basestring):
+            strategy = self.layoutStrategyMap[strategy]()
 
-        self._layoutAlg = layoutAlg
-        return layoutAlg
-    layoutAlg = property(getLayoutAlg, setLayoutAlg)
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    def layout(self):
-        box = self.box
-        self.layoutBox = self.layoutAlg.layout(self.children, box, False)
-        self.onLayout(self, box)
-        return self.layoutBox
-
-    def __call__(self, *args, **kw):
-        if args or kw:
-            return self.layoutInBox(*args, **kw)
-        else:
-            return self.layout()
+        self._strategy = strategy
+        return strategy
+    strategy = property(getStrategy, setStrategy)
 
 LayoutCell.register('layoutcell', 'layout')
+Layout = LayoutCell
 

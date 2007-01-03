@@ -29,7 +29,7 @@ def runAbsLayout():
         Cell(1, 200),
         ]
 
-    vl = AbsLayout()
+    vl = AbsLayoutStrategy()
 
     if 1:
         vl.inside.set(10)
@@ -54,7 +54,7 @@ def runAbsTimiing(n=100):
         Cell(1, 200),
         ]
 
-    vl = AbsLayout()
+    vl = AbsLayoutStrategy()
 
     if 1:
         vl.inside.set(10)
