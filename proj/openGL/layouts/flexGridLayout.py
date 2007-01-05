@@ -83,5 +83,3 @@ class FlexGridLayoutStrategy(GridLayoutStrategy):
 
         return weights, minSizes
 
-FlexGridLayoutStrategy.register('flexgrid', 'fgrid')
-

@@ -21,43 +21,28 @@ from ..data import Rect, Vector
 
 class BasicCell(object):
     visible = True
-
-    layoutVisible = False # set to true of false in layout methods
     box = Rect.property()
-
-    def __init__(self):
-        pass
 
     # Note: You can provide this function if you want to adjust the size
     # alloted to your cell.  If not present, some algorithms run faster
-    ##def adjustAxisSize(self, axisSize, axis, isTrial=False):
-    ##    # axisSize parameter must not be modified... use copies!
-    ##    return axisSize
+    ##def adjustSize(self, lsize):
+    ##    # lsize parameter must not be modified... use copies!
+    ##    return lsize
 
     def layoutInBox(self, lbox):
-        box = self.box
-        self.layoutVisible = True
+        cellBox = self.box
 
         # lbox.pos and lbox.size parameters must not modified... use copies!
-        ceil(lbox.pos, box.pos)
-        floor(lbox.size, box.size)
+        ceil(lbox.pos, cellBox.pos)
+        floor(lbox.size, cellBox.size)
 
-        self.onlayout(self, box)
+        self.onlayout(self, cellBox)
 
     def layoutHide(self):
-        self.layoutVisible = False
+        self.onlayout(self, None)
 
-    def onlayout(self, cell, box):
+    def onlayout(self, cell, cbox):
         pass
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    FactoryMap = {}
-    @classmethod
-    def register(klass, *aliases):
-        for alias in aliases:
-            klass.FactoryMap[alias] = klass
-BasicCell.register('basic')
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -71,9 +56,19 @@ class Cell(BasicCell):
             self.weight[:] = weight
         if min is not None:
             self.minSize[:] = min
-BasicCell.register('cell')
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ MaxSize support
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+def adjustForMaxSize(self, lsize):
+    # lsize parameter must not be modified... use copies!
+    maxSize = self.maxSize
+    idx = (maxSize > 0) & (maxSize < lsize)
+    if idx.any():
+        lsize = lsize.copy()
+        lsize[idx] = maxSize
+    return lsize
 
 class MaxSizeCell(Cell):
     maxSize = Vector.property([0,0], '2f')
@@ -83,13 +78,5 @@ class MaxSizeCell(Cell):
         if max is not None:
             self.maxSize[:] = max
 
-    def adjustAxisSize(self, axisSize, axis, isTrial=False):
-        # axisSize parameter must not be modified... use copies!
-        maxSize = self.maxSize
-        idx = (maxSize > 0) & (maxSize < axisSize)
-        if idx.any():
-            axisSize = axisSize.copy()
-            axisSize[idx] = maxSize
-        return axisSize
-BasicCell.register('maxsize', 'maxsizecell')
+    adjustSize = adjustForMaxSize
 

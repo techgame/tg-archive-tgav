@@ -63,6 +63,7 @@ class GridLayoutStrategy(BaseLayoutStrategy):
 
         lbox = box.copy()
         lsize = lbox.size
+
         # row and col sizes
         lsize = rowSizes.sum(0) + colSizes.sum(0)
         # plus borders along axis
@@ -124,6 +125,4 @@ class GridLayoutStrategy(BaseLayoutStrategy):
     def cellsStats(self, cells, default=zeros((2,), 'f')):
         cellsMinSize = numpy.min([(getattr(c, 'minSize', None) or default) for c in cells], 0)
         return cellsMinSize
-
-GridLayoutStrategy.register('grid')
 

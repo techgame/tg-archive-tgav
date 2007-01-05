@@ -28,5 +28,4 @@ class AbsLayoutStrategy(BaseLayoutStrategy):
                 c.layoutInBox(box)
 
         return box.copy()
-AbsLayoutStrategy.register('abs', 'absolute')
 

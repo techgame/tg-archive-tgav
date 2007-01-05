@@ -20,19 +20,14 @@ class BaseLayoutStrategy(object):
     outside = Vector.property([0,0], '2f')
     inside = Vector.property([0,0], '2f')
 
-    def layout(self, cells, boxPos, boxSize, isTrial=False):
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    __call__ = property(lambda self: self.layout)
+    def layout(self, cells, box, isTrial=False):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def cellsVisible(self, cells):
         return [c for c in cells if getattr(c, 'visible', 1)]
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    FactoryMap = {}
-    @classmethod
-    def register(klass, *aliases):
-        for alias in aliases:
-            klass.FactoryMap[alias] = klass
 

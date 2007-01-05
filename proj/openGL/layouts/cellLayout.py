@@ -13,7 +13,7 @@
 from ..data import Vector, Rect
 
 from .cells import BasicCell
-from .basicLayout import BaseLayoutStrategy
+from .absLayout import AbsLayoutStrategy
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -21,63 +21,31 @@ from .basicLayout import BaseLayoutStrategy
 
 class LayoutCell(BasicCell):
     layoutBox = Rect.property()
+    strategy = AbsLayoutStrategy()
 
-    def __init__(self, strategy='abs'):
-        self.children = []
-        self.strategy = strategy
+    def __init__(self, strategy=None, cells=None):
+        if strategy is not None:
+            self.strategy = strategy
 
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    cellFactoryMap = BasicCell.FactoryMap
-
-    def addCell(self, cell='cell', *args, **kw):
-        if isinstance(cell, basestring):
-            cellFactory = self.cellFactoryMap[cell]
-            cell = cellFactory(*args, **kw)
-
-        self.children.append(cell)
-        return cell
-    add = addCell
+        if cells is None:
+            cells = []
+        self.cells = cells
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def __call__(self, *args, **kw):
-        if args or kw:
-            return self.layoutInBox(*args, **kw)
-        else:
-            return self.layout()
+    __call__ = property(lambda self: self.layoutInBox)
+    layout = property(lambda self: self.layoutInBox)
 
-    def layout(self):
-        box = self.box
-        self.layoutBox = self.strategy.layout(self.children, box, False)
-        self.onlayout(self, box)
-        return self.layoutBox
+    def layoutInBox(self, lbox=None):
+        if lbox is None:
+            lbox = self.box
+        else: self.box.copyFrom(lbox)
 
-    def layoutInBox(self, box):
-        self.box.copyFrom(box)
-        self.layoutVisible = True
-
-        return self.layout()
+        self.layoutBox = self.strategy(self.cells, lbox)
+        self.onlayout(self, lbox)
 
     def layoutHide(self):
-        for c in self.children:
+        self.onlayout(self, None)
+        for c in self.cells:
             c.layoutHide()
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    layoutStrategyMap = BaseLayoutStrategy.FactoryMap
-
-    _strategy = None
-    def getStrategy(self):
-        return self._strategy
-    def setStrategy(self, strategy):
-        if isinstance(strategy, basestring):
-            strategy = self.layoutStrategyMap[strategy]()
-
-        self._strategy = strategy
-        return strategy
-    strategy = property(getStrategy, setStrategy)
-
-LayoutCell.register('layoutcell', 'layout')
-Layout = LayoutCell
 

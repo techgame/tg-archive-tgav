@@ -134,10 +134,9 @@ class AxisLayoutStrategy(BaseLayoutStrategy):
 
         lbox = box.copy()
         lsize = lbox.size
-        # plus borders along axis
-        lsize += axis*(2*self.outside + (len(axisSizes)-1)*self.inside)
-        # plus axis size
-        lsize += axisSizes.sum(0)
+        lsize *= (1-axis)
+        # add axisSize and borders along axis
+        lsize += axisSizes.sum(0) + axis*(2*self.outside + (len(axisSizes)-1)*self.inside)
         return lbox
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -158,22 +157,19 @@ class AxisLayoutStrategy(BaseLayoutStrategy):
         adjSizes = empty_like(axisSizes)
         axis = self.axis
         for c, axSize, adSize in zip(cells, axisSizes, adjSizes):
-            adjustAxisSize = getattr(c, 'adjustAxisSize', None)
-            if adjustAxisSize is not None:
-                adSize[:] = axSize - adjustAxisSize(axSize, axis, isTrial)
+            adjustSize = getattr(c, 'adjustSize', None)
+            if adjustSize is not None:
+                adSize[:] = axSize - axis*adjustSize(axSize)
             else: adSize[:] = default
         return adjSizes
-AxisLayoutStrategy.register('axis')
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class HorizontalLayoutStrategy(AxisLayoutStrategy):
     axis = Vector.property([1,0], '2b')
-HorizontalLayoutStrategy.register('horizontal', 'horiz', 'h')
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class VerticalLayoutStrategy(AxisLayoutStrategy):
     axis = Vector.property([0,1], '2b')
-VerticalLayoutStrategy.register('vertical', 'vert', 'v')
 

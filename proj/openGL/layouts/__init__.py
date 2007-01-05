@@ -6,13 +6,11 @@
 ##~ found in the LICENSE file included with this distribution.    ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
 
-#~ Cells ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-from .cells import BasicCell, Cell, MaxSizeCell
-from .cellLayout import LayoutCell, Layout
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ Imports 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#~ Layout Strategies ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-from .absLayout import AbsLayoutStrategy
-from .axisLayout import AxisLayoutStrategy, VerticalLayoutStrategy, HorizontalLayoutStrategy
-from .gridLayout import GridLayoutStrategy
-from .flexGridLayout import FlexGridLayoutStrategy
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ Definitions 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
