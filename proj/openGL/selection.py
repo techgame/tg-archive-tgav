@@ -17,17 +17,11 @@ from .raw import gl, glu
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class Selector(object):
-    def __init__(self):
-        self.selection = []
+    def start(self):
+        raise NotImplementedError('Subclass Responsibility: %r' % (self,))
 
-    def __iter__(self):
-        return iter(self.selection)
-
-    def __enter__(self):
-        self._namedItems = {}
-
-    def __exit__(self, exc=None, excType=None, excTb=None):
-        del self._namedItems
+    def finish(self):
+        raise NotImplementedError('Subclass Responsibility: %r' % (self,))
 
     def setItem(self, item):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
@@ -36,31 +30,36 @@ class Selector(object):
     def popItem(self):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
 
-    def renderPickMatrix(self, vpbox):
-        raise NotImplementedError('Subclass Responsibility: %r' % (self,))
-
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class NameSelector(Selector):
     """Uses the builtin name-based geometry selection model provided by OpenGL"""
 
-    def __init__(self, pos, size=(2,2), bufferSize=1024):
+    def __init__(self, bufferSize=1024):
         Selector.__init__(self)
-        self.pos = pos
-        self.size = size
         self.setBufferSize(bufferSize)
 
-    def __enter__(self):
-        Selector.__enter__(self)
+    _buffer = (gl.GLuint*0)()
+    def getBufferSize(self):
+        return len(self._buffer)
+    def setBufferSize(self, size):
+        self._buffer = (gl.GLuint*size)()
+    bufferSize = property(getBufferSize, setBufferSize)
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    def start(self):
+        self._namedItems = {}
         gl.glSelectBuffer(self.bufferSize, self._buffer)
         gl.glRenderMode(gl.GL_SELECT)
         gl.glInitNames()
         gl.glPushName(0)
 
-    def __exit__(self, exc=None, excType=None, excTb=None):
+    def finish(self):
         hitRecords = gl.glRenderMode(gl.GL_RENDER)
-        self.selection = self._processHits(hitRecords, self._namedItems)
-        return Selector.__exit__(self, exc, excType, excTb)
+        selection = self._processHits(hitRecords, self._namedItems)
+        del self._namedItems
+        return selection
 
     def _processHits(self, hitRecords, namedItems):
         offset = 0
@@ -77,14 +76,6 @@ class NameSelector(Selector):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def getBufferSize(self):
-        return len(self._buffer)
-    def setBufferSize(self, size):
-        self._buffer = (gl.GLuint*size)()
-    bufferSize = property(getBufferSize, setBufferSize)
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     def setItem(self, item):
         n = id(item)
         self._namedItems[n] = item
@@ -98,14 +89,11 @@ class NameSelector(Selector):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def renderPickMatrix(self, vpbox):
-        p = self.pos
-        s = self.size
-        vp = vpbox.pos[:2].tolist()
-        vs = vpbox.size[:2].tolist()
-        viewport = (gl.GLint*4)(*(vp+vs))
-
-        glu.gluPickMatrix(p[0], p[1], s[0], s[1], viewport)
+    c_viewport = (gl.GLint*4)
+    def pickMatrix(self, vpbox, pos, size):
+        vp = vpbox.pos.astype(int); vs = vpbox.size.astype(int)
+        viewport = self.c_viewport(vp[0], vp[0], vs[0], vs[1])
+        glu.gluPickMatrix(pos[0], pos[1], size[0], size[1], viewport)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
