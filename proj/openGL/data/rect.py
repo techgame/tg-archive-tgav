@@ -118,7 +118,7 @@ class Rect(object):
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def tolist(self):
-        return [self.pos.tolist(), self.size.tolist()]
+        return self.pos.tolist() + self.size.tolist()
 
     def astype(self, dtype):
         return self.copy(dtype)

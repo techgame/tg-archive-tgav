@@ -53,7 +53,6 @@ class NameSelector(Selector):
         gl.glSelectBuffer(self.bufferSize, self._buffer)
         gl.glRenderMode(gl.GL_SELECT)
         gl.glInitNames()
-        gl.glPushName(0)
 
     def finish(self):
         hitRecords = gl.glRenderMode(gl.GL_RENDER)
@@ -90,10 +89,12 @@ class NameSelector(Selector):
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     c_viewport = (gl.GLint*4)
-    def pickMatrix(self, vpbox, pos, size):
-        vp = vpbox.pos.astype(int); vs = vpbox.size.astype(int)
-        viewport = self.c_viewport(vp[0], vp[0], vs[0], vs[1])
-        glu.gluPickMatrix(pos[0], pos[1], size[0], size[1], viewport)
+    def pickMatrix(self, pos, size, vpbox):
+        viewport = self.c_viewport(*vpbox)
+        vp2 = self.c_viewport()
+        gl.glGetIntegerv(gl.GL_VIEWPORT, vp2)
+        
+        glu.gluPickMatrix(pos[0], pos[1], size[0], size[1], vp2)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
