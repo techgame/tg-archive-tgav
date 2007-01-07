@@ -38,6 +38,7 @@ class NameSelector(Selector):
     def __init__(self, bufferSize=1024):
         Selector.__init__(self)
         self.setBufferSize(bufferSize)
+        self._namedItems = {}
 
     _buffer = (gl.GLuint*0)()
     def getBufferSize(self):
@@ -49,7 +50,7 @@ class NameSelector(Selector):
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def start(self):
-        self._namedItems = {}
+        self._namedItems.clear()
         gl.glSelectBuffer(self.bufferSize, self._buffer)
         gl.glRenderMode(gl.GL_SELECT)
         gl.glInitNames()
@@ -57,7 +58,7 @@ class NameSelector(Selector):
     def finish(self):
         hitRecords = gl.glRenderMode(gl.GL_RENDER)
         selection = self._processHits(hitRecords, self._namedItems)
-        del self._namedItems
+        self._namedItems.clear()
         return selection
 
     def _processHits(self, hitRecords, namedItems):
