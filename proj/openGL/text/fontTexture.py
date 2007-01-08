@@ -62,8 +62,6 @@ class FontTextureBase(Texture):
 class FontTextureRect(FontTextureBase):
     texParams = FontTextureBase.texParams + [('target', glext.GL_TEXTURE_RECTANGLE_ARB)]
 
-class FontTexture2D(FontTextureBase):
+class FontTexture2d(FontTextureBase):
     texParams = FontTextureBase.texParams + [('target', gl.GL_TEXTURE_2D)]
-
-FontTexture = FontTextureRect
 

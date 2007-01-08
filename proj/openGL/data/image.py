@@ -93,9 +93,10 @@ class ImageTextureBase(Texture):
 
     def texCoordsForImage(self, components=2, key='flip'):
         scale = self.texCoordScale[components, key]
-        result = self.imageSize[:components] * scale
-        result = self.texCoordsFor(result)
-        return result
+        adjSize = self.imageSize[:components]
+        if self._rstNormalizeTargets.get(self.target, True):
+            adjSize -= 1
+        return self.texCoordsFor(adjSize*scale)
 
     def texCoordsForRect(self, rect, components=2, key='flip'):
         return self.texCoordsForPosSize(rect.pos, rect.size, components, key)
@@ -114,7 +115,4 @@ class ImageTexture2d(ImageTextureBase):
 class ImageTextureRect(ImageTextureBase):
     texParams = ImageTextureBase.texParams + [
                     ('target', glext.GL_TEXTURE_RECTANGLE_ARB), ]
-
-#ImageTexture = ImageTextureRect
-ImageTexture = ImageTexture2d
 

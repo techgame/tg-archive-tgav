@@ -20,7 +20,7 @@ from . import fontTexture
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class Font(object):
-    FontMosaicImage = fontTexture.FontTexture
+    FontMosaicImage = fontTexture.FontTextureRect
     FontTextData = fontData.FontTextData
     FontGeometryArray = fontData.FontGeometryArray
     FontAdvanceArray = fontData.FontAdvanceArray

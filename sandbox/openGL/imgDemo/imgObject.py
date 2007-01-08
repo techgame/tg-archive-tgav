@@ -18,14 +18,14 @@ from TG.openGL.raw import gl
 from TG.openGL.raw.gl import *
 from TG.openGL.data import Vector, Color
 
-from TG.openGL.data.image import ImageTexture2d
+from TG.openGL.data.image import ImageTexture2d as ImageTexture
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class ImageObject(ObservableObject):
-    ImageTexture = ImageTexture2d
+    ImageTexture = ImageTexture
 
     roundValues = True
 
