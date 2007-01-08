@@ -115,5 +115,6 @@ class ImageTextureRect(ImageTextureBase):
     texParams = ImageTextureBase.texParams + [
                     ('target', glext.GL_TEXTURE_RECTANGLE_ARB), ]
 
-ImageTexture = ImageTextureRect
+#ImageTexture = ImageTextureRect
+ImageTexture = ImageTexture2d
 

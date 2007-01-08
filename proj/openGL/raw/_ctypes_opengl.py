@@ -11,6 +11,7 @@ import _ctypes_support
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 openGLLib = _ctypes_support.loadFirstLibrary('OpenGL', 'OpenGL32')
+gluLib = _ctypes_support.loadFirstLibrary('glu32')
 #glutLib = _ctypes_support.loadFirstLibrary('GLUT')
 
 getNameToFirstDigit = re.compile(r'(gl[A-Za-z_]+)\d?').match
@@ -59,6 +60,8 @@ def bind(restype, argtypes, errcheck=None):
                 fnErrCheck = _getErrorCheckForFn(fn)
 
         result = _ctypes_support.attachToLibFn(fn, restype, argtypes, fnErrCheck, openGLLib)
+        if result.api is None:
+            result = _ctypes_support.attachToLibFn(fn, restype, argtypes, fnErrCheck, gluLib)
 
         if bindErrorFunc:
             _bindError(result)

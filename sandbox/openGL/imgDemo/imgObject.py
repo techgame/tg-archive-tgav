@@ -18,7 +18,7 @@ from TG.openGL.raw import gl
 from TG.openGL.raw.gl import *
 from TG.openGL.data import Vector, Color
 
-from TG.openGL.data.image import ImageTexture2d, ImageTextureRect
+from TG.openGL.data.image import ImageTexture2d
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -64,6 +64,7 @@ class ImageObject(ObservableObject):
         geom += off.round()
 
         self.texCoords = texCoords
+        self.glTexCoordv = texCoords.glinfo.glImmediateFor(texCoords)
         texCoordsArrPtr = texCoords.glinfo.glArrayPointer
         self.glTexCoordsArrPtr = partial(texCoordsArrPtr, 
                 texCoords.shape[-1],
@@ -74,6 +75,7 @@ class ImageObject(ObservableObject):
 
         self.geom = geom
         geomArrPtr = geom.glinfo.glArrayPointer
+        self.glVertexv = geom.glinfo.glImmediateFor(geom)
         self.glGeomArrPtr = partial(geomArrPtr, 
                 geom.shape[-1],
                 geom.glTypeId,
@@ -109,11 +111,18 @@ class ImageObject(ObservableObject):
 
         self.imageTex.select()
 
-        self.glEnableTexCoordArray()
-        self.glTexCoordsArrPtr()
+        if 0:
+            self.glEnableTexCoordArray()
+            self.glTexCoordsArrPtr()
 
-        self.glEnableGeomArray()
-        self.glGeomArrPtr()
+            self.glEnableGeomArray()
+            self.glGeomArrPtr()
 
-        self.glDrawArrays()
+            self.glDrawArrays()
+        else:
+            gl.glBegin(gl.GL_QUADS)
+            for t, v in zip(self.texCoords, self.geom):
+                self.glTexCoordv(t.ctypes.data_as(self.glTexCoordv.api.argtypes[-1]))
+                self.glVertexv(v.ctypes.data_as(self.glVertexv.api.argtypes[-1]))
+            gl.glEnd()
 

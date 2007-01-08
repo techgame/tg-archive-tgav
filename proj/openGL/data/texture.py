@@ -10,11 +10,13 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+import sys
 from bisect import bisect_left
 from numpy import asarray
 from ctypes import cast, byref, c_void_p
 
 from ..raw import gl, glext
+from ..raw.errors import  GLError
 
 from .vertexArrays import TextureCoordArray, VertexArray
 from .singleArrays import TextureCoord, Vertex
@@ -508,7 +510,10 @@ class Texture(object):
         else: val = kwattr.iteritems()
 
         for n,v in val:
-            setattr(self, n, v)
+            try:
+                setattr(self, n, v)
+            except GLError, e:
+                print >> sys.stderr, '%r for name: %r value: %r' % (e, n, v)
 
     def release(self):
         if self._as_parameter_ is None:

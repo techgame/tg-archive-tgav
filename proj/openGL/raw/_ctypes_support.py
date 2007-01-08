@@ -11,8 +11,13 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import new
-from ctypes import cdll
+import platform
 from ctypes.util import find_library
+
+if platform.system() == 'Windows':
+    from ctypes import windll as apidll
+else:
+    from ctypes import cdll as apidll
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -22,7 +27,7 @@ def loadFirstLibrary(*libraryname):
     for name in libraryname: 
         path = find_library(name)
         if path:
-            library = cdll.LoadLibrary(path)
+            library = apidll.LoadLibrary(path)
             return library
 
 def attachToLibFn(fn, restype, argtypes, errcheck, lib):

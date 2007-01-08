@@ -78,11 +78,13 @@ xmlSkin = XMLSkin("""<?xml version='1.0'?>
 
                         <event>
                             resize(obj)
+                            evt.Skip()
                         </event>
                         <event type="EVT_SIZE">
                             resize(obj)
+                            evt.Skip()
                         </event>                        
-                        <event type="EVT_ERASE_BACKGROUND"/>
+                        <event type="EVT_ERASE_BACKGROUND" />
 
                         <event type='EVT_MOUSE_EVENTS' run='ctx.model.onMouse(evt)' />
                         <!--<event type='EVT_KEY_UP' run='ctx.model.onKeyboard(evt)' />-->
@@ -186,11 +188,11 @@ class RenderSkinModelBase(wxSkinModel):
         pass
 
     def refresh(self, glCanvas):
-        self.renderSwap(glCanvas)
         t0 = self.timestamp()
         self.renderContent(glCanvas, t0)
         t1 = self.timestamp()
         self.renderFinish(glCanvas, t0, t1)
+        self.renderSwap(glCanvas)
 
     def renderSwap(self, glCanvas):
         glCanvas.SetCurrent()

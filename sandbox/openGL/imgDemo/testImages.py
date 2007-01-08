@@ -47,7 +47,7 @@ class RenderSkinModel(RenderSkinModelBase):
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-        glClearColor(1., 1., 1., 1.)
+        #glClearColor(1., 1., 1., 1.)
         glClear(self.clearMask)
 
         self.imgLogo = ImageObject('tg-logo.png', align=(.5, 1.5, .5))
