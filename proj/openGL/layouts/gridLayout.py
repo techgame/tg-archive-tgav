@@ -29,8 +29,14 @@ class GridLayoutStrategy(BaseLayoutStrategy):
     _vaxis = numpy.array([0,1], 'b')
 
     def __init__(self, nRows=2, nCols=2):
+        self.setRowCol(nRows=2, nCols=2)
+
+    def getRowCol(self):
+        return self.nRows, self.nCols
+    def setRowCol(self, nRows=2, nCols=2):
         self.nRows = nRows
         self.nCols = nCols
+    rowCol = property(getRowCol, setRowCol)
 
     def layout(self, cells, box, isTrial=False):
         if not cells:
