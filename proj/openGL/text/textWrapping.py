@@ -19,7 +19,7 @@ import re
 class BasicTextWrapper(object):
     def wrapText(self, textObj, textData):
         text = textData.text
-        for textSlice, textOffset in self.wrapSlices(textObj, textData):
+        for textSlice in self.wrapSlices(textObj, textData):
             yield text[textSlice]
 
     def wrapSlices(self, textObj, textData):
@@ -27,20 +27,18 @@ class BasicTextWrapper(object):
 
         offset = textData.getOffset()
         for textSlice in self.availTextSlices(textObj, textData):
-            textOffset = offset[textSlice.start:textSlice.stop+1]
-            yield textSlice, textOffset
+            yield textSlice
 
     def availTextSlices(self, textObj, textData):
         text = textData.text
         if text: 
             return [slice(0, len(text))]
-        else:
-            return []
+        else: return []
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class RETextWrapper(BasicTextWrapper):
-    re_wrapPoints = re.compile('$|\n')
+    re_wrapPoints = re.compile('$|\n\r')
 
     def availTextSlices(self, textObj, textData):
         text = textData.text
@@ -56,12 +54,12 @@ class RETextWrapper(BasicTextWrapper):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class LineTextWrapper(RETextWrapper):
-    pass
+    re_wrapPoints = re.compile('$|\n\r')
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class TextWrapper(RETextWrapper):
-    lineWraps = '\n'
+    lineWraps = '\n\r'
     re_wrapPoints = re.compile('[\s-]|$')
 
     def wrapSlices(self, textObj, textData):
@@ -83,19 +81,19 @@ class TextWrapper(RETextWrapper):
 
             # check to see if the next wrap slice falls off the end
             if (wrapSize < (offNext - offLine)):
-                yield (slice(iLine, iCurr), offset[iLine:iCurr+1])
+                yield slice(iLine, iCurr)
                 iLine = iCurr; offLine = offCurr
 
             # check to see if we have a linewrap at the current position
             if text[iNext-1] in lineWraps:
-                yield (slice(iLine, iNext), offset[iLine:iNext+1])
+                yield slice(iLine, iNext)
                 iLine = iNext; offLine = offNext
 
             iCurr = iNext; offCurr = offNext
 
         iNext = len(text)
         if iLine < iNext:
-            yield (slice(iLine, iNext), offset[iLine:iNext+1])
+            yield slice(iLine, iNext)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Wrap Mode Map

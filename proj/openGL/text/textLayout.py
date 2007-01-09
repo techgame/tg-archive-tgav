@@ -10,7 +10,7 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from numpy import array, zeros
+from numpy import array, zeros, concatenate
 from . import textWrapping
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -18,7 +18,7 @@ from . import textWrapping
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class TextLayout(object):
-    def layout(self, textObj, textData, wrapper):
+    def layoutMesh(self, textObj, textData, wrapSlices):
         roundValues = textObj.roundValues
         crop = textObj.crop
         align = textObj.align[textObj.wrapAxis]
@@ -32,42 +32,34 @@ class TextLayout(object):
 
         lineAdvance = zeros(3, 'f')
         lineAdvance[:2] = textData.lineAdvance * textObj.lineSpacing
-
-        # grab the geometry we are laying out
-        geo = textData.geometry.copy()
-        geov = geo.v
-
-        # ask for our slices
-        wrapSlices = wrapper.wrapSlices(textObj, textData)
+        nLinesCrop = int(size[1] // lineAdvance[1]) if crop else None
 
         # offset by lines (usually 1 or 0)
         if textObj.line:
             linePos -= (textObj.line*lineAdvance)
 
         # define some methods to handle alignment and offset
+        offset = textData.getOffset()
         if roundValues:
-            def getOffsetFor(textOffset):
+            def getOffsetFor(textSlice):
+                textOffset = offset[textSlice.start:textSlice.stop+1]
                 alignOff = (oneMinusAlign*textOffset[0] + align*textOffset[-1])
                 return textOffset[:-1] + (linePos - alignOff).round()
         else:
-            def getOffsetFor(textOffset):
+            def getOffsetFor(textSlice):
+                textOffset = offset[textSlice.start:textSlice.stop+1]
                 alignOff = (oneMinusAlign*textOffset[0] + align*textOffset[-1])
                 return textOffset[:-1] + (linePos - alignOff)
 
-        lineCount = 0
-        if crop:
-            for textSlice, textOffset in wrapSlices:
-                lineCount += 1
-                geov[textSlice] += getOffsetFor(textOffset)
-                linePos -= lineAdvance
-                if (linePos[1]<=pos[1]):
-                    geo = geo[:textSlice.stop]
-                    break
-        else:
-            for textSlice, textOffset in wrapSlices:
-                lineCount += 1
-                geov[textSlice] += getOffsetFor(textOffset)
-                linePos -= lineAdvance
+        result = []
+        # grab the geometry we are laying out
+        geometry = textData.geometry.copy()
+        textSlice = slice(0,0)
+        for textSlice in wrapSlices[:nLinesCrop]:
+            lgeom = geometry[textSlice]
+            lgeom.v += getOffsetFor(textSlice)
+            linePos -= lineAdvance
+        geometry = geometry[:textSlice.stop]
+        return geometry
 
-        return geo
 
