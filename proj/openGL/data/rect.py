@@ -260,6 +260,9 @@ class Rect(object):
     #~ Named accessors
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    def sizeAt(self, align):
+        return align*self._size
+
     def posAt(self, align):
         return self._pos + align*self._size
     at = posAt
