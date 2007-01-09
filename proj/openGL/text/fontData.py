@@ -70,9 +70,8 @@ class FontTextData(object):
     def getText(self):
         return self._text
     def setText(self, text):
-        if text != self._text:
-            self._text = text
-            self.recompile()
+        self._text = text
+        self.recompile()
     text = property(getText, setText)
 
     def __nonzero__(self):
