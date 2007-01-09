@@ -10,6 +10,7 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+from itertools import izip, count
 from numpy import array, zeros, concatenate
 from . import textWrapping
 
@@ -18,7 +19,7 @@ from . import textWrapping
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class TextLayout(object):
-    def layoutMesh(self, textObj, textData, wrapSlices):
+    def layoutMesh(self, textObj, textData, iterWrapSlices):
         roundValues = textObj.roundValues
         crop = textObj.crop
         align = textObj.align[textObj.wrapAxis]
@@ -32,32 +33,35 @@ class TextLayout(object):
 
         lineAdvance = zeros(3, 'f')
         lineAdvance[:2] = textData.lineAdvance * textObj.lineSpacing
-        nLinesCrop = int(size[1] // lineAdvance[1]) if crop else None
+        if crop:
+            nLinesCrop = int(size[1] // lineAdvance[1])
+            iterLineSlices = izip(iterWrapSlices, xrange(nLinesCrop))
+        else:
+            iterLineSlices = izip(iterWrapSlices, count())
 
         # offset by lines (usually 1 or 0)
         if textObj.line:
             linePos -= (textObj.line*lineAdvance)
 
         # define some methods to handle alignment and offset
-        offset = textData.getOffset()
         if roundValues:
-            def getOffsetFor(textSlice):
-                textOffset = offset[textSlice.start:textSlice.stop+1]
+            def getOffsetFor(textOffset):
                 alignOff = (oneMinusAlign*textOffset[0] + align*textOffset[-1])
                 return textOffset[:-1] + (linePos - alignOff).round()
         else:
-            def getOffsetFor(textSlice):
-                textOffset = offset[textSlice.start:textSlice.stop+1]
+            def getOffsetFor(textOffset):
                 alignOff = (oneMinusAlign*textOffset[0] + align*textOffset[-1])
                 return textOffset[:-1] + (linePos - alignOff)
 
         result = []
         # grab the geometry we are laying out
         geometry = textData.geometry.copy()
+        offset = textData.getOffset()
         textSlice = slice(0,0)
-        for textSlice in wrapSlices[:nLinesCrop]:
+        for textSlice, nline in iterLineSlices:
+            textOffset = offset[textSlice.start:textSlice.stop+1]
             lgeom = geometry[textSlice]
-            lgeom.v += getOffsetFor(textSlice)
+            lgeom.v += getOffsetFor(textOffset)
             linePos -= lineAdvance
         geometry = geometry[:textSlice.stop]
         return geometry

@@ -17,19 +17,19 @@ import re
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class BasicTextWrapper(object):
-    def wrapText(self, textObj, textData):
+    def iterWrapText(self, textObj, textData):
         text = textData.text
         for textSlice in self.wrapSlices(textObj, textData):
             yield text[textSlice]
 
-    def wrapSlices(self, textObj, textData):
+    def iterWrapSlices(self, textObj, textData):
         if not textData: return
 
         offset = textData.getOffset()
-        for textSlice in self.availTextSlices(textObj, textData):
+        for textSlice in self.iterAvailTextSlices(textObj, textData):
             yield textSlice
 
-    def availTextSlices(self, textObj, textData):
+    def iterAvailTextSlices(self, textObj, textData):
         text = textData.text
         if text: 
             return [slice(0, len(text))]
@@ -40,7 +40,7 @@ class BasicTextWrapper(object):
 class RETextWrapper(BasicTextWrapper):
     re_wrapPoints = re.compile('$|\n\r')
 
-    def availTextSlices(self, textObj, textData):
+    def iterAvailTextSlices(self, textObj, textData):
         text = textData.text
         if not text: return
 
@@ -62,7 +62,7 @@ class TextWrapper(RETextWrapper):
     lineWraps = '\n\r'
     re_wrapPoints = re.compile('[\s-]|$')
 
-    def wrapSlices(self, textObj, textData):
+    def iterWrapSlices(self, textObj, textData):
         wrapAxis = textObj.wrapAxis
         wrapSize = textObj.box.size[wrapAxis]
         if wrapSize <= 0: return
@@ -75,7 +75,7 @@ class TextWrapper(RETextWrapper):
 
         iLine = 0; offLine = offset[iLine, 0, wrapAxis]
         iCurr = iLine; offCurr = offLine
-        for textSlice in self.availTextSlices(textObj, textData):
+        for textSlice in self.iterAvailTextSlices(textObj, textData):
             iNext = textSlice.stop
             offNext = offset[iNext, 0, wrapAxis]
 

@@ -120,8 +120,8 @@ class TextObject(ObservableObject):
         if text is not None:
             self._text = text
         textData.text = self.text
-        wrapSlices = list(self.wrapper.wrapSlices(self, textData))
-        geo = self.layout.layoutMesh(self, textData, wrapSlices)
+        iterWrapSlices = self.wrapper.iterWrapSlices(self, textData)
+        geo = self.layout.layoutMesh(self, textData, iterWrapSlices)
         self.display.update(self, textData, geo)
         return True
 
