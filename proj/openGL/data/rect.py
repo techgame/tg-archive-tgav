@@ -11,7 +11,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import numpy
-from numpy import asarray
+from numpy import vstack
 
 from .glDataProperty import GLDataProperty, asDataProperty
 from .singleArrays import Vector
@@ -175,7 +175,7 @@ class Rect(object):
         return self
 
     def setCorners(self, p0, p1):
-        pv = asarray([p0, p1], self.dtype)
+        pv = vstack([p0, p1])
         p0 = pv.min(0); p1 = pv.max(0)
         return self.setPosSize(p0, p1-p0)
 
