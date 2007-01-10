@@ -10,28 +10,24 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from .gl import glGetError
-from .glu import gluErrorString
+from . import gl, glu
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class GLError(Exception):
-    gluErrorString = staticmethod(gluErrorString)
-    glGetError = staticmethod(glGetError)
-
     fmt = '%s (0x%x)'
 
     def __init__(self, error, callInfo=None):
         self.error = error
-        self.errorString = self.gluErrorString(error)
+        self.errorString = glu.gluErrorString(error)
         Exception.__init__(self, self.fmt % (self.errorString, self.error, ))
 
     @classmethod
     def check(klass, err=None, doRaise=True):
         if err is None:
-            err = klass.glGetError()
+            err = gl.glGetError()
 
         if doRaise and err != 0:
             raise klass(err)

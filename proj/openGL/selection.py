@@ -92,10 +92,7 @@ class NameSelector(Selector):
     c_viewport = (gl.GLint*4)
     def pickMatrix(self, pos, size, vpbox):
         viewport = self.c_viewport(*vpbox)
-        vp2 = self.c_viewport()
-        gl.glGetIntegerv(gl.GL_VIEWPORT, vp2)
-        
-        glu.gluPickMatrix(pos[0], pos[1], size[0], size[1], vp2)
+        glu.gluPickMatrix(pos[0], pos[1], size[0], size[1], viewport)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -107,31 +107,27 @@ class BufferBase(object):
         self._genId()
     usage = property(getUsage, setUsage)
 
-    glGenBuffers = staticmethod(gl.glGenBuffers)
     def _genId(self):
         if self._as_parameter_ is None:
             p = gl.GLenum(0)
-            self.glGenBuffers(1, byref(p))
+            gl.glGenBuffers(1, byref(p))
             self._as_parameter_ = p
-    glDeleteBuffers = staticmethod(gl.glDeleteBuffers)
     def _delId(self):
         p = self._as_parameter_
         if p is not None:
-            self.glDeleteBuffers(1, byref(p))
+            gl.glDeleteBuffers(1, byref(p))
             self._as_parameter_ = None
 
-    glBindBuffer = staticmethod(gl.glBindBuffer)
     def bind(self):
-        self.glBindBuffer(self.target, self)
+        gl.glBindBuffer(self.target, self)
     def unbind(self):
-        self.glBindBuffer(self.target, 0)
+        gl.glBindBuffer(self.target, 0)
 
-    glBufferData = staticmethod(gl.glBufferData)
     def sendData(self, data, usage=None):
         if usage is not None:
             usage = self.usageByName[usage]
         else: usage = self.usage
-        self.glBufferData(self.target, data.nbytes, data.ctypes, usage)
+        gl.glBufferData(self.target, data.nbytes, data.ctypes, usage)
         self.nbytes = data.nbytes
         return (0, self.nbytes)
 
@@ -142,13 +138,12 @@ class BufferBase(object):
         if dtype is None:
             dtype = self.dtype
         nbytes = count*dtype().itemsize
-        self.glBufferData(self.target, nbytes, None, usage)
+        gl.glBufferData(self.target, nbytes, None, usage)
         self.nbytes = nbytes
         return (0, nbytes)
 
-    glBufferSubData = staticmethod(gl.glBufferSubData)
     def sendDataAt(self, data, offset=0):
-        self.glBufferSubData(self.target, offset, data.nbytes, data.ctypes)
+        gl.glBufferSubData(self.target, offset, data.nbytes, data.ctypes)
         return (offset, offset + data.nbytes)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -156,13 +151,12 @@ class BufferBase(object):
     _bufferFromMemory = staticmethod(pythonapi.PyBuffer_FromMemory)
     _bufferFromReadWriteMemory = staticmethod(pythonapi.PyBuffer_FromReadWriteMemory)
 
-    glMapBuffer = staticmethod(gl.glMapBuffer)
     _mapBuffer = None
     def map(self, access, dtype=None):
         access = self.accessByName[access]
         result = self._mapBuffer
         if result is None:
-            ptr = self.glMapBuffer(self.target, access)
+            ptr = gl.glMapBuffer(self.target, access)
 
             if access == gl.GL_READ_ONLY:
                 buf = self._bufferFromMemory(ptr, self.nbytes)
@@ -186,11 +180,10 @@ class BufferBase(object):
             else:
                 return result.view(dtype)
 
-    glUnmapBuffer = staticmethod(gl.glUnmapBuffer)
     def unmap(self):
         self._map_count -= 1
         if self._map_count <= 0:
-            self.glUnmapBuffer(self.target)
+            gl.glUnmapBuffer(self.target)
             self._map_count = 0
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
