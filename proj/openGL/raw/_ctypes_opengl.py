@@ -59,6 +59,7 @@ def bind(restype, argtypes, errcheck=None):
             if not errcheck:
                 fnErrCheck = _getErrorCheckForFn(fn)
 
+        print 'bind:', fn.__name__
         result = _ctypes_support.attachToLibFn(fn, restype, argtypes, fnErrCheck, openGLLib)
         if result.api is None:
             result = _ctypes_support.attachToLibFn(fn, restype, argtypes, fnErrCheck, gluLib)
