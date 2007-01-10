@@ -71,7 +71,7 @@ class RenderSkinModel(RenderSkinModelBase):
         glClear(self.clearMask)
 
         if 1:
-            self.fpsText = TextObject(line=0, align=.5, pos=(0,10,0), font=self.loadFont(self.fontNameFps, self.fontSizeFps), color=(.8, .1, .6))
+            self.fpsText = TextObject(line=0, align=.5, pos=(0,10,0), font=self.loadFont(self.fontNameFps, self.fontSizeFps), color=(.8, .1, .6), crop=False)
 
         self.contentText = TextObject(text=self.sampleText, wrapMode=self.wrapMode, align=.5, font=self.loadFont(self.fontName, self.fontSize), color='#bbf')
 

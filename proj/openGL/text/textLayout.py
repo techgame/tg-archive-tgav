@@ -11,7 +11,10 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 from itertools import izip, count
-from numpy import array, zeros, concatenate
+from numpy import vstack
+
+from ..data import Rect, Vector
+
 from . import textWrapping
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -19,51 +22,81 @@ from . import textWrapping
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class TextLayout(object):
-    def layoutMesh(self, textObj, textData, iterWrapSlices):
-        roundValues = textObj.roundValues
-        crop = textObj.crop
-        align = textObj.align[textObj.wrapAxis]
-        oneMinusAlign = 1-align
+    box = Rect.property()
+    align = Vector.property([0, 1], '2f')
+    crop = True
+    gridCellAlign = True
 
-        pos = textObj.box.pos
-        size = textObj.box.size
+    textData = None
+    lineSpacing = 1
+    lineOffset = 0
 
-        linePos = zeros(3, 'f')
-        linePos[:2] = size*(align, 1) + pos
+    _wrapMode = 'line'
+    _wrapAlg = textWrapping.wrapModeMap[_wrapMode]
+    def getWrapMode(self):
+        return self._wrapMode
+    def setWrapMode(self, wrapMode):
+        self._wrapAlg = textWrapping.wrapModeMap[wrapMode]
+        self._wrapMode = wrapMode
+    wrapMode = property(getWrapMode, setWrapMode)
 
-        lineAdvance = zeros(3, 'f')
-        lineAdvance[:2] = textData.lineAdvance * textObj.lineSpacing
-        if crop:
-            nLinesCrop = int(size[1] // lineAdvance[1])
-            iterLineSlices = izip(iterWrapSlices, xrange(nLinesCrop))
-        else:
-            iterLineSlices = izip(iterWrapSlices, count())
+    def layoutMeshInBox(self, lbox):
+        lineAdvance = self.lineSpacing * self.textData.lineAdvance
 
-        # offset by lines (usually 1 or 0)
-        if textObj.line:
-            linePos -= (textObj.line*lineAdvance)
+        # get the line wrap slices
+        iterWrapSlices = self._wrapAlg.iterWrapSlices(lbox.size, self.textData)
+
+        # figure out line count, and setup wrap slice iterator
+        if self.crop:
+            nLinesCrop = lbox.size[1] // lineAdvance[1]
+            iterLineCount = xrange(int(nLinesCrop))
+        else: iterLineCount = count()
+        lineSlices = zip(iterLineCount, iterWrapSlices)
+
+        # starting position is top and size offset
+        linePos = lbox.pos + lbox.size*self.align
+        # offset by lineAdvance*count
+        linePos -= self.lineOffset*lineAdvance
 
         # define some methods to handle alignment and offset
-        if roundValues:
-            def getOffsetFor(textOffset):
-                alignOff = (oneMinusAlign*textOffset[0] + align*textOffset[-1])
-                return textOffset[:-1] + (linePos - alignOff).round()
+        halignVec = (1,0)*vstack([1-self.align, self.align])
+        if self.gridCellAlign:
+            def lineOffsetFor(lineSpan):
+                aoff = (halignVec*lineSpan).sum(0)
+                aoff -= linePos
+                return aoff.round()
         else:
-            def getOffsetFor(textOffset):
-                alignOff = (oneMinusAlign*textOffset[0] + align*textOffset[-1])
-                return textOffset[:-1] + (linePos - alignOff)
+            def lineOffsetFor(lineSpan):
+                aoff = (halignVec*lineSpan).sum(0)
+                aoff -= linePos
+                return aoff
 
-        result = []
         # grab the geometry we are laying out
-        geometry = textData.geometry.copy()
-        offset = textData.getOffset()
-        textSlice = slice(0,0)
-        for textSlice, nline in iterLineSlices:
-            textOffset = offset[textSlice.start:textSlice.stop+1]
-            lgeom = geometry[textSlice]
-            lgeom.v += getOffsetFor(textOffset)
-            linePos -= lineAdvance
-        geometry = geometry[:textSlice.stop]
-        return geometry
+        offset = self.textData.getOffset()[...,:2]
+        geometry = self.textData.geometry.copy()
+        geomVec = geometry.v[...,:2]
 
+        linesP0P1 = []
+        for nline, ts in lineSlices:
+            linePos -= lineAdvance
+            # get the offset for textSlice
+            toff = offset[ts.start:ts.stop+1]
+            # align the line horizontally
+            lineSpan = toff[[0, -1]].squeeze()
+            lineOff = lineOffsetFor(lineSpan)
+            linesP0P1.append(lineSpan - lineOff)
+            # offset the geometry
+            geomVec[ts] += toff[:-1] - lineOff
+
+        # calculate our (line-oriented) bounding box
+        if linesP0P1:
+            linesP0P1 = vstack(linesP0P1)
+            self.box.setCorners(linesP0P1.min(0), linesP0P1.max(0)+lineAdvance)
+            geometry = geometry[:ts.stop]
+        else: 
+            self.box.setPosSize(linePos, lbox.size*(1,0))
+            geometry = geometry[:0]
+
+        #self.mesh = geometry
+        return geometry
 

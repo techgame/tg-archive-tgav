@@ -31,7 +31,7 @@ from textObject import TextObject
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class RenderSkinModel(RenderSkinModelBase):
-    sampleText = "FreeType 2"
+    sampleText = "FreeType 2\nAnd another line\nThird line"
     fontName, fontSize = 'AndaleMono', 80
 
     fps = 60
@@ -64,7 +64,7 @@ class RenderSkinModel(RenderSkinModelBase):
         glClearColor(0.15, 0.15, 0.25, 1.)
         glClear(self.clearMask)
 
-        self.contentText = TextObject(text=self.sampleText, font=self.loadFont(self.fontName, self.fontSize), color='#bbf')
+        self.contentText = TextObject(text=self.sampleText, font=self.loadFont(self.fontName, self.fontSize), color='#bbf', size=(600.600))
         self.refreshText(False)
 
     def refreshText(self, bRefresh=True, **kw):
@@ -123,10 +123,11 @@ class RenderSkinModel(RenderSkinModelBase):
         self.viewPortSize = w, h
         glViewport (l, b, w, h)
 
+        self.contentText.box.size = w,h
         glMatrixMode (GL_PROJECTION)
         glLoadIdentity ()
         glOrtho(0, w, 0, h, -100, 100)
-        glTranslatef(10, h-10, 0)
+        #glTranslatef(10, h-10, 0)
 
         glMatrixMode (GL_MODELVIEW)
         glLoadIdentity ()

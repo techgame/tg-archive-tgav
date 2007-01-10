@@ -13,7 +13,7 @@
 from TG.observing import ObservableObject
 
 from TG.openGL.data import Vector, Rectf
-from TG.openGL.text import textLayout, textWrapping
+from TG.openGL.text import textLayout
 import textRenderer
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -21,11 +21,6 @@ import textRenderer
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class TextObject(ObservableObject):
-    layout = textLayout.TextLayout()
-
-    WrapModeMap = textWrapping.wrapModeMap
-    wrapper = WrapModeMap[None]
-
     DisplayFactoryMap = textRenderer.displayFactoryMap
     DisplayFactory = DisplayFactoryMap[None]
 
@@ -36,13 +31,14 @@ class TextObject(ObservableObject):
     box = Rectf.property()
     align = Vector.property([0., 0., 0.], dtype='3f')
 
-    line = 1
+    line = 0
     lineSpacing = 1
     crop = True
     wrapAxis = 0
     roundValues = True
 
     def __init__(self, text=None, **kwattr):
+        self.layout = textLayout.TextLayout()
         self.text = text
         self.set(kwattr)
         self.update()
@@ -62,11 +58,9 @@ class TextObject(ObservableObject):
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def getFont(self):
-        return self.textData.font
+        return self.layout.textData.font
     def setFont(self, font):
-        if self.textData:
-            self.textData.recompile()
-        self.textData = font.textData(self.getText())
+        self.layout.textData = font.textData(self.getText())
     font = property(getFont, setFont)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -83,7 +77,7 @@ class TextObject(ObservableObject):
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def setWrapMode(self, mode=None, doUpdate=False):
-        self.wrapper = self.WrapModeMap[mode]
+        self.layout.setWrapMode(mode)
         if doUpdate:
             self.update()
     wrapMode = property(fset=setWrapMode)
@@ -112,17 +106,14 @@ class TextObject(ObservableObject):
     def update(self, text=None, **kwattr):
         if kwattr: 
             self.set(kwattr)
-
-        textData = self.textData
-        if textData is None:
+        if self.layout.textData is None:
             return False
-
         if text is not None:
             self._text = text
-        textData.text = self.text
-        iterWrapSlices = self.wrapper.iterWrapSlices(self, textData)
-        geo = self.layout.layoutMesh(self, textData, iterWrapSlices)
-        self.display.update(self, textData, geo)
+        self.layout.textData.text = self.text
+        geo = self.layout.layoutMeshInBox(self.box)
+
+        self.display.update(self, self.layout.textData, geo)
         return True
 
     def render(self):
