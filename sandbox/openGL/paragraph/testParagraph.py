@@ -18,11 +18,7 @@ from renderBase import RenderSkinModelBase
 
 from TG.openGL.text import Font
 
-from TG.openGL import glBlock, glMatrix
-
-from TG.openGL.raw import gl, glu, glext
-from TG.openGL.raw.gl import *
-from TG.openGL.raw.glu import *
+from TG.openGL.raw import gl
 
 from textObject import TextObject
 
@@ -31,18 +27,20 @@ from textObject import TextObject
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class RenderSkinModel(RenderSkinModelBase):
-    fontNameFps, fontSizeFps = 'AndaleMono', 24
-    if 1:
+    fontNameFps, fontSizeFps = 'Tahoma', 24
+    if 0:
         fontName, fontSize = 'Zapfino', 11
         fontNameRight, fontSizeRight = 'Papyrus', 16
     else:
-        fontName, fontSize = 'AndaleMono', 12
-        fontNameRight, fontSizeRight = 'AndaleMono', 12
+        fontName, fontSize = 'Tahoma', 12
+        fontNameRight, fontSizeRight = 'Tahoma', 12
 
     wrapSize = 0
     wrapMode = None
     fps = 60
     fonts = {
+            'Tahoma': '/Windows/Fonts/TAHOMA.TTF',
+
             'Arial':'/Library/Fonts/Arial',
             'Monaco':'/System/Library/Fonts/Monaco.dfont',
             'Courier': '/System/Library/Fonts/Courier.dfont',
@@ -62,13 +60,13 @@ class RenderSkinModel(RenderSkinModelBase):
 
             }
 
-    clearMask = GL_COLOR_BUFFER_BIT
+    clearMask = gl.GL_COLOR_BUFFER_BIT
     def renderInit(self, glCanvas, renderStart):
-        glEnable(GL_BLEND)
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        gl.glEnable(gl.GL_BLEND)
+        gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
 
-        glClearColor(0.15, 0.15, 0.25, 1.)
-        glClear(self.clearMask)
+        gl.glClearColor(0.15, 0.15, 0.25, 1.)
+        gl.glClear(self.clearMask)
 
         if 1:
             self.fpsText = TextObject(line=0, align=.5, pos=(0,10,0), font=self.loadFont(self.fontNameFps, self.fontSizeFps), color=(.8, .1, .6), crop=False)
@@ -151,15 +149,15 @@ class RenderSkinModel(RenderSkinModelBase):
         (l, b), (w, h) = (border, border), (w-2*border, h-2*border)
 
         self.viewPortSize = w, h
-        glViewport (l, b, w, h)
-        glClear(self.clearMask)
+        gl.glViewport (l, b, w, h)
+        gl.glClear(self.clearMask)
 
-        glMatrixMode (GL_PROJECTION)
-        glLoadIdentity ()
-        glOrtho(0, w, 0, h, -100, 100)
+        gl.glMatrixMode (gl.GL_PROJECTION)
+        gl.glLoadIdentity ()
+        gl.glOrtho(0, w, 0, h, -100, 100)
 
-        glMatrixMode (GL_MODELVIEW)
-        glLoadIdentity ()
+        gl.glMatrixMode (gl.GL_MODELVIEW)
+        gl.glLoadIdentity ()
 
         if self.contentTextRight is not None:
             self.wrapSize = ((w / 2.) - 50)
@@ -181,7 +179,7 @@ class RenderSkinModel(RenderSkinModelBase):
     def renderContent(self, glCanvas, renderStart):
         #oscilateTime = 4
         #oscilate = abs((renderStart % (2*oscilateTime)) - oscilateTime)/ oscilateTime
-        glClear(self.clearMask)
+        gl.glClear(self.clearMask)
 
         self.contentText.render()
 

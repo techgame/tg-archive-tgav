@@ -3,19 +3,38 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import re
+import platform
+
 from ctypes import *
 import _ctypes_support
-
-from . import bDebug
-print "HERE:", __name__, bDebug
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-openGLLib = _ctypes_support.loadFirstLibrary('OpenGL', 'OpenGL32')
-gluLib = _ctypes_support.loadFirstLibrary('glu32')
-#glutLib = _ctypes_support.loadFirstLibrary('GLUT')
+if platform.system() == "Windows":
+    openGL32 = _ctypes_support.loadFirstLibrary('OpenGL', 'OpenGL32')
+    glu32 = _ctypes_support.loadFirstLibrary('glu32')
+
+    wglGetProcAddress = openGL32.wglGetProcAddress
+
+    def attachToLibFn(fn, restype, argtypes, fnErrCheck):
+        fnaddr = wglGetProcAddress(fn.__name__)
+        if fnaddr:
+            result = WINFUNCTYPE(restype, *argtypes)(fnaddr)
+            result.__name__ = fn.__name__
+            return result
+
+        result = _ctypes_support.attachToLibFn(fn, restype, argtypes, fnErrCheck, openGL32)
+        if result.api is None:
+            result = _ctypes_support.attachToLibFn(fn, restype, argtypes, fnErrCheck, glu32)
+        return result
+else:
+    openGL32 = _ctypes_support.loadFirstLibrary('OpenGL')
+    def attachToLibFn(fn, restype, argtypes, fnErrCheck):
+        return _ctypes_support.attachToLibFn(fn, restype, argtypes, fnErrCheck, openGLLib)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 getNameToFirstDigit = re.compile(r'(gl[A-Za-z_]+)\d?').match
 noErrorCheckAllowed = set([
@@ -62,11 +81,7 @@ def bind(restype, argtypes, errcheck=None):
             if not errcheck:
                 fnErrCheck = _getErrorCheckForFn(fn)
 
-        if bDebug[0]:
-            print 'bind:', fn.__name__
-        result = _ctypes_support.attachToLibFn(fn, restype, argtypes, fnErrCheck, openGLLib)
-        if result.api is None:
-            result = _ctypes_support.attachToLibFn(fn, restype, argtypes, fnErrCheck, gluLib)
+        result = attachToLibFn(fn, restype, argtypes, fnErrCheck)
 
         if bindErrorFunc:
             _bindError(result)

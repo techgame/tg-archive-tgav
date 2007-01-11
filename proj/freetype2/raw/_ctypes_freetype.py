@@ -9,7 +9,7 @@ import _ctypes_support
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-freetypeLib = _ctypes_support.loadFirstLibrary('freetype')
+freetypeLib = _ctypes_support.loadFirstLibrary('freetype6', 'freetype')
 
 def cleanupNamespace(namespace):
     _ctypes_support.scrubNamespace(namespace, globals())

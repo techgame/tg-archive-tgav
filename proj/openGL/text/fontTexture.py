@@ -26,7 +26,7 @@ class FontTextureBase(Texture):
             ('wrap', gl.GL_CLAMP),
             ('genMipmaps', True),
             ('magFilter', gl.GL_LINEAR),
-            ('minFilter', gl.GL_LINEAR_MIPMAP_LINEAR),
+            ('minFilter', gl.GL_LINEAR),#_MIPMAP_LINEAR),
             ]
     dataFormat = gl.GL_ALPHA
     dataType = gl.GL_UNSIGNED_BYTE

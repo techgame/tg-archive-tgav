@@ -14,8 +14,8 @@
 import sys
 import time
 
+import TG.openGL.raw
 from TG.openGL.raw import gl
-from TG.openGL.raw.gl import glFlush
 
 from TG.skinning.toolkits.wx import wxSkinModel, XMLSkin
 
@@ -67,6 +67,7 @@ xmlSkin = XMLSkin("""<?xml version='1.0'?>
                             canvas = ctx.canvas
                             <event>
                                 refresh(canvas)
+                                return True
                             </event>
                         </timer>
 
@@ -77,14 +78,15 @@ xmlSkin = XMLSkin("""<?xml version='1.0'?>
                         initialize(obj)
 
                         <event>
-                            resize(obj)
-                            evt.Skip()
+                            PaintDC(obj)
+                            refresh(obj)
+                            return True
                         </event>
                         <event type="EVT_SIZE">
                             resize(obj)
-                            evt.Skip()
+                            return True
                         </event>                        
-                        <event type="EVT_ERASE_BACKGROUND" />
+                        <event type="EVT_ERASE_BACKGROUND"/>
 
                         <event type='EVT_MOUSE_EVENTS' run='ctx.model.onMouse(evt)' />
                         <!--<event type='EVT_KEY_UP' run='ctx.model.onKeyboard(evt)' />-->
@@ -173,11 +175,12 @@ class RenderSkinModelBase(wxSkinModel):
 
         self._lastUpdate = self.timestamp()
         glCanvas.SetCurrent()
+        TG.openGL.raw.apiReload()
         self.renderInit(glCanvas, self._lastUpdate)
         self.resize(glCanvas)
 
     def renderInit(self, glCanvas, renderStart):
-        pass
+        glCanvas.SetCurrent()
 
     def resize(self, glCanvas):
         glCanvas.SetCurrent()
@@ -188,11 +191,11 @@ class RenderSkinModelBase(wxSkinModel):
         pass
 
     def refresh(self, glCanvas):
+        self.renderSwap(glCanvas)
         t0 = self.timestamp()
         self.renderContent(glCanvas, t0)
         t1 = self.timestamp()
         self.renderFinish(glCanvas, t0, t1)
-        self.renderSwap(glCanvas)
 
     def renderSwap(self, glCanvas):
         glCanvas.SetCurrent()
@@ -206,7 +209,7 @@ class RenderSkinModelBase(wxSkinModel):
         ## glFinish () # VERY expensive
 
         self.fpsUpdate(timestamp, timestampEnd)
-        glFlush()
+        gl.glFlush()
     
     def onQuit(self):
         self.repaintTimer.Stop()

@@ -18,11 +18,7 @@ from renderBase import RenderSkinModelBase
 
 from TG.openGL.text import Font
 
-from TG.openGL import glBlock, glMatrix
-
-from TG.openGL.raw import gl, glu, glext
-from TG.openGL.raw.gl import *
-from TG.openGL.raw.glu import *
+from TG.openGL.raw import gl
 
 from textObject import TextObject
 
@@ -32,10 +28,12 @@ from textObject import TextObject
 
 class RenderSkinModel(RenderSkinModelBase):
     sampleText = "FreeType 2\nAnd another line\nThird line"
-    fontName, fontSize = 'AndaleMono', 80
+    fontName, fontSize = 'Tahoma', 80
 
     fps = 60
     fonts = {
+            'Tahoma': '/Windows/Fonts/TAHOMA.TTF',
+
             'Arial':'/Library/Fonts/Arial',
             'Monaco':'/System/Library/Fonts/Monaco.dfont',
             'Courier': '/System/Library/Fonts/Courier.dfont',
@@ -54,15 +52,15 @@ class RenderSkinModel(RenderSkinModelBase):
             'Helvetica': '/System/Library/Fonts/Helvetica.dfont',
             }
 
-    clearMask = GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT
+    clearMask = gl.GL_COLOR_BUFFER_BIT|gl.GL_DEPTH_BUFFER_BIT
     def renderInit(self, glCanvas, renderStart):
-        glEnable(GL_DEPTH_TEST)
+        gl.glEnable(gl.GL_DEPTH_TEST)
 
-        glEnable(GL_BLEND)
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        gl.glEnable(gl.GL_BLEND)
+        gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
 
-        glClearColor(0.15, 0.15, 0.25, 1.)
-        glClear(self.clearMask)
+        gl.glClearColor(0.15, 0.15, 0.25, 1.)
+        gl.glClear(self.clearMask)
 
         self.contentText = TextObject(text=self.sampleText, font=self.loadFont(self.fontName, self.fontSize), color='#bbf', size=(600.600))
         self.refreshText(False)
@@ -121,23 +119,23 @@ class RenderSkinModel(RenderSkinModelBase):
         (l, b), (w, h) = (border, border), (w-2*border, h-2*border)
 
         self.viewPortSize = w, h
-        glViewport (l, b, w, h)
+        gl.glViewport (l, b, w, h)
 
         self.contentText.box.size = w,h
-        glMatrixMode (GL_PROJECTION)
-        glLoadIdentity ()
-        glOrtho(0, w, 0, h, -100, 100)
-        #glTranslatef(10, h-10, 0)
+        gl.glMatrixMode (gl.GL_PROJECTION)
+        gl.glLoadIdentity ()
+        gl.glOrtho(0, w, 0, h, -100, 100)
+        #gl.glTranslatef(10, h-10, 0)
 
-        glMatrixMode (GL_MODELVIEW)
-        glLoadIdentity ()
+        gl.glMatrixMode (gl.GL_MODELVIEW)
+        gl.glLoadIdentity ()
 
         self.refreshText(False)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def renderContent(self, glCanvas, renderStart):
-        glClear(self.clearMask)
+        gl.glClear(self.clearMask)
         self.contentText.render()
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -14,15 +14,11 @@
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-print 'IMPORT:', __name__
-bDebug = [False]
 def apiReload(*modules):
-    bDebug[0] = True
     if not modules:
         from . import gl, glu, glext, errors
         modules = [gl, glu, glext, errors]
 
     for apiMod in modules:
-        print 'Reloading raw api for:', apiMod.__name__
         reload(apiMod)
 

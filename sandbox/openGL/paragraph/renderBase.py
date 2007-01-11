@@ -14,8 +14,8 @@
 import sys
 import time
 
+import TG.openGL.raw
 from TG.openGL.raw import gl
-from TG.openGL.raw.gl import glFlush
 
 from TG.skinning.toolkits.wx import wxSkinModel, XMLSkin
 
@@ -67,6 +67,7 @@ xmlSkin = XMLSkin("""<?xml version='1.0'?>
                             canvas = ctx.canvas
                             <event>
                                 refresh(canvas)
+                                return True
                             </event>
                         </timer>
 
@@ -77,10 +78,13 @@ xmlSkin = XMLSkin("""<?xml version='1.0'?>
                         initialize(obj)
 
                         <event>
-                            resize(obj)
+                            PaintDC(obj)
+                            refresh(obj)
+                            return True
                         </event>
                         <event type="EVT_SIZE">
                             resize(obj)
+                            return True
                         </event>                        
                         <event type="EVT_ERASE_BACKGROUND"/>
 
@@ -171,11 +175,12 @@ class RenderSkinModelBase(wxSkinModel):
 
         self._lastUpdate = self.timestamp()
         glCanvas.SetCurrent()
+        TG.openGL.raw.apiReload()
         self.renderInit(glCanvas, self._lastUpdate)
         self.resize(glCanvas)
 
     def renderInit(self, glCanvas, renderStart):
-        pass
+        glCanvas.SetCurrent()
 
     def resize(self, glCanvas):
         glCanvas.SetCurrent()
@@ -204,7 +209,7 @@ class RenderSkinModelBase(wxSkinModel):
         ## glFinish () # VERY expensive
 
         self.fpsUpdate(timestamp, timestampEnd)
-        glFlush()
+        gl.glFlush()
     
     def onQuit(self):
         self.repaintTimer.Stop()

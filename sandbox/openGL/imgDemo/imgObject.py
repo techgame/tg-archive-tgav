@@ -111,7 +111,7 @@ class ImageObject(ObservableObject):
 
         self.imageTex.select()
 
-        if 0:
+        if 1:
             self.glEnableTexCoordArray()
             self.glTexCoordsArrPtr()
 
