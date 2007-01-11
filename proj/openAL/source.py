@@ -291,6 +291,14 @@ class SourceCollection(object):
             if not s.isSource():
                 raise ValueError('All entries must be source objects')
         self._sources = sources
+    def addSource(self, source=None):
+        if source is None:
+            source = Source()
+        elif not s.isSource():
+            raise ValueError('Entries must be a source object')
+        self._sources.append(source)
+        return source
+
 
     def getSourceIds(self):
         srcids = (al.ALuint * len(self))()
