@@ -30,7 +30,7 @@ if platform.system() == "Windows":
             result = _ctypes_support.attachToLibFn(fn, restype, argtypes, fnErrCheck, glu32)
         return result
 else:
-    openGL32 = _ctypes_support.loadFirstLibrary('OpenGL')
+    openGLLib = _ctypes_support.loadFirstLibrary('OpenGL')
     def attachToLibFn(fn, restype, argtypes, fnErrCheck):
         return _ctypes_support.attachToLibFn(fn, restype, argtypes, fnErrCheck, openGLLib)
 
