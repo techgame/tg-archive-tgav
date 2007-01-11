@@ -205,6 +205,8 @@ class Source(ALIDContextObject):
     def setQueue(self, *buffers):
         self.stop(True)
         self.queue(*buffers)
+    def clearQueue(self):
+        self.setQueue()
 
     def playQueue(self, *buffers):
         self.setQueue(*buffers)
@@ -227,13 +229,33 @@ class Source(ALIDContextObject):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def playFile(self, anAudioFile):
+    def loadFile(slf, anAudioFile):
         from TG.openAL.buffer import Buffer
-        self.playQueue(Buffer.fromFile(anAudioFile))
+        return Buffer.fromFile(anAudioFile)
+
+    def loadFilename(slf, anAudioFilename):
+        from TG.openAL.buffer import Buffer
+        return Buffer.fromFilename(anAudioFilename)
+
+    def playFile(self, anAudioFile):
+        buffer = self.loadFile(anAudioFile)
+        self.playQueue(buffer)
+        return buffer
 
     def playFilename(self, anAudioFilename):
-        from TG.openAL.buffer import Buffer
-        self.playQueue(Buffer.fromFilename(anAudioFilename))
+        buffer = self.loadFilename(anAudioFilename)
+        self.playQueue(buffer)
+        return buffer
+
+    def queueFile(self, anAudioFile):
+        buffer = self.loadFile(anAudioFile)
+        self.queue(buffer)
+        return buffer
+
+    def queueFilename(self, anAudioFilename):
+        buffer = self.loadFilename(anAudioFilename)
+        self.queue(buffer)
+        return buffer
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
