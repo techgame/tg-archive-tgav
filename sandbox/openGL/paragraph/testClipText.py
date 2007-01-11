@@ -28,13 +28,13 @@ from textObject import TextObject
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class RenderSkinModel(RenderSkinModelBase):
-    fontNameFps, fontSizeFps = 'Tahoma', 24
+    fontNameFps, fontSizeFps = 'AndaleMono', 24
     if 0:
         fontName, fontSize = 'Zapfino', 11
         fontNameRight, fontSizeRight = 'Papyrus', 16
     else:
-        fontName, fontSize = 'Tahoma', 12
-        fontNameRight, fontSizeRight = 'Tahoma', 12
+        fontName, fontSize = 'AndaleMono', 12
+        fontNameRight, fontSizeRight = 'AndaleMono', 12
 
     wrapSize = 0
     wrapMode = None

@@ -28,7 +28,7 @@ from textObject import TextObject
 
 class RenderSkinModel(RenderSkinModelBase):
     sampleText = "FreeType 2\nAnd another line\nThird line"
-    fontName, fontSize = 'Tahoma', 80
+    fontName, fontSize = 'AndaleMono', 80
 
     fps = 60
     fonts = {
