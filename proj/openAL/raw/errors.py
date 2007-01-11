@@ -31,7 +31,7 @@ class ALException(Exception):
 
     def __init__(self, error, alErrorString='', callInfo=None):
         self.error = error
-        self.errorString = errorString
+        self.errorString = alErrorString
         excStr = self.exceptionFmt % (self.errorMap.get(error, "???"), error, alErrorString)
         Exception.__init__(self, excStr)
 
