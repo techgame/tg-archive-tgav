@@ -22,6 +22,7 @@ if platform.system() == "Windows":
         fnaddr = wglGetProcAddress(fn.__name__)
         if fnaddr:
             result = WINFUNCTYPE(restype, *argtypes)(fnaddr)
+            result.api = result
             result.__name__ = fn.__name__
             return result
 
