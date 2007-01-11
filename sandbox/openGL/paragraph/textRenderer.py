@@ -27,15 +27,13 @@ class TextDisplay(object):
 
     def update(self, textObj, textData, geometry):
         self.geometry = geometry
-        #self.color = textObj.color
         self.texture = textData.texture
 
-        self.glInterleavedArrays = partial(gl.glInterleavedArrays, geom.glTypeId, 0, geom.ctypes)
-        self.glDrawArrays = partial(gl.glDrawArrays, geom.drawMode, 0, geom.size)
+        self.glInterleavedArrays = partial(gl.glInterleavedArrays, geometry.glTypeId, 0, geometry.ctypes)
+        self.glDrawArrays = partial(gl.glDrawArrays, geometry.drawMode, 0, geometry.size)
 
     def render(self):
         self.texture.select()
-        #self.color.select()
 
         self.glInterleavedArrays()
         self.glDrawArrays()
