@@ -10,6 +10,8 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+from time import sleep
+
 from TG.openAL._properties import *
 from TG.openAL.raw import al
 
@@ -206,7 +208,7 @@ class Source(ALIDContextObject):
         self.stop(True)
         self.queue(*buffers)
     def clearQueue(self):
-        self.setQueue()
+        self.stop(True)
 
     def playQueue(self, *buffers):
         self.setQueue(*buffers)
@@ -214,10 +216,14 @@ class Source(ALIDContextObject):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def play(self, *buffers):
+    def play(self, *buffers, **kw):
         if buffers:
             self.queue(*buffers)
         al.alSourcePlay(self)
+        if kw.pop('wait', False):
+            while self.state != al.AL_PLAYING:
+                sleep(0)
+
     def pause(self):
         al.alSourcePause(self)
     def stop(self, dequeueAll=True):

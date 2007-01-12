@@ -133,6 +133,9 @@ class Buffer(ALIDContextObject):
             self._queuedSrcs = set()
         return self._queuedSrcs
 
+    def isQueued(self):
+        return bool(self._queuedSrcs)
+
     def onQueued(self, src):
         self.getQueuedSources().add(src)
     def onDequeued(self, src):
