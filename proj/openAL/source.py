@@ -304,8 +304,12 @@ class Source(ALIDContextObject):
         return self.state == al.AL_PLAYING
     def isPaused(self):
         return self.state == al.AL_PAUSED
-    def isStopped(self):
-        return self.state in (al.AL_STOPPED, al.AL_INITIAL)
+    def isStopped(self, orInitial=True):
+        if orInitial:
+            return self.state in (al.AL_STOPPED, al.AL_INITIAL)
+        else: return self.state == al.AL_STOPPED
+    def isInitial(self):
+        return self.state == al.AL_INITIAL
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
