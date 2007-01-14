@@ -24,7 +24,7 @@ from . import textWrapping
 class TextLayout(object):
     box = Rect.property()
     align = Vector.property([0, 1], '2f')
-    crop = True
+    crop = False
     gridCellAlign = True
 
     textData = None
