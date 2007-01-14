@@ -49,6 +49,16 @@ class Buffer(ALIDContextObject):
     channels = _alBufferPropertyI(al.AL_CHANNELS)
     size = _alBufferPropertyI(al.AL_SIZE)
 
+    def getSamples(self):
+        return self.size * 8 / (self.bits*self.channels)
+    samples = property(getSamples)
+
+    def getSeconds(self):
+        return self.getSamples()/float(self.frequency)
+    seconds = property(getSeconds)
+
+    _allocated = True
+
     def __init__(self, bCreate=True):
         if not bCreate:
             return
@@ -83,12 +93,24 @@ class Buffer(ALIDContextObject):
         self.createFromId(bufferIds[0])
         return self
 
+    @classmethod
+    def fromId(klass, bufferId):
+        if bufferId:
+            self = klass(False)
+            self._setAsParam(bufferId)
+            self._allocated = False
+            return self
+        else: return None
+
     def createFromId(self, bufferId):
         self._setAsParam(bufferId)
         self._context.addBuffer(self)
         return self
 
     def destroy(self):
+        if not self._allocated:
+            return 
+
         if self._hasAsParam():
             i = self.inContext()
             try:
@@ -174,7 +196,7 @@ class Buffer(ALIDContextObject):
         return self
 
     def loadFilename(self, filename):
-        """Make sure that the source is dequeued from all buffers"""
+        """Make sure that the buffer is dequeued from all sources"""
         format = al.ALenum(0)
         data = al.POINTER(al.ALvoid)()
         size = al.ALsizei(0)
@@ -193,6 +215,7 @@ class Buffer(ALIDContextObject):
         return self.loadFile(dataFile)
 
     def loadFile(self, dataFile):
+        """Make sure that the buffer is dequeued from all sources"""
         dataFile.seek(0)
         raw = dataFile.read()
         return self.loadData(raw)

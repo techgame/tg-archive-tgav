@@ -15,6 +15,8 @@ from time import sleep
 from TG.openAL._properties import *
 from TG.openAL.raw import al
 
+from TG.openAL.buffer import Buffer
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -79,7 +81,7 @@ class Source(ALIDContextObject):
     looping = alSourcePropertyI(al.AL_LOOPING)
     type = alSourcePropertyI(al.AL_SOURCE_TYPE)
 
-    buffer = alSourcePropertyI(al.AL_BUFFER)
+    buffer_id = alSourcePropertyI(al.AL_BUFFER)
     buffers_queued = alSourcePropertyI(al.AL_BUFFERS_QUEUED)
     buffers_processed = alSourcePropertyI(al.AL_BUFFERS_PROCESSED)
 
@@ -150,6 +152,25 @@ class Source(ALIDContextObject):
         if ctx is not None:
             ctx.removeSource(self)
 
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    _buffer_view = None
+    def getBuffer(self):
+        bufferId = self.buffer_id
+        if not bufferId:
+            return None
+
+        view = self._buffer_view
+        if view is None:
+            view = Buffer(False)
+            self._buffer_view = view
+
+        view._setAsParam(bufferId)
+        return view
+    buffer = property(getBuffer)
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     _bufferQueue = None
     def getBufferQueue(self):
         if self._bufferQueue is None:
@@ -190,6 +211,12 @@ class Source(ALIDContextObject):
     def dequeueAll(self):
         self.dequeue(self.getBufferQueue())
 
+    def dequeueProcessed(self):
+        nProcessed = self.buffers_processed
+        buffers = self.getBufferQueue()[:nProcessed]
+        self.dequeue(buffers)
+        return buffers
+
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def onQueueBuffer(self, buf):
@@ -220,9 +247,14 @@ class Source(ALIDContextObject):
         if buffers:
             self.queue(*buffers)
         al.alSourcePlay(self)
-        if kw.pop('wait', False):
-            while self.state != al.AL_PLAYING:
-                sleep(0)
+
+        wait = kw.pop('wait', False)
+        if wait:
+            if wait <= 1: wait = 5
+            for x in xrange(wait):
+                if self.state != al.AL_PLAYING:
+                    sleep(0.01)
+                else: break
 
     def pause(self):
         al.alSourcePause(self)
@@ -236,11 +268,9 @@ class Source(ALIDContextObject):
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def loadFile(slf, anAudioFile):
-        from TG.openAL.buffer import Buffer
         return Buffer.fromFile(anAudioFile)
 
     def loadFilename(slf, anAudioFilename):
-        from TG.openAL.buffer import Buffer
         return Buffer.fromFilename(anAudioFilename)
 
     def playFile(self, anAudioFile):
