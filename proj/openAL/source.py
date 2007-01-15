@@ -10,7 +10,7 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from time import sleep
+import time
 
 from TG.openAL._properties import *
 from TG.openAL.raw import al
@@ -77,6 +77,7 @@ class Source(ALIDContextObject):
         al.AL_PAUSED: 'paused',
         al.AL_STOPPED: 'stopped',
         }
+    stateFromString = dict((v, k) for k,v in stateToString.items())
 
     looping = alSourcePropertyI(al.AL_LOOPING)
     type = alSourcePropertyI(al.AL_SOURCE_TYPE)
@@ -237,9 +238,9 @@ class Source(ALIDContextObject):
     def clearQueue(self):
         self.stop(True)
 
-    def playQueue(self, *buffers):
+    def playQueue(self, *buffers, **kw):
         self.setQueue(*buffers)
-        self.play()
+        self.play(**kw)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -251,19 +252,28 @@ class Source(ALIDContextObject):
         wait = kw.pop('wait', False)
         if wait:
             if wait <= 1: wait = 5
-            for x in xrange(wait):
-                if self.state != al.AL_PLAYING:
-                    sleep(0.01)
-                else: break
+            self.waitForState(al.AL_PLAYING, wait)
 
     def pause(self):
         al.alSourcePause(self)
-    def stop(self, dequeueAll=True):
+    def stop(self, dequeueAll=True, wait=False):
         al.alSourceStop(self)
         if dequeueAll:
             self.dequeueAll()
+        if wait:
+            if wait <= 1: wait = 5
+            self.waitForState(al.AL_STOPPED, wait)
     def rewind(self):
         al.alSourceRewind(self)
+
+    def waitForState(self, state, waitLoops=5, waitTime=0.01):
+        state = self.stateFromString.get(state, state)
+        for x in xrange(waitLoops):
+            if self.state != state:
+                time.sleep(waitTime)
+            else: 
+                return True
+        return False
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -299,6 +309,7 @@ class Source(ALIDContextObject):
         if self._hasAsParam():
             return self.stateToString[self.state]
         else: return "uninitialized"
+    statestr = property(getStateStr)
     
     def isPlaying(self):
         return self.state == al.AL_PLAYING
