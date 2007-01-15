@@ -252,7 +252,7 @@ class Source(ALIDContextObject):
         wait = kw.pop('wait', False)
         if wait:
             if wait <= 1: wait = 5
-            self.waitForState(al.AL_PLAYING, wait)
+            self.waitForStates([al.AL_PLAYING], wait)
 
     def pause(self):
         al.alSourcePause(self)
@@ -262,14 +262,14 @@ class Source(ALIDContextObject):
             self.dequeueAll()
         if wait:
             if wait <= 1: wait = 5
-            self.waitForState(al.AL_STOPPED, wait)
+            self.waitForStates([al.AL_STOPPED], wait)
     def rewind(self):
         al.alSourceRewind(self)
 
-    def waitForState(self, state, waitLoops=5, waitTime=0.01):
-        state = self.stateFromString.get(state, state)
+    def waitForStates(self, states, waitLoops=5, waitTime=0.01):
+        states = [self.stateFromString.get(s, s) for s in states]
         for x in xrange(waitLoops):
-            if self.state != state:
+            if self.state not in states:
                 time.sleep(waitTime)
             else: 
                 return True
