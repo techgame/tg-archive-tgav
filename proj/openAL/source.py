@@ -70,7 +70,7 @@ class Source(ALIDContextObject):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    state = alSourcePropertyI(al.AL_SOURCE_STATE)
+    state_id = alSourcePropertyI(al.AL_SOURCE_STATE)
     stateToString = {
         al.AL_INITIAL: 'initial',
         al.AL_PLAYING: 'playing',
@@ -80,7 +80,7 @@ class Source(ALIDContextObject):
     stateFromString = dict((v, k) for k,v in stateToString.items())
 
     looping = alSourcePropertyI(al.AL_LOOPING)
-    type = alSourcePropertyI(al.AL_SOURCE_TYPE)
+    type_id = alSourcePropertyI(al.AL_SOURCE_TYPE)
 
     buffer_id = alSourcePropertyI(al.AL_BUFFER)
     buffers_queued = alSourcePropertyI(al.AL_BUFFERS_QUEUED)
@@ -108,7 +108,7 @@ class Source(ALIDContextObject):
         return "<%s.%s alid: %s state: %s>" % (
                 self.__class__.__module__,
                 self.__class__.__name__,
-                self._as_parameter_, self.getStateStr())
+                self._as_parameter_, self.state)
 
     def __del__(self):
         try:
@@ -152,6 +152,19 @@ class Source(ALIDContextObject):
         ctx = self._context
         if ctx is not None:
             ctx.removeSource(self)
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    typeToString  = {
+        al.AL_UNDETERMINED: 'undetermined',
+        al.AL_STATIC: 'static',
+        al.AL_STREAMING: 'streaming',
+    }
+    typeFromString = dict((v,k) for k,v in typeToString.items())
+
+    def getType(self):
+        return self.typeToString[self.type_id]
+    type = property(getType)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -269,7 +282,7 @@ class Source(ALIDContextObject):
     def waitForStates(self, states, waitLoops=5, waitTime=0.01):
         states = [self.stateFromString.get(s, s) for s in states]
         for x in xrange(waitLoops):
-            if self.state not in states:
+            if self.state_id not in states:
                 time.sleep(waitTime)
             else: 
                 return True
@@ -305,22 +318,22 @@ class Source(ALIDContextObject):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def getStateStr(self):
+    def getState(self):
         if self._hasAsParam():
-            return self.stateToString[self.state]
+            return self.stateToString[self.state_id]
         else: return "uninitialized"
-    statestr = property(getStateStr)
+    state = property(getState)
     
     def isPlaying(self):
-        return self.state == al.AL_PLAYING
+        return self.state_id == al.AL_PLAYING
     def isPaused(self):
-        return self.state == al.AL_PAUSED
+        return self.state_id == al.AL_PAUSED
     def isStopped(self, orInitial=True):
         if orInitial:
-            return self.state in (al.AL_STOPPED, al.AL_INITIAL)
-        else: return self.state == al.AL_STOPPED
+            return self.state_id in (al.AL_STOPPED, al.AL_INITIAL)
+        else: return self.state_id == al.AL_STOPPED
     def isInitial(self):
-        return self.state == al.AL_INITIAL
+        return self.state_id == al.AL_INITIAL
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
