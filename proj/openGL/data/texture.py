@@ -12,11 +12,13 @@
 
 import sys
 from bisect import bisect_left
+from warnings import warn
+
 from numpy import asarray
 from ctypes import cast, byref, c_void_p
 
 from ..raw import gl, glext
-from ..raw.errors import  GLError
+from ..raw import errors as glErrors
 
 from .vertexArrays import TextureCoordArray, VertexArray
 from .singleArrays import TextureCoord, Vertex
@@ -497,7 +499,6 @@ class Texture(object):
                     break
 
         self._genId()
-        self.bind()
         self.set(self.texParams)
         self.set(kwargs)
         
@@ -511,8 +512,9 @@ class Texture(object):
         for n,v in val:
             try:
                 setattr(self, n, v)
-            except GLError, e:
-                print >> sys.stderr, '%r for name: %r value: %r' % (e, n, v)
+            except glErrors.GLError, glerr:
+                if glerr.error == 0x500:
+                    print >> sys.stderr, '%s: %s for name: %r value: %r' % (glerr.__class__.__name__, glerr, n, v)
 
     def release(self):
         if self._as_parameter_ is None:
@@ -525,7 +527,10 @@ class Texture(object):
         if self._as_parameter_ is None:
             p = gl.GLenum(0)
             gl.glGenTextures(1, byref(p))
+            gl.glBindTexture(self.target, p)
             self._as_parameter_ = p
+        else:
+            gl.glBindTexture(self.target, self)
     def _delId(self):
         p = self._as_parameter_
         if p is not None:

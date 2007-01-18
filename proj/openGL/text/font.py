@@ -61,3 +61,8 @@ class Font(object):
         self.textData = self.FontTextData.factoryUpdateFor(self)
         self.texture = self.mosaicImage
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+class Font2d(Font):
+    FontMosaicImage = fontTexture.FontTexture2d
+

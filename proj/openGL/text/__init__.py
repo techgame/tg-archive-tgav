@@ -10,18 +10,36 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from font import Font
+from font import Font, Font2d
 import freetypeFontLoader
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def fromFace(face, size=None, **kw):
+def loaderFromFaceFilename(klass, face, size=None, **kw):
     loader = freetypeFontLoader.FreetypeFontLoader(face, size, **kw)
-    return loader.compile(Font())
-fromFilename = fromFace
+    loader.FontFactory = klass
+    return loader
 
-Font.fromFace = staticmethod(fromFace)
-Font.fromFilename = staticmethod(fromFilename)
+def fromFaceFilename(klass, face, size=None, **kw):
+    loader = loaderFromFaceFilename(klass, face, size, **kw)
+    return loader.compile()
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Font.fromFace = classmethod(fromFaceFilename)
+Font.fromFilename = classmethod(fromFaceFilename)
+Font.loaderFromFace = classmethod(loaderFromFaceFilename)
+Font.loaderFromFilename = classmethod(loaderFromFaceFilename)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Font2d.fromFace = classmethod(fromFaceFilename)
+Font2d.fromFilename = classmethod(fromFaceFilename)
+Font2d.loaderFromFace = classmethod(loaderFromFaceFilename)
+Font2d.loaderFromFilename = classmethod(loaderFromFaceFilename)
+
+fromFace = Font2d.fromFace
+fromFilename = Font2d.fromFilename
 

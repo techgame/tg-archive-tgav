@@ -15,7 +15,7 @@ import itertools
 from TG.freetype2.face import FreetypeFace
 
 from ..data import blockMosaic
-from .font import Font
+from . import font 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -23,7 +23,7 @@ from .font import Font
 
 class FreetypeFontLoader(object):
     LayoutAlgorithm = blockMosaic.BlockMosaicAlg
-    FontFactory = Font
+    FontFactory = font.Font
 
     def __init__(self, face, size=None, dpi=None, charset=NotImplemented):
         self.setFace(face)
@@ -93,13 +93,14 @@ class FreetypeFontLoader(object):
     def compile(self, fontResult=None):
         face = self.getFace()
         charset = self.getCharset()
+
+        if fontResult is None:
+            fontResult = self.FontFactory()
+
         return self.compileFontOnto(fontResult, face, charset)
 
     @classmethod
     def compileFontOnto(klass, fontResult, face, charset):
-        if fontResult is None:
-            fontResult = klass.FontFactory()
-
         fontResult._onLoaderStart()
         count, gidxMap = klass._compileCharMap(fontResult, face, charset)
 
