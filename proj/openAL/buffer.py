@@ -200,13 +200,13 @@ class Buffer(ALIDContextObject):
         format = al.ALenum(0)
         data = al.POINTER(al.ALvoid)()
         size = al.ALsizei(0)
-        freqency = al.ALsizei(0)
+        frequency = al.ALsizei(0)
 
-        alut.alutLoadWAVFile(str(filename), al.byref(format), al.byref(data), al.byref(size), al.byref(freqency))
+        alut.alutLoadWAVFile(str(filename), al.byref(format), al.byref(data), al.byref(size), al.byref(frequency))
         try:
-            self.loadPCMData(format, data, size, freqency)
+            self.loadPCMData(format, data, size, frequency)
         finally:
-            alut.alutUnloadWAV(format, data, size, freqency)
+            alut.alutUnloadWAV(format, data, size, frequency)
         return self
 
     @classmethod
@@ -230,25 +230,25 @@ class Buffer(ALIDContextObject):
         format = al.ALenum(0)
         data = al.POINTER(al.ALvoid)()
         size = al.ALsizei(0)
-        freqency = al.ALsizei(0)
+        frequency = al.ALsizei(0)
 
-        alut.alutLoadWAVMemory(waveRaw, al.byref(format), al.byref(data), al.byref(size), al.byref(freqency))
+        alut.alutLoadWAVMemory(waveRaw, al.byref(format), al.byref(data), al.byref(size), al.byref(frequency))
         try:
-            self.loadPCMData(format, data, size, freqency)
+            self.loadPCMData(format, data, size, frequency)
         finally:
-            alut.alutUnloadWAV(format, data, size, freqency)
+            alut.alutUnloadWAV(format, data, size, frequency)
         return self
     loadData = loadWaveData
 
-    def loadPCMData(self, format, pcmData, size, freqency):
+    def loadPCMData(self, format, pcmData, size, frequency):
         if not isinstance(format, al.ALenum):
             format = al.ALenum(format)
         if not isinstance(size, al.ALsizei):
             size = al.ALsizei(size)
-        if not isinstance(freqency, al.ALsizei):
-            freqency = al.ALsizei(freqency)
+        if not isinstance(frequency, al.ALsizei):
+            frequency = al.ALsizei(frequency)
 
         self.dequeue()
-        al.alBufferData(self, format, pcmData, size, freqency)
+        al.alBufferData(self, format, pcmData, size, frequency)
         return self
 
