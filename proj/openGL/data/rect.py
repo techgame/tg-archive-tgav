@@ -190,7 +190,9 @@ class Rect(object):
 
     def getCorner(self):
         return self._pos + self._size
-    corner = property(getCorner)
+    def setCorner(self, value):
+        self._size = value - self._pos
+    corner = property(getCorner, setCorner)
     
     def setSize(self, size, aspect=None, align=None):
         self._size[:] = size
@@ -208,7 +210,7 @@ class Rect(object):
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @classmethod
-    def unionPosSize(klass, *args):
+    def unionCorners(klass, *args):
         rectItems = []
         for a in args:
             if isinstance(a, Rect):
@@ -216,8 +218,8 @@ class Rect(object):
             else: rectItems.extend(a)
 
         if rectItems:
-            pos = numpy.min((r.pos for r in rectItems), 0)
-            corner = numpy.max((r.corner for r in rectItems), 0)
+            pos = numpy.min([r.pos for r in rectItems], 0)
+            corner = numpy.max([r.corner for r in rectItems], 0)
             return (pos, corner)
 
     def union(self, rectItems):
