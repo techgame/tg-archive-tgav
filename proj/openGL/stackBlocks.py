@@ -19,17 +19,17 @@ from TG.openGL.raw.errors import GLError
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def _glPurgeStackOf(method):
-    GLError.check()
-    try:
-        method = getattr(method, 'api', method)
-        while 1:
-            method()
-            if glGetError() != 0:
-                return
-        
-    except Exception:
-        pass
+def getInfo():
+   return {
+        'vendor': gl.glGetString(gl.GL_VENDOR),
+        'renderer': gl.glGetString(gl.GL_RENDERER),
+        'version': gl.glGetString(gl.GL_VERSION),
+        'extensions': gl.glGetString(gl.GL_EXTENSIONS),
+        }
+
+def _glPurgeStackOf(popStack, count):
+    for idx in xrange(count):
+        popStack()
 
 @contextmanager
 def glName(name):
@@ -39,8 +39,14 @@ def glName(name):
     finally:
         gl.glPopName()
 
+def glGetValueFor(glid):
+    v = gl.GLint(0)
+    gl.glGetIntegerv(glid, gl.byref(v))
+    return v.value
+
 def glPurgeNames():
-    _glPurgeStackOf(gl.glPopName)
+    count = glGetValueFor(gl.GL_NAME_STACK_DEPTH)
+    _glPurgeStackOf(gl.glPopName, count)
 
 @contextmanager
 def glClientAttribs(mask):
@@ -51,7 +57,8 @@ def glClientAttribs(mask):
         gl.glPopClientAttrib()
 
 def glPurgeClientAttribs():
-    _glPurgeStackOf(gl.glPopClientAttribs)
+    count = glGetValueFor(gl.GL_CLIENT_ATTRIB_STACK_DEPTH)
+    _glPurgeStackOf(gl.glPopClientAttrib, count)
 
 @contextmanager
 def glAttribs(mask):
@@ -62,7 +69,8 @@ def glAttribs(mask):
         gl.glPopAttrib()
 
 def glPurgeAttribs():
-    _glPurgeStackOf(gl.glPopAttribs)
+    count = glGetValueFor(gl.GL_ATTRIB_STACK_DEPTH)
+    _glPurgeStackOf(gl.glPopAttrib, count)
 
 @contextmanager
 def glImmediate(mode=None):
@@ -92,13 +100,29 @@ def glMatrix(mode=None):
         finally:
             gl.glPopMatrix()
 
-def glPurgeMatrix(mode=None):
+_matrixStackDepth = {
+        gl.GL_MODELVIEW: gl.GL_MODELVIEW_STACK_DEPTH,
+        gl.GL_PROJECTION: gl.GL_PROJECTION_STACK_DEPTH,
+        gl.GL_TEXTURE: gl.GL_TEXTURE_STACK_DEPTH,
+        }
+def glPurgeMatrix(mode=None, matrixStackDepth=_matrixStackDepth):
+    stackDepthToken = matrixStackDepth[mode or glGetValueFor(gl.GL_MATRIX_MODE)]
+    count = glGetValueFor(stackDepthToken)
+
     if mode is None:
-        _glPurgeStackOf(gl.glPopMatrix)
+        _glPurgeStackOf(gl.glPopMatrix, count)
         gl.glLoadIdentity()
     else:
         gl.glMatrixMode(mode)
-        _glPurgeStackOf(gl.glPopMatrix)
+        _glPurgeStackOf(gl.glPopMatrix, count)
         gl.glLoadIdentity()
-        gl.glMatrixMode(gl.GL_MODEL_VIEW)
+        gl.glMatrixMode(gl.GL_MODELVIEW)
+
+def glPurgeAllStacks():
+    glPurgeMatrix(gl.GL_MODELVIEW)
+    glPurgeMatrix(gl.GL_PROJECTION)
+    glPurgeMatrix(gl.GL_TEXTURE)
+    glPurgeAttribs()
+    glPurgeClientAttribs()
+    glPurgeNames()
 
