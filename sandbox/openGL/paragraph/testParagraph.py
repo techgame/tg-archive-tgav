@@ -28,7 +28,7 @@ from textObject import TextObject
 
 class RenderSkinModel(RenderSkinModelBase):
     fontNameFps, fontSizeFps = 'AndaleMono', 24
-    if 0:
+    if 1:
         fontName, fontSize = 'Zapfino', 11
         fontNameRight, fontSizeRight = 'Papyrus', 16
     else:

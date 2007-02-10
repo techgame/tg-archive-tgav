@@ -150,13 +150,14 @@ class FreetypeFontLoader(object):
         if mosaicImage is None:
             return (None, {})
 
-        mosaic, mosaicSize = klass._compileGlyphMosaic(fontResult ,face, gidxMap, mosaicImage.getMaxMosaicSize())
+        mosaic, mosaicSize = klass._compileGlyphMosaic(fontResult, face, gidxMap, mosaicImage.getMaxMosaicSize())
         mosaicImage.createMosaic(mosaicSize)
         return (mosaicImage, mosaic)
 
     @classmethod
     def _compileGlyphMosaic(klass, fontResult, face, gidxMap, maxSize):
-        alg = klass.LayoutAlgorithm((maxSize, maxSize))
+        if maxSize < 256: raise Exception("Max layout texture size is too small: %s" % (maxSize,))
+        alg = klass.LayoutAlgorithm((maxSize-2, maxSize-2))
 
         mosaic = {}
         for gidx in gidxMap.iterkeys():
@@ -168,7 +169,7 @@ class FreetypeFontLoader(object):
         mosaicSize, layout, unplaced = alg.layout()
 
         if unplaced:
-            raise RuntimeError("Not all characters could be placed in mosaic")
+            raise Exception("Not all characters could be placed in mosaic.  (%s placed, %s unplaced)" % (len(layout), len(unplaced)))
 
         return mosaic, mosaicSize
 

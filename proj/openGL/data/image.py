@@ -22,9 +22,8 @@ from .texture import Texture, TextureCoord, TextureCoordArray, VertexArray
 
 class ImageTextureBase(Texture):
     texParams = Texture.texParams + [
-            ('wrap', gl.GL_CLAMP_TO_EDGE),
-
-            ('genMipmaps', True),
+            #('wrap', gl.GL_CLAMP_TO_EDGE),
+            #('genMipmaps', True),
             ('magFilter', gl.GL_LINEAR),
             ('minFilter', gl.GL_LINEAR),#_MIPMAP_LINEAR),
             ]
@@ -94,8 +93,6 @@ class ImageTextureBase(Texture):
     def texCoordsForImage(self, components=2, key='flip'):
         scale = self.texCoordScale[components, key]
         adjSize = self.imageSize[:components]
-        if self._rstNormalizeTargets.get(self.target, True):
-            adjSize -= 1
         return self.texCoordsFor(adjSize*scale)
 
     def texCoordsForRect(self, rect, components=2, key='flip'):

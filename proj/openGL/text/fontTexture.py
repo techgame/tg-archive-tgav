@@ -23,8 +23,8 @@ class FontTextureBase(Texture):
     texParams = Texture.texParams + [
             ('format', gl.GL_ALPHA),
 
-            ('wrap', gl.GL_CLAMP),
-            ('genMipmaps', True),
+            #('wrap', gl.GL_CLAMP),
+            #('genMipmaps', True),
             ('magFilter', gl.GL_LINEAR),
             ('minFilter', gl.GL_LINEAR),#_MIPMAP_LINEAR),
             ]

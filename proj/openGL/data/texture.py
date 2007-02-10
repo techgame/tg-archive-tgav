@@ -847,6 +847,8 @@ class Texture(object):
             i = gl.GLint(0)
             gl.glGetIntegerv(pname, byref(i))
             r = i.value
+            if r == 0 and target == gl.GL_TEXTURE_2D:
+                r = 512
             klass._maxTextureSizeByTarget[target] = r
         return r
 
