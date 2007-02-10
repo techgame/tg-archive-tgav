@@ -13,7 +13,7 @@ import _ctypes_support
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 if platform.system() == "Windows":
-    openGL32 = _ctypes_support.loadFirstLibrary('OpenGL', 'OpenGL32')
+    openGL32 = _ctypes_support.loadFirstLibrary('OpenGL32')
     glu32 = _ctypes_support.loadFirstLibrary('glu32')
 
     wglGetProcAddress = openGL32.wglGetProcAddress
@@ -22,13 +22,20 @@ if platform.system() == "Windows":
         fnaddr = wglGetProcAddress(fn.__name__)
         if fnaddr:
             result = WINFUNCTYPE(restype, *argtypes)(fnaddr)
+            if fnErrCheck is not None:
+                result.errcheck = fnErrCheck
             result.api = result
             result.__name__ = fn.__name__
-            return result
 
-        result = _ctypes_support.attachToLibFn(fn, restype, argtypes, fnErrCheck, openGL32)
-        if result.api is None:
+        elif fn.__name__.startswith('glu'):
             result = _ctypes_support.attachToLibFn(fn, restype, argtypes, fnErrCheck, glu32)
+            if result.api is None:
+                result = _ctypes_support.attachToLibFn(fn, restype, argtypes, fnErrCheck, openGL32)
+
+        else:
+            result = _ctypes_support.attachToLibFn(fn, restype, argtypes, fnErrCheck, openGL32)
+            if result.api is None:
+                result = _ctypes_support.attachToLibFn(fn, restype, argtypes, fnErrCheck, glu32)
         return result
 else:
     openGLLib = _ctypes_support.loadFirstLibrary('OpenGL')
@@ -54,9 +61,13 @@ def canErrorCheckFn(fn):
 
 glGetError = None
 
+def glNullCheckError(result, func, args):
+    err = None
+    #print '=== %s%r -%r-> %r ' % (func.__name__, args, err, result)
+    return result
 def glCheckError(result, func, args):
-    #print '>>> %s%r -> %r ' % (func.__name__, args, result)
     err = glGetError()
+    #print '+++ %s%r -%r-> %r ' % (func.__name__, args, err, result)
     if err != 0:
         from errors import GLError
         raise GLError(err, callInfo=(func, args, result))
@@ -68,6 +79,8 @@ def _bindError(errorFunc, g=globals()):
 def _getErrorCheckForFn(fn):
     if canErrorCheckFn(fn):
         return glCheckError
+    #else:
+    #    return glNullCheckError
 
 def cleanupNamespace(namespace):
     _ctypes_support.scrubNamespace(namespace, globals())

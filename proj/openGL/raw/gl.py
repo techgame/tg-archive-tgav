@@ -3545,7 +3545,7 @@ def glGetSeparableFilter(target, format, type, row, column, span, _api_=None):
     """
     return _api_(target, format, type, row, column, span)
     
-@bind(POINTER(GLubyte), [GLenum])
+@bind(c_char_p, [GLenum])
 def glGetString(name, _api_=None): 
     """glGetString(name)
     
