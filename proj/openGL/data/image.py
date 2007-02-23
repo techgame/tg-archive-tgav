@@ -22,7 +22,7 @@ from .texture import Texture, TextureCoord, TextureCoordArray, VertexArray
 
 class ImageTextureBase(Texture):
     texParams = Texture.texParams + [
-            #('wrap', gl.GL_CLAMP_TO_EDGE),
+            ('wrap', gl.GL_CLAMP),
             #('genMipmaps', True),
             ('magFilter', gl.GL_LINEAR),
             ('minFilter', gl.GL_LINEAR),#_MIPMAP_LINEAR),

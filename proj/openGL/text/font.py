@@ -63,6 +63,9 @@ class Font(object):
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+class FontRect(Font):
+    FontMosaicImage = fontTexture.FontTextureRect
+
 class Font2d(Font):
     FontMosaicImage = fontTexture.FontTexture2d
 

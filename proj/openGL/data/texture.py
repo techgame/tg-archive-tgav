@@ -33,19 +33,21 @@ class glTexParamProperty(object):
     def __init__(self, propertyEnum):
         self._as_parameter_ = gl.GLenum(propertyEnum)
 
-    def __get__(self, obj, klass):
+    def __get__(self, obj, klass=None):
         if obj is None: 
             return self
 
         cValue = self.GLParamType()
         self.glGetTexParameter(obj.target, self, cValue)
         return cValue.value
+    get = __get__
 
     def __set__(self, obj, value):
         if not isinstance(value, (list, tuple)):
             value = (value,)
         cValue = self.GLParamType(*value)
         self.glSetTexParameter(obj.target, self, cValue)
+    set = __set__
 
 class glTexParamProperty_i(glTexParamProperty):
     GLParamType = (gl.GLint*1)
@@ -486,7 +488,10 @@ class Texture(object):
         self.create(*args, **kwargs)
 
     def __del__(self):
-        self.release()
+        try:
+            self.release()
+        except Exception:
+            pass
 
     def create(self, target=None, **kwargs):
         if not self._as_parameter_ is None:
@@ -586,15 +591,13 @@ class Texture(object):
     wrapS = glTexParamProperty_i(gl.GL_TEXTURE_WRAP_S)
     wrapT = glTexParamProperty_i(gl.GL_TEXTURE_WRAP_T)
     wrapR = glTexParamProperty_i(gl.GL_TEXTURE_WRAP_R)
+    _wrapGroup = (wrapS, wrapT, wrapR)
 
     def setWrap(self, wrap):
-        if isinstance(wrap, tuple):
-            wrapS, wrapT, wrapR = wrap
-        else:
-            wrapS = wrapT = wrapR = wrap
-        self.wrapS = wrapS
-        self.wrapT = wrapT
-        self.wrapR = wrapR
+        if not isinstance(wrap, tuple):
+            wrap = wrap, wrap, wrap
+        for slot, value in zip(self._wrapGroup, wrap[:self.ndim]):
+            slot.set(self, value)
     wrap = property(fset=setWrap)
 
     magFilter = glTexParamProperty_i(gl.GL_TEXTURE_MAG_FILTER)
@@ -872,11 +875,29 @@ class Texture(object):
         ndim = (texSize == 0).argmax()
 
         if klass._rstNormalizeTargets.get(target, True):
-            return (texCoords[..., :ndim]/texSize[:ndim])
+            return (texCoords[..., :ndim]/(texSize[:ndim]+1))
         else:
             return texCoords[..., :ndim]
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    _targetNDims = {
+        gl.GL_TEXTURE_1D: 1,
+        gl.GL_TEXTURE_2D: 2,
+        gl.GL_TEXTURE_3D: 3,
+        gl.GL_TEXTURE_CUBE_MAP: 2,
+
+        glext.GL_TEXTURE_RECTANGLE_ARB: 2,
+        }
+
+    def getNDim(self):
+        return self.targetNDim(self.target)
+    ndim = property(getNDim)
+
+    @staticmethod
+    def targetNDim(target, targetNDims=_targetNDims):
+        return targetNDims[target]
+    del _targetNDims
 
     _targetPowersOfTwo = {
         gl.GL_TEXTURE_1D: True,
