@@ -20,6 +20,10 @@ class AbsLayoutStrategy(BaseLayoutStrategy):
     """AbsLayout just lets each cell know it should lay itself out"""
 
     def layout(self, cells, box, isTrial=False):
+        box = box.copy()
+
+        self.adjustBox(box)
+
         # determin visible cells
         visCells = self.cellsVisible(cells)
 
@@ -27,5 +31,11 @@ class AbsLayoutStrategy(BaseLayoutStrategy):
             for c in cells:
                 c.layoutInBox(box)
 
-        return box.copy()
+        return box
+
+    def adjustBox(self, box):
+        borders = self.outside
+        if borders.any():
+            box.pos[:] += borders
+            box.size[:] -= 2*borders
 
