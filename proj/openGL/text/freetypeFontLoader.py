@@ -47,7 +47,10 @@ class FreetypeFontLoader(object):
         return self._face
     def setFace(self, face):
         if isinstance(face, basestring):
-            face = FreetypeFace(face)
+            if '#' in face:
+                face, idx = face.rsplit('#', 1)
+            else: idx = 0
+            face = FreetypeFace(face, int(idx or 0))
         if face is not self._face:
             self._face = face
             del self.font

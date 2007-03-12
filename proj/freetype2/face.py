@@ -53,7 +53,7 @@ class FreetypeFace(object):
 
     def __repr__(self):
         klass = self.__class__
-        fmt = '<%s.%: %%s>' % (klass.__module__, klass.__name__,)
+        fmt = '<%s.%s: %%s>' % (klass.__module__, klass.__name__,)
         if not self._as_parameter_:
             info = '{uninitialized}'
         else:

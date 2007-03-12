@@ -10,8 +10,6 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from TG.observing import ObservableObject
-
 from TG.openGL.data import Vector, Rectf
 from TG.openGL.text import textLayout
 import textRenderer
@@ -20,7 +18,7 @@ import textRenderer
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class TextObject(ObservableObject):
+class TextObject(object):
     DisplayFactoryMap = textRenderer.displayFactoryMap
     DisplayFactory = DisplayFactoryMap[None]
 

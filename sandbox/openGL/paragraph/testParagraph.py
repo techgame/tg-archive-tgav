@@ -28,12 +28,12 @@ from textObject import TextObject
 
 class RenderSkinModel(RenderSkinModelBase):
     fontNameFps, fontSizeFps = 'AndaleMono', 24
-    if 1:
+    if 0:
         fontName, fontSize = 'Zapfino', 11
         fontNameRight, fontSizeRight = 'Papyrus', 16
     else:
-        fontName, fontSize = 'AndaleMono', 12
-        fontNameRight, fontSizeRight = 'AndaleMono', 12
+        fontName, fontSize = 'CourierNew#1', 12
+        fontNameRight, fontSizeRight = 'CourierNew#0', 12
 
     wrapSize = 0
     wrapMode = None
@@ -45,6 +45,10 @@ class RenderSkinModel(RenderSkinModelBase):
             'Monaco':'/System/Library/Fonts/Monaco.dfont',
             'Courier': '/System/Library/Fonts/Courier.dfont',
             'CourierNew': '/Library/Fonts/Courier New',
+            'CourierNew#0': '/Library/Fonts/Courier New#0',
+            'CourierNew#1': '/Library/Fonts/Courier New#1',
+            'CourierNew#2': '/Library/Fonts/Courier New#2',
+            'CourierNew#3': '/Library/Fonts/Courier New#3',
             'AndaleMono': '/Library/Fonts/Andale Mono',
             'AppleGothic':'/System/Library/Fonts/AppleGothic.dfont',
             'LucidaGrande':'/System/Library/Fonts/LucidaGrande.dfont',
