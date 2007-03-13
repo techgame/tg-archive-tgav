@@ -163,9 +163,9 @@ class Rect(object):
         self.setPosSize(pos, size, aspect, align)
         return self
 
-    def setPosSize(self, pos, size, aspect=None, align=None):
+    def setPosSize(self, pos, size, aspect=None, align=None, grow=False):
         self._pos[:] = pos
-        self.setSize(size, aspect, align)
+        self.setSize(size, aspect, align, grow)
         return self
 
     @classmethod
@@ -194,10 +194,10 @@ class Rect(object):
         self._size = value - self._pos
     corner = property(getCorner, setCorner)
     
-    def setSize(self, size, aspect=None, align=None):
+    def setSize(self, size, aspect=None, align=None, grow=False):
         self._size[:] = size
         if aspect is not None: 
-            return self.setAspect(aspect, align)
+            return self.setAspect(aspect, align, grow)
         return self
     def sizeAs(self, aspect):
         return self.toAspect(self._size.copy(), aspect)
@@ -243,16 +243,16 @@ class Rect(object):
     def getAspect(self):
         s = self._size[0:2].astype(float)
         return s[0]/s[1]
-    def setAspect(self, aspect, align=None):
+    def setAspect(self, aspect, align=None, grow=False):
         if aspect is None: 
             return self
 
         if align is None:
-            self.toAspect(self._size, aspect)
+            self.toAspect(self._size, aspect, grow)
             return self
 
         size = self._size.copy()
-        self.toAspect(self._size, aspect)
+        self.toAspect(self._size, aspect, grow)
         return self.alignIn(align, size)
     aspect = property(getAspect, setAspect)
 
