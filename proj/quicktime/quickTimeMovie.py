@@ -56,8 +56,8 @@ class QTNewMoviePropertyElement(ctypes.Structure):
         return klass.fromPropertyList(properties)
 
     @classmethod
-    def fromPropertyList(klass, propList):
-        propList = [klass.new(*p) for p in propList]
+    def fromPropertyList(klass, *propLists):
+        propList = [klass.new(*p) for propList in propLists for p in propList]
         return (klass*len(propList))(*propList)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -69,7 +69,7 @@ def qtEnterMovies():
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class QTMovieTexture(CVOpenGLTexture):
+class QTTexture(CVOpenGLTexture):
     def __init__(self, visualContext):
         CVOpenGLTexture.__init__(self)
         self.visualContext = visualContext
@@ -101,58 +101,52 @@ class QTOpenGLVisualContext(object):
     def process(self):
         libQuickTime.QTVisualContextTask(self)
 
-    _texture = None
-    def texture(self):
-        tex = self._texture
+    _qtTexture = None
+    def qtTexture(self):
+        tex = self._qtTexture
         if tex is None:
-            tex = QTMovieTexture(self)
-            self._texture = tex
+            tex = QTTexture(self)
+            self._qtTexture = tex
         return tex
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class QTMovie(object):
-    def __init__(self, filePath=None):
+    def __init__(self, path=None):
         self.createContext()
-        if filePath is not None:
-            self.loadPath(filePath)
+        if path is not None:
+            self.loadPath(path)
 
-    def createContext(self):
-        self.visualContext = QTOpenGLVisualContext()
-        self.texMovie = self.visualContext.texture()
-        
-    def loadURL(self, fileURL):
-        cfFileURL = asCFURL(fileURL)
+    def loadPath(self, path):
+        if '://' in path:
+            return self.loadURL(path)
+        else:
+            return self.loadFilePath(path)
+
+    def loadURL(self, urlPath):
+        cfFileURL = asCFURL(urlPath)
 
         return self.loadFromProperties([
                 ('dloc', 'cfur', cfFileURL),
-
-                ('mprp', 'actv', booleanTrue),
-                #('mprp', 'intn', booleanTrue),
-                #('mins', 'aurn', booleanTrue),
-                # No async for right now
-                ('mins', 'asok', booleanTrue),
-
                 ('ctxt', 'visu', self.visualContext),
                 ])
 
-    def loadPath(self, filePath):
+    def loadFilePath(self, filePath):
         cfFilePath = asCFString(filePath)
 
         return self.loadFromProperties([
                 ('dloc', 'cfnp', cfFilePath),
-
-                ('mprp', 'actv', booleanTrue),
-                #('mprp', 'intn', booleanTrue),
-                #('mins', 'aurn', booleanTrue),
-                # No async for right now
-                ('mins', 'asok', booleanTrue),
-
                 ('ctxt', 'visu', self.visualContext),
                 ])
 
-    def loadFromProperties(self, movieProperties):
-        movieProperties = QTNewMoviePropertyElement.fromPropertyList(movieProperties)
+    def loadFromProperties(self, movieProperties, 
+            defaultMovieProperties=[
+                ('mprp', 'actv', booleanTrue), # set movie active after loading
+                ('mprp', 'intn', booleanTrue), # don't interact with user
+                ('mins', 'aurn', booleanTrue), # don't ask user help for unresolved references
+                ('mins', 'asok', booleanTrue), # load asynchronously
+                ]):
+        movieProperties = QTNewMoviePropertyElement.fromPropertyList(movieProperties, defaultMovieProperties)
         self._as_parameter_ = c_void_p()
         errqt = libQuickTime.NewMovieFromProperties(len(movieProperties), movieProperties, 0, None, byref(self._as_parameter_))
 
@@ -176,12 +170,16 @@ class QTMovie(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def process(self, millisec=0):
+    def createContext(self):
+        self.visualContext = QTOpenGLVisualContext()
+        self.qtTexture = self.visualContext.qtTexture()
+        
+    def process(self, seconds=0):
         self.visualContext.process()
-        return self.processMovieTask()
+        return self.processMovieTask(seconds)
 
-    def processMovieTask(self, millisec=0):
-        return libQuickTime.MoviesTask(self, millisec)
+    def processMovieTask(self, seconds=0):
+        return libQuickTime.MoviesTask(self, int(seconds*1000))
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
