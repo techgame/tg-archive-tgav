@@ -11,9 +11,13 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from raw import freetype as FT
+import os
+
 import ctypes
 from ctypes import byref, cast, c_void_p, c_uint
+
+from raw import freetype as FT
+from raw._ctypes_freetype import FreetypeException
 
 from library import FreetypeLibrary
 from glyph import FreetypeFaceGlyph
@@ -42,8 +46,11 @@ class FreetypeFace(object):
     def __init__(self, fontFilename, faceIndex=0, ftLibrary=None):
         self._as_parameter_ = self._as_parameter_type_()
         ftLibrary = ftLibrary or FreetypeLibrary()
-        self._ft_new_face(ftLibrary, fontFilename, faceIndex, byref(self._as_parameter_))
-        self.library = ftLibrary
+        try:
+            self._ft_new_face(ftLibrary, fontFilename, faceIndex, byref(self._as_parameter_))
+        except FreetypeException:
+            self._as_parameter_ = None
+            raise
 
     _ft_done_face = FT.FT_Done_Face
     def __del__(self):
@@ -434,6 +441,92 @@ class FreetypeFace(object):
             print >> out, '      id:', cm.encoding.value, 'index:', index, 'plat_id:', cm.platform_id, 'encoding_id:', cm.encoding_id
         print >> out
 
+Face = FreetypeFace
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+class FreetypeFaceIndex(dict):
+    FaceFactory = FreetypeFace
+    _primaryKeys = ['familyName']
+
+    systemFontPaths = {
+        'Windows': [r'%SystemRoot%\Fonts'],
+        'Darwin': [r'/System/Library/Fonts', r'/Library/Fonts', r'~/Library/Fonts']
+        }
+    _normStyleName = staticmethod(str.lower)
+
+    def __init__(self, path=None, sysPaths=False):
+        dict.__init__(self)
+        if path is not None:
+            self.addPath(path)
+
+        if sysPaths:
+            import platform
+            systemPath = self.systemFontPaths[platform.system()]
+            self.addPath(systemPath)
+
+    def face(self, key, style=0):
+        if isinstance(key, dict):
+            faceEntry = key
+        else: faceEntry = self[key]
+
+        if isinstance(style, basestring):
+            style = self._normStyleName(style)
+            style = faceEntry['styles'].index(style)
+
+        face = self.FaceFactory(faceEntry['filename'], style)
+        return face
+
+    @classmethod
+    def forPath(klass, path):
+        return klass(path)
+
+    @classmethod
+    def forSystem(klass):
+        return klass(sysPaths=True)
+
+    def addPath(self, path):
+        if isinstance(path, basestring):
+            paths = [path]
+        else: paths = iter(path)
+
+        for each in paths:
+            each = os.path.expandvars(each)
+            each = os.path.expanduser(each)
+
+            for fname in os.listdir(each):
+                fontFilename = os.path.join(each, fname)
+                if os.path.isfile(fontFilename):
+                    self.add(fontFilename)
+
+    def add(self, fontFilename):
+        try:
+            face0 = self.FaceFactory(fontFilename)
+        except FreetypeException:
+            return False
+
+        self.addFace(face0, fontFilename)
+        return True
+
+    def addFace(self, face0, fontFilename):
+        faceSet = [face0] + [self.FaceFactory(fontFilename,idx) for idx in range(1, face0.numFaces)]
+        self.addFaceSet(faceSet, fontFilename)
+
+    def addFaceSet(self, faceSet, fontFilename):
+        face0 = faceSet[0]
+
+        entry = {
+            'filename': fontFilename,
+            'family': face0.familyName,
+            'postscript': face0.postscriptName,
+            'styles': map(self._normStyleName, [facei.styleName for facei in faceSet]),
+            }
+
+        for pkey in self._primaryKeys:
+            pv = getattr(face0, pkey)
+            self[pv] = entry
+
+FaceIndex = FreetypeFaceIndex
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Main 

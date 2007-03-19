@@ -131,3 +131,5 @@ class FreetypeFaceGlyph(object):
         print >> out, '        hori:', (metrics.horiBearingX/ptDiv, metrics.horiBearingY/ptDiv, metrics.horiAdvance/ptDiv)
         print >> out, '        vert:', (metrics.vertBearingX/ptDiv, metrics.vertBearingY/ptDiv, metrics.vertAdvance/ptDiv)
 
+Glyph = FreetypeFaceGlyph
+

@@ -30,6 +30,8 @@ class FreetypeLibrary(object):
     def __new__(klass, useSingleton=True, *args, **kw):
         if not useSingleton or klass.singleton is None:
             self = object.__new__(klass, *args, **kw)
+            self._initLibrary()
+
             if klass.singleton is None:
                 # Don't change the singleton...
                 klass.singleton = self
@@ -37,7 +39,10 @@ class FreetypeLibrary(object):
             self = klass.singleton
         return self
 
-    def __init__(self):
+    def __init__(self, useSingleton=True, *args, **kw):
+        pass
+
+    def _initLibrary(self):
         self._as_parameter_ = self._as_parameter_type_()
         self._ft_init(byref(self._as_parameter_))
 
@@ -56,5 +61,5 @@ class FreetypeLibrary(object):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 if __name__=='__main__':
-    print '%s.%s.%s' % library.getVersion()
+    print '%s.%s.%s' % FreetypeLibrary().getVersion()
 
