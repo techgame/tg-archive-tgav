@@ -48,6 +48,7 @@ class FreetypeFace(object):
         ftLibrary = ftLibrary or FreetypeLibrary()
         try:
             self._ft_new_face(ftLibrary, fontFilename, faceIndex, byref(self._as_parameter_))
+            self.filename = fontFilename
         except FreetypeException:
             self._as_parameter_ = None
             raise
@@ -447,7 +448,7 @@ Face = FreetypeFace
 
 class FreetypeFaceIndex(dict):
     FaceFactory = FreetypeFace
-    _primaryKeys = ['familyName']
+    primaryKeys = ['filename', 'familyName']
 
     systemFontPaths = {
         'Windows': [r'%SystemRoot%\Fonts'],
@@ -455,7 +456,9 @@ class FreetypeFaceIndex(dict):
         }
     _normStyleName = staticmethod(str.lower)
 
-    def __init__(self, path=None, sysPaths=False):
+    def __init__(self, path=None, sysPaths=False, primaryKeys=None):
+        if primaryKeys is not None:
+            self.primaryKeys = primaryKeys
         dict.__init__(self)
         if path is not None:
             self.addPath(path)
@@ -468,7 +471,8 @@ class FreetypeFaceIndex(dict):
     def face(self, key, style=0):
         if isinstance(key, dict):
             faceEntry = key
-        else: faceEntry = self[key]
+
+        faceEntry = self[key]
 
         if isinstance(style, basestring):
             style = self._normStyleName(style)
@@ -510,19 +514,19 @@ class FreetypeFaceIndex(dict):
 
     def addFace(self, face0, fontFilename):
         faceSet = [face0] + [self.FaceFactory(fontFilename,idx) for idx in range(1, face0.numFaces)]
-        self.addFaceSet(faceSet, fontFilename)
+        self.addFaceSet(faceSet)
 
-    def addFaceSet(self, faceSet, fontFilename):
+    def addFaceSet(self, faceSet):
         face0 = faceSet[0]
 
         entry = {
-            'filename': fontFilename,
+            'filename': face0.filename,
             'family': face0.familyName,
             'postscript': face0.postscriptName,
             'styles': map(self._normStyleName, [facei.styleName for facei in faceSet]),
             }
 
-        for pkey in self._primaryKeys:
+        for pkey in self.primaryKeys:
             pv = getattr(face0, pkey)
             self[pv] = entry
 
