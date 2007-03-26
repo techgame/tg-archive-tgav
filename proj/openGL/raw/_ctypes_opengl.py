@@ -9,6 +9,21 @@ from ctypes import *
 import _ctypes_support
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ CTypes Overrides 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+def POINTER(baseType):
+    # overrides ctypes's POINTER method to just use the direct classes for
+    # character strings, and c_void_p for all others, to maximize compatibility
+    # with numpy
+    if baseType == c_char:
+        return c_char_p
+    elif baseType == c_wchar:
+        return c_wchar_p
+    else:
+        return c_void_p
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
