@@ -10,10 +10,12 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+from functools import partial
+from numpy import array
 from ..raw import gl
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#~ Definitions 
+#~ Constants
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 _dtype_gltype_map = {
@@ -30,11 +32,9 @@ _dtype_gltype_map = {
     }
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#~ GL Array Info Descriptor classes
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 arrayFormatInfo = {
-    None: (None, None, True, '', 0),
+    None: (None, '', True, '', 0),
     'vertex': (gl.GL_VERTEX_ARRAY, 'glVertex', True, 'hlifd', [2,3,4]),
     'texture_coord': (gl.GL_TEXTURE_COORD_ARRAY, 'glTexCoord', True, 'hlifd', [1,2,3,4]),
     'multi_texture_coord': (gl.GL_TEXTURE_COORD_ARRAY, 'glTexCoord', 'glMultiTexCoord', 'hlifd', [1,2,3,4]),
@@ -46,7 +46,22 @@ arrayFormatInfo = {
     'edge_flag': (gl.GL_EDGE_FLAG_ARRAY, 'glEdgeFlag', True, 'B', 1),
     }
 
-class ArrayViewBase(object):
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ Definitions 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+_arrayViewRegistry = {}
+def _registerArrayView(klass):
+    klass._configClass()
+    _arrayViewRegistry[klass.kind] = klass
+
+def arrayView(kind):
+    avFactory = _arrayViewRegistry[kind]
+    return avFactory()
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+class ArrayView(object):
     arrayFormatInfo = arrayFormatInfo
 
     kind = None
@@ -54,7 +69,7 @@ class ArrayViewBase(object):
     glid_buffer = gl.GL_ARRAY_BUFFER
 
     glfn_single = None
-    glfn_pointer = None
+    glfn_group = None
 
     def config(klassOrSelf, kind=None):
         if kind is None:
@@ -71,114 +86,76 @@ class ArrayViewBase(object):
         klassOrSelf.glfn_single = afinfo[1] + fmt
         klassOrSelf._glsingle = None
 
-        klassOrSelf.glfn_pointer = afinfo[1] + 'Pointer'
-        klassOrSelf._glpointer_raw = None
-        klassOrSelf._glpointer = None
-    clsConfig = classmethod(config)
+        klassOrSelf.glfn_group = afinfo[1] + 'Pointer'
+        klassOrSelf._glgroup = None
+        return klassOrSelf
+    _configClass = classmethod(config)
 
-    def enable(self, gl): 
+    def enable(self, gl=gl): 
         gl.glEnableClientState(self.glid_kind)
-    def disable(self, gl): 
+    def disable(self, gl=gl): 
         gl.glDisableClientState(self.glid_kind)
-    def bind(self, gl, arr):
-        glid_type, gl_fmt = _dtype_gltype_map[arr.dtype.char]
+
+    def bind(self, arr, gl=gl):
+        arr = array(arr, copy=False, subok=1)
+        glid_type, glc_fmt = _dtype_gltype_map[arr.dtype.char]
         glc_dim = arr.shape[-1]
 
         glfn_single = self.glfn_single % dict(dim=glc_dim, fmt=glc_fmt)
-        self._glsingle = getattr(gl, glfn_single)
+        glsingle_raw = getattr(gl, glfn_single)
+        self._glsingle = partial(glsingle_raw, arr.ctypes)
 
-        self._glpointer_raw = getattr(gl, self.glfn_pointer)
-        self._glpointer = partial(self._glpointer_raw, glc_dim, glid_type)#, arr.stride[-2], arr)
+        glgroup_raw = getattr(gl, self.glfn_group)
+        self._glgroup = partial(glgroup_raw, glc_dim, glid_type, arr.strides[-2], arr.ctypes)
 
-    def one(self, arr):
-        self._glsingle(arr)
-    def send(self, arr):
-        self._glpointer(arr.stride[-2], arr)
+    def one(self):
+        self._glsingle()
+    def send(self):
+        self._glgroup()
+
+_registerArrayView(ArrayView)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class ArrayView(ArrayViewBase):
-    def __init__(self, kind):
-        ArrayViewBase.__init__(self)
-        if kind is not None:
-            self.config(kind)
-
-class VertexArrayView(ArrayViewBase): 
+class VertexArrayView(ArrayView): 
     kind = 'vertex'
-VertexArrayView.clsConfig()
+_registerArrayView(VertexArrayView)
 
-class TexCoordArrayView(ArrayViewBase): 
+class TexCoordArrayView(ArrayView): 
     kind = 'texture_coord'
-TexCoordArrayView.clsConfig()
+_registerArrayView(TexCoordArrayView)
 
-class MultiTexCoordArrayView(ArrayViewBase): 
+class MultiTexCoordArrayView(ArrayView): 
     kind = 'multi_texture_coord'
-MultiTexCoordArrayView.clsConfig()
+_registerArrayView(MultiTexCoordArrayView)
 
-class NormalArrayView(ArrayViewBase): 
+class NormalArrayView(ArrayView): 
     kind = 'normal'
-NormalArrayView.clsConfig()
+_registerArrayView(NormalArrayView)
 
-class ColorArrayView(ArrayViewBase): 
+class ColorArrayView(ArrayView): 
     kind = 'color'
-ColorArrayView.clsConfig()
+_registerArrayView(ColorArrayView)
 
-class SecondaryColorArrayView(ArrayViewBase): 
+class SecondaryColorArrayView(ArrayView): 
     kind = 'secondary_color'
-SecondaryColorArrayView.clsConfig()
+_registerArrayView(SecondaryColorArrayView)
 
-class ColorIndexArrayView(ArrayViewBase): 
+class ColorIndexArrayView(ArrayView): 
     kind = 'color_index'
-ColorIndexArrayView.clsConfig()
+_registerArrayView(ColorIndexArrayView)
 
-class FogCoordArrayView(ArrayViewBase): 
+class FogCoordArrayView(ArrayView): 
     kind = 'fog_coord'
-FogCoordArrayView.clsConfig()
+_registerArrayView(FogCoordArrayView)
 
-class EdgeFlagArrayView(ArrayViewBase): 
+class EdgeFlagArrayView(ArrayView): 
     kind = 'edge_flag'
-EdgeFlagArrayView.clsConfig()
+_registerArrayView(EdgeFlagArrayView)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#~ GL Element Array Info Descriptor
+#~ Add in draw array views
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-drawMode = {
-    None: gl.GL_POINTS,
-    'pts': gl.GL_POINTS,
-    'points': gl.GL_POINTS,
-
-    'lines': gl.GL_LINES,
-    'lineLoop': gl.GL_LINE_LOOP,
-    'lineStrip': gl.GL_LINE_STRIP,
-
-    'tris': gl.GL_TRIANGLES,
-    'triangles': gl.GL_TRIANGLES,
-    'triStrip': gl.GL_TRIANGLE_STRIP,
-    'triangleStrip': gl.GL_TRIANGLE_STRIP,
-    'triFan': gl.GL_TRIANGLE_FAN,
-    'triangleFan': gl.GL_TRIANGLE_FAN,
-
-    'quads': gl.GL_QUADS,
-    'quadStrip': gl.GL_QUAD_STRIP,
-    }
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-class ElementArrayView(object):
-    glid_buffer = gl.GL_ELEMENT_ARRAY_BUFFER
-    glid_kind = None
-
-    glfn_pointer = None
-    glfn_single = None
-
-    def bind(self, gl, arr):
-        pass
-
-    def single(self, gl): gl.glArrayViewElement
-    def draw(self, gl): gl.glDrawElements
-    def drawRange(self, gl): gl.glDrawRangeElements
-    def drawMany(self, gl): gl.glMultiDrawElements
-    def drawArray(self, gl): gl.glDrawArrays
-    def drawMultiArray(self, gl): gl.glMultiDrawArrays
+from . import drawArrayViews
 
