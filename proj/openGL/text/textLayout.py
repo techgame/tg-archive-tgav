@@ -41,10 +41,13 @@ class TextLayout(object):
     wrapMode = property(getWrapMode, setWrapMode)
 
     def layoutMeshInBox(self, lbox):
-        lineAdvance = self.lineSpacing * self.textData.lineAdvance
+        textData = self.textData
+        lineAdvance = self.lineSpacing * textData.lineAdvance
+
+        textOffsets = textData.getOffset()
 
         # get the line wrap slices
-        iterWrapSlices = self._wrapAlg.iterWrapSlices(lbox.size, self.textData)
+        iterWrapSlices = self._wrapAlg.iterWrapSlices(lbox.size, textData.text, textOffsets)
 
         # figure out line count, and setup wrap slice iterator
         if self.crop:
@@ -72,7 +75,7 @@ class TextLayout(object):
                 return aoff
 
         # grab the geometry we are laying out
-        offset = self.textData.getOffset()[...,:2]
+        offset = textOffsets[...,:2]
         geometry = self.textData.geometry.copy()
         geomVec = geometry.v[...,:2]
 

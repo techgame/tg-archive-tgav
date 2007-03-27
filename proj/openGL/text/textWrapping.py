@@ -17,18 +17,16 @@ import re
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class BasicTextWrapper(object):
-    def iterWrapText(self, wrapSize, textData):
-        text = textData.text
-        for textSlice in self.wrapSlices(wrapSize, textData):
+    def iterWrapText(self, wrapSize, text, textOffsets):
+        for textSlice in self.wrapSlices(wrapSize, text, textOffsets):
             yield text[textSlice]
 
-    def iterWrapSlices(self, wrapSize, textData):
-        if not textData: return
-        for textSlice in self.iterAvailTextSlices(wrapSize, textData):
+    def iterWrapSlices(self, wrapSize, text, textOffsets):
+        if not text: return
+        for textSlice in self.iterAvailTextSlices(wrapSize, text, textOffsets):
             yield textSlice
 
-    def iterAvailTextSlices(self, wrapSize, textData):
-        text = textData.text
+    def iterAvailTextSlices(self, wrapSize, text, textOffsets):
         if text: 
             return [slice(0, len(text))]
         else: return []
@@ -38,8 +36,7 @@ class BasicTextWrapper(object):
 class RETextWrapper(BasicTextWrapper):
     re_wrapPoints = re.compile('$|\n|\r')
 
-    def iterAvailTextSlices(self, wrapSize, textData):
-        text = textData.text
+    def iterAvailTextSlices(self, wrapSize, text, textOffsets):
         if not text: return
 
         iterMatches = self.re_wrapPoints.finditer(text)
@@ -61,22 +58,20 @@ class TextWrapper(RETextWrapper):
     re_wrapPoints = re.compile('[\s-]|$')
 
     wrapAxis = 0
-    def iterWrapSlices(self, wrapSize, textData):
+    def iterWrapSlices(self, wrapSize, text, textOffsets):
         wrapAxis = self.wrapAxis
         axisWrapSize = wrapSize[wrapAxis]
         if axisWrapSize <= 0: return
 
-        text = textData.text
         if not text: return
-        offset = textData.getOffset()
 
         lineWraps = self.lineWraps
 
-        iLine = 0; offLine = offset[iLine, 0, wrapAxis]
+        iLine = 0; offLine = textOffsets[iLine, 0, wrapAxis]
         iCurr = iLine; offCurr = offLine
-        for textSlice in self.iterAvailTextSlices(wrapSize, textData):
+        for textSlice in self.iterAvailTextSlices(wrapSize, text, textOffsets):
             iNext = textSlice.stop
-            offNext = offset[iNext, 0, wrapAxis]
+            offNext = textOffsets[iNext, 0, wrapAxis]
 
             # check to see if the next wrap slice falls off the end
             if (axisWrapSize < (offNext - offLine)):
