@@ -22,14 +22,11 @@ class BasicTextWrapper(object):
             yield text[textSlice]
 
     def iterWrapSlices(self, wrapSize, text, textOffsets):
-        if not text: return
-        for textSlice in self.iterAvailTextSlices(wrapSize, text, textOffsets):
-            yield textSlice
+        return self.iterAvailTextSlices(wrapSize, text, textOffsets)
 
     def iterAvailTextSlices(self, wrapSize, text, textOffsets):
         if text: 
-            return [slice(0, len(text))]
-        else: return []
+            yield slice(0, len(text))
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

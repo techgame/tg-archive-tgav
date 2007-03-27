@@ -76,7 +76,7 @@ class TextLayout(object):
 
         # grab the geometry we are laying out
         offset = textOffsets[...,:2]
-        geometry = self.textData.geometry.copy()
+        geometry = textData.geometry.copy()
         geomVec = geometry.v[...,:2]
 
         linesP0P1 = []
