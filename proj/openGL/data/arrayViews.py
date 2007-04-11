@@ -81,7 +81,7 @@ class ArrayView(object):
         if isinstance(afinfo[4], (int, long)):
             # dimension is not used in format
             fmt = '%(fmt)s'
-        else: fmt = '%(dim)d%(fmt)s'
+        else: fmt = '%(dim)d%(fmt)sv'
 
         klassOrSelf.glfn_single = afinfo[1] + fmt
         klassOrSelf._glsingle = None
@@ -105,8 +105,10 @@ class ArrayView(object):
         glsingle_raw = getattr(gl, glfn_single)
         self._glsingle = partial(glsingle_raw, arr.ctypes)
 
-        glgroup_raw = getattr(gl, self.glfn_group)
-        self._glgroup = partial(glgroup_raw, glc_dim, glid_type, arr.strides[-2], arr.ctypes)
+        if len(arr.strides) >= 2:
+            glgroup_raw = getattr(gl, self.glfn_group)
+            self._glgroup = partial(glgroup_raw, glc_dim, glid_type, arr.strides[-2], arr.ctypes)
+        else: self._glgroup = None
 
     def one(self):
         self._glsingle()
