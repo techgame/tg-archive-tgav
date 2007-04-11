@@ -241,8 +241,8 @@ class FreetypeFace(object):
         else: width, height = 0, size
         if isinstance(dpi, tuple): 
             wdpi, hdpi = dpi
-        else: wdpi, hdpi = 0, dpi
-        self._ft_setCharSize(width, height, wdpi, hdpi)
+        else: wdpi = hdpi = dpi
+        self._ft_setCharSize(int(width*ptDiv), int(height*ptDiv), wdpi, hdpi)
         self.lastSize = '%s@%sdpi'%(height, hdpi)
 
     _ft_setPixelSizes = FT.FT_Set_Pixel_Sizes
