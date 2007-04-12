@@ -84,36 +84,32 @@ class ArrayView(object):
         else: fmt = '%(dim)d%(fmt)sv'
 
         klassOrSelf.glfn_single = afinfo[1] + fmt
-        klassOrSelf._glsingle = None
-
         klassOrSelf.glfn_group = afinfo[1] + 'Pointer'
-        klassOrSelf._glgroup = None
         return klassOrSelf
     _configClass = classmethod(config)
-
-    def enable(self, gl=gl): 
-        gl.glEnableClientState(self.glid_kind)
-    def disable(self, gl=gl): 
-        gl.glDisableClientState(self.glid_kind)
 
     def bind(self, arr, gl=gl):
         arr = array(arr, copy=False, subok=1)
         glid_type, glc_fmt = _dtype_gltype_map[arr.dtype.char]
         glc_dim = arr.shape[-1]
 
-        glfn_single = self.glfn_single % dict(dim=glc_dim, fmt=glc_fmt)
-        glsingle_raw = getattr(gl, glfn_single)
-        self._glsingle = partial(glsingle_raw, arr.ctypes)
-
         if len(arr.strides) >= 2:
             glgroup_raw = getattr(gl, self.glfn_group)
-            self._glgroup = partial(glgroup_raw, glc_dim, glid_type, arr.strides[-2], arr.ctypes)
-        else: self._glgroup = None
+            self._glsend = partial(glgroup_raw, glc_dim, glid_type, arr.strides[-2], arr.ctypes)
+            self._glenable = partial(gl.glEnableClientState, self.glid_kind)
+            self._gldisable = partial(gl.glDisableClientState, self.glid_kind)
+        else: 
+            glsingle_raw = getattr(gl, self.glfn_single % dict(dim=glc_dim, fmt=glc_fmt))
+            self._glsend = partial(glsingle_raw, arr.ctypes)
+            self._glenable = lambda: None
+            self._gldisable = lambda: None
 
-    def one(self):
-        self._glsingle()
+    def enable(self): 
+        self._glenable()
+    def disable(self): 
+        self._gldisable()
     def send(self):
-        self._glgroup()
+        self._glsend()
 
 _registerArrayView(ArrayView)
 
