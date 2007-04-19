@@ -20,6 +20,26 @@ from .texture import Texture, TextureCoord, TextureCoordArray, VertexArray
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+def imagePremultiply(image, raiseOnInvalid=True):
+    bands = image.getbands()
+    if bands[-1] != 'A':
+        if raiseOnInvalid:
+            raise TypeError("Image does not have an alpha channel as the last band")
+        else: 
+            return image
+
+    imageData = image.getdata()
+
+    a = imageData.getband(len(bands)-1)
+    
+    for idx in xrange(len(bands)-1):
+        ba = a.chop_multiply(imageData.getband(idx))
+        imageData.putband(ba, idx)
+
+    return image
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 class ImageTextureBase(Texture):
     texParams = Texture.texParams + [
             ('wrap', gl.GL_CLAMP),
