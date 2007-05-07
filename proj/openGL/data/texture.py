@@ -11,8 +11,8 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import sys
+import weakref
 from bisect import bisect_left
-from warnings import warn
 
 from numpy import array, asarray
 from ctypes import cast, byref, c_void_p
@@ -504,12 +504,6 @@ class Texture(object):
         'c-la': gl.GL_COMPRESSED_LUMINANCE_ALPHA, 'C-LA': gl.GL_COMPRESSED_LUMINANCE_ALPHA, 'compressed_luminance_alpha': gl.GL_COMPRESSED_LUMINANCE_ALPHA,
         'c-i': gl.GL_COMPRESSED_INTENSITY, 'C-I': gl.GL_COMPRESSED_INTENSITY, 'compressed_intensity': gl.GL_COMPRESSED_INTENSITY, } 
 
-    def __del__(self):
-        try:
-            self.release()
-        except Exception, e:
-            print >> sys.stderr, "Error releasing %s in __del__: %r" % (self.__class__, e)
-
     def set(self, val=None, **kwattr):
         if val:
             if isinstance(val, dict):
@@ -540,17 +534,19 @@ class Texture(object):
 
             texture_id = gl.GLenum(0)
             gl.glGenTextures(1, byref(texture_id))
-            self.texture_id = texture_id
 
+            def delGLTexture(wr, texture_id=texture_id.value):
+                texture_id = gl.GLenum(texture_id)
+                gl.glDeleteTextures(1, byref(texture_id))
+            texture_id.wr = weakref.ref(texture_id, delGLTexture)
+
+            self.texture_id = texture_id
             self.set(self.texParams)
 
         return target, texture_id
 
     def _delTextureInfo(self):
-        texture_id = self.texture_id
-        if texture_id is not None:
-            gl.glDeleteTextures(1, byref(texture_id))
-            self.texture_id = None
+        self.texture_id = None
 
     def bind(self):
         target, oid = self._getTextureInfo()
