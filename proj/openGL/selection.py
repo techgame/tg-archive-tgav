@@ -23,11 +23,11 @@ class Selector(object):
     def finish(self):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
 
-    def setItem(self, item):
+    def load(self, item):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
-    def pushItem(self, item):
+    def push(self, item):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
-    def popItem(self):
+    def pop(self):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -76,23 +76,29 @@ class NameSelector(Selector):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def setItem(self, item):
+    def load(self, item):
         n = id(item)
         self._namedItems[n] = item
         gl.glLoadName(n)
-    def pushItem(self, item):
+    def push(self, item):
         n = id(item)
         self._namedItems[n] = item
         gl.glPushName(n)
-    def popItem(self):
+    def pop(self):
         gl.glPopName()
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     c_viewport = (gl.GLint*4)
     def pickMatrix(self, pos, size, vpbox):
-        gl.glTranslatef((vpbox[2]-2*(pos[0]-vpbox[0])/size[0]), (vpbox[3]-2*(pos[1]-vpbox[1])/size[1]), 0)
-        gl.glScalef(vpbox[2]/size[0], vpbox[3]/size[1], 1)
+        gl.glTranslatef(
+                (vpbox[2] - 2*(pos[0] - vpbox[0])/size[0]), 
+                (vpbox[3] - 2*(pos[1] - vpbox[1])/size[1]), 
+                0)
+        gl.glScalef(
+                vpbox[2]/size[0],
+                vpbox[3]/size[1],
+                1)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
