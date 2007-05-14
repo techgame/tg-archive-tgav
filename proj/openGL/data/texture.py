@@ -586,6 +586,7 @@ class Texture(object):
 
         target = self.validTargets(targets).next()
         self._target = target
+        self.select()
         return target
     target = property(getTarget, setTarget)
 

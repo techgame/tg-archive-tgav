@@ -48,7 +48,7 @@ class ImageTexture(Texture):
             ('genMipmaps', True),
             ('magFilter', gl.GL_LINEAR),
             ('minFilter', gl.GL_LINEAR),
-            ('minFilter', gl.GL_LINEAR_MIPMAP_LINEAR),
+            #('minFilter', gl.GL_LINEAR_MIPMAP_LINEAR),
             ]
 
     modeFormatMap = {
