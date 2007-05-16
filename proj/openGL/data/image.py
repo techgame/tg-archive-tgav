@@ -47,8 +47,8 @@ class ImageTexture(Texture):
             ('wrap', gl.GL_CLAMP),
             ('genMipmaps', True),
             ('magFilter', gl.GL_LINEAR),
-            ('minFilter', gl.GL_LINEAR),
-            #('minFilter', gl.GL_LINEAR_MIPMAP_LINEAR),
+            #('minFilter', gl.GL_LINEAR),
+            ('minFilter', gl.GL_LINEAR_MIPMAP_LINEAR),
             ]
 
     modeFormatMap = {
@@ -56,12 +56,13 @@ class ImageTexture(Texture):
         'RGB': (gl.GL_RGB, gl.GL_UNSIGNED_BYTE),
         'LA': (gl.GL_LUMINANCE_ALPHA, gl.GL_UNSIGNED_BYTE),
         'L': (gl.GL_LUMINANCE, gl.GL_UNSIGNED_BYTE),
+        'A': (gl.GL_ALPHA, gl.GL_UNSIGNED_BYTE),
         }
 
     box = Box.property(publish='box')
 
-    def __init__(self, image=None):
-        self.image = image
+    def __init__(self, image=None, format=True):
+        self.setImage(image, format)
         self.send()
 
     _image = None
@@ -70,7 +71,9 @@ class ImageTexture(Texture):
     def setImage(self, image, format=True):
         if format is True:
             self.format = self.modeFormatMap[image.mode][0]
+            self.dataFormat = self.format
         elif format is not None:
+            self.dataFormat = format
             self.format = format
 
         self._image = image
@@ -83,7 +86,8 @@ class ImageTexture(Texture):
     def send(self, sgo=None):
         image = self.image
         self.select()
-        dataFormat, dataType = self.modeFormatMap[image.mode]
+        dataFormat = self.dataFormat
+        dataType = self.modeFormatMap[image.mode][1]
         size = self.asValidSize(image.size)
         data = self.data2d(size=size, format=dataFormat, dataType=dataType)
         data.setImageOn(self)
