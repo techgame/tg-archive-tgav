@@ -175,8 +175,9 @@ class QTMovie(object):
         self.qtTexture = self.visualContext.qtTexture()
         
     def process(self, seconds=0):
-        self.visualContext.process()
-        return self.processMovieTask(seconds)
+        r = self.visualContext.process()
+        self.processMovieTask(seconds)
+        return r
 
     def processMovieTask(self, seconds=0):
         return libQuickTime.MoviesTask(self, int(seconds*1000))
@@ -226,15 +227,4 @@ class QTMovie(object):
 
     def ptInMovie(self):
         return libQuickTime.PtInMovie(self)
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    _availFrame = 0
-    def _onImageAvailable(self, visualContext, syncTimeStamp, userParam):
-        self._availFrame += 1
-
-    def _setupImageAvailableCB(self):
-        QTVisualContextImageAvailableCallback = ctypes.CFUNCTYPE(None, c_void_p, c_uint32, c_void_p)
-        onImageAvailableCallback = QTVisualContextImageAvailableCallback(self._onImageAvailable)
-        libQuickTime.QTVisualContextSetImageAvailableCallback(self.visualContext, onImageAvailableCallback, None)
 

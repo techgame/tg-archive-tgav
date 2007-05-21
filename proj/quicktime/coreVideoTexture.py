@@ -57,42 +57,9 @@ class CVOpenGLTexture(object):
         self.target = libCoreVideo.CVOpenGLTextureGetTarget(cvTextureRef)
         self._as_parameter_ = libCoreVideo.CVOpenGLTextureGetName(cvTextureRef)
 
-        # CVOpenGLTextureGetCleanTexCoords takes into account whether or not the texture is flipped
         libCoreVideo.CVOpenGLTextureGetCleanTexCoords(cvTextureRef, *self._texCoordsAddresses)
-        #libCoreVideo.CVOpenGLTextureIsFlipped(cvTextureRef)
-
         self.size = abs(self.texCoords[2]-self.texCoords[0])
         return True
-
-    def renderDirect(self):
-        if not self._as_parameter_:
-            return False
-
-        texCoords = self.texCoords
-        w, h = texCoords[2]-texCoords[0]
-        gl.glPushMatrix()
-        if h<0:
-            gl.glTranslatef(0, -h, 0)
-            gl.glScalef(1, -1, 1)
-
-        self.select()
-        gl.glBegin(gl.GL_QUADS)
-
-        gl.glTexCoord2f(*texCoords[0])
-        gl.glVertex2f(*texCoords[0])
-
-        gl.glTexCoord2f(*texCoords[1])
-        gl.glVertex2f(*texCoords[1])
-
-        gl.glTexCoord2f(*texCoords[2])
-        gl.glVertex2f(*texCoords[2])
-
-        gl.glTexCoord2f(*texCoords[3])
-        gl.glVertex2f(*texCoords[3])
-
-        gl.glEnd()
-
-        gl.glPopMatrix()
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
