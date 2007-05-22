@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
 ##~ Copyright (C) 2002-2006  TechGame Networks, LLC.              ##
 ##~                                                               ##
@@ -56,6 +55,8 @@ class FilterVisitor(AtomFilterVisitor):
         'FT_MODERR_START_LIST',
         'FT_MODERR_END_LIST',
 
+        'FT_INT_MAX',
+        'FT_LONG_MAX',
         'FT_UINT_MAX',
         'FT_ULONG_MAX',
 

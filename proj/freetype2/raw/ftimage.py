@@ -85,6 +85,31 @@ FT_Curve_Tag_Cubic = 2 # = FT_CURVE_TAG_CUBIC
 FT_Curve_Tag_Touch_X = 8 # = FT_CURVE_TAG_TOUCH_X
 FT_Curve_Tag_Touch_Y = 16 # = FT_CURVE_TAG_TOUCH_Y
 
+# typedef FT_Outline_MoveToFunc
+FT_Outline_MoveToFunc = POINTER(CFUNCTYPE(c_int, POINTER(FT_Vector), FT_Pointer))
+
+# typedef FT_Outline_LineToFunc
+FT_Outline_LineToFunc = FT_Outline_MoveToFunc
+
+# typedef FT_Outline_ConicToFunc
+FT_Outline_ConicToFunc = POINTER(CFUNCTYPE(c_int, POINTER(FT_Vector), POINTER(FT_Vector), FT_Pointer))
+
+# typedef FT_Outline_CubicToFunc
+FT_Outline_CubicToFunc = POINTER(CFUNCTYPE(c_int, POINTER(FT_Vector), POINTER(FT_Vector), POINTER(FT_Vector), FT_Pointer))
+
+class FT_Outline_Funcs_(Structure):
+    _fields_ = [
+        ("move_to", FT_Outline_MoveToFunc),
+        ("line_to", FT_Outline_LineToFunc),
+        ("conic_to", FT_Outline_ConicToFunc),
+        ("cubic_to", FT_Outline_CubicToFunc),
+        ("shift", c_int),
+        ("delta", FT_Pos),
+        ]
+
+# typedef FT_Outline_Funcs
+FT_Outline_Funcs = FT_Outline_Funcs_
+
 class FT_Glyph_Format_(c_int):
     '''enum FT_Glyph_Format_''' 
     FT_GLYPH_FORMAT_NONE = 0
@@ -96,10 +121,45 @@ class FT_Glyph_Format_(c_int):
 # typedef FT_Glyph_Format
 FT_Glyph_Format = FT_Glyph_Format_
 
+class FT_Span_(Structure):
+    _fields_ = [
+        ("x", c_short),
+        ("len", c_ushort),
+        ("coverage", c_ubyte),
+        ]
+
+# typedef FT_Span
+FT_Span = FT_Span_
+
+# typedef FT_SpanFunc
+FT_SpanFunc = POINTER(CFUNCTYPE(None, c_int, c_int, POINTER(FT_Span), FT_Pointer))
+
+# typedef FT_Raster_BitTest_Func
+FT_Raster_BitTest_Func = POINTER(CFUNCTYPE(c_int, c_int, c_int, FT_Pointer))
+
+# typedef FT_Raster_BitSet_Func
+FT_Raster_BitSet_Func = POINTER(CFUNCTYPE(None, c_int, c_int, FT_Pointer))
+
 FT_RASTER_FLAG_DEFAULT = 0x0
 FT_RASTER_FLAG_AA = 0x1
 FT_RASTER_FLAG_DIRECT = 0x2
 FT_RASTER_FLAG_CLIP = 0x4
+
+class FT_Raster_Params_(Structure):
+    _fields_ = [
+        ("target", POINTER(FT_Bitmap)),
+        ("source", c_void_p),
+        ("flags", c_int),
+        ("gray_spans", FT_SpanFunc),
+        ("black_spans", FT_SpanFunc),
+        ("bit_test", FT_Raster_BitTest_Func),
+        ("bit_set", FT_Raster_BitSet_Func),
+        ("user", FT_Pointer),
+        ("clip_box", FT_BBox),
+        ]
+
+# typedef FT_Raster_Params
+FT_Raster_Params = FT_Raster_Params_
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

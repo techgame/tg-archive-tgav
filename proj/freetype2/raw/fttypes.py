@@ -24,6 +24,9 @@ FT_MAX_MODULES = 32
 
 #~ Code block from "/usr/local/include/freetype2/freetype/fttypes.h" ~~~
 
+# typedef FT_Bool
+FT_Bool = c_ubyte
+
 # typedef FT_Byte
 FT_Byte = c_ubyte
 
