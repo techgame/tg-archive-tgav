@@ -18,7 +18,7 @@ FT_Int32 = c_int
 
 FT_RENDER_POOL_SIZE = 16384L
 
-#~ line: 297, skipped: 10 ~~~~~~
+#~ line: 317, skipped: 10 ~~~~~~
 
 FT_MAX_MODULES = 32
 

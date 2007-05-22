@@ -12,10 +12,6 @@ from ftsystem import *
 #~   "/usr/local/include/freetype2/freetype/freetype.h"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-FREETYPE_MAJOR = 2
-FREETYPE_MINOR = 1
-FREETYPE_PATCH = 9
-
 class FT_Glyph_Metrics_(Structure):
     _fields_ = [
         ("width", FT_Pos),
@@ -152,6 +148,7 @@ FT_FACE_FLAG_FAST_GLYPHS = ( 1L << 7 )
 FT_FACE_FLAG_MULTIPLE_MASTERS = ( 1L << 8 )
 FT_FACE_FLAG_GLYPH_NAMES = ( 1L << 9 )
 FT_FACE_FLAG_EXTERNAL_STREAM = ( 1L << 10 )
+FT_FACE_FLAG_HINTER = ( 1L << 11 )
 
 FT_STYLE_FLAG_ITALIC = ( 1 << 0 )
 FT_STYLE_FLAG_BOLD = ( 1 << 1 )
@@ -226,18 +223,6 @@ def FT_Init_FreeType(alibrary, _api_=None):
         alibrary : POINTER(FT_Library)
     """
     return _api_(alibrary)
-    
-
-@bind(None, [FT_Library, POINTER(c_int), POINTER(c_int), POINTER(c_int)])
-def FT_Library_Version(library, amajor, aminor, apatch, _api_=None): 
-    """FT_Library_Version(library, amajor, aminor, apatch)
-    
-        library : FT_Library
-        amajor : POINTER(c_int)
-        aminor : POINTER(c_int)
-        apatch : POINTER(c_int)
-    """
-    return _api_(library, amajor, aminor, apatch)
     
 
 @bind(FT_Error, [FT_Library], True)
@@ -343,6 +328,50 @@ def FT_Done_Face(face, _api_=None):
         face : FT_Face
     """
     return _api_(face)
+    
+
+@bind(FT_Error, [FT_Face, FT_Int], True)
+def FT_Select_Size(face, strike_index, _api_=None): 
+    """FT_Select_Size(face, strike_index)
+    
+        face : FT_Face
+        strike_index : FT_Int
+    """
+    return _api_(face, strike_index)
+    
+
+class FT_Size_Request_Type_(c_int):
+    '''enum FT_Size_Request_Type_''' 
+    FT_SIZE_REQUEST_TYPE_NOMINAL = 0
+    FT_SIZE_REQUEST_TYPE_REAL_DIM = 1
+    FT_SIZE_REQUEST_TYPE_BBOX = 2
+    FT_SIZE_REQUEST_TYPE_CELL = 3
+    FT_SIZE_REQUEST_TYPE_SCALES = 4
+    FT_SIZE_REQUEST_TYPE_MAX = 5
+
+# typedef FT_Size_Request_Type
+FT_Size_Request_Type = FT_Size_Request_Type_
+
+class FT_Size_RequestRec_(Structure):
+    _fields_ = [
+        ("type", FT_Size_Request_Type),
+        ("width", FT_Long),
+        ("height", FT_Long),
+        ("horiResolution", FT_UInt),
+        ("vertResolution", FT_UInt),
+        ]
+
+# typedef FT_Size_Request
+FT_Size_Request = POINTER(FT_Size_RequestRec_)
+
+@bind(FT_Error, [FT_Face, FT_Size_Request], True)
+def FT_Request_Size(face, req, _api_=None): 
+    """FT_Request_Size(face, req)
+    
+        face : FT_Face
+        req : FT_Size_Request
+    """
+    return _api_(face, req)
     
 
 @bind(FT_Error, [FT_Face, FT_F26Dot6, FT_F26Dot6, FT_UInt, FT_UInt], True)
@@ -455,7 +484,19 @@ def FT_Get_Kerning(face, left_glyph, right_glyph, kern_mode, akerning, _api_=Non
     return _api_(face, left_glyph, right_glyph, kern_mode, akerning)
     
 
-@bind(FT_Error, [FT_Face, FT_UInt, FT_Pointer, FT_UInt], True)
+@bind(FT_Error, [FT_Face, FT_Fixed, FT_Int, POINTER(c_long)], True)
+def FT_Get_Track_Kerning(face, point_size, degree, akerning, _api_=None): 
+    """FT_Get_Track_Kerning(face, point_size, degree, akerning)
+    
+        face : FT_Face
+        point_size : FT_Fixed
+        degree : FT_Int
+        akerning : POINTER(c_long)
+    """
+    return _api_(face, point_size, degree, akerning)
+    
+
+@bind(FT_Error, [FT_Face, FT_UInt, FT_Pointer, FT_UInt])
 def FT_Get_Glyph_Name(face, glyph_index, buffer, buffer_max, _api_=None): 
     """FT_Get_Glyph_Name(face, glyph_index, buffer, buffer_max)
     
@@ -546,6 +587,29 @@ def FT_Get_Name_Index(face, glyph_name, _api_=None):
     return _api_(face, glyph_name)
     
 
+FT_SUBGLYPH_FLAG_ARGS_ARE_WORDS = 1
+FT_SUBGLYPH_FLAG_ARGS_ARE_XY_VALUES = 2
+FT_SUBGLYPH_FLAG_ROUND_XY_TO_GRID = 4
+FT_SUBGLYPH_FLAG_SCALE = 8
+FT_SUBGLYPH_FLAG_XY_SCALE = 0x40
+FT_SUBGLYPH_FLAG_2X2 = 0x80
+FT_SUBGLYPH_FLAG_USE_MY_METRICS = 0x200
+
+@bind(FT_Error, [FT_GlyphSlot, FT_UInt, POINTER(c_int), POINTER(c_uint), POINTER(c_int), POINTER(c_int), POINTER(FT_Matrix)], True)
+def FT_Get_SubGlyph_Info(glyph, sub_index, p_index, p_flags, p_arg1, p_arg2, p_transform, _api_=None): 
+    """FT_Get_SubGlyph_Info(glyph, sub_index, p_index, p_flags, p_arg1, p_arg2, p_transform)
+    
+        glyph : FT_GlyphSlot
+        sub_index : FT_UInt
+        p_index : POINTER(c_int)
+        p_flags : POINTER(c_uint)
+        p_arg1 : POINTER(c_int)
+        p_arg2 : POINTER(c_int)
+        p_transform : POINTER(FT_Matrix)
+    """
+    return _api_(glyph, sub_index, p_index, p_flags, p_arg1, p_arg2, p_transform)
+    
+
 @bind(FT_Long, [FT_Long, FT_Long, FT_Long])
 def FT_MulDiv(a, b, c, _api_=None): 
     """FT_MulDiv(a, b, c)
@@ -612,6 +676,22 @@ def FT_Vector_Transform(vec, matrix, _api_=None):
         matrix : POINTER(FT_Matrix)
     """
     return _api_(vec, matrix)
+    
+
+FREETYPE_MAJOR = 2
+FREETYPE_MINOR = 3
+FREETYPE_PATCH = 4
+
+@bind(None, [FT_Library, POINTER(c_int), POINTER(c_int), POINTER(c_int)])
+def FT_Library_Version(library, amajor, aminor, apatch, _api_=None): 
+    """FT_Library_Version(library, amajor, aminor, apatch)
+    
+        library : FT_Library
+        amajor : POINTER(c_int)
+        aminor : POINTER(c_int)
+        apatch : POINTER(c_int)
+    """
+    return _api_(library, amajor, aminor, apatch)
     
 
 
