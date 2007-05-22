@@ -31,6 +31,11 @@ class FilterVisitor(AtomFilterVisitor):
         if item.extern and item.name.startswith('FT_'):
             self.select(item)
 
+    def onEnumeration(self, item):
+        if item.name.startswith('FT_'):
+            self.select(item)
+            print 'SWH:', item
+
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     includePrefixes = set([
@@ -95,7 +100,7 @@ class FilterVisitor(AtomFilterVisitor):
         self.select(item)
 
     def onPPInclude(self, item):
-        print '"%s" includes "%s"' % (item.file.name, item.filename)
+        pass #print '"%s" includes "%s"' % (item.file.name, item.filename)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Main 

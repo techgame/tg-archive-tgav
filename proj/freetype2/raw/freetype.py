@@ -471,6 +471,12 @@ def FT_Render_Glyph(slot, render_mode, _api_=None):
     return _api_(slot, render_mode)
     
 
+class FT_Kerning_Mode_(c_int):
+    '''enum FT_Kerning_Mode_''' 
+    FT_KERNING_DEFAULT = 0
+    FT_KERNING_UNFITTED = 1
+    FT_KERNING_UNSCALED = 2
+
 @bind(FT_Error, [FT_Face, FT_UInt, FT_UInt, FT_UInt, POINTER(FT_Vector)], True)
 def FT_Get_Kerning(face, left_glyph, right_glyph, kern_mode, akerning, _api_=None): 
     """FT_Get_Kerning(face, left_glyph, right_glyph, kern_mode, akerning)

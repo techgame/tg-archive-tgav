@@ -14,17 +14,17 @@ from fttypes import *
 FT_Memory = POINTER("FT_MemoryRec_")
 
 # typedef FT_Alloc_Func
-FT_Alloc_Func = POINTER(CFUNCTYPE(c_void_p, FT_Memory, c_long))
+FT_Alloc_Func = POINTER(CFUNCTYPE(FT_Pointer, FT_Memory, c_long))
 
 # typedef FT_Free_Func
-FT_Free_Func = POINTER(CFUNCTYPE(None, FT_Memory, c_void_p))
+FT_Free_Func = POINTER(CFUNCTYPE(None, FT_Memory, FT_Pointer))
 
 # typedef FT_Realloc_Func
-FT_Realloc_Func = POINTER(CFUNCTYPE(c_void_p, FT_Memory, c_long, c_long, c_void_p))
+FT_Realloc_Func = POINTER(CFUNCTYPE(FT_Pointer, FT_Memory, c_long, c_long, FT_Pointer))
 
 class FT_MemoryRec_(Structure):
     _fields_ = [
-        ("user", c_void_p),
+        ("user", FT_Pointer),
         ("alloc", FT_Alloc_Func),
         ("free", FT_Free_Func),
         ("realloc", FT_Realloc_Func),
@@ -37,7 +37,7 @@ FT_Stream = POINTER("FT_StreamRec_")
 class FT_StreamDesc_(Union):
     _fields_ = [
         ("value", c_long),
-        ("pointer", c_void_p),
+        ("pointer", FT_Pointer),
         ]
 
 # typedef FT_StreamDesc

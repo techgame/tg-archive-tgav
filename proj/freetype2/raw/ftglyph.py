@@ -56,6 +56,14 @@ def FT_Glyph_Transform(glyph, matrix, delta, _api_=None):
     return _api_(glyph, matrix, delta)
     
 
+class FT_Glyph_BBox_Mode_(c_int):
+    '''enum FT_Glyph_BBox_Mode_''' 
+    FT_GLYPH_BBOX_UNSCALED = 0
+    FT_GLYPH_BBOX_SUBPIXELS = 0
+    FT_GLYPH_BBOX_GRIDFIT = 1
+    FT_GLYPH_BBOX_TRUNCATE = 2
+    FT_GLYPH_BBOX_PIXELS = 3
+
 @bind(None, [FT_Glyph, FT_UInt, POINTER(FT_BBox)])
 def FT_Glyph_Get_CBox(glyph, bbox_mode, acbox, _api_=None): 
     """FT_Glyph_Get_CBox(glyph, bbox_mode, acbox)
