@@ -94,7 +94,7 @@ class FreetypeFace(object):
     @property
     def faceFlagsList(self):
         faceFlags = self.faceFlags
-        return [flag for mask, flag in self.faceFlagsMap.iteritems() if faceFlags & mask]
+        return set(flag for mask, flag in self.faceFlagsMap.iteritems() if faceFlags & mask)
 
     def hasFlag(self, flag):
         flag = self.faceFlagsByName.get(flag, flag)
@@ -524,6 +524,7 @@ class FreetypeFaceIndex(dict):
             'family': face0.familyName,
             'postscript': face0.postscriptName,
             'styles': map(self._normStyleName, [facei.styleName for facei in faceSet]),
+            'flags': face0.faceFlagsList,
             }
 
         for pkey in self.primaryKeys:
@@ -537,5 +538,9 @@ FaceIndex = FreetypeFaceIndex
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 if __name__=='__main__':
-    pass
+    fi = FaceIndex(None, True, ['familyName'])
+    for n, e in fi.iteritems():
+        print '%30s: [%s]' % (n, ', '.join(e['styles']))
+        print '%30s  [%s]' % ('', ', '.join(e['flags']))
+
 
