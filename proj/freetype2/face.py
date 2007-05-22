@@ -428,9 +428,9 @@ class FreetypeFace(object):
         print >> out, '  flags:', hex(face.faceFlags), '=', ' | '.join(face.faceFlagsList)
         print >> out, '  metrics:'
         print >> out, '    units per em:', face.unitsPerEM/ptDiv
-        print >> out, '    ascender:', face.ascender / ptDiv, 'descender:', face.descender / ptDiv, 'height:', face.height / ptDiv
-        print >> out, '    lineAscender:', face.lineAscender / ptDiv, 'lineDescender:', face.lineDescender / ptDiv, 'lineHeight:', face.lineHeight / ptDiv
-        print >> out, '    bbox:', [(face.bbox.xMin/ptDiv, face.bbox.xMax/ptDiv), (face.bbox.yMin/ptDiv, face.bbox.yMax/ptDiv)]
+        print >> out, '    ascender:', face.ascender / ptDiv, 'descender:', face.descender / ptDiv, 'height:', face.height / ptDiv, '(a-d:', (face.ascender-face.descender)/ptDiv, ')'
+        print >> out, '    lineAscender:', face.lineAscender / ptDiv, 'lineDescender:', face.lineDescender / ptDiv, 'lineHeight:', face.lineHeight / ptDiv, '(la-ld:', (face.lineAscender-face.lineDescender)/ptDiv, ')'
+        print >> out, '    bbox:', [(face.bbox.xMin/ptDiv, face.bbox.yMin/ptDiv), (face.bbox.xMax/ptDiv, face.bbox.yMax/ptDiv)]
         print >> out, '    underline pos:', face.underlinePosition/ptDiv, 'thickness:', face.underlineThickness/ptDiv
         print >> out, '    max advance width:', face.maxAdvanceWidth/ptDiv, 'height:', face.maxAdvanceHeight/ptDiv
         cm = face.charmap[0]
@@ -540,7 +540,23 @@ FaceIndex = FreetypeFaceIndex
 if __name__=='__main__':
     fi = FaceIndex(None, True, ['familyName'])
     for n, e in fi.iteritems():
-        print '%30s: [%s]' % (n, ', '.join(e['styles']))
+        print '%30r: [%s]' % (n, ', '.join(e['styles']))
         print '%30s  [%s]' % ('', ', '.join(e['flags']))
+
+    try: 
+        f = fi.face('Courier')
+        print
+        f.printInfo()
+        print
+    except LookupError: 
+        pass
+
+    try: 
+        f = fi.face('Comic Sans MS')
+        print
+        f.printInfo()
+        print
+    except LookupError: 
+        pass
 
 

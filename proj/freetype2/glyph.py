@@ -12,6 +12,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 from raw import freetype as FT
+from raw import ftglyph
 import ctypes
 from ctypes import byref, cast, c_void_p
 
@@ -116,6 +117,22 @@ class FreetypeFaceGlyph(object):
         if renderMode is None: 
             renderMode = self.renderMode
         self._ft_renderGlyph(renderMode)
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    bboxModes = dict(
+        unscaled = 0,
+        subpixels = 0,
+        gridfit = 1,
+        truncate = 2,
+        pixels = 3,)
+
+    _ft_getCBox = ftglyph.FT_Glyph_Get_CBox
+    def getCBox(self, mode=3):
+        cbox = FT.FT_BBox()
+        mode = self.bboxModes.get(mode, mode)
+        self._ft_getCBox(mode, byref(cbox))
+        return cbox
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

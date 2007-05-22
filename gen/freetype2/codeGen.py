@@ -34,7 +34,6 @@ class FilterVisitor(AtomFilterVisitor):
     def onEnumeration(self, item):
         if item.name.startswith('FT_'):
             self.select(item)
-            print 'SWH:', item
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -149,6 +148,18 @@ def main():
 
     freetype = ciFilesByName['freetype.h']
     freetype.importAll(fttypes, ftimage, ftsystem)
+
+    ftbbox = ciFilesByName['ftbbox.h']
+    ftbbox.importAll(freetype)
+
+    ftoutln = ciFilesByName['ftoutln.h']
+    ftoutln.importAll(freetype)
+
+    ftglyph = ciFilesByName['ftglyph.h']
+    ftglyph.importAll(freetype)
+
+    ftstroke = ciFilesByName['ftstroke.h']
+    ftstroke.importAll(freetype, ftglyph)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # write output files
