@@ -214,11 +214,37 @@ class QTMovie(object):
         print
 
 
+    def getMovieRate(self):
+        return libQuickTime.GetMovieRate(self)
+    def getMovieTime(self):
+        # Sending a value of None to this method will only return the current time
+        # value, versus the time value and the pointer to the time structure
+        return libQuickTime.GetMovieTime(self, None)
+
+
+    def setMovieTime(self, pos):
+        pass
+        #return libQuickTime.SetMovieTime(self, time.struct_time)
+
+
+
+    def getMovieDuration(self):
+        return libQuickTime.GetMovieDuration(self)
+    def getMovieTimeScale(self):
+        return libQuickTime.GetMovieTimeScale(self)
+
     def start(self):
         libQuickTime.StartMovie(self)
 
     def stop(self):
         libQuickTime.StopMovie(self)
+
+    def pause(self):
+        libQuickTime.SetMovieRate(self, 0)
+
+    def goToBeginning(self):
+        libQuickTime.GoToBeginningOfMovie(self)
+
 
     def isActive(self):
         return libQuickTime.GetMovieActive(self)
