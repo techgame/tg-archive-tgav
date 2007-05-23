@@ -92,7 +92,7 @@ class FreetypeFace(object):
         return self._face.face_flags
 
     @property
-    def faceFlagsList(self):
+    def flags(self):
         faceFlags = self.faceFlags
         return set(flag for mask, flag in self.faceFlagsMap.iteritems() if faceFlags & mask)
 
@@ -425,7 +425,7 @@ class FreetypeFace(object):
         face = self
         print >> out, 'name:', face.getPostscriptName(), 'family:', face.familyName, 'style:', face.styleName
         print >> out, '  faces:', face.numFaces, '(%s)' % (face.faceIndex,), 'glyph count:', face.numGlyphs
-        print >> out, '  flags:', hex(face.faceFlags), '=', ' | '.join(face.faceFlagsList)
+        print >> out, '  flags:', hex(face.faceFlags), '=', ' | '.join(face.flags)
         print >> out, '  metrics:'
         print >> out, '    units per em:', face.unitsPerEM/ptDiv
         print >> out, '    ascender:', face.ascender / ptDiv, 'descender:', face.descender / ptDiv, 'height:', face.height / ptDiv, '(a-d:', (face.ascender-face.descender)/ptDiv, ')'
@@ -524,7 +524,7 @@ class FreetypeFaceIndex(dict):
             'family': face0.familyName,
             'postscript': face0.postscriptName,
             'styles': map(self._normStyleName, [facei.styleName for facei in faceSet]),
-            'flags': face0.faceFlagsList,
+            'flags': face0.flags,
             }
 
         for pkey in self.primaryKeys:
