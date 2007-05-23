@@ -32,9 +32,9 @@ libQuickTime = ctypes.cdll.LoadLibrary(libQuickTimePath)
 
 class TimeRecord(ctypes.Structure):
     _fields_ = [
-        ('value', ctypes.c_long)
-        ('scale', ctypes.c_long)
-        ('base', ctypes.c_void_p)
+        ('value', ctypes.c_long),
+        ('scale', ctypes.c_long),
+        ('base', ctypes.c_void_p),
         ]
 
 class QTNewMoviePropertyElement(ctypes.Structure):
@@ -226,12 +226,12 @@ class QTMovie(object):
     def getMovieTime(self):
         # Sending a value of None to this method will only return the current time
         # value, versus the time value and the pointer to the time structure
-        timeRecord = TimeRecord()
-        return libQuickTime.GetMovieTime(self, byref(timeRecord))
+        return libQuickTime.GetMovieTime(self, None)
 
 
     def setMovieTime(self, pos):
         timeRecord = TimeRecord()
+        libQuickTime.GetMovieTime(self, byref(timeRecord))
         timeRecord.value = pos
         return libQuickTime.SetMovieTime(self, byref(timeRecord))
 
