@@ -12,6 +12,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import os
+import weakref
 
 import ctypes
 from ctypes import byref, cast, c_void_p, c_uint
@@ -20,7 +21,7 @@ from raw import freetype as FT
 from raw._ctypes_freetype import FreetypeException
 
 from library import FreetypeLibrary
-from glyph import FreetypeFaceGlyph
+from glyph import FreetypeGlyphSlot
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Constants / Variiables / Etc. 
@@ -35,8 +36,7 @@ ptDiv16 = float(1<<16)
 
 class FreetypeFace(object):
     faceIndex = 0
-    loadFlags = FT.FT_LOAD_RENDER
-    renderMode = FT.FT_Render_Mode.FT_RENDER_MODE_NORMAL
+    GlyphType = FreetypeGlyphSlot
 
     #~ FreeType API interation ~~~~~~~~~~~~~~~~~~~~~~~~~~
     _as_parameter_ = None
@@ -44,24 +44,30 @@ class FreetypeFace(object):
 
     _ft_new_face = staticmethod(FT.FT_New_Face)
     def __init__(self, fontFilename, faceIndex=0, ftLibrary=None):
-        self._as_parameter_ = self._as_parameter_type_()
+        self.newFace(fontFilename, faceIndex, ftLibrary)
+
+    def newFace(self, fontFilename, faceIndex=0, ftLibrary=None):
         ftLibrary = ftLibrary or FreetypeLibrary()
-        try:
-            self._ft_new_face(ftLibrary, fontFilename, faceIndex, byref(self._as_parameter_))
-            self.filename = fontFilename
-        except FreetypeException:
-            self._as_parameter_ = None
-            raise
+        self.filename = fontFilename
+
+        _as_parameter_ = self._as_parameter_type_()
+        self._ft_new_face(ftLibrary, fontFilename, faceIndex, byref(_as_parameter_))
+        self._as_parameter_ = _as_parameter_
+
+        def dealloc(wr, doneFace=FT.FT_Done_Face, pface=_as_parameter_):
+            doneFace(pface)
+        self._dealloc = weakref.ref(self, dealloc)
 
     _ft_done_face = FT.FT_Done_Face
-    def __del__(self):
+    def close(self):
         if self._as_parameter_ is not None:
+            del self._dealloc
             self._ft_done_face()
         self._as_parameter_ = None
 
     def __repr__(self):
         klass = self.__class__
-        fmt = '<%s.%s: %%s>' % (klass.__module__, klass.__name__,)
+        fmt = '<%s: %%s>' % (klass.__name__,)
         if not self._as_parameter_:
             info = '{uninitialized}'
         else:
@@ -198,7 +204,7 @@ class FreetypeFace(object):
 
     @property
     def glyph(self):
-        return FreetypeFaceGlyph(self._face.glyph, self)
+        return self.GlyphType(self._face.glyph, self)
 
     @property
     def size(self):
@@ -256,16 +262,29 @@ class FreetypeFace(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    glyphLoadFlags = FT.FT_LOAD_RENDER
+    glyphRenderMode = FT.FT_Render_Mode.FT_RENDER_MODE_NORMAL
+
+    def allowVerticalLayout(self, onlyIfVertical=True):
+        if 'vertical' in self.flags:
+            self.loadVerticalLayout()
+            return True
+        return False
+
+    def loadVerticalLayout(self):
+        self.glyphLoadFlags |= FT.FT_LOAD_VERTICAL_LAYOUT
+
     _ft_loadGlyph = FT.FT_Load_Glyph
     def loadGlyph(self, glyphIndex, flags=None):
         if flags is None: 
-            flags = self.loadFlags 
+            flags = self.glyphLoadFlags 
         if isinstance(glyphIndex, basestring):
             glyphIndex = self.getCharIndex(glyphIndex)
         self._ft_loadGlyph(glyphIndex, flags)
         glyph = self.glyph
         glyph.index = glyphIndex
         return glyph
+    __getitem__ = loadGlyph
 
     def iterUniqueGlyphs(self, chars, flags=None):
         indexes = frozenset(self.iterCharIndexes(chars))
@@ -282,7 +301,7 @@ class FreetypeFace(object):
     _ft_loadChar = FT.FT_Load_Char
     def loadChar(self, char, flags=None):
         if flags is None: 
-            flags = self.loadFlags 
+            flags = self.glyphLoadFlags 
         self._ft_loadChar(ord(char), flags)
         glyph = self.glyph
         glyph.index = self.getCharIndex(char)
