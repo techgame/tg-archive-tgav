@@ -67,12 +67,12 @@ class FreetypeFace(object):
 
     def __repr__(self):
         klass = self.__class__
-        fmt = '<%s: %%s>' % (klass.__name__,)
+        return '<%s: %%s>' % (klass.__name__,self._getInfoName(),)
+
+    def _getInfoName(self):
         if not self._as_parameter_:
-            info = '{uninitialized}'
-        else:
-            info = '"%(familyName)s(%(styleName)s):%(lastSize)s"' % self.getInfo()
-        return fmt % (info,)
+            return '{uninitialized}'
+        return '"%(familyName)s(%(styleName)s):%(lastSize)s"' % self.getInfo()
 
     def __contains__(self, key):
         if isinstance(key, basestring):
@@ -262,7 +262,7 @@ class FreetypeFace(object):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    glyphLoadFlags = FT.FT_LOAD_RENDER
+    glyphLoadFlags = FT.FT_LOAD_DEFAULT
     glyphRenderMode = FT.FT_Render_Mode.FT_RENDER_MODE_NORMAL
 
     def allowVerticalLayout(self, onlyIfVertical=True):
