@@ -32,7 +32,7 @@ class CepstralEngine(CepstralObject):
             raise NotImplementedError()
         else: params = None
 
-        self._setAsParam(_swift.swift_engine_open(params))
+        self._set_param(_swift.swift_engine_open(params))
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

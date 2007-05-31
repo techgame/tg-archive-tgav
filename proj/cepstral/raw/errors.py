@@ -17,17 +17,17 @@ from swift_defs import swift_result_t
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class CepstralError(Exception):
-    exceptionFmt = '%s %s(0x%x) %s'
+    exceptionFmt = '<%s %s(0x%x) %s>'
     errorMap = swift_result_t.lookup
 
     def __init__(self, error, errorString='', callInfo=None):
         self.error = error
-        self.errorString = errorString
+        self.errorString = errorString or ''
         excStr = self.exceptionFmt % (
                         self.__class__.__name__,
                         self.errorMap.get(error, "???"),
-                        error,
-                        errorString)
+                        self.error,
+                        self.errorString)
 
         Exception.__init__(self, excStr)
 

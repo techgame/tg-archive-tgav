@@ -10,9 +10,14 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+from ctypes import byref, c_void_p
+
+from TG.metaObserving import OBKeyedSet
+
 from .base import CepstralObject, _swift
 from .voice import CepstralVoice
 from .waveform import CepstralWaveform
+from .event import CepstralEvent
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -20,11 +25,19 @@ from .waveform import CepstralWaveform
 
 class CepstralPort(CepstralObject):
     _closeFromParam = staticmethod(_swift.swift_port_close)
-
-    def __init__(self, engine, **kw):
+    def __init__(self, engine, async=True, **kw):
+        self.events = OBKeyedSet()
         self.engine = engine
+
+        self.async = async
+
         if engine is not None:
             self.open(engine, **kw)
+
+    def _set_param(self, as_parameter):
+        CepstralObject._set_param(self, as_parameter)
+        if self._as_parameter_:
+            self.hookEvents()
 
     def open(self, engine, *argparams, **kwparams):
         if self._as_parameter_ is not None:
@@ -35,13 +48,12 @@ class CepstralPort(CepstralObject):
 
         else: params = None
 
-        self._setAsParam(_swift.swift_port_open(engine, params))
+        self._set_param(_swift.swift_port_open(engine, params))
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     #~ Params
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    _swift.swift_port_set_callback
     _swift.swift_port_set_param
     _swift.swift_port_set_params
 
@@ -49,12 +61,12 @@ class CepstralPort(CepstralObject):
         return _swift.swift_port_language_encoding(self)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # Voices
+    #~ Voices
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def getVoiceList(self, search, order): 
         voiceParamList = self._getVoiceListRaw(search, order)
-        return [CepstralVoice.fromParam(voice_param) 
+        return [CepstralVoice.from_param(voice_param) 
                     for voice_param in voiceParamList]
 
     def _getVoiceListRaw(self, search, order):
@@ -70,7 +82,7 @@ class CepstralPort(CepstralObject):
         voice_param = _swift.swift_port_get_current_voice(self)
         voice = self._voice
         if voice is None or voice._as_parameter_ != voice_param:
-            voice = CepstralVoice.fromParam(voice_param)
+            voice = CepstralVoice.from_param(voice_param)
             self._voice = voice
         return voice
     def setVoice(self, voice):
@@ -90,24 +102,52 @@ class CepstralPort(CepstralObject):
         self._voice = None
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # Port Methods
+    #~ Port Methods
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    statusLookup = dict([(k, v.split("SWIFT_STATUS_")[1].lower())
+            for k, v in _swift.swift_status_t.lookup.items() 
+                if isinstance(k,  int)])
+
     def status(self, async=None):
-        _swift.swift_port_status(self, async)
+        if async is None: 
+            async = self.async
+        r = _swift.swift_port_status(self, async)
+        return self.statusLookup[r.value]
 
     def wait(self, async=None):
+        if async is None: 
+            async = self.async
         _swift.swift_port_wait(self, async)
-    def stop(self, async=None, place=None):
+    def stop(self, async=None, place=-1):
+        if async is None: 
+            async = self.async
         _swift.swift_port_stop(self, async, place)
-    def pause(self, async=None, place=None):
+    def pause(self, async=None, place=-1):
+        if async is None: 
+            async = self.async
         _swift.swift_port_pause(self, async, place)
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #~ Async Config
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    _async = None
+    def getAsync(self):
+        return self._async
+    def setAsync(self, async):
+        if async:
+            self._async = c_void_p(int(async))
+        else: self._async = None
+    async = property(getAsync, setAsync)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     #~ Speak methods
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def speak(self, text, encoding=None, isfile=False, async=None, params=None):
+        if async is None: 
+            async = self.async
         if isfile:
             _swift.swift_port_speak_file(self, text, encoding, async, params)
             return 
@@ -134,18 +174,40 @@ class CepstralPort(CepstralObject):
     def wave(self, text, encoding=None, isfile=False, params=None):
         if isfile:
             waveform_param = _swift.swift_port_get_wave(self, text, 0, encoding, isfile, params)
-            return CepstralWaveform.fromParam(waveform_param)
+            return CepstralWaveform.from_param(waveform_param)
 
         if isinstance(text, unicode):
             encoding = encoding or 'utf-8'
             text = text.encode(encoding)
 
         waveform_param = _swift.swift_port_get_wave(self, text, len(text), encoding, isfile, params)
-        return CepstralWaveform.fromParam(waveform_param)
+        return CepstralWaveform.from_param(waveform_param)
 
     def playWave(self, wave, async=None, params=None):
+        if async is None: 
+            async = self.async
         _swift.swift_port_play_wave(self, wave, async, params)
 
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #~ Callbacks
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    def hookEvents(self, mask=0x7fe):
+        self._setCallback(self._onSynthesisEvent, mask)
+
+    def _setCallback(self, fn, mask=0x7fe):
+        fn_cb = _swift.swift_callback_t(fn)
+        self._fn_cb = fn_cb
+        _swift.swift_port_set_callback(self, fn_cb, mask, 32)
+
+    def _onSynthesisEvent(self, evt_param, evtKind, user):
+        evt = CepstralEvent.fromEvent(evt_param, evtKind, self)
+        self.events.call_n1(evt.name, evt)
+        self.events.call_n1(None, evt)
+        return 0
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #~ Misc
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     # XXX: _swift.swift_port_get_perfstats

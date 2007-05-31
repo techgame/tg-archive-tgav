@@ -80,7 +80,7 @@ def swift_port_close(port, _api_=None):
 #~ line: 142, skipped: 15 ~~~~~~
 
 # typedef swift_callback_t
-swift_callback_t = POINTER(CFUNCTYPE(swift_result_t, POINTER(swift_event), swift_event_t, c_void_p))
+swift_callback_t = CFUNCTYPE(swift_result_t, POINTER(swift_event), swift_event_t, c_void_p)
 
 #~ line: 160, skipped: 18 ~~~~~~
 

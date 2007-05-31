@@ -23,14 +23,14 @@ class CepstralWaveform(CepstralObject):
         if self._as_parameter_ is not None:
             raise RuntimeError("Waveform already initialized")
 
-        self._setAsParam(_swift.swift_waveform_new())
+        self._set_param(_swift.swift_waveform_new())
 
     def open(self, filename, format, encoding, sample_rate, num_channels):
         if self._as_parameter_ is not None:
             raise RuntimeError("Waveform already open")
 
         waveform_param = _swift.swift_waveform_open(filename, format, encoding, sample_rate, num_channels)
-        self._setAsParam(waveform_param)
+        self._set_param(waveform_param)
 
     def save(self, filename, format):
         _swift.swift_waveform_save(self, filename, format)

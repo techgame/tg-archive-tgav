@@ -12,6 +12,7 @@
 
 import weakref
 from .raw import swift as _swift
+from .raw.errors import CepstralError
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -21,12 +22,12 @@ class CepstralObject(object):
     _as_parameter_ = None
 
     @classmethod
-    def fromParam(klass, as_parameter):
-        self = klass.__new__()
-        self._setAsParam(as_parameter)
+    def from_param(klass, as_parameter):
+        self = klass.__new__(klass)
+        self._set_param(as_parameter)
         return self
 
-    def _setAsParam(self, as_parameter):
+    def _set_param(self, as_parameter):
         if as_parameter:
             if self._as_parameter_:
                 self.close()
@@ -39,7 +40,7 @@ class CepstralObject(object):
 
     def close(self):
         self._closeFromParam(self)
-        self._setAsParam(None)
+        self._set_param(None)
 
     _closeFromParam = None
 
