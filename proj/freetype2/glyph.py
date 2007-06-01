@@ -78,7 +78,14 @@ class FreetypeGlyphSlot(object):
     def format(self):
         return self._glyphslot.format # FT_Glyph_Format
 
+    def isBitmapFormat(self):
+        format = self.format
+        return format.value == format.FT_GLYPH_FORMAT_BITMAP
+
     def getBitmapArray(self):
+        if not self.isBitmapFormat():
+            return None
+
         gbmp = self._glyphslot.bitmap
         if gbmp.buffer:
             bmpstr = string_at(gbmp.buffer, gbmp.rows*gbmp.pitch)

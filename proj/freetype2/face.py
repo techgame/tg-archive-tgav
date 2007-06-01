@@ -14,6 +14,9 @@
 import os
 import weakref
 
+import numpy
+from numpy import frombuffer, ndarray
+
 import ctypes
 from ctypes import byref, cast, c_void_p, c_uint
 
@@ -67,7 +70,7 @@ class FreetypeFace(object):
 
     def __repr__(self):
         klass = self.__class__
-        return '<%s: %%s>' % (klass.__name__,self._getInfoName(),)
+        return '<%s: %s>' % (klass.__name__,self._getInfoName(),)
 
     def _getInfoName(self):
         if not self._as_parameter_:
@@ -321,11 +324,28 @@ class FreetypeFace(object):
         if isinstance(right, basestring):
             right = self.getCharIndex(right)
         self._ft_getKerning(left, right, kernMode, byref(aKerning))
-        return (aKerning.x, aKerning.y)
+        return frombuffer(aKerning, 'l')
     def getKerningByIndex(self, leftIndex, rightIndex, kernMode=0):
         aKerning = FT.FT_Vector()
         self._ft_getKerning(leftIndex, rightIndex, kernMode, byref(aKerning))
-        return (aKerning.x, aKerning.y)
+        return frombuffer(aKerning, 'l')
+    def kernArray(self, indexes, offset, kernMode=0):
+        if offset is None:
+            offset = numpy.zeros((len(indexes), 2), 'l')
+
+        kern_g0g1 = numpy.zeros((2,), 'l')
+        kern_ref = kern_g0g1.ctypes.data_as(ctypes.POINTER(FT.FT_Vector))
+        ft_getKerning = self._ft_getKerning
+
+        g0 = int(indexes[0])
+        for i in xrange(1, len(indexes)):
+            g1 = int(indexes[i])
+            ft_getKerning(g0, g1, kernMode, kern_ref)
+            offset[i] = kern_g0g1
+            g0 = g1
+
+        offset >>= 6
+        return offset
 
     def iterKerning(self, chars, kernMode=0):
         left = None
@@ -334,7 +354,7 @@ class FreetypeFace(object):
                 yield (0, 0)
             else:
                 self._ft_getKerning(left, right, kernMode, byref(aKerning))
-                yield (aKerning.x, aKerning.y)
+                yield frombuffer(aKerning, 'l')
             left = right
 
     def iterKerningSwapped(self, chars, kernMode=0):
@@ -344,7 +364,7 @@ class FreetypeFace(object):
                 yield (0, 0)
             else:
                 self._ft_getKerning(left, right, kernMode, byref(aKerning))
-                yield (aKerning.x, aKerning.y)
+                yield frombuffer(aKerning, 'l')
             right = left
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
