@@ -14,10 +14,9 @@ from TG.cepstral.engine import CepstralEngine
 def main(argv):
     engine = CepstralEngine()
     port = engine.newPort()
-    port.async =  True
+    port.setVoiceName('Diane')
 
     port.speak(' '.join(argv))
-    port.speak(__file__, isfile=True)
 
     @port.events.on('word')
     def onTTSWord(evt):

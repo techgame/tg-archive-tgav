@@ -95,10 +95,10 @@ class CepstralPort(CepstralObject):
     voice = property(getVoice, setVoice)
 
     def setVoiceName(self, voiceName):
-        _swift.swift_port_set_voice_by_name(voiceName)
+        _swift.swift_port_set_voice_by_name(self, voiceName)
         self._voice = None
     def setVoiceDir(self, voiceDir):
-        _swift.swift_port_set_voice_from_dir(voiceDir)
+        _swift.swift_port_set_voice_from_dir(self, voiceDir)
         self._voice = None
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
