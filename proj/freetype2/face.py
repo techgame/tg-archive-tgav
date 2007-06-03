@@ -46,13 +46,36 @@ class FreetypeFace(object):
     _as_parameter_type_ = FT.FT_Face
 
     _ft_new_face = staticmethod(FT.FT_New_Face)
-    def __init__(self, fontFilename, faceIndex=0, ftLibrary=None):
-        self.newFace(fontFilename, faceIndex, ftLibrary)
+    def __init__(self, fontFilename, faceIndex=None, ftLibrary=None):
+        if fontFilename:
+            self.open(fontFilename, faceIndex, ftLibrary)
 
-    def newFace(self, fontFilename, faceIndex=0, ftLibrary=None):
-        ftLibrary = ftLibrary or FreetypeLibrary()
+    def open(self, fontFilename, faceIndex=None, ftLibrary=None):
+        if faceIndex is None:
+            fontFilename, sc, faceIndex = fontFilename.partition('#')
+
         self.filename = fontFilename
+        ftLibrary = ftLibrary or FreetypeLibrary()
 
+        if not faceIndex or isinstance(faceIndex, int) or faceIndex.isdigit():
+            self._newFace(fontFilename, int(faceIndex or 0), ftLibrary)
+            return faceIndex < self.numFaces
+
+        searchStyle = faceIndex.lower().replace(' ', '')
+        self._newFace(fontFilename, 0, ftLibrary)
+        for idx in xrange(1, self.numFaces):
+            styleName = self.styleName.lower().replace(' ', '')
+            if styleName == searchStyle:
+                return True
+
+            self.close()
+            self._newFace(fontFilename, idx, ftLibrary)
+
+        # we did not find the face
+        self._newFace(fontFilename, 0, ftLibrary)
+        return False
+
+    def _newFace(self, fontFilename, faceIndex, ftLibrary):
         _as_parameter_ = self._as_parameter_type_()
         self._ft_new_face(ftLibrary, fontFilename, faceIndex, byref(_as_parameter_))
         self._as_parameter_ = _as_parameter_
@@ -329,23 +352,22 @@ class FreetypeFace(object):
         aKerning = FT.FT_Vector()
         self._ft_getKerning(leftIndex, rightIndex, kernMode, byref(aKerning))
         return frombuffer(aKerning, 'l')
-    def kernArray(self, indexes, offset, kernMode=0):
-        if offset is None:
-            offset = numpy.zeros((len(indexes), 2), 'l')
+    def kernArray(self, indexes, advance, kernMode=0):
+        if not (self.faceFlags & FT.FT_FACE_FLAG_KERNING):
+            return advance
 
         kern_g0g1 = numpy.zeros((2,), 'l')
         kern_ref = kern_g0g1.ctypes.data_as(ctypes.POINTER(FT.FT_Vector))
         ft_getKerning = self._ft_getKerning
 
         g0 = int(indexes[0])
-        for i in xrange(1, len(indexes)):
-            g1 = int(indexes[i])
+        for i in xrange(0, len(indexes)-1):
+            g1 = int(indexes[i+1])
             ft_getKerning(g0, g1, kernMode, kern_ref)
-            offset[i] = kern_g0g1
+            advance[i] += kern_g0g1 >> 6
             g0 = g1
 
-        offset >>= 6
-        return offset
+        return advance
 
     def iterKerning(self, chars, kernMode=0):
         left = None
