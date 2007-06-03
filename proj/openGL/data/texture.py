@@ -14,7 +14,7 @@ import sys
 import weakref
 from bisect import bisect_left
 
-from numpy import array, asarray
+from numpy import array, asarray, zeros
 from ctypes import cast, byref, c_void_p
 
 from TG.geomath.data.box import Box
@@ -290,7 +290,7 @@ class TextureImageBasic(object):
         self.texData(cdata, cdata, pixelStoreSettings)
     cdata = property(fset=texCData)
     def texArray(self, array, pixelStoreSettings=None):
-        self.texData(array, array.ctypes, pixelStoreSettings)
+        self.texString(array.tostring(), pixelStoreSettings)
     array = property(fset=texArray)
 
     def texBlank(self):
@@ -650,7 +650,7 @@ class Texture(object):
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     box = None
-    texSize = None
+    texSize = zeros(1, 'L')
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     #~ Texture Data
