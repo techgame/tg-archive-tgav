@@ -17,3 +17,5 @@ Icon?
 syntax: regexp
 ^gen/.*/build/.*
 ^sandbox/misc/.*
+^proj/cepstral/test/demos/.*
+
