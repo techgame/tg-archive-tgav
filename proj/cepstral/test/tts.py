@@ -14,7 +14,7 @@ from TG.cepstral.engine import CepstralEngine
 def main(argv):
     engine = CepstralEngine()
     port = engine.newPort()
-    port.setVoiceName('Diane')
+    port.setVoiceName('David')
 
     port.speak(' '.join(argv))
 

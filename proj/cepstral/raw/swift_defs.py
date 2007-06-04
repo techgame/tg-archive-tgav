@@ -79,7 +79,10 @@ class swift_result_t(c_int):
         -15: "SWIFT_QUEUE_FULL",
         -16: "SWIFT_TOKEN_TIMEOUT",
         }
-    lookup.update([(v,k) for k,v in lookup.items()])
+    rlookup = dict([(v,k) for k,v in lookup.items()])
+    def __repr__(self): return str(self)
+    def __str__(self): 
+        return self.lookup.get(self.value) or str(self.value)
 
 #~ line: 65, skipped: 18 ~~~~~~
 
@@ -100,7 +103,10 @@ class swift_status_t(c_int):
         2: "SWIFT_STATUS_PAUSED",
         3: "SWIFT_STATUS_QUEUED",
         }
-    lookup.update([(v,k) for k,v in lookup.items()])
+    rlookup = dict([(v,k) for k,v in lookup.items()])
+    def __repr__(self): return str(self)
+    def __str__(self): 
+        return self.lookup.get(self.value) or str(self.value)
 
 #~ line: 74, skipped: 6 ~~~~~~
 
@@ -141,7 +147,10 @@ class swift_event_t(c_int):
         -1: "SWIFT_EVENT_ALL",
         -1: "SWIFT_EVENT_NOW",
         }
-    lookup.update([(v,k) for k,v in lookup.items()])
+    rlookup = dict([(v,k) for k,v in lookup.items()])
+    def __repr__(self): return str(self)
+    def __str__(self): 
+        return self.lookup.get(self.value) or str(self.value)
 
 #~ line: 93, skipped: 16 ~~~~~~
 
@@ -158,7 +167,10 @@ class swift_voice_retention_policy_t(c_int):
         1: "SWIFT_VOICE_RETAIN_PORT_USAGE",
         2: "SWIFT_VOICE_RETAIN_NONE",
         }
-    lookup.update([(v,k) for k,v in lookup.items()])
+    rlookup = dict([(v,k) for k,v in lookup.items()])
+    def __repr__(self): return str(self)
+    def __str__(self): 
+        return self.lookup.get(self.value) or str(self.value)
 
 #~ line: 100, skipped: 4 ~~~~~~
 
