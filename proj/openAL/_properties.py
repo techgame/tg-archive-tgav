@@ -14,6 +14,7 @@ import weakref
 from itertools import takewhile, count
 from ctypes import cast, byref, c_void_p, _SimpleCData, POINTER
 
+from TG.kvObserving import KVObject
 from TG.openAL.raw import al, alc
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -53,10 +54,9 @@ class ALIDObject(ALObject):
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class ALContextObject(ALObject):
+class ALContextObject(KVObject, ALObject):
     _context = None
     def _captureCurrentContext(self):
-        from context import Context
         self._context = weakref.proxy(Context.getCurrent())
 
     def inContext(self):
@@ -74,6 +74,29 @@ class ALContextObject(ALObject):
             alc.alcMakeContextCurrent(context)
             yield True
             alc.alcMakeContextCurrent(current)
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    processEvents = []
+    _process_cache = None
+    def process(self):
+        cache = self._process_cache
+        if cache is None:
+            cache = {}
+            for pe in self.processEvents:
+                if not isinstance(pe, tuple):
+                    pe = (pe, pe)
+                cache[pe] = None
+            self._process_cache = cache
+
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        kvpub = self.kvpub
+        for (name, attr), lastVal in cache.items():
+            val = getattr(self, attr or name, lastVal)
+            if val != lastVal:
+                kvpub(name)
+            cache[name, attr] = val
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -227,4 +250,10 @@ class alcPropertyS(alObjectReadProperty):
     
     def valueFromAPI(self, cVal):
         return alc.cast(cVal, al.c_char_p).value
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ Context import
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+from context import Context
 

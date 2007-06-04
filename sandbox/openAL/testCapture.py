@@ -28,7 +28,6 @@ def main():
 
     device = openAL.Device()
     context = openAL.Context(device, None)
-    context.makeCurrent()
 
     if 1:
         print "OpenAL Library:"
@@ -63,13 +62,24 @@ def main():
         wave.writeWaveHeader()
 
         sampleList = []
+
+        @capture.kvo('sampleCount')
+        def onCountChange(capture, sampleCount):
+            if sampleCount <= 0:
+                print '.',
+                return
+
+            print 'Capture samples available:', sampleCount
+            data = capture.samples()
+            assert len(data) > 0
+            wave.writeFrames(data)
+            sampleList.append(data)
+
         capture.start()
         for x in xrange(60):
             time.sleep(0.1)
-            data = capture.samples()
-            if data:
-                wave.writeFrames(data)
-                sampleList.append(data)
+            context.process()
+
         capture.stop()
         wave.close()
 
@@ -81,7 +91,13 @@ def main():
 
         print 'Queing audio:'
         src = openAL.Source(buf)
+
+        @src.kvo('sec_offset')
+        def onCountChange(src, s):
+            print "Second Offset:", s
+
         while src.isPlaying():
+            context.process()
             print wig.next(),
             sys.stdout.flush()
             time.sleep(0.1)

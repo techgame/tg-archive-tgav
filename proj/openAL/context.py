@@ -63,6 +63,7 @@ class Context(ALIDObject):
         self._device = device
         device._addContext(self)
         self._device = device
+        self.makeCurrent()
 
     __dealocating = False
     def destroy(self):
@@ -81,9 +82,16 @@ class Context(ALIDObject):
 
     def makeCurrent(self):
         return bool(alc.alcMakeContextCurrent(self))
+    select = makeCurrent
 
     def process(self):
+        self.makeCurrent()
+        for src in self.getSources():
+            src.process()
+        for cap in self.getCaptures():
+            cap.process()
         alc.alcProcessContext(self)
+
     def suspend(self):
         alc.alcSuspendContext(self)
 
@@ -95,9 +103,11 @@ class Context(ALIDObject):
         if result is None:
             result = Device.fromContext(self)
         return result
+    device = property(getDevice)
 
     def getAttrs(self):
         return self._getAttrsFor(self)
+    attrs = property(getAttrs)
 
     @classmethod
     def getDefaultAttrs(self):
@@ -128,11 +138,36 @@ class Context(ALIDObject):
                 src = self._sources.pop()
                 src.destroy()
             del self._sources
+    sources = property(getSources, setSources, delSources)
 
     def addSource(self, source):
         self.getSources().add(source)
     def removeSource(self, source):
         self.getSources().discard(source)
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #~ Capture Collection
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    _captures = None
+    def getCaptures(self):
+        if self._captures is None:
+            self.setCaptures(set())
+        return self._captures
+    def setCaptures(self, captures):
+        self._captures = captures
+    def delCaptures(self):
+        if self._captures is not None:
+            while self._captures:
+                src = self._captures.pop()
+                src.destroy()
+            del self._captures
+    captures = property(getCaptures, setCaptures, delCaptures)
+
+    def addCapture(self, capture):
+        self.getCaptures().add(capture)
+    def removeCapture(self, capture):
+        self.getCaptures().discard(capture)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     #~ Buffer Collection
@@ -151,6 +186,7 @@ class Context(ALIDObject):
                 buf = self._buffers.pop()
                 buf.destroy()
             del self._buffers
+    buffers = property(getBuffers, setBuffers, delBuffers)
 
     def addBuffer(self, buffer):
         self.getBuffers().add(buffer)

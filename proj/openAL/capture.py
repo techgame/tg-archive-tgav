@@ -24,6 +24,16 @@ if not hasattr(alc, 'alcCaptureOpenDevice'):
 else:
 
     class Capture(ALIDContextObject):
+        processEvents = [
+            'capturing',
+            'sampleCount', 
+
+            'format',
+            'frequency',
+            'bufferCount',
+            'entrySize',
+            ]
+
         _buffer = None
         format = None
         frequency = 0
@@ -62,8 +72,9 @@ else:
             self._buffer = al.c_buffer(self.bufferCount*self.entrySize, 0)
             self._setAsParam(alc.alcCaptureOpenDevice(name, int(frequency), int(format), len(self._buffer)))
 
-            from device import Device
-            Device.fromCurrentContext()._addContext(self)
+            context = self._context
+            context.addCapture(self)
+            context.device._addContext(self)
 
         __dealocating = False
         def close(self):
@@ -122,24 +133,32 @@ else:
 
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        _isCapturing = False
-        def isCapturing(self):
-            return self._isCapturing
-        def _setCapturing(self, isCapturing):
-            self._isCapturing = isCapturing
+        _capturing = False
+        def getCapturing(self):
+            return self._capturing
+        isCapturing = getCapturing
+        def setCapturing(self, capturing):
+            self._capturing = capturing
+        capturing = property(getCapturing, setCapturing)
 
         def start(self):
             alc.alcCaptureStart(self)
-            self._setCapturing(True)
+            self.setCapturing(True)
         def stop(self):
             alc.alcCaptureStop(self)
-            self._setCapturing(False)
+            self.setCapturing(False)
         def samples(self, count=None):
             if count is None: 
                 count = self.bufferCount
             count = min(count, self.sampleCount)
-            alc.alcCaptureSamples(self, self._buffer, count)
             if count:
+                alc.alcCaptureSamples(self, self._buffer, count)
                 return self._buffer[:count*self.entrySize]
             else: return ''
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ Context import
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+from device import Device
 

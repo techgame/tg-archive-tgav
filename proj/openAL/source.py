@@ -47,6 +47,18 @@ class alSourcePropertyFV(alVectorObjectProperty):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class Source(ALIDContextObject):
+    processEvents = [
+        ('state', 'state_id'),
+
+        ('buffer', 'buffer_id'),
+        'buffers_queued',
+        'buffers_processed',
+
+        'byte_offset',
+        'sample_offset',
+        'sec_offset',
+        ]
+
     position = alSourcePropertyFV(al.AL_POSITION)
     velocity = alSourcePropertyFV(al.AL_VELOCITY)
     direction = alSourcePropertyFV(al.AL_DIRECTION)
@@ -335,6 +347,8 @@ class Source(ALIDContextObject):
     def isInitial(self):
         return self.state_id == al.AL_INITIAL
 
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class SourceCollection(object):
@@ -354,13 +368,13 @@ class SourceCollection(object):
         for s in sources:
             if not s.isSource():
                 raise ValueError('All entries must be source objects')
-        self._sources = sources
+        self.getSources()[:] = sources
     def addSource(self, source=None):
         if source is None:
             source = Source()
         elif not s.isSource():
             raise ValueError('Entries must be a source object')
-        self._sources.append(source)
+        self.getSources().append(source)
         return source
 
 
@@ -408,10 +422,6 @@ class SourceCollection(object):
         else: return False
     def isPaused(self):
         return not self.isStopped() and not self.isPlaying()
-        for s in self.getSources():
-            if s.isPlaying():
-                return True
-        else: return False
     def isStopped(self):
         for s in self.getSources():
             if not s.isStopped():
