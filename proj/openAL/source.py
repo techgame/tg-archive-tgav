@@ -53,6 +53,7 @@ class Source(ALIDContextObject):
         ('buffer', 'buffer_id'),
         'buffers_queued',
         'buffers_processed',
+        'currentBuffer',
 
         'byte_offset',
         'sample_offset',
@@ -130,6 +131,16 @@ class Source(ALIDContextObject):
             traceback.print_exc()
             raise
 
+    def process(self):
+        ALIDContextObject.process(self)
+
+        processed = self.buffers_processed
+        for idx, buf in enumerate(self.getBufferQueue()):
+            if idx == processed:
+                buf.playingSources.add(self)
+            else: buf.playingSources.discard(self)
+            buf.process()
+        
     def isSource(self):
         return True
 
@@ -180,6 +191,27 @@ class Source(ALIDContextObject):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    _lastBuffer = None
+    def getCurrentBuffer(self):
+        buffq = self.bufferQueue
+        bidx = self.buffers_processed
+        if len(buffq) < bidx:
+            curBuffer = buffq[bidx]
+        else: curBuffer = None
+
+        lastBuffer = self._lastBuffer
+        if lastBuffer is curBuffer:
+            return
+        if lastBuffer is not None:
+            lastBuffer.playingSources.discard(self)
+            lastBuffer.process()
+        if curBuffer is not None:
+            curBuffer.playingSources.add(self)
+            curBuffer.process()
+        self._lastBuffer = curBuffer
+        return curBuffer
+    currentBuffer = property(getCurrentBuffer)
+
     _buffer_view = None
     def getBuffer(self):
         bufferId = self.buffer_id
@@ -202,6 +234,7 @@ class Source(ALIDContextObject):
         if self._bufferQueue is None:
             self._bufferQueue = []
         return self._bufferQueue
+    bufferQueue = property(getBufferQueue)
 
     def isQueued(self, buffer):
         return (buffer in self.getBufferQueue())

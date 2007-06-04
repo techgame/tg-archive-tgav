@@ -59,6 +59,11 @@ class ALContextObject(KVObject, ALObject):
     def _captureCurrentContext(self):
         self._context = weakref.proxy(Context.getCurrent())
 
+    def asWeakRef(self, cb):
+        return weakref.ref(self, cb)
+    def asWeakProxy(self, cb):
+        return weakref.proxy(self, cb)
+
     def inContext(self):
         i = self._inContext(self._context)
         i.next()

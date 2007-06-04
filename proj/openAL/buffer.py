@@ -44,6 +44,16 @@ class _alBufferPropertyI(alObjectProperty):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class Buffer(ALIDContextObject):
+    processEvents = [
+        'playingSources',
+        'queuedSources',
+
+        'format',
+        'frequency',
+        'channels',
+        'size',
+        ]
+
     frequency = _alBufferPropertyI(al.AL_FREQUENCY)
     bits = _alBufferPropertyI(al.AL_BITS)
     channels = _alBufferPropertyI(al.AL_CHANNELS)
@@ -104,7 +114,7 @@ class Buffer(ALIDContextObject):
 
     def createFromId(self, bufferId):
         self._setAsParam(bufferId)
-        self._context.addBuffer(self)
+        #self._context.addBuffer(self)
         return self
 
     def destroy(self):
@@ -149,19 +159,29 @@ class Buffer(ALIDContextObject):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    _playingSrcs = None
+    def getPlayingSources(self):
+        if self._playingSrcs is None:
+            self._playingSrcs = set()
+        return self._playingSrcs
+    playingSources = property(getPlayingSources)
+
     _queuedSrcs = None
     def getQueuedSources(self):
         if self._queuedSrcs is None:
             self._queuedSrcs = set()
         return self._queuedSrcs
+    queuedSources = property(getQueuedSources)
 
     def isQueued(self):
         return bool(self._queuedSrcs)
 
     def onQueued(self, src):
         self.getQueuedSources().add(src)
+        self.process()
     def onDequeued(self, src):
         self.getQueuedSources().discard(src)
+        self.process()
 
     def queue(self, *srcs):
         for src in srcs:

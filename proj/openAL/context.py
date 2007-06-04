@@ -169,27 +169,28 @@ class Context(ALIDObject):
     def removeCapture(self, capture):
         self.getCaptures().discard(capture)
 
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    #~ Buffer Collection
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ##~ Buffer Collection
+    ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    _buffers = None
-    def getBuffers(self):
-        if self._buffers is None:
-            self.setBuffers(set())
-        return self._buffers
-    def setBuffers(self, buffers):
-        self._buffers = buffers
-    def delBuffers(self):
-        if self._buffers is not None:
-            while self._buffers:
-                buf = self._buffers.pop()
-                buf.destroy()
-            del self._buffers
-    buffers = property(getBuffers, setBuffers, delBuffers)
+    #_buffers = None
+    #def getBuffers(self):
+    #    if self._buffers is None:
+    #        self.setBuffers(set())
+    #    return self._buffers
+    #def setBuffers(self, buffers):
+    #    self._buffers = buffers
+    #def delBuffers(self):
+    #    if self._buffers is not None:
+    #        while self._buffers:
+    #            buf = self._buffers.pop()
+    #            if buf():
+    #                buf().destroy()
+    #        del self._buffers
+    #buffers = property(getBuffers, setBuffers, delBuffers)
 
-    def addBuffer(self, buffer):
-        self.getBuffers().add(buffer)
-    def removeBuffer(self, buffer):
-        self.getBuffers().discard(buffer)
+    #def addBuffer(self, buffer):
+    #    self.getBuffers().add(buffer)
+    #def removeBuffer(self, buffer):
+    #    self.getBuffers().discard(buffer)
 
