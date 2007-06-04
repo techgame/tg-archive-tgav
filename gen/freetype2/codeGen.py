@@ -35,6 +35,10 @@ class FilterVisitor(AtomFilterVisitor):
         if item.name.startswith('FT_'):
             self.select(item)
 
+    def onTypedef(self, item):
+        if item.name.startswith('FT_'):
+            self.select(item)
+
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     includePrefixes = set([
