@@ -163,6 +163,17 @@ class FT_Orientation(c_int):
     FT_ORIENTATION_FILL_RIGHT = 0
     FT_ORIENTATION_FILL_LEFT = 1
     FT_ORIENTATION_NONE = 2
+    lookup = {
+        0: "FT_ORIENTATION_TRUETYPE",
+        1: "FT_ORIENTATION_POSTSCRIPT",
+        0: "FT_ORIENTATION_FILL_RIGHT",
+        1: "FT_ORIENTATION_FILL_LEFT",
+        2: "FT_ORIENTATION_NONE",
+        }
+    rlookup = dict([(v,k) for k,v in lookup.items()])
+    def __repr__(self): return str(self)
+    def __str__(self): 
+        return self.lookup.get(self.value) or str(self.value)
 
 @bind(FT_Orientation, [POINTER(FT_Outline)])
 def FT_Outline_Get_Orientation(outline, _api_=None): 

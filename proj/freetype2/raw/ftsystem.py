@@ -64,6 +64,9 @@ class FT_StreamRec_(Structure):
         ]
 FT_Stream.set_type(FT_StreamRec_)
 
+# typedef FT_StreamRec
+FT_StreamRec = FT_StreamRec_
+
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ End of code generated from:

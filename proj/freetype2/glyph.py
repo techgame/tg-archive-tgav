@@ -14,13 +14,14 @@
 import weakref
 
 import numpy
-from numpy import frombuffer, ndarray
+from numpy import frombuffer, ndarray, zeros
 
 import ctypes
 from ctypes import byref, cast, c_void_p, string_at
 
 from raw import freetype as FT
 from raw import ftglyph
+from raw.errors import FreetypeException
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Constants / Variiables / Etc. 
@@ -82,14 +83,27 @@ class FreetypeGlyphSlot(object):
         format = self.format
         return format.value == format.FT_GLYPH_FORMAT_BITMAP
 
-    def getBitmapArray(self):
-        if not self.isBitmapFormat():
-            return None
+    def getBitmapArray(self, gbmp=None):
+        if gbmp is None:
+            gbmp = self._glyphslot.bitmap
 
-        gbmp = self._glyphslot.bitmap
         if gbmp.buffer:
-            bmpstr = string_at(gbmp.buffer, gbmp.rows*gbmp.pitch)
-            return ndarray((gbmp.rows, gbmp.width), 'B', bmpstr, 0, (gbmp.pitch, 1))
+            if gbmp.pixel_mode == '\x02':
+                # gray bytes
+                bmpstr = string_at(gbmp.buffer, gbmp.rows*gbmp.width)
+                return ndarray((gbmp.rows, gbmp.width), 'B', bmpstr)
+
+            if gbmp.pixel_mode == '\x01':
+                bmpstr = string_at(gbmp.buffer, gbmp.rows*gbmp.width)
+                bits = ndarray((gbmp.rows, abs(gbmp.pitch)), 'B', bmpstr)
+
+                result = zeros((gbmp.rows, gbmp.width), 'B')
+                for i in xrange(gbmp.width):
+                    w = (bits[:] >> (7-i)) & 1
+                    result[:, i] = 255 * w[:, 0]
+                return result
+
+            raise NotImplementedError("Unimplemented font bitmap pixel mode")
 
     @property
     def bitmap(self):
@@ -133,18 +147,44 @@ class FreetypeGlyphSlot(object):
 
     _renderMode = None
     def getRenderMode(self):
-        if self._renderMode is None:
-            return self.face.glyphRenderMode
-        return self._renderMode
+        mode = self._renderMode
+        if mode is None:
+            mode = self.face.glyphRenderMode
+        return mode
     def setRenderMode(self, renderMode):
         self._renderMode = renderMode
     renderMode = property(getRenderMode, setRenderMode)
 
+    origin = ftglyph.FT_Vector(0, 0)
     _ft_renderGlyph = FT.FT_Render_Glyph
+    _ft_glyphToBitmap = staticmethod(ftglyph.FT_Glyph_To_Bitmap)
     def render(self, renderMode=None):
         if renderMode is None: 
             renderMode = self.renderMode
         self._ft_renderGlyph(renderMode)
+
+        # Glyph to bitmap process -- seems to produce same results as renderGlyph
+        ##glyph = self.glyph
+        ##self._ft_glyphToBitmap(glyph, renderMode, self.origin, 1)
+        ##bitmapGlyph = cast(glyph, ftglyph.FT_BitmapGlyph)
+        ##gbmp = bitmapGlyph[0].bitmap
+        return self.getBitmapArray()
+
+    _ft_getGlyph = ftglyph.FT_Get_Glyph
+    _ft_doneGlyph = staticmethod(ftglyph.FT_Done_Glyph)
+
+    _glyph = None
+    def getGlyph(self):
+        glyph = self._glyph
+        if glyph is None:
+            glyph = ftglyph.FT_Glyph()
+            self._ft_getGlyph(glyph)
+            self._glyph = glyph
+            def dealloc(wr, glyph=glyph):
+                ftglyph.FT_Done_Glyph(glyph)
+            weakref.ref(self, dealloc)
+        return glyph
+    glyph = property(getGlyph)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -155,19 +195,12 @@ class FreetypeGlyphSlot(object):
         truncate = 2,
         pixels = 3,)
 
-    _ft_getGlyph = ftglyph.FT_Get_Glyph
-    _ft_doneGlyph = staticmethod(ftglyph.FT_Done_Glyph)
     _ft_getGlyphCBox = staticmethod(ftglyph.FT_Glyph_Get_CBox)
-
     def getCBox(self, mode=1):
         mode = self.bboxModes.get(mode, mode)
 
         cbox = FT.FT_BBox()
-
-        glyph = ftglyph.FT_Glyph()
-        self._ft_getGlyph(glyph)
-        self._ft_getGlyphCBox(glyph, mode, byref(cbox))
-
+        self._ft_getGlyphCBox(self.glyph, mode, byref(cbox))
         return frombuffer(cbox, 'l').reshape((2,2))
     cbox = property(getCBox)
 

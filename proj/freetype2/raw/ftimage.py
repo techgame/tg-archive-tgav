@@ -43,6 +43,23 @@ class FT_Pixel_Mode_(c_int):
     FT_PIXEL_MODE_LCD = 5
     FT_PIXEL_MODE_LCD_V = 6
     FT_PIXEL_MODE_MAX = 7
+    lookup = {
+        0: "FT_PIXEL_MODE_NONE",
+        1: "FT_PIXEL_MODE_MONO",
+        2: "FT_PIXEL_MODE_GRAY",
+        3: "FT_PIXEL_MODE_GRAY2",
+        4: "FT_PIXEL_MODE_GRAY4",
+        5: "FT_PIXEL_MODE_LCD",
+        6: "FT_PIXEL_MODE_LCD_V",
+        7: "FT_PIXEL_MODE_MAX",
+        }
+    rlookup = dict([(v,k) for k,v in lookup.items()])
+    def __repr__(self): return str(self)
+    def __str__(self): 
+        return self.lookup.get(self.value) or str(self.value)
+
+# typedef FT_Pixel_Mode
+FT_Pixel_Mode = FT_Pixel_Mode_
 
 class FT_Bitmap_(Structure):
     _fields_ = [
@@ -128,9 +145,24 @@ class FT_Glyph_Format_(c_int):
     FT_GLYPH_FORMAT_BITMAP = 1651078259
     FT_GLYPH_FORMAT_OUTLINE = 1869968492
     FT_GLYPH_FORMAT_PLOTTER = 1886154612
+    lookup = {
+        0: "FT_GLYPH_FORMAT_NONE",
+        1668246896: "FT_GLYPH_FORMAT_COMPOSITE",
+        1651078259: "FT_GLYPH_FORMAT_BITMAP",
+        1869968492: "FT_GLYPH_FORMAT_OUTLINE",
+        1886154612: "FT_GLYPH_FORMAT_PLOTTER",
+        }
+    rlookup = dict([(v,k) for k,v in lookup.items()])
+    def __repr__(self): return str(self)
+    def __str__(self): 
+        return self.lookup.get(self.value) or str(self.value)
 
 # typedef FT_Glyph_Format
 FT_Glyph_Format = FT_Glyph_Format_
+
+FT_RasterRec_ = c_void_p # Structure with empty _fields_
+# typedef FT_Raster
+FT_Raster = POINTER(FT_RasterRec_)
 
 class FT_Span_(Structure):
     _fields_ = [
@@ -171,6 +203,34 @@ class FT_Raster_Params_(Structure):
 
 # typedef FT_Raster_Params
 FT_Raster_Params = FT_Raster_Params_
+
+# typedef FT_Raster_NewFunc
+FT_Raster_NewFunc = POINTER(CFUNCTYPE(c_int, FT_Pointer, POINTER(FT_Raster)))
+
+# typedef FT_Raster_DoneFunc
+FT_Raster_DoneFunc = POINTER(CFUNCTYPE(None, FT_Raster))
+
+# typedef FT_Raster_ResetFunc
+FT_Raster_ResetFunc = POINTER(CFUNCTYPE(None, FT_Raster, POINTER(c_ubyte), c_ulong))
+
+# typedef FT_Raster_SetModeFunc
+FT_Raster_SetModeFunc = POINTER(CFUNCTYPE(c_int, FT_Raster, c_ulong, FT_Pointer))
+
+# typedef FT_Raster_RenderFunc
+FT_Raster_RenderFunc = POINTER(CFUNCTYPE(c_int, FT_Raster, POINTER(FT_Raster_Params)))
+
+class FT_Raster_Funcs_(Structure):
+    _fields_ = [
+        ("glyph_format", FT_Glyph_Format),
+        ("raster_new", FT_Raster_NewFunc),
+        ("raster_reset", FT_Raster_ResetFunc),
+        ("raster_set_mode", FT_Raster_SetModeFunc),
+        ("raster_render", FT_Raster_RenderFunc),
+        ("raster_done", FT_Raster_DoneFunc),
+        ]
+
+# typedef FT_Raster_Funcs
+FT_Raster_Funcs = FT_Raster_Funcs_
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

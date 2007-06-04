@@ -21,7 +21,7 @@ import ctypes
 from ctypes import byref, cast, c_void_p, c_uint
 
 from raw import freetype as FT
-from raw._ctypes_freetype import FreetypeException
+from raw.errors import FreetypeException
 
 from library import FreetypeLibrary
 from glyph import FreetypeGlyphSlot
@@ -63,7 +63,7 @@ class FreetypeFace(object):
 
         searchStyle = faceIndex.lower().replace(' ', '')
         self._newFace(fontFilename, 0, ftLibrary)
-        for idx in xrange(1, self.numFaces):
+        for idx in xrange(1, self.numFaces+1):
             styleName = self.styleName.lower().replace(' ', '')
             if styleName == searchStyle:
                 return True
@@ -135,7 +135,7 @@ class FreetypeFace(object):
     faceFlagsMap = {
         FT.FT_FACE_FLAG_SCALABLE: 'scalable',
         FT.FT_FACE_FLAG_FIXED_SIZES: 'fixed_sizes',
-        FT.FT_FACE_FLAG_FIXED_WIDTH: 'fixed_wleadidth',
+        FT.FT_FACE_FLAG_FIXED_WIDTH: 'fixed_width',
         FT.FT_FACE_FLAG_SFNT: 'sfnt',
         FT.FT_FACE_FLAG_HORIZONTAL: 'horizontal',
         FT.FT_FACE_FLAG_VERTICAL: 'vertical',
@@ -299,6 +299,9 @@ class FreetypeFace(object):
 
     def loadVerticalLayout(self):
         self.glyphLoadFlags |= FT.FT_LOAD_VERTICAL_LAYOUT
+
+    def isLayoutVertical(self):
+        return self.glyphLoadFlags & FT.FT_LOAD_VERTICAL_LAYOUT
 
     _ft_loadGlyph = FT.FT_Load_Glyph
     def loadGlyph(self, glyphIndex, flags=None):

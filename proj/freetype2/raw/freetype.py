@@ -51,6 +51,10 @@ FT_DriverRec_ = c_void_p # Structure with empty _fields_
 # typedef FT_Driver
 FT_Driver = POINTER(FT_DriverRec_)
 
+FT_RendererRec_ = c_void_p # Structure with empty _fields_
+# typedef FT_Renderer
+FT_Renderer = POINTER(FT_RendererRec_)
+
 # typedef FT_Face
 FT_Face = POINTER("FT_FaceRec_")
 
@@ -84,6 +88,31 @@ class FT_Encoding_(c_int):
     FT_ENCODING_ADOBE_LATIN_1 = 1818326065
     FT_ENCODING_OLD_LATIN_2 = 1818326066
     FT_ENCODING_APPLE_ROMAN = 1634889070
+    lookup = {
+        0: "FT_ENCODING_NONE",
+        1937337698: "FT_ENCODING_MS_SYMBOL",
+        1970170211: "FT_ENCODING_UNICODE",
+        1936353651: "FT_ENCODING_SJIS",
+        1734484000: "FT_ENCODING_GB2312",
+        1651074869: "FT_ENCODING_BIG5",
+        2002873971: "FT_ENCODING_WANSUNG",
+        1785686113: "FT_ENCODING_JOHAB",
+        1936353651: "FT_ENCODING_MS_SJIS",
+        1734484000: "FT_ENCODING_MS_GB2312",
+        1651074869: "FT_ENCODING_MS_BIG5",
+        2002873971: "FT_ENCODING_MS_WANSUNG",
+        1785686113: "FT_ENCODING_MS_JOHAB",
+        1094995778: "FT_ENCODING_ADOBE_STANDARD",
+        1094992453: "FT_ENCODING_ADOBE_EXPERT",
+        1094992451: "FT_ENCODING_ADOBE_CUSTOM",
+        1818326065: "FT_ENCODING_ADOBE_LATIN_1",
+        1818326066: "FT_ENCODING_OLD_LATIN_2",
+        1634889070: "FT_ENCODING_APPLE_ROMAN",
+        }
+    rlookup = dict([(v,k) for k,v in lookup.items()])
+    def __repr__(self): return str(self)
+    def __str__(self): 
+        return self.lookup.get(self.value) or str(self.value)
 
 # typedef FT_Encoding
 FT_Encoding = FT_Encoding_
@@ -96,6 +125,9 @@ class FT_CharMapRec_(Structure):
         ("encoding_id", FT_UShort),
         ]
 FT_CharMap.set_type(FT_CharMapRec_)
+
+# typedef FT_CharMapRec
+FT_CharMapRec = FT_CharMapRec_
 
 FT_Face_InternalRec_ = c_void_p # Structure with empty _fields_
 # typedef FT_Face_Internal
@@ -136,6 +168,9 @@ class FT_FaceRec_(Structure):
         ("internal", FT_Face_Internal),
         ]
 FT_Face.set_type(FT_FaceRec_)
+
+# typedef FT_FaceRec
+FT_FaceRec = FT_FaceRec_
 
 FT_FACE_FLAG_SCALABLE = ( 1L << 0 )
 FT_FACE_FLAG_FIXED_SIZES = ( 1L << 1 )
@@ -181,6 +216,9 @@ class FT_SizeRec_(Structure):
         ]
 FT_Size.set_type(FT_SizeRec_)
 
+# typedef FT_SizeRec
+FT_SizeRec = FT_SizeRec_
+
 FT_SubGlyphRec_ = c_void_p # Structure with empty _fields_
 # typedef FT_SubGlyph
 FT_SubGlyph = POINTER(FT_SubGlyphRec_)
@@ -216,7 +254,10 @@ class FT_GlyphSlotRec_(Structure):
         ]
 FT_GlyphSlot.set_type(FT_GlyphSlotRec_)
 
-@bind(FT_Error, [POINTER(FT_Library)], True)
+# typedef FT_GlyphSlotRec
+FT_GlyphSlotRec = FT_GlyphSlotRec_
+
+@bind(FT_Error, [POINTER(FT_Library)])
 def FT_Init_FreeType(alibrary, _api_=None): 
     """FT_Init_FreeType(alibrary)
     
@@ -225,7 +266,7 @@ def FT_Init_FreeType(alibrary, _api_=None):
     return _api_(alibrary)
     
 
-@bind(FT_Error, [FT_Library], True)
+@bind(FT_Error, [FT_Library])
 def FT_Done_FreeType(library, _api_=None): 
     """FT_Done_FreeType(library)
     
@@ -264,7 +305,7 @@ class FT_Open_Args_(Structure):
 # typedef FT_Open_Args
 FT_Open_Args = FT_Open_Args_
 
-@bind(FT_Error, [FT_Library, c_char_p, FT_Long, POINTER(FT_Face)], True)
+@bind(FT_Error, [FT_Library, c_char_p, FT_Long, POINTER(FT_Face)])
 def FT_New_Face(library, filepathname, face_index, aface, _api_=None): 
     """FT_New_Face(library, filepathname, face_index, aface)
     
@@ -276,7 +317,7 @@ def FT_New_Face(library, filepathname, face_index, aface, _api_=None):
     return _api_(library, filepathname, face_index, aface)
     
 
-@bind(FT_Error, [FT_Library, POINTER(c_ubyte), FT_Long, FT_Long, POINTER(FT_Face)], True)
+@bind(FT_Error, [FT_Library, POINTER(c_ubyte), FT_Long, FT_Long, POINTER(FT_Face)])
 def FT_New_Memory_Face(library, file_base, file_size, face_index, aface, _api_=None): 
     """FT_New_Memory_Face(library, file_base, file_size, face_index, aface)
     
@@ -289,7 +330,7 @@ def FT_New_Memory_Face(library, file_base, file_size, face_index, aface, _api_=N
     return _api_(library, file_base, file_size, face_index, aface)
     
 
-@bind(FT_Error, [FT_Library, POINTER(FT_Open_Args), FT_Long, POINTER(FT_Face)], True)
+@bind(FT_Error, [FT_Library, POINTER(FT_Open_Args), FT_Long, POINTER(FT_Face)])
 def FT_Open_Face(library, args, face_index, aface, _api_=None): 
     """FT_Open_Face(library, args, face_index, aface)
     
@@ -301,7 +342,7 @@ def FT_Open_Face(library, args, face_index, aface, _api_=None):
     return _api_(library, args, face_index, aface)
     
 
-@bind(FT_Error, [FT_Face, c_char_p], True)
+@bind(FT_Error, [FT_Face, c_char_p])
 def FT_Attach_File(face, filepathname, _api_=None): 
     """FT_Attach_File(face, filepathname)
     
@@ -311,7 +352,7 @@ def FT_Attach_File(face, filepathname, _api_=None):
     return _api_(face, filepathname)
     
 
-@bind(FT_Error, [FT_Face, POINTER(FT_Open_Args)], True)
+@bind(FT_Error, [FT_Face, POINTER(FT_Open_Args)])
 def FT_Attach_Stream(face, parameters, _api_=None): 
     """FT_Attach_Stream(face, parameters)
     
@@ -321,7 +362,7 @@ def FT_Attach_Stream(face, parameters, _api_=None):
     return _api_(face, parameters)
     
 
-@bind(FT_Error, [FT_Face], True)
+@bind(FT_Error, [FT_Face])
 def FT_Done_Face(face, _api_=None): 
     """FT_Done_Face(face)
     
@@ -330,7 +371,7 @@ def FT_Done_Face(face, _api_=None):
     return _api_(face)
     
 
-@bind(FT_Error, [FT_Face, FT_Int], True)
+@bind(FT_Error, [FT_Face, FT_Int])
 def FT_Select_Size(face, strike_index, _api_=None): 
     """FT_Select_Size(face, strike_index)
     
@@ -348,6 +389,18 @@ class FT_Size_Request_Type_(c_int):
     FT_SIZE_REQUEST_TYPE_CELL = 3
     FT_SIZE_REQUEST_TYPE_SCALES = 4
     FT_SIZE_REQUEST_TYPE_MAX = 5
+    lookup = {
+        0: "FT_SIZE_REQUEST_TYPE_NOMINAL",
+        1: "FT_SIZE_REQUEST_TYPE_REAL_DIM",
+        2: "FT_SIZE_REQUEST_TYPE_BBOX",
+        3: "FT_SIZE_REQUEST_TYPE_CELL",
+        4: "FT_SIZE_REQUEST_TYPE_SCALES",
+        5: "FT_SIZE_REQUEST_TYPE_MAX",
+        }
+    rlookup = dict([(v,k) for k,v in lookup.items()])
+    def __repr__(self): return str(self)
+    def __str__(self): 
+        return self.lookup.get(self.value) or str(self.value)
 
 # typedef FT_Size_Request_Type
 FT_Size_Request_Type = FT_Size_Request_Type_
@@ -361,10 +414,12 @@ class FT_Size_RequestRec_(Structure):
         ("vertResolution", FT_UInt),
         ]
 
+# typedef FT_Size_RequestRec
+FT_Size_RequestRec = FT_Size_RequestRec_
 # typedef FT_Size_Request
 FT_Size_Request = POINTER(FT_Size_RequestRec_)
 
-@bind(FT_Error, [FT_Face, FT_Size_Request], True)
+@bind(FT_Error, [FT_Face, FT_Size_Request])
 def FT_Request_Size(face, req, _api_=None): 
     """FT_Request_Size(face, req)
     
@@ -374,7 +429,7 @@ def FT_Request_Size(face, req, _api_=None):
     return _api_(face, req)
     
 
-@bind(FT_Error, [FT_Face, FT_F26Dot6, FT_F26Dot6, FT_UInt, FT_UInt], True)
+@bind(FT_Error, [FT_Face, FT_F26Dot6, FT_F26Dot6, FT_UInt, FT_UInt])
 def FT_Set_Char_Size(face, char_width, char_height, horz_resolution, vert_resolution, _api_=None): 
     """FT_Set_Char_Size(face, char_width, char_height, horz_resolution, vert_resolution)
     
@@ -387,7 +442,7 @@ def FT_Set_Char_Size(face, char_width, char_height, horz_resolution, vert_resolu
     return _api_(face, char_width, char_height, horz_resolution, vert_resolution)
     
 
-@bind(FT_Error, [FT_Face, FT_UInt, FT_UInt], True)
+@bind(FT_Error, [FT_Face, FT_UInt, FT_UInt])
 def FT_Set_Pixel_Sizes(face, pixel_width, pixel_height, _api_=None): 
     """FT_Set_Pixel_Sizes(face, pixel_width, pixel_height)
     
@@ -398,7 +453,7 @@ def FT_Set_Pixel_Sizes(face, pixel_width, pixel_height, _api_=None):
     return _api_(face, pixel_width, pixel_height)
     
 
-@bind(FT_Error, [FT_Face, FT_UInt, FT_Int32], True)
+@bind(FT_Error, [FT_Face, FT_UInt, FT_Int32])
 def FT_Load_Glyph(face, glyph_index, load_flags, _api_=None): 
     """FT_Load_Glyph(face, glyph_index, load_flags)
     
@@ -409,7 +464,7 @@ def FT_Load_Glyph(face, glyph_index, load_flags, _api_=None):
     return _api_(face, glyph_index, load_flags)
     
 
-@bind(FT_Error, [FT_Face, FT_ULong, FT_Int32], True)
+@bind(FT_Error, [FT_Face, FT_ULong, FT_Int32])
 def FT_Load_Char(face, char_code, load_flags, _api_=None): 
     """FT_Load_Char(face, char_code, load_flags)
     
@@ -457,11 +512,23 @@ class FT_Render_Mode_(c_int):
     FT_RENDER_MODE_LCD = 3
     FT_RENDER_MODE_LCD_V = 4
     FT_RENDER_MODE_MAX = 5
+    lookup = {
+        0: "FT_RENDER_MODE_NORMAL",
+        1: "FT_RENDER_MODE_LIGHT",
+        2: "FT_RENDER_MODE_MONO",
+        3: "FT_RENDER_MODE_LCD",
+        4: "FT_RENDER_MODE_LCD_V",
+        5: "FT_RENDER_MODE_MAX",
+        }
+    rlookup = dict([(v,k) for k,v in lookup.items()])
+    def __repr__(self): return str(self)
+    def __str__(self): 
+        return self.lookup.get(self.value) or str(self.value)
 
 # typedef FT_Render_Mode
 FT_Render_Mode = FT_Render_Mode_
 
-@bind(FT_Error, [FT_GlyphSlot, FT_Render_Mode], True)
+@bind(FT_Error, [FT_GlyphSlot, FT_Render_Mode])
 def FT_Render_Glyph(slot, render_mode, _api_=None): 
     """FT_Render_Glyph(slot, render_mode)
     
@@ -476,8 +543,20 @@ class FT_Kerning_Mode_(c_int):
     FT_KERNING_DEFAULT = 0
     FT_KERNING_UNFITTED = 1
     FT_KERNING_UNSCALED = 2
+    lookup = {
+        0: "FT_KERNING_DEFAULT",
+        1: "FT_KERNING_UNFITTED",
+        2: "FT_KERNING_UNSCALED",
+        }
+    rlookup = dict([(v,k) for k,v in lookup.items()])
+    def __repr__(self): return str(self)
+    def __str__(self): 
+        return self.lookup.get(self.value) or str(self.value)
 
-@bind(FT_Error, [FT_Face, FT_UInt, FT_UInt, FT_UInt, POINTER(FT_Vector)], True)
+# typedef FT_Kerning_Mode
+FT_Kerning_Mode = FT_Kerning_Mode_
+
+@bind(FT_Error, [FT_Face, FT_UInt, FT_UInt, FT_UInt, POINTER(FT_Vector)])
 def FT_Get_Kerning(face, left_glyph, right_glyph, kern_mode, akerning, _api_=None): 
     """FT_Get_Kerning(face, left_glyph, right_glyph, kern_mode, akerning)
     
@@ -490,7 +569,7 @@ def FT_Get_Kerning(face, left_glyph, right_glyph, kern_mode, akerning, _api_=Non
     return _api_(face, left_glyph, right_glyph, kern_mode, akerning)
     
 
-@bind(FT_Error, [FT_Face, FT_Fixed, FT_Int, POINTER(c_long)], True)
+@bind(FT_Error, [FT_Face, FT_Fixed, FT_Int, POINTER(c_long)])
 def FT_Get_Track_Kerning(face, point_size, degree, akerning, _api_=None): 
     """FT_Get_Track_Kerning(face, point_size, degree, akerning)
     
@@ -523,7 +602,7 @@ def FT_Get_Postscript_Name(face, _api_=None):
     return _api_(face)
     
 
-@bind(FT_Error, [FT_Face, FT_Encoding], True)
+@bind(FT_Error, [FT_Face, FT_Encoding])
 def FT_Select_Charmap(face, encoding, _api_=None): 
     """FT_Select_Charmap(face, encoding)
     
@@ -533,7 +612,7 @@ def FT_Select_Charmap(face, encoding, _api_=None):
     return _api_(face, encoding)
     
 
-@bind(FT_Error, [FT_Face, FT_CharMap], True)
+@bind(FT_Error, [FT_Face, FT_CharMap])
 def FT_Set_Charmap(face, charmap, _api_=None): 
     """FT_Set_Charmap(face, charmap)
     
@@ -601,7 +680,7 @@ FT_SUBGLYPH_FLAG_XY_SCALE = 0x40
 FT_SUBGLYPH_FLAG_2X2 = 0x80
 FT_SUBGLYPH_FLAG_USE_MY_METRICS = 0x200
 
-@bind(FT_Error, [FT_GlyphSlot, FT_UInt, POINTER(c_int), POINTER(c_uint), POINTER(c_int), POINTER(c_int), POINTER(FT_Matrix)], True)
+@bind(FT_Error, [FT_GlyphSlot, FT_UInt, POINTER(c_int), POINTER(c_uint), POINTER(c_int), POINTER(c_int), POINTER(FT_Matrix)])
 def FT_Get_SubGlyph_Info(glyph, sub_index, p_index, p_flags, p_arg1, p_arg2, p_transform, _api_=None): 
     """FT_Get_SubGlyph_Info(glyph, sub_index, p_index, p_flags, p_arg1, p_arg2, p_transform)
     

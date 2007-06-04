@@ -11,24 +11,35 @@ import _ctypes_support
 
 freetypeLib = _ctypes_support.loadFirstLibrary('freetype6', 'freetype')
 
+errorFuncNames = set([])
+errorSkipNames = set([
+        'FT_Get_Kerning'])
+
 def cleanupNamespace(namespace):
     _ctypes_support.scrubNamespace(namespace, globals())
 
-class FreetypeException(Exception):
-    def __init__(self, ftError, moreInfo):
-        Exception.__init__(self, '%s (%s)' % (ftError, moreInfo))
-        self.ftError = ftError
-
 def checkFreetypeError(ftError, func, args):
-    #print '%s%r -> %s' % (func.__name__, args, ftError)
-    if ftError != 0:
-        raise FreetypeException(ftError, '%s%r' % (func.__name__, args))
+    if ftError.value != 0:
+        import errors
+        raise errors.FreetypeException(ftError.value, 
+                callInfo=(func, args, ftError))
     return ftError
 
+def _getErrorCheckForFn(fn, restype):
+    if fn.__name__ in errorSkipNames:
+        return None
+
+    if restype and restype.__name__ == 'FT_Error':
+        return checkFreetypeError
+    return None
+
 def bind(restype, argtypes, errcheck=None):
-    if errcheck:
-        errcheck = checkFreetypeError
     def bindFuncTypes(fn):
-        return _ctypes_support.attachToLibFn(fn, restype, argtypes, errcheck, freetypeLib)
+        fnErrCheck = errcheck
+        if errcheck is None:
+            fnErrCheck = _getErrorCheckForFn(fn, restype)
+
+        return _ctypes_support.attachToLibFn(fn, restype, argtypes, fnErrCheck, freetypeLib)
     return bindFuncTypes
+
 

@@ -20,17 +20,43 @@ class FT_Stroker_LineJoin(c_int):
     FT_STROKER_LINEJOIN_ROUND = 0
     FT_STROKER_LINEJOIN_BEVEL = 1
     FT_STROKER_LINEJOIN_MITER = 2
+    lookup = {
+        0: "FT_STROKER_LINEJOIN_ROUND",
+        1: "FT_STROKER_LINEJOIN_BEVEL",
+        2: "FT_STROKER_LINEJOIN_MITER",
+        }
+    rlookup = dict([(v,k) for k,v in lookup.items()])
+    def __repr__(self): return str(self)
+    def __str__(self): 
+        return self.lookup.get(self.value) or str(self.value)
 
 class FT_Stroker_LineCap(c_int):
     '''enum FT_Stroker_LineCap''' 
     FT_STROKER_LINECAP_BUTT = 0
     FT_STROKER_LINECAP_ROUND = 1
     FT_STROKER_LINECAP_SQUARE = 2
+    lookup = {
+        0: "FT_STROKER_LINECAP_BUTT",
+        1: "FT_STROKER_LINECAP_ROUND",
+        2: "FT_STROKER_LINECAP_SQUARE",
+        }
+    rlookup = dict([(v,k) for k,v in lookup.items()])
+    def __repr__(self): return str(self)
+    def __str__(self): 
+        return self.lookup.get(self.value) or str(self.value)
 
 class FT_StrokerBorder(c_int):
     '''enum FT_StrokerBorder''' 
     FT_STROKER_BORDER_LEFT = 0
     FT_STROKER_BORDER_RIGHT = 1
+    lookup = {
+        0: "FT_STROKER_BORDER_LEFT",
+        1: "FT_STROKER_BORDER_RIGHT",
+        }
+    rlookup = dict([(v,k) for k,v in lookup.items()])
+    def __repr__(self): return str(self)
+    def __str__(self): 
+        return self.lookup.get(self.value) or str(self.value)
 
 @bind(FT_StrokerBorder, [POINTER(FT_Outline)])
 def FT_Outline_GetInsideBorder(outline, _api_=None): 

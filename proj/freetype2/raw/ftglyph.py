@@ -26,6 +26,37 @@ class FT_GlyphRec_(Structure):
         ]
 FT_Glyph.set_type(FT_GlyphRec_)
 
+# typedef FT_GlyphRec
+FT_GlyphRec = FT_GlyphRec_
+
+# typedef FT_BitmapGlyph
+FT_BitmapGlyph = POINTER("FT_BitmapGlyphRec_")
+
+class FT_BitmapGlyphRec_(Structure):
+    _fields_ = [
+        ("root", FT_GlyphRec),
+        ("left", FT_Int),
+        ("top", FT_Int),
+        ("bitmap", FT_Bitmap),
+        ]
+FT_BitmapGlyph.set_type(FT_BitmapGlyphRec_)
+
+# typedef FT_BitmapGlyphRec
+FT_BitmapGlyphRec = FT_BitmapGlyphRec_
+
+# typedef FT_OutlineGlyph
+FT_OutlineGlyph = POINTER("FT_OutlineGlyphRec_")
+
+class FT_OutlineGlyphRec_(Structure):
+    _fields_ = [
+        ("root", FT_GlyphRec),
+        ("outline", FT_Outline),
+        ]
+FT_OutlineGlyph.set_type(FT_OutlineGlyphRec_)
+
+# typedef FT_OutlineGlyphRec
+FT_OutlineGlyphRec = FT_OutlineGlyphRec_
+
 @bind(FT_Error, [FT_GlyphSlot, POINTER(FT_Glyph)])
 def FT_Get_Glyph(slot, aglyph, _api_=None): 
     """FT_Get_Glyph(slot, aglyph)
@@ -64,6 +95,20 @@ class FT_Glyph_BBox_Mode_(c_int):
     FT_GLYPH_BBOX_GRIDFIT = 1
     FT_GLYPH_BBOX_TRUNCATE = 2
     FT_GLYPH_BBOX_PIXELS = 3
+    lookup = {
+        0: "FT_GLYPH_BBOX_UNSCALED",
+        0: "FT_GLYPH_BBOX_SUBPIXELS",
+        1: "FT_GLYPH_BBOX_GRIDFIT",
+        2: "FT_GLYPH_BBOX_TRUNCATE",
+        3: "FT_GLYPH_BBOX_PIXELS",
+        }
+    rlookup = dict([(v,k) for k,v in lookup.items()])
+    def __repr__(self): return str(self)
+    def __str__(self): 
+        return self.lookup.get(self.value) or str(self.value)
+
+# typedef FT_Glyph_BBox_Mode
+FT_Glyph_BBox_Mode = FT_Glyph_BBox_Mode_
 
 @bind(None, [FT_Glyph, FT_UInt, POINTER(FT_BBox)])
 def FT_Glyph_Get_CBox(glyph, bbox_mode, acbox, _api_=None): 
