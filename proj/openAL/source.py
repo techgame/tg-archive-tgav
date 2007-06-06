@@ -312,8 +312,13 @@ class Source(ALIDContextObject):
             if wait <= 1: wait = 5
             self.waitForStates([al.AL_PLAYING], wait)
 
-    def pause(self):
-        al.alSourcePause(self)
+    def resume(self):
+        if self.state == 'paused':
+            al.alSourcePlay(self)
+    def pause(self, pause=True):
+        if pause:
+            al.alSourcePause(self)
+        else: self.resume()
     def stop(self, dequeueAll=True, wait=False):
         al.alSourceStop(self)
         if dequeueAll:
