@@ -12,6 +12,7 @@
 
 from TG.openAL._properties import *
 from TG.openAL.raw import al, alc, alut
+from TG.openAL.raw.errors import ALException
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Constants / Variables / Etc. 
@@ -127,16 +128,20 @@ class Buffer(ALIDContextObject):
                 self.destroyFromId(self)
             finally:
                 self._delAsParam()
-                i.next()
+                del i
 
     def destroyFromId(self, bufferId):
         bufferIds = (1*al.ALuint)()
         bufferIds[:] = [bufferId._as_parameter_]
-        al.alDeleteBuffers(1, bufferIds)
+        bufferId._as_parameter_ = None
+        try:
+            al.alDeleteBuffers(1, bufferIds)
+        except ALException:
+            pass
 
-        ctx = self._context
-        if ctx is not None:
-            ctx.removeBuffer(self)
+        #ctx = self._context
+        #if ctx is not None:
+        #    ctx.removeBuffer(self)
 
     def setData(self, data, format, frequency):
         return self.setDataRaw(data, len(data), format, frequency)
@@ -192,7 +197,7 @@ class Buffer(ALIDContextObject):
             try:
                 src.dequeue(self)
                 continue
-            except al.ALException, e:
+            except ALException, e:
                 if e.error != al.AL_INVALID_VALUE:
                     raise
 

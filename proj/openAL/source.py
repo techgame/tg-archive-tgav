@@ -195,7 +195,7 @@ class Source(ALIDContextObject):
     def getCurrentBuffer(self):
         buffq = self.bufferQueue
         bidx = self.buffers_processed
-        if len(buffq) < bidx:
+        if bidx < len(buffq):
             curBuffer = buffq[bidx]
         else: curBuffer = None
 
