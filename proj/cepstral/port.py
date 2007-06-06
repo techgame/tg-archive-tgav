@@ -148,7 +148,7 @@ class CepstralPort(CepstralObject):
             _swift.swift_port_pause(self, async, place)
             return True
     def resume(self, async=None, place=-1):
-        if self.status() == 'pause':
+        if self.status() == 'paused':
             # pause a second time resumes for cepstral
             self.pause(async, place)
 
