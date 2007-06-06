@@ -14,7 +14,7 @@ from ctypes import byref, c_void_p
 
 from TG.metaObserving import MetaObservableType, OBKeyedSet
 
-from .base import CepstralObject, _swift
+from .base import CepstralObject, CepstralError, _swift
 from .voice import CepstralVoice
 from .waveform import CepstralWaveform
 from .event import CepstralEvent
@@ -133,20 +133,26 @@ class CepstralPort(CepstralObject):
         if async is None: 
             async = self.async
         if self.status_val() > 0:
-            _swift.swift_port_wait(self, async)
-            return True
+            try:
+                _swift.swift_port_wait(self, async)
+            except CepstralError: return False
+            else: return True
     def stop(self, async=None, place=-1):
         if async is None: 
             async = self.async
         if self.status_val() > 0:
-            _swift.swift_port_stop(self, async, place)
-            return True
+            try: 
+                _swift.swift_port_stop(self, async, place)
+            except CepstralError: return False
+            else: return True
     def pause(self, async=None, place=-1):
         if async is None: 
             async = self.async
         if self.status_val() > 0:
-            _swift.swift_port_pause(self, async, place)
-            return True
+            try:
+                _swift.swift_port_pause(self, async, place)
+            except CepstralError: return False
+            else: return True
     def resume(self, async=None, place=-1):
         if self.status() == 'paused':
             # pause a second time resumes for cepstral
