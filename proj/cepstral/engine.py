@@ -11,7 +11,6 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 from .base import CepstralObject, _swift
-from .port import CepstralPort
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
@@ -39,6 +38,15 @@ class CepstralEngine(CepstralObject):
     def newPort(self, *argparams, **kwparams):
         return CepstralPort(self, *argparams, **kwparams)
 
+    _port = None
+    def getPort(self):
+        port = self._port
+        if port is None:
+            port = self.newPort()
+            self._port = port
+        return port
+    port = property(getPort)
+
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     _voiceRententionPolicyMap = {
@@ -57,4 +65,7 @@ class CepstralEngine(CepstralObject):
         _swift.swift_engine_set_voice_retention_policy(self, value)
     voiceRententionPolicy = property(getVoiceRententionPolicy, setVoiceRententionPolicy)
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+from .port import CepstralPort
 

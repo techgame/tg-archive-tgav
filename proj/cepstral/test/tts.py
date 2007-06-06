@@ -5,28 +5,25 @@
 
 import sys
 import time
-from TG.cepstral.engine import CepstralEngine
+from TG.cepstral import CepstralPort
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def main(argv):
-    engine = CepstralEngine()
-    port = engine.newPort()
-    port.setVoiceName('David')
+    port = CepstralPort()
 
-    port.speak(' '.join(argv))
+    text = ' '.join(argv)
+    port.setVoiceName('David')
+    port.speak(text)
+
+    port.setVoiceName('Diane')
+    port.speak(text)
 
     @port.events.on('word')
     def onTTSWord(evt):
-        print 'tts word:', evt.text
-
-    @port.events.on(None)
-    def onTTS(evt):
-        if evt.name == 'phoneme':
-            return
-        print evt, evt.textPos
+        print 'on tts word:', evt.text, evt.textPos
 
     while port.status() != 'done':
         print port.status()

@@ -25,8 +25,10 @@ from .event import CepstralEvent
 
 class CepstralPort(CepstralObject):
     _closeFromParam = staticmethod(_swift.swift_port_close)
-    def __init__(self, engine, async=True, **kw):
+    def __init__(self, engine=None, async=True, **kw):
         self.events = OBKeyedSet()
+        if engine is None:
+            engine = CepstralEngine()
         self.engine = engine
 
         self.async = async
@@ -212,4 +214,8 @@ class CepstralPort(CepstralObject):
 
     # XXX: _swift.swift_port_get_perfstats
     # XXX: _swift.swift_port_load_sfx
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+from engine import CepstralEngine
 
