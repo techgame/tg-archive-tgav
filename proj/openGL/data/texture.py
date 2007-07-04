@@ -549,8 +549,8 @@ class Texture(object):
         self.texture_id = None
 
     def bind(self):
-        target, oid = self._getTextureInfo()
-        gl.glBindTexture(target, oid)
+        target, texture_id = self._getTextureInfo()
+        gl.glBindTexture(target, texture_id)
     def unbind(self):
         target = self.target
         if target:
@@ -580,8 +580,8 @@ class Texture(object):
         return self._target
     def setTarget(self, targets=None):
         if targets is None:
-            targets = [v for n,v in self.texParams if n == 'target'][0]
-        if isinstance(targets, (long, int, str)):
+            targets = [v for n, v in self.texParams if n == 'target']
+        elif isinstance(targets, (long, int, str)):
             targets = [targets]
 
         target = self.validTargets(targets).next()
@@ -694,7 +694,7 @@ class Texture(object):
         data.setImageOn(self, level, **kw)
         return data
     def setImage1d(self, data, level=0):
-        data.select()
+        self.select(); data.select()
         try:
             texSize = data.size
             gl.glTexImage1D(self.target, level, self.format, 
@@ -705,7 +705,7 @@ class Texture(object):
             data.deselect()
         return data
     def setImage2d(self, data, level=0):
-        data.select()
+        self.select(); data.select()
         try:
             texSize = data.size
             gl.glTexImage2D(self.target, level, self.format, 
@@ -717,7 +717,7 @@ class Texture(object):
             data.deselect()
         return data
     def setImage3d(self, data, level=0):
-        data.select()
+        self.select(); data.select()
         try:
             texSize = data.size
             gl.glTexImage3D(self.target, level, self.format, 
@@ -734,7 +734,7 @@ class Texture(object):
         data.setSubImageOn(self, level, **kw)
         return self
     def setSubImage1d(self, data, level=0):
-        data.select()
+        self.select(); data.select()
         try:
             texPos = data.pos; texSize = data.size
             gl.glTexSubImage1D(self.target, level,
@@ -745,7 +745,7 @@ class Texture(object):
             data.deselect()
         return data
     def setSubImage2d(self, data, level=0):
-        data.select()
+        self.select(); data.select()
         try:
             texPos = data.pos; texSize = data.size
             gl.glTexSubImage2D(self.target, level, 
@@ -756,7 +756,7 @@ class Texture(object):
             data.deselect()
         return data
     def setSubImage3d(self, data, level=0):
-        data.select()
+        self.select(); data.select()
         try:
             texPos = data.pos; texSize = data.size
             gl.glTexSubImage3D(self.target, level,
@@ -773,7 +773,7 @@ class Texture(object):
         data.setCompressedImageOn(self, level, **kw)
         return data
     def setCompressedImage1d(self, data, level=0):
-        data.select()
+        self.select(); data.select()
         try:
             texSize = data.size
             gl.glCompressedTexImage1D(self.target, level, self.format, 
@@ -784,7 +784,7 @@ class Texture(object):
             data.deselect()
         return data
     def setCompressedImage2d(self, data, level=0):
-        data.select()
+        self.select(); data.select()
         try:
             texSize = data.size
             gl.glCompressedTexImage2D(self.target, level, self.format, 
@@ -795,7 +795,7 @@ class Texture(object):
             data.deselect()
         return data
     def setCompressedImage3d(self, data, level=0):
-        data.select()
+        self.select(); data.select()
         try:
             texSize = data.size
             gl.glCompressedTexImage3D(self.target, level, self.format, 
@@ -812,7 +812,7 @@ class Texture(object):
         data.setCompressedSubImageOn(self, level, **kw)
         return data
     def setCompressedSubImage1d(self, data, level=0):
-        data.select()
+        self.select(); data.select()
         try:
             texPos = data.pos; texSize = data.size
             gl.glCompressedTexSubImage1D(self.target, level,
@@ -823,7 +823,7 @@ class Texture(object):
             data.deselect()
         return data
     def setCompressedSubImage2d(self, data, level=0):
-        data.select()
+        self.select(); data.select()
         try:
             texPos = data.pos; texSize = data.size
             gl.glCompressedTexSubImage2D(self.target, level,
@@ -834,7 +834,7 @@ class Texture(object):
             data.deselect()
         return data
     def setCompressedSubImage3d(self, data, level=0):
-        data.select()
+        self.select(); data.select()
         try:
             texPos = data.pos; texSize = data.size
             gl.glCompressedTexSubImage3D(self.target, level, 
@@ -973,6 +973,9 @@ class Texture(object):
         if targetList is None:
             return supported
 
-        return (supported[t] for t in targetList if t in supported)
+        return (supported[e] 
+                    for v in targetList 
+                        for e in (v if isinstance(v, (tuple, list)) else [v]) 
+                            if e in supported)
     _targetMap_supported = None
 
