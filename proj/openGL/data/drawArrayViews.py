@@ -11,7 +11,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 from functools import partial
-from numpy import array
+from numpy import asarray
 from ..raw import gl
 from .arrayViews import _dtype_gltype_map, _registerArrayView
 
@@ -54,14 +54,17 @@ class DrawArrayView(object):
 
     def bind(self, mode, arr, gl=gl):
         if isinstance(arr, (int, long)):
-            arr = array([0, arr], dtype='i')
-        else: arr = array(arr, dtype='i', copy=False, subok=1)
+            arr = asarray([0, arr], dtype='i')
+        elif isinstance(arr, slice):
+            arr = asarray([arr.start, arr.stop], dtype='i')
+        else: arr = asarray(arr, dtype='i')
         glid_mode = self.drawModes.get(mode, mode)
 
         self._glsingle = partial(gl.glDrawArrays, glid_mode, arr[0], arr[1])
         if arr.ndim > 1:
             self._glgroup = partial(gl.glMultiDrawArrays, glid_mode, arr[0].ctypes, arr[1].ctypes, arr.shape[1])
-        else: self._glgroup = self._glsingle
+        else: 
+            self._glgroup = self._glsingle
 
     def one(self):
         self._glsingle()
@@ -75,7 +78,7 @@ _registerArrayView(DrawArrayView)
 class DrawElementArrayView(DrawArrayView):
     kind = 'draw_elements'
     def bind(self, arr, gl=gl):
-        arr = array(arr, copy=False, subok=1)
+        arr = asarray(arr, copy=False, subok=1)
 
         glid_type = _dtype_gltype_map[arr.dtype.char][0]
         glid_mode = self.drawModes.get(mode, mode)
