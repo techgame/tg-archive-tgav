@@ -65,6 +65,7 @@ class DrawArrayView(object):
             self._glgroup = partial(gl.glMultiDrawArrays, glid_mode, arr[0].ctypes, arr[1].ctypes, arr.shape[1])
         else: 
             self._glgroup = self._glsingle
+        return self
 
     def one(self):
         self._glsingle()
@@ -77,8 +78,8 @@ _registerArrayView(DrawArrayView)
 
 class DrawElementArrayView(DrawArrayView):
     kind = 'draw_elements'
-    def bind(self, arr, gl=gl):
-        arr = asarray(arr, copy=False, subok=1)
+    def bind(self, mode, arr, gl=gl):
+        arr = asarray(arr)
 
         glid_type = _dtype_gltype_map[arr.dtype.char][0]
         glid_mode = self.drawModes.get(mode, mode)
@@ -88,6 +89,7 @@ class DrawElementArrayView(DrawArrayView):
         #XXX: Implement this when used
         #self._glgroup = partial(gl.glMultiDrawElements, glid_mode, arr[0].ctypes, glid_type, arr[1].ctypes)
         self._glgroup = self._glsingle
+        return self
 
 _registerArrayView(DrawElementArrayView)
 
