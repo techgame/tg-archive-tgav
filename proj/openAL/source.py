@@ -85,6 +85,7 @@ class Source(ALIDContextObject):
 
     state_id = alSourcePropertyI(al.AL_SOURCE_STATE)
     stateToString = {
+        0: 'uninitialized',
         al.AL_INITIAL: 'initial',
         al.AL_PLAYING: 'playing',
         al.AL_PAUSED: 'paused',
