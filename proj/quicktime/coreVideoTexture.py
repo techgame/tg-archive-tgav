@@ -31,6 +31,9 @@ else:
     libCoreVideoPath = ctypes.util.find_library("CoreVideo")
     libCoreVideo = ctypes.cdll.LoadLibrary(libCoreVideoPath)
 
+    libQuickTimePath = ctypes.util.find_library("QuickTime")
+    libQuickTime = ctypes.cdll.LoadLibrary(libQuickTimePath)
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
