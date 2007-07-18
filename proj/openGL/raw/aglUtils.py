@@ -71,7 +71,9 @@ AGL_SAMPLE_ALPHA = 61
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 libAGLPath = ctypes.util.find_library("AGL")
-libAGL = ctypes.cdll.LoadLibrary(libAGLPath)
+if libAGLPath:
+    libAGL = ctypes.cdll.LoadLibrary(libAGLPath)
+else: libAGL = None
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 

@@ -10,21 +10,23 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from struct import pack, unpack
 import ctypes, ctypes.util
-from ctypes import cast, byref, c_void_p, c_float, POINTER
+from ctypes import cast, byref, c_void_p
 
-from TG.openGL.raw import aglUtils
-
-from TG.quicktime.coreFoundationUtils import asCFString, asCFURL, c_appleid, fromAppleId, toAppleId, booleanTrue, booleanFalse
-from TG.quicktime.coreVideoTexture import CVOpenGLTexture
+from .movieDisplayContext import QTGWorldContext, QTOpenGLVisualContext
+from .coreFoundationUtils import asCFString, asCFURL, c_appleid, fromAppleId, toAppleId, booleanTrue, booleanFalse
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Libraries
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-libQuickTimePath = ctypes.util.find_library("QuickTime")
-libQuickTime = ctypes.cdll.LoadLibrary(libQuickTimePath)
+if hasattr(ctypes, 'windll'):
+    libQuickTimePath = ctypes.util.find_library("QTMLClient.dll")
+    libQuickTime = ctypes.cdll.LoadLibrary(libQuickTimePath)
+    libQuickTime.InitializeQTML()
+else:
+    libQuickTimePath = ctypes.util.find_library("QuickTime")
+    libQuickTime = ctypes.cdll.LoadLibrary(libQuickTimePath)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ QuickTime Stuff
@@ -74,47 +76,10 @@ class QTNewMoviePropertyElement(ctypes.Structure):
 def qtEnterMovies():
     libQuickTime.EnterMovies()
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-class QTTexture(CVOpenGLTexture):
-    def __init__(self, visualContext):
-        CVOpenGLTexture.__init__(self)
-        self.visualContext = visualContext
-
-    def isNewImageAvailable(self):
-        return libQuickTime.QTVisualContextIsNewImageAvailable(self.visualContext, None)
-    def updateCVTexture(self, cvTextureRef):
-        libQuickTime.QTVisualContextCopyImageForTime(self.visualContext, None, None, byref(cvTextureRef))
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-class QTOpenGLVisualContext(object):
-    _as_parameter_ = None
-
-    def __init__(self, bCreate=True):
-        if bCreate:
-            self.create()
-
-    def create(self):
-        if self._as_parameter_:
-            return self
-
-        cglCtx, cglPix = aglUtils.getCGLContextAndFormat()
-        self._as_parameter_ = c_void_p()
-        errqt = libQuickTime.QTOpenGLTextureContextCreate(None, cglCtx, cglPix, None, byref(self._as_parameter_))
-        assert not errqt, errqt
-        return self
-
-    def process(self):
-        libQuickTime.QTVisualContextTask(self)
-
-    _qtTexture = None
-    def qtTexture(self):
-        tex = self._qtTexture
-        if tex is None:
-            tex = QTTexture(self)
-            self._qtTexture = tex
-        return tex
+def qtVersion():
+    r = ctypes.c_long(0)
+    libQuickTime.Gestalt(fromAppleId('qtim'), byref(r))
+    return r.value
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -131,29 +96,23 @@ class QTMovie(object):
             return self.loadFilePath(path)
 
     def loadURL(self, urlPath):
-        cfFileURL = asCFURL(urlPath)
-
-        return self.loadFromProperties([
-                ('dloc', 'cfur', cfFileURL),
-                ('ctxt', 'visu', self.visualContext),
-                ])
+        return self.loadFromProperties([('dloc', 'cfur', asCFURL(urlPath))])
 
     def loadFilePath(self, filePath):
-        cfFilePath = asCFString(filePath)
+        return self.loadFromProperties([('dloc', 'cfnp', asCFString(filePath))])
 
-        return self.loadFromProperties([
-                ('dloc', 'cfnp', cfFilePath),
-                ('ctxt', 'visu', self.visualContext),
-                ])
+    defaultMovieProperties=[
+        ('mprp', 'actv', booleanTrue), # set movie active after loading
+        ('mprp', 'intn', booleanTrue), # don't interact with user
+        ('mins', 'aurn', booleanTrue), # don't ask user help for unresolved references
+        ('mins', 'asok', booleanTrue), # load asynchronously
+        ]
+    def loadFromProperties(self, movieProperties):
+        movieProperties = QTNewMoviePropertyElement.fromPropertyList(
+                                movieProperties, 
+                                self.defaultMovieProperties, 
+                                self.displayContext.getMovieProperties())
 
-    def loadFromProperties(self, movieProperties, 
-            defaultMovieProperties=[
-                ('mprp', 'actv', booleanTrue), # set movie active after loading
-                ('mprp', 'intn', booleanTrue), # don't interact with user
-                ('mins', 'aurn', booleanTrue), # don't ask user help for unresolved references
-                ('mins', 'asok', booleanTrue), # load asynchronously
-                ]):
-        movieProperties = QTNewMoviePropertyElement.fromPropertyList(movieProperties, defaultMovieProperties)
         self._as_parameter_ = c_void_p()
         errqt = libQuickTime.NewMovieFromProperties(len(movieProperties), movieProperties, 0, None, byref(self._as_parameter_))
 
@@ -165,7 +124,7 @@ class QTMovie(object):
                 print '   ', toAppleId(prop.propClass), toAppleId(prop.propID), prop.propStatus
             print
             print 
-            raise Exception("Failed to initialize QuickTime movie from properties")
+            raise RuntimeError("Failed to initialize QuickTime movie from properties")
         elif 0:
             print 'Movie Properties::'
             for prop in movieProperties:
@@ -173,16 +132,29 @@ class QTMovie(object):
             print
             self.printTracks()
 
+        self.displayContext.updateForMovie(self)
         return True
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    _movieDisplayContexts = [
+        QTOpenGLVisualContext,
+        QTGWorldContext,
+        ]
     def createContext(self):
-        self.visualContext = QTOpenGLVisualContext()
-        self.qtTexture = self.visualContext.qtTexture()
+        for displayContext in self._movieDisplayContexts:
+            if displayContext.isContextSupported():
+                self.displayContext = displayContext()
+                break
+        else:
+            raise RuntimeError("No suitable display context could be found")
+
+    def getQTTexture(self):
+        return self.displayContext.getQTTexture()
+    qtTexture = property(getQTTexture)
         
     def process(self, seconds=0):
-        r = self.visualContext.process()
+        r = self.displayContext.process()
         self.processMovieTask(seconds)
         return r
 
@@ -220,29 +192,43 @@ class QTMovie(object):
                     #    print 'enabled'
         print
 
-    def getMovieRate(self):
+    def getBox(self):
+        rect = (c_short*4)()
+        libQuickTime.GetMovieBox(self, byref(rect))
+        return list(rect)
+
+    def getRate(self):
         return libQuickTime.GetMovieRate(self)
-    def getMovieTime(self):
+    getMovieRate = getRate
+    def setRate(self, rate):
+        return libQuickTime.SetMovieRate(self, rate)
+    setMovieRate = setRate
+
+    def getTime(self):
         # Sending a value of None to this method will only return the current time
         # value, versus the time value and the pointer to the time structure
         return libQuickTime.GetMovieTime(self, None)
-    def setMovieTime(self, pos):
+    getMovieTime = getTime
+    def setTime(self, pos):
         timeRecord = TimeRecord()
         libQuickTime.GetMovieTime(self, byref(timeRecord))
         timeRecord.value = pos
         libQuickTime.SetMovieTime(self, byref(timeRecord))
+    setMovieTime = setTime
 
-    def getMovieDuration(self):
+    def getDuration(self):
         return libQuickTime.GetMovieDuration(self)
-    def getMovieTimeScale(self):
+    getMovieDuration = getDuration
+    def getTimeScale(self):
         return libQuickTime.GetMovieTimeScale(self)
+    getMovieTimeScale = getTimeScale
 
     def start(self):
         libQuickTime.StartMovie(self)
     def stop(self):
         libQuickTime.StopMovie(self)
     def pause(self):
-        libQuickTime.SetMovieRate(self, 0)
+        self.setRate(0)
     def goToBeginning(self):
         libQuickTime.GoToBeginningOfMovie(self)
 

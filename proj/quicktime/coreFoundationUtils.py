@@ -18,8 +18,13 @@ from ctypes import c_void_p
 #~ Constants / Variiables / Etc. 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-libCoreFoundationPath = ctypes.util.find_library("CoreFoundation")
-libCoreFoundation = ctypes.cdll.LoadLibrary(libCoreFoundationPath)
+if hasattr(ctypes, 'windll'):
+    libCoreFoundationPath = ctypes.util.find_library("QTMLClient.dll")
+    libCoreFoundation = ctypes.cdll.LoadLibrary(libCoreFoundationPath)
+    libCoreFoundation.InitializeQTML()
+else:
+    libCoreFoundationPath = ctypes.util.find_library("CoreFoundation")
+    libCoreFoundation = ctypes.cdll.LoadLibrary(libCoreFoundationPath)
 
 CFStringRef = ctypes.c_void_p
 kCFStringEncodingUTF8 = 0x8000100
@@ -36,10 +41,9 @@ c_appleid = ctypes.c_uint32
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def asCFString(astr):
-    utf8_astr = astr.encode('utf8')
-    p_astr = ctypes.c_char_p(utf8_astr)
+    p_astr = ctypes.c_char_p(astr.encode('utf8'))
     cfs_astr = libCoreFoundation.CFStringCreateWithCString(0, p_astr, kCFStringEncodingUTF8)
-    assert len(astr) == libCoreFoundation.CFStringGetLength(cfs_astr)
+    #assert len(astr) == libCoreFoundation.CFStringGetLength(cfs_astr)
     return CFStringRef(cfs_astr)
 
 def asCFURL(astr):

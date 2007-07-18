@@ -561,9 +561,7 @@ class Texture(object):
     def disable(self):
         gl.glDisable(self.target)
 
-    def select(self, unit=None):
-        if unit is not None:
-            gl.glActiveTexture(unit)
+    def select(self):
         self.bind()
         self.enable()
         return self
