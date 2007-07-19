@@ -61,8 +61,8 @@ class ImageTexture(Texture):
     box = Box.property(publish='box')
 
     def __init__(self, image=None, format=True):
-        self.setImage(image, format)
-        self.send()
+        if image is not None:
+            self.setImage(image, format)
 
     _image = None
     def getImage(self):
@@ -76,6 +76,7 @@ class ImageTexture(Texture):
             self.format = format
 
         self._image = image
+        self.send()
         self.box.size = image.size
     image = property(getImage, setImage)
 
@@ -84,7 +85,7 @@ class ImageTexture(Texture):
 
     def send(self, sgo=None):
         image = self.image
-        self.select()
+        self.bind()
         dataFormat = self.dataFormat
         dataType = self.modeFormatMap[image.mode][1]
         size = self.asValidSize(image.size)

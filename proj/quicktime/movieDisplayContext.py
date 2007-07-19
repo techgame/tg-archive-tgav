@@ -42,6 +42,10 @@ else:
 class QTMovieDisplayContext(object):
     TextureFactory = None
 
+    @classmethod
+    def isContextSupported(klass):
+        return False
+    
     def getMovieProperties(self):
         return []
 
@@ -103,6 +107,9 @@ class QTGWorldContext(QTMovieDisplayContext):
         if not hasattr(libQuickTime, 'NewGWorldFromPtr'):
             return False
         return True
+
+    def process(self):
+        pass
 
     def updateForMovie(self, movie):
         rect = (ctypes.c_short*4)()

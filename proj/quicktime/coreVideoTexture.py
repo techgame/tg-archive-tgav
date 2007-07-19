@@ -11,6 +11,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import weakref
+from functools import partial
 
 import ctypes, ctypes.util
 from ctypes import c_void_p, byref
@@ -121,33 +122,39 @@ class QTGWorldTexture(OpenGLTexture):
     def __init__(self, gworldContext):
         OpenGLTexture.__init__(self)
         self.data = gworldContext.data
+        self._data_ptr = self.data.ctypes._as_parameter_
         self.size = gworldContext.size
 
-        self.texCoords[:] = self.size
-        self.texCoords *= [[0,1], [1,1], [1,0], [0,0]]
-
         if self.target == gl.GL_TEXTURE_2D:
-            self.texSize = map(self.nextPowerOf2, self.size)
-            self.texCoords /= self.texSize
-        else:
             self.texSize = self.size
+            #self.texSize = tuple(map(self.nextPowerOf2, self.size))
+            self.texCoords[:] = 1.
+            #self.texCoords[:] = self.size
+            #self.texCoords /= self.texSize
+        else:
+            self.texCoords[:] = self.size
+            self.texSize = self.size
+        self.texCoords *= [[0,1], [1,1], [1,0], [0,0]]
 
         self.initTexture()
 
     def initTexture(self):
-        target, texture_id = self._getTextureInfo()
-        gl.glBindTexture(target, texture_id)
-        gl.glTexImage2D(target, 0, gl.GL_RGBA, self.texSize[0], self.texSize[1], 0, gl.GL_BGRA, gl.GL_UNSIGNED_INT_8_8_8_8, None)
+        self._getTextureInfo()
+        self.bind()
 
+        dataFormat = gl.GL_BGRA
+        dataType = gl.GL_UNSIGNED_INT_8_8_8_8
+        gl.glTexImage2D(self.target, 0, gl.GL_RGBA8, self.texSize[0], self.texSize[1], 0, dataFormat, dataType, None)
+        self._pushToTexture = partial(gl.glTexSubImage2D, self.target, 0, 0, 0, self.size[0], self.size[1], dataFormat, dataType, self._data_ptr)
+
+    _pushToTexture = None
     def update(self, force=False):
-        target = self.target
-        gl.glBindTexture(target, self.texture_id)
-        gl.glTexSubImage2D(target, 0, 0, 0, self.size[0], self.size[1], gl.GL_BGRA, gl.GL_UNSIGNED_INT_8_8_8_8, self.data.ctypes)
+        self.bind()
+        self._pushToTexture()
         return True
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    texture_id = None
     def _getTextureInfo(self):
         target = self.target
         texture_id = self.texture_id
