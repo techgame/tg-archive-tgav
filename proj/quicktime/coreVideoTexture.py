@@ -19,6 +19,7 @@ from ctypes import c_void_p, byref
 import numpy
 
 from TG.openGL.raw import gl, glext
+from TG.openGL.data.texture import Texture
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Constants / Variiables / Etc. 
@@ -116,21 +117,19 @@ class QTCVTexture(CVOpenGLTexture):
 
 class QTGWorldTexture(OpenGLTexture):
     target = gl.GL_TEXTURE_2D
-    target = glext.GL_TEXTURE_RECTANGLE_ARB
+    #target = glext.GL_TEXTURE_RECTANGLE_ARB
     texture_id = 0
 
     def __init__(self, gworldContext):
         OpenGLTexture.__init__(self)
-        self.data = gworldContext.data
-        self._data_ptr = self.data.ctypes._as_parameter_
+        self._data_ptr = gworldContext.data.ctypes._as_parameter_
         self.size = gworldContext.size
 
+        self.target = Texture.validTargets(['rect', '2d']).next()
         if self.target == gl.GL_TEXTURE_2D:
-            self.texSize = self.size
-            #self.texSize = tuple(map(self.nextPowerOf2, self.size))
-            self.texCoords[:] = 1.
-            #self.texCoords[:] = self.size
-            #self.texCoords /= self.texSize
+            self.texSize = tuple(map(Texture.nextPowerOf2, self.size))
+            self.texCoords[:] = self.size
+            self.texCoords /= self.texSize
         else:
             self.texCoords[:] = self.size
             self.texSize = self.size
@@ -139,48 +138,31 @@ class QTGWorldTexture(OpenGLTexture):
         self.initTexture()
 
     def initTexture(self):
-        self._getTextureInfo()
+        texture_id = gl.GLenum(0)
+        gl.glGenTextures(1, byref(texture_id))
+
+        def delGLTexture(wr, texture_id=texture_id.value):
+            texture_id = gl.GLenum(texture_id)
+            gl.glDeleteTextures(1, byref(texture_id))
+        texture_id.wr = weakref.ref(texture_id, delGLTexture)
+
+        self.texture_id = texture_id
         self.bind()
 
-        dataFormat = gl.GL_BGRA
-        dataType = gl.GL_UNSIGNED_INT_8_8_8_8
-        gl.glTexImage2D(self.target, 0, gl.GL_RGBA8, self.texSize[0], self.texSize[1], 0, dataFormat, dataType, None)
-        self._pushToTexture = partial(gl.glTexSubImage2D, self.target, 0, 0, 0, self.size[0], self.size[1], dataFormat, dataType, self._data_ptr)
+        gl.glTexParameteri(self.target, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR)
+        gl.glTexParameteri(self.target, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR)
+
+        dataFormat = gl.GL_BGRA; dataType = gl.GL_UNSIGNED_INT_8_8_8_8
+        gl.glTexImage2D(self.target, 0, gl.GL_RGBA8, 
+            self.texSize[0], self.texSize[1], False, 
+            dataFormat, dataType, None)
+        self._pushToTexture = partial(gl.glTexSubImage2D, self.target, 0, 
+                0, 0, self.size[0], self.size[1], 
+                dataFormat, dataType, self._data_ptr)
 
     _pushToTexture = None
     def update(self, force=False):
         self.bind()
         self._pushToTexture()
         return True
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    def _getTextureInfo(self):
-        target = self.target
-        texture_id = self.texture_id
-        if not texture_id:
-            if not target:
-                target = self.setTarget()
-
-            texture_id = gl.GLenum(0)
-            gl.glGenTextures(1, byref(texture_id))
-
-            def delGLTexture(wr, texture_id=texture_id.value):
-                texture_id = gl.GLenum(texture_id)
-                gl.glDeleteTextures(1, byref(texture_id))
-            texture_id.wr = weakref.ref(texture_id, delGLTexture)
-
-            self.texture_id = texture_id
-        return target, texture_id
-
-    def _delTextureInfo(self):
-        self.texture_id = None
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    _powersOfTwo = [0] + [1<<s for s in xrange(31)]
-    @staticmethod
-    def nextPowerOf2(v, powersOfTwo=_powersOfTwo):
-        return [e for e in powersOfTwo if e>=v][0]
-    del _powersOfTwo
 
