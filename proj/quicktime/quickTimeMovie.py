@@ -227,9 +227,9 @@ class QTMovie(object):
         libQuickTime.GoToBeginningOfMovie(self)
 
     def isActive(self):
-        return libQuickTime.GetMovieActive(self)
+        return bool(libQuickTime.GetMovieActive(self))
     def isDone(self):
-        return libQuickTime.IsMovieDone(self)
+        return bool(libQuickTime.IsMovieDone(self))
 
     def ptInMovie(self):
         return libQuickTime.PtInMovie(self)
