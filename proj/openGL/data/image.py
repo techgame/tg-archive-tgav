@@ -92,6 +92,10 @@ class ImageTexture(Texture):
         data = self.data2d(size=size, format=dataFormat, dataType=dataType)
         data.setImageOn(self)
 
+        if (size != image.size).any():
+            data.texBlank()
+            data.setSubImageOn(self, size=[min(e+1, m) for e,m in zip(image.size, size)])
+
         data.texString(image.tostring(), dict(alignment=1,))
         data.setSubImageOn(self, size=image.size)
 

@@ -188,29 +188,40 @@ class TextureImageBasic(object):
     border = False
 
     _dataTypeSizeMap = {
-        1: 1, 2: 2, 3: 3, 4: 4,
+        1: (1, False), 
+        2: (2, False), 
+        3: (3, False), 
+        4: (4, False), 
 
-        gl.GL_UNSIGNED_BYTE: 1,
-        gl.GL_BYTE: 1,
-        gl.GL_BITMAP: 1,
-        gl.GL_UNSIGNED_SHORT: 2,
-        gl.GL_SHORT: 2,
-        gl.GL_UNSIGNED_INT: 4,
-        gl.GL_INT: 4,
-        gl.GL_FLOAT: 4,
-        gl.GL_UNSIGNED_BYTE_3_3_2: 1,
-        gl.GL_UNSIGNED_BYTE_2_3_3_REV: 1,
-        gl.GL_UNSIGNED_SHORT_5_6_5: 2,
-        gl.GL_UNSIGNED_SHORT_5_6_5_REV: 2,
-        gl.GL_UNSIGNED_SHORT_4_4_4_4: 2,
-        gl.GL_UNSIGNED_SHORT_4_4_4_4_REV: 2,
-        gl.GL_UNSIGNED_SHORT_5_5_5_1: 2,
-        gl.GL_UNSIGNED_SHORT_1_5_5_5_REV: 2,
-        gl.GL_UNSIGNED_INT_8_8_8_8: 4,
-        gl.GL_UNSIGNED_INT_8_8_8_8_REV: 4,
-        gl.GL_UNSIGNED_INT_10_10_10_2: 4,
-        gl.GL_UNSIGNED_INT_2_10_10_10_REV: 4,
+        gl.GL_UNSIGNED_BYTE: (1, False),
+        gl.GL_BYTE: (1, False),
+        gl.GL_BITMAP: (1, False),
+        gl.GL_UNSIGNED_SHORT: (2, False),
+        gl.GL_SHORT: (2, False),
+        gl.GL_UNSIGNED_INT: (4, False),
+        gl.GL_INT: (4, False),
+        gl.GL_FLOAT: (4, False),
+
+        gl.GL_UNSIGNED_BYTE_3_3_2: (1, True),
+        gl.GL_UNSIGNED_BYTE_2_3_3_REV: (1, True),
+        gl.GL_UNSIGNED_SHORT_5_6_5: (2, True),
+        gl.GL_UNSIGNED_SHORT_5_6_5_REV: (2, True),
+        gl.GL_UNSIGNED_SHORT_4_4_4_4: (2, True),
+        gl.GL_UNSIGNED_SHORT_4_4_4_4_REV: (2, True),
+        gl.GL_UNSIGNED_SHORT_5_5_5_1: (2, True),
+        gl.GL_UNSIGNED_SHORT_1_5_5_5_REV: (2, True),
+        gl.GL_UNSIGNED_INT_8_8_8_8: (4, True),
+        gl.GL_UNSIGNED_INT_8_8_8_8_REV: (4, True),
+        gl.GL_UNSIGNED_INT_10_10_10_2: (4, True),
+        gl.GL_UNSIGNED_INT_2_10_10_10_REV: (4, True),
         }
+    _dataComponentsMap = {
+        gl.GL_RGB: 3, gl.GL_RGBA: 4,
+        gl.GL_BGR: 3, gl.GL_BGRA: 4,
+        gl.GL_COLOR_INDEX: 1, gl.GL_STENCIL_INDEX: 1, gl.GL_DEPTH_COMPONENT: 1,
+        gl.GL_RED: 1, gl.GL_GREEN: 1, gl.GL_BLUE: 1, gl.GL_ALPHA: 1, 
+        gl.GL_LUMINANCE: 1, gl.GL_LUMINANCE_ALPHA: 2, 
+    }
 
     def __init__(self, *args, **kwattrs):
         super(TextureImageBasic, self).__init__()
@@ -225,7 +236,10 @@ class TextureImageBasic(object):
             setattr(self, n, v)
 
     def getDataTypeSize(self):
-        return self._dataTypeSizeMap[self.dataType]
+        byteSize, compIncluded = self._dataTypeSizeMap[self.dataType]
+        if not compIncluded:
+            byteSize *= self._dataComponentsMap[self.format]
+        return byteSize
 
     def getSizeInBytes(self):
         byteSize = self.getDataTypeSize()
@@ -295,10 +309,16 @@ class TextureImageBasic(object):
 
     def texBlank(self):
         # setup the alignment properly
+        blankData = self._blank
+
+        nbytes = self.getSizeInBytes()
+        if len(blankData) < nbytes:
+            blankData = (gl.GLubyte*nbytes*4)()
+            self.__class__._blank = blankData
+
         ps = self.newPixelStore(alignment=1)
-        byteCount = self.getSizeInBytes()
-        data = (gl.GLubyte*byteCount)()
-        self.texCData(data)
+        self.texCData(blankData)
+    _blank = ()
 
     def setImageOn(self, texture, level=0, **kw):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
@@ -885,10 +905,13 @@ class Texture(object):
     def texCoordsFor(self, texCoords):
         return self.texCoordsForData(texCoords, self.texSize, self.target)
 
+    def isNormalizedTarget(self):
+        return self._rstNormalizeTargets.get(self.target, True)
+
     @classmethod
     def texCoordsForData(klass, texCoords, texSize, target):
         if klass._rstNormalizeTargets.get(target, True):
-            return texCoords/(texSize+1)
+            return texCoords/texSize
         else: return texCoords
 
     def getVertexMesh(self, box=None, key='quads'):
