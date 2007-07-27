@@ -15,8 +15,8 @@ _errorExclusions = set([])#'alcCloseDevice', 'alcMakeContextCurrent'])
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-openALLib = _ctypes_support.loadFirstLibrary('OpenAL', 'OpenAL32')
-alutLib = _ctypes_support.loadFirstLibrary('ALUT') or openALLib
+openALLib = _ctypes_support.loadFirstLibrary('OpenAL', 'OpenAL32', abi='cdecl')
+alutLib = _ctypes_support.loadFirstLibrary('ALUT', abi='cdecl') or openALLib
 
 errorFuncNames = set(['alGetError', 'alcGetError', 'alcGetContextsDevice'])
 alGetError = None

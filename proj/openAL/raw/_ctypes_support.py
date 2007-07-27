@@ -10,19 +10,40 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+import os, sys
 import new
-from ctypes import cdll
-from ctypes.util import find_library
+import ctypes
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ Const
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+abiLoaderMap = {
+    'c': ctypes.cdll,
+    'cdecl': ctypes.cdll,
+
+    'posix': ctypes.cdll,
+    'nt': getattr(ctypes, 'windll', None),
+    'ce': getattr(ctypes, 'windll', None),
+
+    'win': getattr(ctypes, 'windll', None),
+    'ole': getattr(ctypes, 'oledll', None),
+
+    'py': ctypes.pydll,
+    }
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def loadFirstLibrary(*libraryname):
+def loadFirstLibrary(*libraryname, **kw):
+    abi = kw.get('abi', os.name)
+
+    abiLoadLibrary = abiLoaderMap[abi].LoadLibrary
     for name in libraryname: 
         path = find_library(name)
         if path:
-            library = cdll.LoadLibrary(path)
+            library = abiLoadLibrary(path)
             return library
 
 def attachToLibFn(fn, restype, argtypes, errcheck, lib):
@@ -52,4 +73,47 @@ def scrubNamespace(namespace, hostNamespace):
     for n in names:
         if namespace[n] is hostNamespace[n]:
             del namespace[n]
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~ Customized find library for applications
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+if os.name == "nt":
+    def find_library(name, executable_path=sys.exec_prefix):
+        # See MSDN for the REAL search order.
+        paths = [os.path.join(executable_path, 'bin'), executable_path] 
+        paths += os.environ['PATH'].split(os.pathsep)
+
+        for directory in paths:
+            fname = os.path.join(directory, name)
+            if os.path.exists(fname):
+                return fname
+            if fname.lower().endswith(".dll"):
+                continue
+            fname = fname + ".dll"
+            if os.path.exists(fname):
+                return fname
+        return None
+
+if os.name == "posix" and sys.platform == "darwin":
+    from ctypes.macholib.dyld import dyld_find as _dyld_find
+    pathSearches = [
+        '%(path)slib%(name)s.dylib',
+        '%(path)s%(name)s.dylib',
+        '%(path)s%(name)s.framework/%(name)s']
+
+    def find_library(name, executable_path=sys.exec_prefix):
+        paths = ['', '@executable_path/../Frameworks/', executable_path]
+        
+
+        libNameData = {'path': '', 'name': name}
+        for directory in paths:
+            libNameData['path'] = directory
+            for pthFmt in pathSearches:
+                libName = pthFmt % libNameData
+                try:
+                    return _dyld_find(libName, executable_path)
+                except ValueError:
+                    continue
+        return None
 

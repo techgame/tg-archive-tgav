@@ -9,7 +9,7 @@ import _ctypes_support
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-freetypeLib = _ctypes_support.loadFirstLibrary('freetype6', 'freetype')
+freetypeLib = _ctypes_support.loadFirstLibrary('freetype', abi='cdecl')
 
 errorFuncNames = set([])
 errorSkipNames = set([

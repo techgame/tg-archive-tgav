@@ -21,7 +21,7 @@ import _ctypes_support
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-cepstralLib = _ctypes_support.loadFirstLibrary('swift')
+cepstralLib = _ctypes_support.loadFirstLibrary('swift', abi='cdecl')
 
 errorFuncNames = set([
         'swift_event_get_error',
