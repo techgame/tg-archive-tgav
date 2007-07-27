@@ -400,7 +400,7 @@ class SourceCollection(object):
     _sources = None
     def getSources(self):
         if self._sources is None:
-            self.setSources([])
+            self._sources = []
         return self._sources
     def setSources(self, sources):
         sources = list(sources)
