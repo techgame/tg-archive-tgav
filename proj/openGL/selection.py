@@ -55,13 +55,13 @@ class NameSelector(Selector):
         gl.glRenderMode(gl.GL_SELECT)
         gl.glInitNames()
 
-    def finish(self):
+    def finish(self, incZDepth=False):
         hitRecords = gl.glRenderMode(gl.GL_RENDER)
-        selection = self._processHits(hitRecords, self._namedItems)
+        selection = self._processHits(hitRecords, self._namedItems, incZDepth)
         self._namedItems.clear()
         return selection
 
-    def _processHits(self, hitRecords, namedItems):
+    def _processHits(self, hitRecords, namedItems, incZDepth=False):
         offset = 0
         buffer = self._buffer
         result = []
@@ -70,7 +70,9 @@ class NameSelector(Selector):
             names = list(buffer[offset+3:offset+3+nameRecords])
             offset += 3+nameRecords
 
-            namedHit = ((minZ, maxZ), [namedItems[n] for n in names])
+            namedHit = [namedItems[n] for n in names]
+            if incZDepth:
+                namedHit = ((minZ, maxZ), namedHit)
             result.append(namedHit)
         return result
 
