@@ -76,13 +76,13 @@ class NameSelector(Selector):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def load(self, item):
-        n = id(item)
-        self._namedItems[n] = item
+    def load(self, *items):
+        n = id(items[0])
+        self._namedItems[n] = items
         gl.glLoadName(n)
-    def push(self, item):
-        n = id(item)
-        self._namedItems[n] = item
+    def push(self, *items):
+        n = id(items[0])
+        self._namedItems[n] = items
         gl.glPushName(n)
     def pop(self):
         gl.glPopName()
