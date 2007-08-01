@@ -94,8 +94,8 @@ class NameSelector(Selector):
     c_viewport = (gl.GLint*4)
     def pickMatrix(self, pos, size, vpbox):
         gl.glTranslatef(
-                (vpbox[2] - 2*(pos[0] - vpbox[0])/size[0]), 
-                (vpbox[3] - 2*(pos[1] - vpbox[1])/size[1]), 
+                (vpbox[2] - 2*(pos[0] - vpbox[0]))/size[0], 
+                (vpbox[3] - 2*(pos[1] - vpbox[1]))/size[1], 
                 0)
         gl.glScalef(
                 vpbox[2]/size[0],
