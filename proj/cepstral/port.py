@@ -129,6 +129,9 @@ class CepstralPort(CepstralObject):
         return self.statusLookup[self.status_id(async).value]
     state = property(status)
 
+    def isPlaying(self):
+        return self.status() == 'running'
+
     def wait(self, async=None):
         if async is None: 
             async = self.async
