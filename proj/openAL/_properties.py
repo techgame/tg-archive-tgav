@@ -14,7 +14,7 @@ import weakref
 from itertools import takewhile, count
 from ctypes import cast, byref, c_void_p, _SimpleCData, POINTER
 
-from TG.metaObserving import MetaObservableType, OBKeyedSet
+from TG.kvObserving import KVObject
 from TG.openAL.raw import al, alc
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -54,9 +54,7 @@ class ALIDObject(ALObject):
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class ALContextObject(ALObject):
-    __metaclass__ = MetaObservableType
-
+class ALContextObject(ALObject, KVObject):
     _context = None
     def _captureCurrentContext(self):
         self._context = weakref.proxy(Context.getCurrent())
@@ -84,8 +82,6 @@ class ALContextObject(ALObject):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    events = OBKeyedSet.property()
-
     processEvents = []
     _process_cache = None
     def process(self):
@@ -100,11 +96,11 @@ class ALContextObject(ALObject):
 
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        events = self.events
+        kvpub = self.kvpub
         for (name, attr), lastVal in cache.items():
             val = getattr(self, attr or name, lastVal)
             if val != lastVal:
-                events.call_n2(name, name, getattr(self, name, val))
+                kvpub(name)
             cache[name, attr] = val
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

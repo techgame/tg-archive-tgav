@@ -12,7 +12,7 @@
 
 from ctypes import byref, c_void_p
 
-from TG.metaObserving import MetaObservableType, OBKeyedSet
+from TG.kvObserving import KVObject
 
 from .base import CepstralObject, CepstralError, _swift
 from .voice import CepstralVoice
@@ -23,10 +23,7 @@ from .event import CepstralEvent
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-class CepstralPort(CepstralObject):
-    __metaclass__ = MetaObservableType
-    events = OBKeyedSet.property()
-
+class CepstralPort(CepstralObject, KVObject):
     _closeFromParam = staticmethod(_swift.swift_port_close)
     def __init__(self, engine=None, async=True, **kw):
         if engine is None:
@@ -96,19 +93,19 @@ class CepstralPort(CepstralObject):
 
         _swift.swift_port_set_voice(self, voice)
         self._voice = voice
-        self.events.call_n1('voice', voice)
+        self.kvpub('voice')
     voice = property(getVoice, setVoice)
 
     def setVoiceName(self, voiceName):
         _swift.swift_port_set_voice_by_name(self, voiceName)
         self._voice = None
-        self.events.call_n1('voice', None)
+        self.kvpub('voice')
     voiceName = property(None, setVoiceName)
 
     def setVoiceDir(self, voiceDir):
         _swift.swift_port_set_voice_from_dir(self, voiceDir)
         self._voice = None
-        self.events.call_n1('voice', None)
+        self.kvpub('voice')
     voiceDir = property(None, setVoiceDir)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -237,7 +234,7 @@ class CepstralPort(CepstralObject):
 
     def _onSynthesisEvent(self, evt_param, evtKind, user):
         evt = CepstralEvent.fromEvent(evt_param, evtKind, self)
-        self.events.call_n1(evt.name, evt)
+        self.kvpub.event('@' + evt.name, evt)
         return 0
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

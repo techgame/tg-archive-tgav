@@ -21,8 +21,8 @@ def main(argv):
     port.setVoiceName('Diane')
     port.speak(text)
 
-    @port.events.on('word')
-    def onTTSWord(evt):
+    @port.kvo('@word')
+    def onTTSWord(port, evt):
         print 'on tts word:', evt.text, evt.textPos
 
     while port.status() != 'done':
