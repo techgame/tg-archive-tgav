@@ -52,6 +52,15 @@ class CepstralPort(CepstralObject, KVObject):
         self._set_param(_swift.swift_port_open(engine, params))
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    _lastStateValue = None
+    def process(self):
+        value = self.status_val()
+        if value != self._lastStateValue:
+            self.kvpub.publish('state')
+        self._lastStateValue = value
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     #~ Params
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -135,24 +144,30 @@ class CepstralPort(CepstralObject, KVObject):
         if self.status_val() > 0:
             try:
                 _swift.swift_port_wait(self, async)
-            except CepstralError: return False
-            else: return True
+            except CepstralError: 
+                return False
+            else: 
+                return True
     def stop(self, async=None, place=-1):
         if async is None: 
             async = self.async
         if self.status_val() > 0:
             try: 
                 _swift.swift_port_stop(self, async, place)
-            except CepstralError: return False
-            else: return True
+            except CepstralError: 
+                return False
+            else: 
+                return True
     def pause(self, async=None, place=-1):
         if async is None: 
             async = self.async
         if self.status_val() > 0:
             try:
                 _swift.swift_port_pause(self, async, place)
-            except CepstralError: return False
-            else: return True
+            except CepstralError: 
+                return False
+            else: 
+                return True
     def resume(self, async=None, place=-1):
         if self.status() == 'paused':
             # pause a second time resumes for cepstral
@@ -233,6 +248,8 @@ class CepstralPort(CepstralObject, KVObject):
         _swift.swift_port_set_callback(self, fn_cb, mask, 32)
 
     def _onSynthesisEvent(self, evt_param, evtKind, user):
+        if CepstralEvent is None: 
+            return 0
         evt = CepstralEvent.fromEvent(evt_param, evtKind, self)
         self.kvpub.event('@' + evt.name, evt)
         return 0
