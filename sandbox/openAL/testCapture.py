@@ -96,10 +96,19 @@ def main():
         def onCountChange(src, s):
             print "Second Offset:", s
 
+        @src.kvo('state')
+        def onStateChange(src, s):
+            print "State:", s
+
+
         while src.isPlaying():
             context.process()
             print wig.next(),
             sys.stdout.flush()
+            time.sleep(0.1)
+
+        for x in xrange(10):
+            context.process()
             time.sleep(0.1)
 
         break
