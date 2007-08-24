@@ -3,8 +3,8 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import re
-import platform
 
+import ctypes
 from ctypes import *
 import _ctypes_support
 
@@ -27,7 +27,7 @@ def POINTER(baseType):
 #~ Definitions 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-if platform.system() == "Windows":
+if hasattr(ctypes, 'windll'):
     openGL32 = _ctypes_support.loadFirstLibrary('OpenGL32')
     glu32 = _ctypes_support.loadFirstLibrary('glu32')
 
