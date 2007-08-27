@@ -23,6 +23,9 @@ import _ctypes_support
 
 cepstralLib = _ctypes_support.loadFirstLibrary('swift', abi='cdecl')
 
+if cepstralLib is None:
+    raise ImportError("Cepstral library not found")
+
 errorFuncNames = set([
         'swift_event_get_error',
         'swift_strerror',
