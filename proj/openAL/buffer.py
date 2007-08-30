@@ -206,11 +206,12 @@ class Buffer(ALIDContextObject):
 
     def play(self):
         from TG.openAL.source import Source
-        self.playOn(Source(self))
+        return self.playOn(Source(self))
 
     def playOn(self, *srcs):
         for src in srcs:
             src.playQueue(self)
+        return src
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

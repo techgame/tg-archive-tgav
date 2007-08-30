@@ -17,3 +17,8 @@ from capture import Capture
 from source import Source, SourceCollection
 from buffer import Buffer
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+def playFilename(filename):
+    buffer = Buffer.fromFilename(filename)
+    return buffer.play()
