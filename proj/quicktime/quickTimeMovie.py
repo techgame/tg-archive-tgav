@@ -11,7 +11,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import ctypes, ctypes.util
-from ctypes import cast, byref, c_void_p
+from ctypes import cast, byref, c_void_p, c_short
 
 from .movieDisplayContext import QTGWorldContext, QTOpenGLVisualContext
 from .coreFoundationUtils import asCFString, asCFURL, c_appleid, fromAppleId, toAppleId, booleanTrue, booleanFalse
@@ -27,6 +27,10 @@ if hasattr(ctypes, 'windll'):
 else:
     libQuickTimePath = ctypes.util.find_library("QuickTime")
     libQuickTime = ctypes.cdll.LoadLibrary(libQuickTimePath)
+
+libQuickTime.GetMovieVolume.argtypes = [c_void_p]
+libQuickTime.GetMovieVolume.restype = c_short
+libQuickTime.SetMovieVolume.argtypes = [c_void_p, c_short]
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ QuickTime Stuff
@@ -216,6 +220,26 @@ class QTMovie(object):
         return libQuickTime.GetMovieDuration(self)
     def getTimeScale(self):
         return libQuickTime.GetMovieTimeScale(self)
+
+    def getVolume(self):
+        # volume is converted from a floating point number to an 8.8 fixed point number
+        volume = libQuickTime.GetMovieVolume(self)
+        volume = volume / 256.0
+        return volume
+    def setVolume(self, volume):
+        # volume is converted from a floating point number to an 8.8 fixed point number
+        volume = int(volume * 256) & 0xffff
+        return libQuickTime.SetMovieVolume(self, volume)
+    def mute(self, toggle=False):
+        volume = self.getVolume()
+        if toggle or volume >= 0.0:
+            self.setVolume(-volume)
+    def unmute(self):
+        volume = self.getVolume()
+        if volume < 0.0:
+            self.setVolume(-volume)
+        elif volume == 0.0:
+            self.setVolume(0.1)
 
     def start(self):
         libQuickTime.StartMovie(self)
