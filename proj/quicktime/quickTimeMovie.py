@@ -96,12 +96,20 @@ class QTMovie(object):
             self.loadPath(path)
 
     def __del__(self):
-        self.destroy()
+        try:
+            self.destroy()
+        except Exception:
+            import traceback
+            traceback.print_exc()
 
     def destroy(self):
         if not self._as_parameter_: return
         libQuickTime.StopMovie(self)
         libQuickTime.DisposeMovie(self)
+        self._as_parameter_ = None
+        self.displayContext.destroy()
+        self.displayContext = None
+
 
     def loadPath(self, path):
         if '://' in path:

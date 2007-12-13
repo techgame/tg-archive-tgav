@@ -58,6 +58,9 @@ class QTMovieDisplayContext(object):
             tex = self.TextureFactory(self)
             self._qtTexture = tex
         return tex
+    def delQTTexture(self):
+        self._qtTexture.destroy()
+        self._qtTexture = None
 
     def process(self):
         pass
@@ -79,7 +82,9 @@ class QTOpenGLVisualContext(QTMovieDisplayContext):
 
     def destroy(self):
         if not self._as_parameter_: return
+        self.delQTTexture()
         libQuickTime.QTVisualContextRelease(self)
+        self._as_parameter_ = None
 
     @classmethod
     def isContextSupported(klass):
@@ -122,7 +127,9 @@ class QTGWorldContext(QTMovieDisplayContext):
 
     def destroy(self):
         if not self._as_parameter_: return
+        self.delQTTexture()
         libQuickTime.DisposeGWorld(self)
+        self._as_parameter_ = None
 
     def process(self):
         pass

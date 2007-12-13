@@ -80,11 +80,19 @@ class CVOpenGLTexture(OpenGLTexture):
         self._texCoordsAddresses = [tc.ctypes.data for tc in self.texCoords]
         self._cvTextureRef = c_void_p(0)
 
+    def __del__(self):
+        self.destroy()
+
     def isNewImageAvailable(self):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
 
     def updateCVTexture(self, cvTextureRef):
         raise NotImplementedError('Subclass Responsibility: %r' % (self,))
+
+    def destroy(self):
+        if not self._cvTextureRef: return
+        libCoreVideo.CVOpenGLTextureRelease(self._cvTextureRef)
+        self._cvTextureRef = c_void_p(0)
 
     def update(self, force=False):
         if not force and not self.isNewImageAvailable():
