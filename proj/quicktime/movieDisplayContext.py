@@ -10,6 +10,8 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+import weakref
+
 from struct import pack, unpack
 import ctypes, ctypes.util
 from ctypes import byref, c_void_p
@@ -72,6 +74,13 @@ class QTOpenGLVisualContext(QTMovieDisplayContext):
     def __init__(self):
         self.create()
 
+    def __del__(self):
+        self.destroy()
+
+    def destroy(self):
+        if not self._as_parameter_: return
+        libQuickTime.QTVisualContextRelease(self)
+
     @classmethod
     def isContextSupported(klass):
         if not hasattr(aglUtils, 'getCGLContextAndFormat'):
@@ -108,6 +117,13 @@ class QTGWorldContext(QTMovieDisplayContext):
             return False
         return True
 
+    def __del__(self):
+        self.destroy()
+
+    def destroy(self):
+        if not self._as_parameter_: return
+        libQuickTime.DisposeGWorld(self)
+
     def process(self):
         pass
 
@@ -133,7 +149,6 @@ class QTGWorldContext(QTMovieDisplayContext):
                 0,
                 self.data.ctypes, 
                 self.size[0]*4)
-        assert bool(self._as_parameter_), (ret, self._as_parameter_)
 
         libQuickTime.SetMovieGWorld(movie, self, None)
         return True

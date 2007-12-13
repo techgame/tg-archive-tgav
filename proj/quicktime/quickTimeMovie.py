@@ -10,6 +10,8 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+import weakref
+
 import ctypes, ctypes.util
 from ctypes import cast, byref, c_void_p, c_short
 
@@ -92,6 +94,14 @@ class QTMovie(object):
         self.createContext()
         if path is not None:
             self.loadPath(path)
+
+    def __del__(self):
+        self.destroy()
+
+    def destroy(self):
+        if not self._as_parameter_: return
+        libQuickTime.StopMovie(self)
+        libQuickTime.DisposeMovie(self)
 
     def loadPath(self, path):
         if '://' in path:
