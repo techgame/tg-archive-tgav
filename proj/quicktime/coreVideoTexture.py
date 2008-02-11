@@ -145,6 +145,12 @@ class QTGWorldTexture(OpenGLTexture):
 
         self.initTexture()
 
+    def __del__(self):
+        self.destroy()
+
+    def destroy(self):
+        pass
+
     def initTexture(self):
         texture_id = gl.GLenum(0)
         gl.glGenTextures(1, byref(texture_id))
