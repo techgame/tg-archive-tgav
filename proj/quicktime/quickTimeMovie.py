@@ -90,6 +90,8 @@ def qtVersion():
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class QTMovie(object):
+    _as_parameter_ = None
+
     def __init__(self, path=None):
         self.createContext()
         if path is not None:
@@ -103,13 +105,14 @@ class QTMovie(object):
             traceback.print_exc()
 
     def destroy(self):
+        self.destroyMovie()
+        self.destroyContext()
+
+    def destroyMovie(self):
         if not self._as_parameter_: return
         libQuickTime.StopMovie(self)
         libQuickTime.DisposeMovie(self)
         self._as_parameter_ = None
-        self.displayContext.destroy()
-        self.displayContext = None
-
 
     def loadPath(self, path):
         if '://' in path:
@@ -130,6 +133,9 @@ class QTMovie(object):
         ('mins', 'asok', booleanTrue), # load asynchronously
         ]
     def loadFromProperties(self, movieProperties):
+        self.destroyMovie()
+        self.displayContext.reset()
+
         movieProperties = QTNewMoviePropertyElement.fromPropertyList(
                                 movieProperties, 
                                 self.defaultMovieProperties, 
@@ -170,15 +176,18 @@ class QTMovie(object):
                 break
         else:
             raise RuntimeError("No suitable display context could be found")
+    def destroyContext(self):
+        self.displayContext.destroy()
+        self.displayContext = None
 
     def getQTTexture(self):
         return self.displayContext.getQTTexture()
     qtTexture = property(getQTTexture)
         
     def process(self, seconds=0):
-        r = self.displayContext.process()
+        if self.displayContext:
+            self.displayContext.process()
         self.processMovieTask(seconds)
-        return r
 
     def processMovieTask(self, seconds=0):
         return libQuickTime.MoviesTask(self, int(seconds*1000))

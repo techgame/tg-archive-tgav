@@ -59,8 +59,13 @@ class QTMovieDisplayContext(object):
             self._qtTexture = tex
         return tex
     def delQTTexture(self):
+        if self._qtTexture is None:
+            return
         self._qtTexture.destroy()
         self._qtTexture = None
+
+    def reset(self):
+        pass
 
     def process(self):
         pass
@@ -130,6 +135,9 @@ class QTGWorldContext(QTMovieDisplayContext):
         self.delQTTexture()
         libQuickTime.DisposeGWorld(self)
         self._as_parameter_ = None
+
+    def reset(self):
+        self.delQTTexture()
 
     def process(self):
         pass
