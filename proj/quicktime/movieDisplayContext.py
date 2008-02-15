@@ -146,8 +146,10 @@ class QTGWorldContext(QTMovieDisplayContext):
         self.size = (rect[3], rect[2])
         self.data = numpy.zeros((rect[2], rect[3], 4), 'B')
         self._as_parameter_ = c_void_p()
+        if not self.data.size:
+            return False
 
-        ret = libQuickTime.NewGWorldFromPtr(
+        errqt = libQuickTime.NewGWorldFromPtr(
                 byref(self._as_parameter_), 
                 self.k32ARGBPixelFormat,
                 byref(rect),
@@ -156,6 +158,9 @@ class QTGWorldContext(QTMovieDisplayContext):
                 0,
                 self.data.ctypes, 
                 self.size[0]*4)
+
+        if errqt:
+            return False
 
         libQuickTime.SetMovieGWorld(movie, self, None)
         return True
