@@ -54,7 +54,9 @@ def asCFURL(astr):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def fromAppleId(strAppleId): 
-    return unpack('!I', strAppleId)[0]
+    return unpack('!I', str(strAppleId))[0]
 def toAppleId(intAppleId): 
+    if isinstance(intAppleId, c_appleid):
+        intAppleId = intAppleId.value
     return pack('!I', intAppleId)
 

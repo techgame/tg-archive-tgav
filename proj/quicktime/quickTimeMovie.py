@@ -81,6 +81,8 @@ class QTNewMoviePropertyElement(ctypes.Structure):
 
 def qtEnterMovies():
     libQuickTime.EnterMovies()
+def qtExitMovies():
+    libQuickTime.ExitMovies()
 
 def qtVersion():
     r = ctypes.c_long(0)
@@ -93,6 +95,7 @@ class QTMovie(object):
     _as_parameter_ = None
 
     def __init__(self, path=None):
+        qtEnterMovies() 
         self.createContext()
         if path is not None:
             self.loadPath(path)
@@ -139,7 +142,8 @@ class QTMovie(object):
         movieProperties = QTNewMoviePropertyElement.fromPropertyList(
                                 movieProperties, 
                                 self.defaultMovieProperties, 
-                                self.displayContext.getMovieProperties())
+                                self.displayContext.getMovieProperties(),
+                                )
 
         self._as_parameter_ = c_void_p()
         errqt = libQuickTime.NewMovieFromProperties(len(movieProperties), movieProperties, 0, None, byref(self._as_parameter_))
@@ -181,7 +185,8 @@ class QTMovie(object):
         self.displayContext = None
 
     def getQTTexture(self):
-        return self.displayContext.getQTTexture()
+        if self.hasVisuals():
+            return self.displayContext.getQTTexture()
     qtTexture = property(getQTTexture)
         
     def process(self, seconds=0):
@@ -206,27 +211,33 @@ class QTMovie(object):
         libQuickTime.SetMoviePlayHints(self, hintsLoop, hintsLoop)
 
     def printTracks(self):
+        print 'Movie Tracks::'
         trackMediaType = c_appleid()
         for trackIdx in xrange(libQuickTime.GetMovieTrackCount(self)):
             track = libQuickTime.GetMovieIndTrack(self, trackIdx)
-            print 'track:', trackIdx, track
+            print '  track:', trackIdx, track
             if track:
                 trackMedia = libQuickTime.GetTrackMedia(track)
-                print '  media:', trackMedia
+                print '    media:', trackMedia,
                 if trackMedia:
                     libQuickTime.GetMediaHandlerDescription(trackMedia, byref(trackMediaType), 0, 0)
-                    print '    ', toAppleId(trackMediaType)
+                    print toAppleId(trackMediaType)
                     #if trackMediaType[:] not in ('vide', 'soun'):
                     #    libQuickTime.SetTrackEnabled(track, False)
                     #    print 'disabled'
                     #else:
                     #    print 'enabled'
+                else:
+                    print "<unset>"
         print
 
     def getBox(self):
         rect = (c_short*4)()
         libQuickTime.GetMovieBox(self, byref(rect))
         return list(rect)
+
+    def hasVisuals(self):
+        return sum(self.getBox()[2:]) > 0 # do we have a size?
 
     def getRate(self):
         return libQuickTime.GetMovieRate(self)
