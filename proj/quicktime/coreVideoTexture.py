@@ -166,7 +166,8 @@ class QTGWorldTexture(OpenGLTexture):
         gl.glTexParameteri(self.target, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR)
         gl.glTexParameteri(self.target, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR)
 
-        dataFormat = gl.GL_BGRA; dataType = gl.GL_UNSIGNED_INT_8_8_8_8
+        dataFormat = gl.GL_RGBA
+        dataType = gl.GL_UNSIGNED_INT_8_8_8_8
         gl.glTexImage2D(self.target, 0, gl.GL_RGBA8, 
             self.texSize[0], self.texSize[1], False, 
             dataFormat, dataType, None)

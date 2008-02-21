@@ -118,7 +118,9 @@ class QTOpenGLVisualContext(QTMovieDisplayContext):
 
 class QTGWorldContext(QTMovieDisplayContext):
     _as_parameter_ = None
-    k32ARGBPixelFormat = 0x00000020
+    #k32ARGBPixelFormat = 0x00000020
+    k32RGBAPixelFormat = 0x41424752
+    k32ABGRPixelFormat = 0x52474241
     TextureFactory = QTGWorldTexture
 
     @classmethod
@@ -159,7 +161,7 @@ class QTGWorldContext(QTMovieDisplayContext):
 
         errqt = libQuickTime.NewGWorldFromPtr(
                 byref(self._as_parameter_), 
-                self.k32ARGBPixelFormat,
+                self.k32RGBAPixelFormat,
                 byref(rect),
                 None,
                 None,
@@ -168,7 +170,8 @@ class QTGWorldContext(QTMovieDisplayContext):
                 self.size[0]*4)
 
         if errqt:
-            return False
+            #darn... that's too bad... try it anyway
+            pass
 
         libQuickTime.SetMovieGWorld(movie, self, None)
         return True
