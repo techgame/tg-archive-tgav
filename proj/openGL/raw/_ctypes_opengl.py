@@ -7,6 +7,7 @@ import re
 import ctypes
 from ctypes import *
 import _ctypes_support
+from ._ctypes_errCheckMaps import noErrorCheck, mustErrorCheck
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~ CTypes Overrides 
@@ -60,25 +61,18 @@ else:
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 getNameToFirstDigit = re.compile(r'(gl[A-Za-z_]+)\d?').match
-noErrorCheckAllowed = set([
-        'glBegin',
-        'glVertex', 'glColor', 'glIndex', 
-        'glNormal', 'glEdgeFlag', 
-        'glTexCoord', 'glMultiTexCoord', 'glMaterial', 
-        'glEvalCoord', 'glEvalPoint', 
-        'glArrayElement', 
-        'glCallList', 'glCallLists', 
-        ])
 
-def canErrorCheckFn(fn):
-    name = getNameToFirstDigit(fn.__name__).groups()[0]
-    return name not in noErrorCheckAllowed
+def fnBaseName(fn):
+    return getNameToFirstDigit(fn.__name__).groups()[0]
+
+def mustErrorCheckFn(fn):
+    return name not in mustErrorCheck
 
 glGetError = None
 
 def glNullCheckError(result, func, args):
     err = None
-    #print '=== %s%r -%r-> %r ' % (func.__name__, args, err, result)
+    print '=== %s%r -%r-> %r ' % (func.__name__, args, err, result)
     return result
 def glCheckError(result, func, args):
     err = glGetError()
@@ -92,7 +86,10 @@ def _bindError(errorFunc, g=globals()):
     g[errorFunc.__name__] = errorFunc
 
 def _getErrorCheckForFn(fn):
-    if canErrorCheckFn(fn):
+    name = fnBaseName(fn)
+    if name in noErrorCheck:
+        return None
+    elif name in mustErrorCheck:
         return glCheckError
     #else:
     #    return glNullCheckError
