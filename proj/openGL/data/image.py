@@ -69,7 +69,7 @@ class ImageTexture(Texture):
         return self._image
     def setImage(self, image, format=True):
         if image.mode == 'P':
-            image = image.convert('RGB')
+            image = image.convert('RGBA')
 
         if format is True:
             self.format = self.modeFormatMap[image.mode][0]
