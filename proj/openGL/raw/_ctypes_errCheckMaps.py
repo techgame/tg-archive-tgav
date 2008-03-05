@@ -21,6 +21,7 @@ noErrorCheck = set([
     ])
 
 mustErrorCheck = set([
+    'glIsEnabled',
     'glRenderMode',
     'glDrawArrays', 'glDrawBuffer', 'glDrawElements', 'glDrawRangeElements'
 
