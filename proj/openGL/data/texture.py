@@ -144,7 +144,7 @@ class PixelStore(object):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class TextureImageBasic(object):
-    formatMap = {
+    srcFormatMap = {
         'rgb': gl.GL_RGB, 'RGB': gl.GL_RGB,
         'rgba': gl.GL_RGBA, 'RGBA': gl.GL_RGBA,
 
@@ -268,7 +268,7 @@ class TextureImageBasic(object):
         return self._format
     def setFormat(self, format):
         if isinstance(format, basestring):
-            format = self.formatMap[format]
+            format = self.srcFormatMap[format]
         self._format = format
     # format should be: gl.GL_COLOR_INDEX,  gl.GL_RED, gl.GL_GREEN, gl.GL_BLUE, gl.GL_ALPHA,  gl.GL_RGB,  gl.GL_BGR  gl.GL_RGBA, gl.GL_BGRA, gl.GL_LUMINANCE, gl.GL_LUMINANCE_ALPHA
     format = property(getFormat, setFormat)
