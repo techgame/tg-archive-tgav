@@ -44,7 +44,7 @@ def imagePremultiply(image, raiseOnInvalid=True):
 class ImageTexture(Texture):
     texParams = Texture.texParams + [
             ('target', ('rect', '2d')),
-            ('wrap', gl.GL_CLAMP),
+            ('wrap', gl.GL_CLAMP_TO_EDGE),
             ('genMipmaps', True),
             ('magFilter', gl.GL_LINEAR),
             ('minFilter', gl.GL_LINEAR),
