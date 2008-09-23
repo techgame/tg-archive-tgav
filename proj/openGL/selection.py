@@ -10,6 +10,7 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+from operator import itemgetter
 from .raw import gl, glu
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -70,21 +71,33 @@ class NameSelector(Selector):
             names = list(buffer[offset+3:offset+3+nameRecords])
             offset += 3+nameRecords
 
-            namedHit = [namedItems[n] for n in names]
+            maxOrder = None
+            namedHit = []
+            for n in names:
+                order, item = namedItems[n]
+                maxOrder = max(maxOrder, order)
+                namedHit.append(item)
+
             if incZDepth:
                 namedHit = ((minZ, maxZ), namedHit)
-            result.append(namedHit)
+            result.append((maxOrder, namedHit))
+
+        result.sort(key=lambda e: e[0])
+        result = [e[1] for e in result]
+
         return result
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def load(self, *items):
         n = id(items[0])
-        self._namedItems[n] = items
+        names = self._namedItems
+        names[n] = (len(names), items)
         gl.glLoadName(n)
     def push(self, *items):
         n = id(items[0])
-        self._namedItems[n] = items
+        names = self._namedItems
+        names[n] = (len(names), items)
         gl.glPushName(n)
     def pop(self):
         gl.glPopName()
