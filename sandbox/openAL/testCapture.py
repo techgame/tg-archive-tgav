@@ -42,7 +42,7 @@ def main():
         for each in openAL.Capture.allDeviceNames():
             print '    available:', each
         print
-        capture = openAL.Capture(count=1<<20)
+        capture = openAL.Capture()
         print
         print capture.name
         print
@@ -50,17 +50,18 @@ def main():
     buf = openAL.Buffer()
     while 1:
 
-        if raw_input('Ready? > ').lower() != 'y':
+        if raw_input('Ready? [y]> ').lower() not in ['y', 'yes', '']:
             break
 
         print capture
         print capture.frequency, capture.channels, capture.width
 
-        wave = WaveFormat('capture.wav', 'wb')
-        wave.setFormat(wave.formatEnum.WAVE_FORMAT_MULAW, capture.frequency, capture.channels, capture.width)
-        #wave.setFormat(wave.formatEnum.WAVE_FORMAT_PCM, capture.frequency, capture.channels, capture.width)
-        wave.writeWaveHeader()
+        capture.wave = WaveFormat('capture.wav', 'wb')
+        capture.wave.setFormatFrom('PCM', capture)
+        capture.wave.writeWaveHeader()
+        capture.lemming = 0
 
+        counts = []
         sampleList = []
 
         @capture.kvo('sampleCount')
@@ -69,11 +70,10 @@ def main():
                 print '.',
                 return
 
-            print 'Capture samples available:', sampleCount
             data = capture.samples()
-            assert len(data) > 0
-            wave.writeFrames(data)
+            capture.wave.writeFrames(data)
             sampleList.append(data)
+            print 'Capture samples available:', sampleCount, 'bytes:', len(data)
 
         capture.start()
         for x in xrange(60):
@@ -81,7 +81,7 @@ def main():
             context.process()
 
         capture.stop()
-        wave.close()
+        capture.wave.close()
 
         print
         data = ''.join(sampleList)

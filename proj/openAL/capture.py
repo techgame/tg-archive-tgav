@@ -30,14 +30,14 @@ else:
 
             'format',
             'frequency',
-            'bufferCount',
+            'entryCount',
             'entrySize',
             ]
 
         _buffer = None
         format = None
         frequency = 0
-        bufferCount = 0
+        entryCount = 0
         entrySize = 0
 
         entrySizeMap = {
@@ -49,7 +49,7 @@ else:
         name = alcPropertyS(alc.ALC_CAPTURE_DEVICE_SPECIFIER)
         sampleCount = alcPropertyI(alc.ALC_CAPTURE_SAMPLES)
 
-        def __init__(self, name=None, frequency=44100, format=al.AL_FORMAT_STEREO16, count=65536):
+        def __init__(self, name=None, frequency=44100, format=al.AL_FORMAT_STEREO16, count=None):
             if name is not False:
                 self.open(name, frequency=frequency, format=format, count=count)
 
@@ -61,15 +61,15 @@ else:
                         self.__class__.__module__, self.__class__.__name__,
                         self.frequency, self.getChannels(), self.getWidth())
 
-        def open(self, name=None, frequency=44100, format=al.AL_FORMAT_STEREO16, count=1024):
+        def open(self, name=None, frequency=44100, format=al.AL_FORMAT_STEREO16, count=65536):
             name = name and str(name) or None
             format = alFormatMap.get(format, format)
 
-            self.bufferCount = count
             self.entrySize = self.entrySizeMap[format]
+            self.entryCount = count or 65536
             self.frequency = frequency
             self.format = format
-            self._buffer = al.c_buffer(self.bufferCount*self.entrySize, 0)
+            self._buffer = al.c_buffer(self.entryCount*self.entrySize, 0)
             self._setAsParam(alc.alcCaptureOpenDevice(name, int(frequency), int(format), len(self._buffer)))
 
             context = self._context
@@ -83,7 +83,7 @@ else:
                 try:
                     alc.alcCaptureCloseDevice(self)
 
-                    del self.bufferCount
+                    del self.entryCount
                     del self.entrySize
                     del self.frequency
                     del self.format
@@ -146,11 +146,13 @@ else:
             self.setCapturing(True)
         def stop(self):
             alc.alcCaptureStop(self)
+            self.sampleCount = 0
             self.setCapturing(False)
         def samples(self, count=None):
-            if count is None: 
-                count = self.bufferCount
-            count = min(count, self.sampleCount)
+            if not self.isCapturing():
+                return ''
+
+            count = min(self.sampleCount, count or self.entryCount)
             if count:
                 alc.alcCaptureSamples(self, self._buffer, count)
                 return self._buffer[:count*self.entrySize]
