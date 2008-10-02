@@ -54,17 +54,20 @@ class WaveFormat(object):
             fileOrName = file(fileOrName, mode, *args, **kw)
         self._file = fileOrName
 
-        if 'r' in mode:
+        if 'r' in self._file.mode:
             self.readWaveHeader()
 
-    def close(self):
+    def close(self, closeFile=True):
         if self._riff:
             self._riff.close()
             del self._riff
 
         if self._file:
-            self._file.close()
-            del self._file
+            if closeFile:
+                self._file.close()
+                del self._file
+            else:
+                self._file.flush()
 
     def readWaveHeader(self):
         if self._riff is not None:
