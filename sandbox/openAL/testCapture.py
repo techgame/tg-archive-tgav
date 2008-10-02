@@ -43,6 +43,7 @@ def main():
             print '    available:', each
         print
         capture = openAL.Capture()
+        capture2 = openAL.Capture()
         print
         print capture.name
         print
@@ -59,10 +60,7 @@ def main():
         capture.wave = WaveFormat('capture.wav', 'wb')
         capture.wave.setFormatFrom('PCM', capture)
         capture.wave.writeWaveHeader()
-        capture.lemming = 0
-
-        counts = []
-        sampleList = []
+        capture.sampleList = []
 
         @capture.kvo('sampleCount')
         def onCountChange(capture, sampleCount):
@@ -72,7 +70,7 @@ def main():
 
             data = capture.samples()
             capture.wave.writeFrames(data)
-            sampleList.append(data)
+            capture.sampleList.append(data)
             print 'Capture samples available:', sampleCount, 'bytes:', len(data)
 
         capture.start()
@@ -84,7 +82,7 @@ def main():
         capture.wave.close()
 
         print
-        data = ''.join(sampleList)
+        data = ''.join(capture.sampleList)
         print 'all data:', len(data), len(data)/float(capture.frequency*capture.channels*capture.width)
         print 'raw:', data[:40].encode('hex')
         buf.setDataFromCapture(data, capture)
