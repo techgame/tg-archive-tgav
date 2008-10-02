@@ -67,11 +67,11 @@ def main():
             if sampleCount <= 0:
                 print '.',
                 return
-
-            data = capture.samples()
-            capture.wave.writeFrames(data)
-            capture.sampleList.append(data)
-            print 'Capture samples available:', sampleCount, 'bytes:', len(data)
+            elif capture.isCapturing():
+                data = capture.samples()
+                capture.wave.writeFrames(data)
+                capture.sampleList.append(data)
+                print 'Capture samples available:', sampleCount, 'bytes:', len(data)
 
         capture.start()
         for x in xrange(60):

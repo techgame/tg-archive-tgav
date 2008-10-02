@@ -101,7 +101,7 @@ class ALContextObject(ALObject, KVObject):
             val = getattr(self, attr or name, lastVal)
             if val != lastVal:
                 kvpub(name)
-            cache[name, attr] = val
+            cache[name, attr] = getattr(self, attr or name, val)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

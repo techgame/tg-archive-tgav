@@ -146,7 +146,6 @@ else:
             self.setCapturing(True)
         def stop(self):
             alc.alcCaptureStop(self)
-            self.sampleCount = 0
             self.setCapturing(False)
         def samples(self, count=None):
             if not self.isCapturing():
