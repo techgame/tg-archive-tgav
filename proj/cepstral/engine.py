@@ -58,7 +58,7 @@ class CepstralEngine(CepstralObject):
     _voiceRententionPolicyMap.update(_swift.swift_voice_retention_policy_t.lookup)
 
     def getVoiceRententionPolicy(self):
-        policy = _swift.swift_engine_get_voice_retention_policy(self)
+        policy = _swift.swift_engine_get_voice_retention_policy(self).value
         return self._voiceRententionPolicyMap[policy]
     def setVoiceRententionPolicy(self, value):
         value = self._voiceRententionPolicyMap[value]

@@ -28,6 +28,7 @@ class CepstralPort(CepstralObject, KVObject):
     def __init__(self, engine=None, async=True, **kw):
         if engine is None:
             engine = CepstralEngine()
+            engine.voiceRententionPolicy = 'port'
         self.engine = engine
 
         self.async = async
