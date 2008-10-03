@@ -10,6 +10,15 @@ from swift_defs import *
 #~   "inc/swift_params.h"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+@bind(POINTER(swift_params), [c_char_p])
+def swift_params_new(key, _api_=None): 
+    """swift_params_ref(params)
+    
+        key : c_char_p
+    """
+    return _api_(key)
+    
+
 @bind(POINTER(swift_params), [POINTER(swift_params)])
 def swift_params_ref(params, _api_=None): 
     """swift_params_ref(params)
@@ -57,7 +66,7 @@ def swift_params_set_val(params, name, val, _api_=None):
 #~ line: 119, skipped: 30 ~~~~~~
 
 # typedef swift_params_iterator
-swift_params_iterator = POINTER(CFUNCTYPE(swift_result_t, POINTER(swift_params), c_char_p, POINTER(swift_val), c_void_p))
+swift_params_iterator = CFUNCTYPE(swift_result_t, POINTER(swift_params), c_char_p, POINTER(swift_val), c_void_p)
 
 #~ line: 139, skipped: 20 ~~~~~~
 
@@ -125,6 +134,27 @@ def swift_params_get_float(params, name, def_, _api_=None):
     
 
 #~ line: 238, skipped: 34 ~~~~~~
+
+class swift_param_type_t(c_int):
+    SWIFT_PARAM_NONE = -1  #< Invalid parameter. 
+    SWIFT_PARAM_FLAG = 0   #< True or false (1/0). 
+    SWIFT_PARAM_INT = 1    # Integer value. 
+    SWIFT_PARAM_FLOAT = 2  #< Floating point value. 
+    SWIFT_PARAM_STRING = 3 #< String value. 
+    SWIFT_PARAM_ENUM = 4   #< Enumerated value. 
+
+class swift_param_desc(Structure):
+    _fields_ = [
+        ('name', c_char_p),
+        ('help', c_char_p),
+        ('type', swift_param_type_t),
+        ('nEnum', c_int),
+        ('enumValues', POINTER(c_char_p)),
+        ('reserved', c_void_p*3)]
+
+swift_param_descriptors = bindExport('swift_param_descriptors', POINTER(swift_param_desc))
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @bind(c_int, [c_char_p, POINTER(swift_val)])
 def swift_param_validate(name, val, _api_=None): 

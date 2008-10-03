@@ -66,3 +66,7 @@ def bind(restype, argtypes, errcheck=None):
         return result
     return bindFuncTypes
 
+def bindExport(exportName, asType=c_void_p):
+    value = getattr(cepstralLib, exportName)
+    return cast(value, asType)
+

@@ -75,16 +75,24 @@ class CepstralPort(CepstralObject, KVObject):
     #~ Voices
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def getVoiceList(self, search, order): 
-        voiceParamList = self._getVoiceListRaw(search, order)
-        return [CepstralVoice.from_param(voice_param) 
-                    for voice_param in voiceParamList]
+    def getVoiceList(self, search=None, order=None): 
+        return self._getVoiceListRaw(search, order)
+    voiceList = property(getVoiceList)
 
-    def _getVoiceListRaw(self, search, order):
+    def getLicensedVoiceList(self, search=None, order=None):
+        return self._getVoiceListRaw(search, order, 
+                        lambda v: v.isLicensed())
+    licensedVoiceList = property(getLicensedVoiceList)
+
+    def _getVoiceListRaw(self, search, order, accept=None):
+        if accept is None:
+            accept = lambda voice: True
         result = []
         voice_param = _swift.swift_port_find_first_voice(self, search, order)
         while voice_param:
-            result.append(voice_param)
+            voice = CepstralVoice.from_param(voice_param)
+            if accept(voice):
+                result.append(voice)
             voice_param = _swift.swift_port_find_next_voice(self)
         return result
 
@@ -98,15 +106,26 @@ class CepstralPort(CepstralObject, KVObject):
         return voice
     def setVoice(self, voice):
         if isinstance(voice, basestring):
-            _swift.swift_port_set_voice_by_name(voice)
-            self._voice = None
+            return self.setVoiceName(voice)
 
         _swift.swift_port_set_voice(self, voice)
         self._voice = voice
         self.kvpub('voice')
     voice = property(getVoice, setVoice)
 
+    def setLicensedVoice(self, voice=None):
+        if voice is None or not voice.isLicensed():
+            for voice in self.getLicensedVoiceList():
+                break
+
+        if voice is not None:
+            self.setVoice(voice)
+            return True
+        else: return False
+
     def setVoiceName(self, voiceName):
+        if not isinstance(voice, basestring):
+            raise TypeError("Expected a string voice name, not %s" % (type(voiceName),))
         _swift.swift_port_set_voice_by_name(self, voiceName)
         self._voice = None
         self.kvpub('voice')
