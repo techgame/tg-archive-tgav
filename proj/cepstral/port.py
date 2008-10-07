@@ -124,7 +124,7 @@ class CepstralPort(CepstralObject, KVObject):
         else: return False
 
     def setVoiceName(self, voiceName):
-        if not isinstance(voice, basestring):
+        if not isinstance(voiceName, basestring):
             raise TypeError("Expected a string voice name, not %s" % (type(voiceName),))
         _swift.swift_port_set_voice_by_name(self, voiceName)
         self._voice = None
