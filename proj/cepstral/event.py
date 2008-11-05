@@ -10,7 +10,7 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from ctypes import byref, c_float, c_int, c_char_p
+from ctypes import byref, c_float, c_int, c_char_p, c_void_p
 from .base import CepstralObject, _swift, CepstralError
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -55,7 +55,9 @@ class CepstralEvent(CepstralObject):
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def getContext(self):
-        _swift.swift_event_get_context(self, port, async)
+        async = c_void_p(0)
+        _swift.swift_event_get_context(self, self.port, byref(async))
+        return async
     context = property(getContext)
 
     def getTimes(self):

@@ -10,7 +10,7 @@
 #~ Imports 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from ctypes import byref, c_void_p
+from ctypes import byref, c_void_p, c_ulong
 
 from TG.kvObserving import KVObject
 
@@ -26,12 +26,11 @@ from .event import CepstralEvent
 class CepstralPort(CepstralObject, KVObject):
     _closeFromParam = staticmethod(_swift.swift_port_close)
     def __init__(self, engine=None, async=True, **kw):
+        self.initAsync(async)
         if engine is None:
             engine = CepstralEngine()
             engine.voiceRententionPolicy = 'port'
         self.engine = engine
-
-        self.async = async
 
         if engine is not None:
             self.open(engine, **kw)
@@ -146,8 +145,7 @@ class CepstralPort(CepstralObject, KVObject):
                 if isinstance(k,  int)])
 
     def status_id(self, async=None):
-        if async is None: 
-            async = self.async
+        async = self._asyncAsParam(async)
         return _swift.swift_port_status(self, async)
     def status_val(self, async=None):
         return self.status_id(async).value
@@ -159,8 +157,7 @@ class CepstralPort(CepstralObject, KVObject):
         return self.status() == 'running'
 
     def wait(self, async=None):
-        if async is None: 
-            async = self.async
+        async = self._asyncAsParam(async)
         if self.status_val() > 0:
             try:
                 _swift.swift_port_wait(self, async)
@@ -169,8 +166,7 @@ class CepstralPort(CepstralObject, KVObject):
             else: 
                 return True
     def stop(self, async=None, place=-1):
-        if async is None: 
-            async = self.async
+        async = self._asyncAsParam(async)
         if self.status_val() > 0:
             try: 
                 _swift.swift_port_stop(self, async, place)
@@ -179,8 +175,7 @@ class CepstralPort(CepstralObject, KVObject):
             else: 
                 return True
     def pause(self, async=None, place=-1):
-        if async is None: 
-            async = self.async
+        async = self._asyncAsParam(async)
         if self.status_val() > 0:
             try:
                 _swift.swift_port_pause(self, async, place)
@@ -197,22 +192,32 @@ class CepstralPort(CepstralObject, KVObject):
     #~ Async Config
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    _async = None
+    _asyncHandle = None
+    def initAsync(self, async=True):
+        self._asyncHandle = c_void_p(0)
+        self.setAsync(async)
     def getAsync(self):
         return self._async
     def setAsync(self, async):
-        if async:
-            self._async = c_void_p(int(async))
-        else: self._async = None
+        self._async = async
     async = property(getAsync, setAsync)
+
+    def _asyncAsParam(self, async=None, asByref=False):
+        if async is None:
+            async = self.async
+
+        if async:
+            handle = self._asyncHandle
+            if asByref:
+                handle = byref(handle)
+            return handle
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     #~ Speak methods
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def speak(self, text, encoding=None, isfile=False, async=None, params=None):
-        if async is None: 
-            async = self.async
+        async = self._asyncAsParam(async, True)
         if isfile:
             _swift.swift_port_speak_file(self, text, encoding, async, params)
             return 
@@ -250,8 +255,7 @@ class CepstralPort(CepstralObject, KVObject):
         return CepstralWaveform.from_param(waveform_param)
 
     def playWave(self, wave, async=None, params=None):
-        if async is None: 
-            async = self.async
+        async = self._asyncAsParam(async, True)
         _swift.swift_port_play_wave(self, wave, async, params)
         return self
 
@@ -267,7 +271,7 @@ class CepstralPort(CepstralObject, KVObject):
         self._fn_cb = fn_cb
         _swift.swift_port_set_callback(self, fn_cb, mask, 32)
 
-    def _onSynthesisEvent(self, evt_param, evtKind, user):
+    def _onSynthesisEvent(self, evt_param, evtKind, userData):
         if CepstralEvent is None: 
             return 0
         evt = CepstralEvent.fromEvent(evt_param, evtKind, self)
