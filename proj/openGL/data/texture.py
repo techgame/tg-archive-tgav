@@ -536,7 +536,7 @@ class Texture(object):
                 setattr(self, n, v)
             except glErrors.GLError, glerr:
                 if glerr.error == 0x500:
-                    print >> sys.stderr, '%s: %s for name: %r value: %r' % (glerr.__class__.__name__, glerr, n, v)
+                    print >> sys.stdout, '%s: %s for name: %r value: %r' % (glerr.__class__.__name__, glerr, n, v)
 
     def release(self):
         if self.texture_id is None:
