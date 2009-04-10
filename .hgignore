@@ -13,6 +13,7 @@ syntax: glob
 *.m4b
 *.mov
 *.wav
+*.dll
 
 syntax: regexp
 ^gen/.*/build/.*
