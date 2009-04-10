@@ -11,6 +11,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 from TG.openAL._properties import *
+from TG.openAL.constants import alFormatMap
 from TG.openAL.raw import al, alc, alut
 from TG.openAL.raw.errors import ALException
 
@@ -158,6 +159,7 @@ class Buffer(ALIDContextObject):
 
     def setDataRaw(self, data, size, format, frequency):
         format = format or self.format
+        format = alFormatMap.get(format, format)
         frequency = frequency or self.frequency
         al.alBufferData(self, format, data, size, frequency)
         return self
@@ -268,6 +270,7 @@ class Buffer(ALIDContextObject):
 
     def loadPCMData(self, format, pcmData, size, frequency):
         if not isinstance(format, al.ALenum):
+            format = alFormatMap.get(format, format)
             format = al.ALenum(format)
         if not isinstance(size, al.ALsizei):
             size = al.ALsizei(size)
